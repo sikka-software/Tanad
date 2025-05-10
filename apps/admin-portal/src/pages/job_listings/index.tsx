@@ -102,7 +102,7 @@ export default function JobListingsPage() {
   return (
     <div>
       <CustomPageMeta title={t("JobListings.title")} description={t("JobListings.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={jobListings?.length} itemsText={t("Pages.JobListings.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -115,13 +115,12 @@ export default function JobListingsPage() {
             store={useJobListingsStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("JobListings.title")}
+            title={t("Pages.JobListings.title")}
             onAddClick={
               canCreateJobListings ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("JobListings.create_listing")}
-            searchPlaceholder={t("JobListings.search_listings")}
-            count={jobListings?.length}
+            createLabel={t("Pages.JobListings.add")}
+            searchPlaceholder={t("Pages.JobListings.search")}
             hideOptions={jobListings?.length === 0}
           />
         )}
@@ -140,7 +139,7 @@ export default function JobListingsPage() {
                 data={sortedListings as JobListingWithJobs[]}
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
-                emptyMessage={t("JobListings.no_listings_found")}
+                emptyMessage={t("Pages.JobListings.no_listings_found")}
                 renderItem={(listing: JobListingWithJobs) => (
                   <JobListingCard key={listing.id} jobListing={listing} />
                 )}
@@ -153,7 +152,7 @@ export default function JobListingsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("JobListings.edit_listing")}
+          title={actionableJobListing ? t("Pages.JobListings.edit") : t("Pages.JobListings.add")}
           formId="job-listing-form"
           loadingSave={loadingSaveJobListing}
         >
@@ -185,7 +184,7 @@ export default function JobListingsPage() {
   );
 }
 
-JobListingsPage.messages = ["Pages", "JobListings", "General"];
+JobListingsPage.messages = ["Notes", "Pages", "JobListings", "Settings", "Jobs", "General"];
 
 export const getStaticProps = async ({ locale }: { locale: string }) => {
   return {

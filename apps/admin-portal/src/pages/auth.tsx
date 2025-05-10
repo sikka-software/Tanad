@@ -1,6 +1,6 @@
 import { pick } from "lodash";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -214,7 +214,7 @@ export default function Auth() {
           src={logoSrc}
         />
         <div className="text-muted-foreground w-full pt-4 text-center text-sm md:text-start xl:whitespace-nowrap">
-          {t("Landing.footer.tagline")}
+          {t("General.tagline")}
         </div>
       </div>
       {isForgotPassword ? (
@@ -388,7 +388,7 @@ export default function Auth() {
 
 Auth.messages = ["Pages", "Auth", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Auth.messages),

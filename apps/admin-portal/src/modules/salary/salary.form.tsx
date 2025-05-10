@@ -154,7 +154,7 @@ export function SalaryForm({
       const created_at = defaultValues?.created_at || undefined;
       const currency = defaultValues?.currency || undefined;
       const payment_date = data.payment_date;
-      const notes = data.notes?.trim() || undefined;
+      const notes = data.notes || undefined;
 
       const payload = {
         amount,
@@ -214,7 +214,7 @@ export function SalaryForm({
                   <FormLabel>{t("Salaries.form.employee_name.label")} *</FormLabel>
                   <FormControl>
                     <ComboboxAdd
-                      direction={locale === "ar" ? "rtl" : "ltr"}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
                       data={employeeOptions}
                       isLoading={employeesLoading}
                       defaultValue={field.value}
@@ -240,10 +240,10 @@ export function SalaryForm({
                       }}
                       texts={{
                         placeholder: t("Salaries.form.employee_name.placeholder"),
-                        searchPlaceholder: t("Employees.search_employees"),
+                        searchPlaceholder: t("Pages.Employees.search"),
                         noItems: t("Salaries.form.employee_name.no_employees"),
                       }}
-                      addText={t("Employees.add_new")}
+                      addText={t("Pages.Employees.add")}
                       onAddClick={() => setIsEmployeeDialogOpen(true)}
                     />
                   </FormControl>
@@ -481,19 +481,24 @@ export function SalaryForm({
               </div>
             </div>
           </div>
-          <NotesSection control={form.control} title={t("Salaries.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode}
+            control={form.control}
+            title={t("Salaries.form.notes.label")}
+          />
         </form>
       </Form>
 
       <FormDialog
         open={isEmployeeDialogOpen}
         onOpenChange={setIsEmployeeDialogOpen}
-        title={t("Employees.add_new")}
+        title={t("Pages.Employees.add")}
         formId="employee-form"
         loadingSave={isEmployeeSaving}
         dummyData={() => process.env.NODE_ENV === "development" && generateDummyEmployee()}
       >
         <EmployeeForm
+          nestedForm
           formHtmlId="employee-form"
           onSuccess={() => {
             setIsEmployeeSaving(false);

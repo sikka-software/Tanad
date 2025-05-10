@@ -30,10 +30,10 @@ const FormSectionHeader = ({
     <div
       className={cn(
         inDialog ? "top-0" : "top-12",
-        "sticky z-10 flex !min-h-12 w-full flex-col items-center justify-between",
+        "sticky z-10 flex !min-h-12 w-full flex-col items-center justify-start",
       )}
     >
-      <div className="bg-muted sticky top-12 z-10 flex !min-h-12 w-full items-center justify-between gap-4 border-y px-2">
+      <div className="bg-muted flex !min-h-12 w-full items-center justify-between gap-4 border-y px-2">
         <div className="flex flex-col">
           <div className="flex flex-row items-center gap-2">
             <h2 className="ms-2 text-xl font-bold">{title}</h2>

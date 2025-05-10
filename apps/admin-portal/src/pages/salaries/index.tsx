@@ -1,5 +1,9 @@
+import { FormSheet } from "@root/src/components/ui/form-sheet";
+import { BranchForm } from "@root/src/modules/branch/branch.form";
+import { Branch } from "@root/src/modules/branch/branch.type";
+import { SalaryForm } from "@root/src/modules/salary/salary.form";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -35,6 +39,8 @@ export default function SalariesPage() {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableSalary, setActionableSalary] = useState<Salary | null>(null);
 
+  const loadingSaveSalary = useSalaryStore((state) => state.isLoading);
+  const setLoadingSaveSalary = useSalaryStore((state) => state.setIsLoading);
   const viewMode = useSalaryStore((state) => state.viewMode);
   const isDeleteDialogOpen = useSalaryStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useSalaryStore((state) => state.setIsDeleteDialogOpen);
@@ -51,9 +57,9 @@ export default function SalariesPage() {
   const getSortedSalaries = useSalaryStore((state) => state.getSortedData);
 
   const { data: salaries, isLoading, error } = useSalaries();
+  const { mutate: duplicateSalary } = useDuplicateSalary();
   const { mutateAsync: deleteSalaries, isPending: isDeleting } = useBulkDeleteSalaries();
   const { createDeleteHandler } = useDeleteHandler();
-  const { mutate: duplicateSalary } = useDuplicateSalary();
 
   const { handleAction: onActionClicked } = useDataTableActions({
     data: salaries,
@@ -89,8 +95,11 @@ export default function SalariesPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Salaries.title")} description={t("Salaries.description")} />
-      <DataPageLayout>
+      <CustomPageMeta
+        title={t("Pages.Salaries.title")}
+        description={t("Pages.Salaries.description")}
+      />
+      <DataPageLayout count={salaries?.length} itemsText={t("Pages.Salaries.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -103,11 +112,10 @@ export default function SalariesPage() {
             store={useSalaryStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Salaries.title")}
+            title={t("Pages.Salaries.title")}
             onAddClick={canCreateSalaries ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Salaries.create_salary")}
-            searchPlaceholder={t("Salaries.search_salaries")}
-            count={salaries?.length}
+            createLabel={t("Pages.Salaries.create")}
+            searchPlaceholder={t("Pages.Salaries.search")}
             hideOptions={salaries?.length === 0}
           />
         )}
@@ -133,6 +141,25 @@ export default function SalariesPage() {
           )}
         </div>
 
+        <FormSheet
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Pages.Salaries.edit")}
+          formId="salary-form"
+          loadingSave={loadingSaveSalary}
+        >
+          <SalaryForm
+            formHtmlId={"salary-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableSalary(null);
+              setLoadingSaveSalary(false);
+            }}
+            defaultValues={actionableSalary as Salary}
+            editMode={true}
+          />
+        </FormSheet>
+
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
@@ -146,9 +173,9 @@ export default function SalariesPage() {
   );
 }
 
-SalariesPage.messages = ["Pages", "Salaries", "General"];
+SalariesPage.messages = ["Notes", "Pages", "Salaries", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

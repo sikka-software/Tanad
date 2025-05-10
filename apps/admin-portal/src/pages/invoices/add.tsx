@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps, GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -31,15 +31,15 @@ export default function AddInvoicePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Invoices.add_new")} />
+      <CustomPageMeta title={t("Pages.Invoices.add")} />
       <PageTitle
         formButtons
         formId="invoice-form"
         loading={isLoading}
         onCancel={() => router.push("/invoices")}
         texts={{
-          title: t("Invoices.add_new"),
-          submit_form: t("Invoices.add_new"),
+          title: t("Pages.Invoices.add"),
+          submit_form: t("Pages.Invoices.add"),
           cancel: t("General.cancel"),
         }}
       />
@@ -49,9 +49,9 @@ export default function AddInvoicePage() {
   );
 }
 
-AddInvoicePage.messages = ["Pages", "Invoices", "General"];
+AddInvoicePage.messages = ["Notes", "Pages", "Invoices", "ProductsFormSection", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

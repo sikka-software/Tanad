@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import DigitsInput from "@/ui/digits-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 
@@ -248,24 +249,25 @@ export function CarForm({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="vin"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Cars.form.vin.label")}</FormLabel>
-                  <FormControl>
-                    <Input
+          </div>
+          <FormField
+            control={form.control}
+            name="vin"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Cars.form.vin.label")}</FormLabel>
+                <FormControl>
+                  <DigitsInput disabled={isLoading} {...field} />
+                  {/* <Input
                       placeholder={t("Cars.form.vin.placeholder")}
                       disabled={isLoading}
                       {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                    /> */}
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}

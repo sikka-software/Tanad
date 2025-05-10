@@ -5,10 +5,18 @@ import { NotesEditor } from "../blocks/editor-x/notes-editor";
 import { FormControl, FormField, FormItem, FormMessage } from "../ui/form";
 import FormSectionHeader from "./form-section-header";
 
-const NotesSection = ({ control, title }: { control: Control<any>; title: string }) => {
+const NotesSection = ({
+  control,
+  title,
+  inDialog,
+}: {
+  control: Control<any>;
+  title: string;
+  inDialog?: boolean;
+}) => {
   return (
     <div>
-      <FormSectionHeader title={title} />
+      <FormSectionHeader inDialog={inDialog} title={title} />
       <div className="form-container">
         <FormField
           control={control}

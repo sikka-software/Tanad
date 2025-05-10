@@ -54,7 +54,7 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
         const salary = row.original;
         return (
           <ComboboxAdd
-            direction={locale === "ar" ? "rtl" : "ltr"}
+            dir={locale === "ar" ? "rtl" : "ltr"}
             inCell
             data={employeeOptions}
             isLoading={employeesLoading}
@@ -71,10 +71,10 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
             }}
             texts={{
               placeholder: ". . .",
-              searchPlaceholder: t("Employees.search_employees"),
+              searchPlaceholder: t("Pages.Employees.search"),
               noItems: t("Salaries.form.employee_name.no_employees"),
             }}
-            addText={t("Employees.add_new")}
+            addText={t("Pages.Employees.add")}
             ariaInvalid={false}
           />
         );
@@ -170,6 +170,7 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditSalary}
       canDuplicateAction={canDuplicateSalary}
       canViewAction={canViewSalary}

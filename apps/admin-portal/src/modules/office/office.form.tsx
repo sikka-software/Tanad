@@ -15,6 +15,7 @@ import { Input } from "@/ui/input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
+import BooleanTabs from "@/components/ui/boolean-tabs";
 import CodeInput from "@/components/ui/code-input";
 import PhoneInput from "@/components/ui/phone-input";
 
@@ -33,11 +34,15 @@ const createOfficeSchema = (t: (key: string) => string) => {
   const baseOfficeSchema = z.object({
     name: z.string().min(1, t("Offices.form.name.required")),
     code: z.string().optional().or(z.literal("")),
-    email: z.string().email().optional().or(z.literal("")),
+    email: z
+      .string()
+      .email({ message: t("Offices.form.email.invalid") })
+      .optional()
+      .or(z.literal("")),
     phone: z.string().optional().or(z.literal("")),
     manager: z
       .string({ invalid_type_error: t("Offices.form.manager.invalid_uuid") })
-      .uuid({ message: t("Offices.form.manager.invalid_uuid") })
+      // .uuid({ message: t("Offices.form.manager.invalid_uuid") })
       .optional()
       .nullable(),
     status: z.enum(["active", "inactive"], {
@@ -58,6 +63,7 @@ export function OfficeForm({
   onSuccess,
   defaultValues,
   editMode,
+  nestedForm,
 }: ModuleFormProps<OfficeCreateData | OfficeUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
@@ -124,6 +130,7 @@ export function OfficeForm({
               region: data.region?.trim() || undefined,
               country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
+              status: data.status,
               notes: data.notes,
             },
           },
@@ -154,7 +161,7 @@ export function OfficeForm({
             country: data.country?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
             enterprise_id: membership.enterprise_id,
-            status: "active",
+            status: data.status,
             user_id: user.id,
             notes: data.notes,
           },
@@ -188,7 +195,7 @@ export function OfficeForm({
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="name"
@@ -243,7 +250,7 @@ export function OfficeForm({
                 )}
               />
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="email"
@@ -284,7 +291,7 @@ export function OfficeForm({
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="manager"
@@ -293,7 +300,7 @@ export function OfficeForm({
                     <FormLabel>{t("Offices.form.manager.label")}</FormLabel>
                     <FormControl>
                       <ComboboxAdd
-                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={employeeOptions}
                         isLoading={employeesLoading}
                         defaultValue={field.value || ""}
@@ -302,10 +309,10 @@ export function OfficeForm({
                         }}
                         texts={{
                           placeholder: t("Offices.form.manager.placeholder"),
-                          searchPlaceholder: t("Employees.search_employees"),
-                          noItems: t("Offices.form.manager.no_employees"),
+                          searchPlaceholder: t("Pages.Employees.search"),
+                          noItems: t("Pages.Employees.no_employees_found"),
                         }}
-                        addText={t("Employees.add_new")}
+                        addText={t("Pages.Employees.add")}
                         onAddClick={() => setIsEmployeeFormDialogOpen(true)}
                         ariaInvalid={!!form.formState.errors.manager}
                       />
@@ -321,8 +328,17 @@ export function OfficeForm({
                   <FormItem>
                     <FormLabel>{t("Offices.form.status.label")}</FormLabel>
                     <FormControl>
-                      <CommandSelect
-                        direction={locale === "ar" ? "rtl" : "ltr"}
+                      <BooleanTabs
+                        trueText={t("Offices.form.status.active")}
+                        falseText={t("Offices.form.status.inactive")}
+                        value={field.value === "active"}
+                        onValueChange={(newValue) => {
+                          field.onChange(newValue ? "active" : "inactive");
+                        }}
+                        listClassName="w-full"
+                      />
+                      {/* <CommandSelect
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={[
                           { label: t("Offices.form.status.active"), value: "active" },
                           { label: t("Offices.form.status.inactive"), value: "inactive" },
@@ -339,7 +355,7 @@ export function OfficeForm({
                           return <div>{item.label}</div>;
                         }}
                         ariaInvalid={!!form.formState.errors.status}
-                      />
+                      /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -348,21 +364,28 @@ export function OfficeForm({
             </div>
           </div>
           <AddressFormSection
+            dir={locale === "ar" ? "rtl" : "ltr"}
+            inDialog={editMode || nestedForm}
             title={t("Offices.form.address.label")}
             control={form.control}
             isLoading={isLoading}
           />
-          <NotesSection control={form.control} title={t("Offices.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode || nestedForm}
+            control={form.control}
+            title={t("Offices.form.notes.label")}
+          />
         </form>
       </Form>
       <FormDialog
         open={isEmployeeFormDialogOpen}
         onOpenChange={setIsEmployeeFormDialogOpen}
-        title={t("Employees.add_new")}
+        title={t("Pages.Employees.add")}
         formId="employee-form"
         loadingSave={isEmployeeSaving}
       >
         <EmployeeForm
+          nestedForm
           formHtmlId="employee-form"
           onSuccess={() => {
             setIsEmployeeSaving(false);

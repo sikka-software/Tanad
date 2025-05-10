@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 
@@ -41,7 +41,7 @@ const ActivityPage = () => {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "activity_log" },
         (payload) => {
-          console.log("New activity log received:", payload.new);
+          // console.log("New activity log received:", payload.new);
           // Invalidate the query to refetch activity logs
           queryClient.invalidateQueries({ queryKey: activityLogKeys.lists() });
         },
@@ -76,7 +76,7 @@ export default ActivityPage;
 
 ActivityPage.messages = ["Pages", "General", "ActivityLogs"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, ActivityPage.messages),

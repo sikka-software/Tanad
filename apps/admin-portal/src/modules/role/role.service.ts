@@ -7,7 +7,7 @@ import { createClient } from "@/utils/supabase/component";
 import type { Role, RoleCreateData, RoleUpdateData } from "./role.type";
 
 export async function fetchRoles(): Promise<Role[]> {
-  console.log("Service: Calling /api/roles/list...");
+  // console.log("Service: Calling /api/roles/list...");
 
   try {
     const response = await fetch("/api/roles/list", {

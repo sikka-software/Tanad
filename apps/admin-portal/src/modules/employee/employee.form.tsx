@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import NotesSection from "@root/src/components/forms/notes-section";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@root/src/components/ui/tooltip";
 import { getNotesValue } from "@root/src/lib/utils";
 import { PlusCircle, Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -9,6 +11,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { ComboboxAdd } from "@/ui/combobox-add";
+import CountryInput from "@/ui/country-input";
 import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
@@ -33,6 +36,9 @@ import type { EmployeeCreateData, EmployeeUpdateData } from "@/employee/employee
 
 import useUserStore from "@/stores/use-user-store";
 
+import { JobForm } from "../job/job.form";
+import { useJobs } from "../job/job.hooks";
+import useJobStore from "../job/job.store";
 import { useCreateEmployee } from "./employee.hooks";
 import { useUpdateEmployee } from "./employee.hooks";
 
@@ -51,14 +57,20 @@ export function EmployeeForm({
   onSuccess,
   defaultValues,
   editMode,
+  nestedForm,
 }: ModuleFormProps<EmployeeUpdateData | EmployeeCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
 
-  const isDepartmentSaving = useDepartmentStore((state) => state.isLoading);
-  const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
+  const isDepartmentSaving = useDepartmentStore((state) => state.isLoading);
+  const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
+
+  const [isJobDialogOpen, setIsJobDialogOpen] = useState(false);
+  const { data: jobs, isLoading: jobsLoading } = useJobs();
+  const isJobSaving = useJobStore((state) => state.isLoading);
+  const setIsJobSaving = useJobStore((state) => state.setIsLoading);
 
   const { mutateAsync: updateEmployeeMutate, isPending: isUpdatingEmployee } = useUpdateEmployee();
   const { mutateAsync: createEmployeeMutate, isPending: isCreatingEmployee } = useCreateEmployee();
@@ -109,13 +121,13 @@ export function EmployeeForm({
           return count === 0;
         }, t("Employees.form.email.duplicate")),
       phone: z.string().optional(),
-      position: z.string().min(1, t("Employees.form.position.required")),
-      department: z.string().nullable(),
+      job_id: z.string().min(1, t("Employees.form.job.required")),
       hire_date: z.date({
         required_error: t("Employees.form.hire_date.required"),
       }),
       salary: z.array(salaryComponentSchema).optional(),
       status: z.enum(["active", "inactive", "on_leave", "terminated"]),
+      nationality: z.string().optional(),
       notes: z.any().optional().nullable(),
     });
   };
@@ -127,8 +139,7 @@ export function EmployeeForm({
       last_name: defaultValues?.last_name || "",
       email: defaultValues?.email || "",
       phone: defaultValues?.phone ?? "",
-      position: defaultValues?.position || "",
-      department: defaultValues?.department_id || null,
+      job_id: defaultValues?.job_id || "",
       hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
       salary: defaultValues?.salary as { type: string; amount: number }[] | undefined,
       status: (["active", "inactive", "on_leave", "terminated"].includes(
@@ -137,6 +148,7 @@ export function EmployeeForm({
         ? defaultValues?.status
         : "active") as "active" | "inactive" | "on_leave" | "terminated",
       notes: getNotesValue(defaultValues) || "",
+      nationality: defaultValues?.nationality || "",
     },
   });
 
@@ -152,11 +164,12 @@ export function EmployeeForm({
         ...defaultValues,
         status: mappedStatus as "active" | "inactive" | "on_leave" | "terminated",
         hire_date: defaultValues.hire_date ? new Date(defaultValues.hire_date) : undefined,
-        position: defaultValues.position || "",
+        job_id: defaultValues.job_id || "",
         phone: defaultValues.phone || "",
         salary:
           (defaultValues.salary as { type: string; amount: number }[] | undefined) || undefined,
         notes: getNotesValue(defaultValues) || "",
+        nationality: defaultValues.nationality || "",
       });
     } else {
       // Optionally reset to empty if defaultValues becomes null (e.g., switching modes)
@@ -173,25 +186,19 @@ export function EmployeeForm({
   const totalSalary =
     salaryComponents?.reduce((sum, comp) => sum + (Number(comp.amount) || 0), 0) || 0;
 
-  const departmentOptions =
-    departments?.map((department) => ({
-      label: department.name,
-      value: department.id,
-    })) || [];
-
   const handleSubmit = async (data: z.input<ReturnType<typeof createEmployeeFormSchema>>) => {
     setIsEmployeeSaving(true);
     // Log dirtyFields for debugging
-    console.log("Form dirtyFields:", form.formState.dirtyFields);
-    console.log("Form isDirty:", form.formState.isDirty);
+    // console.log("Form dirtyFields:", form.formState.dirtyFields);
+    // console.log("Form isDirty:", form.formState.isDirty);
 
     // Explicitly check if any field has been marked as dirty
     const isActuallyDirty = Object.keys(form.formState.dirtyFields).length > 0;
-    console.log("Is Actually Dirty (based on dirtyFields object):", isActuallyDirty);
+    // console.log("Is Actually Dirty (based on dirtyFields object):", isActuallyDirty);
 
     // Check if editing and if the form is actually dirty based on the dirtyFields object
     if (editMode && !isActuallyDirty) {
-      console.log("Form not dirty (based on dirtyFields), closing without saving.");
+      // console.log("Form not dirty (based on dirtyFields), closing without saving.");
       // If nothing changed, just close the form without an API call or toast
       onSuccess?.();
       return;
@@ -203,17 +210,15 @@ export function EmployeeForm({
       last_name: data.last_name.trim(),
       email: data.email.trim(),
       phone: data.phone?.trim() || undefined,
-      position: data.position.trim(),
       hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
-      notes: data.notes?.trim() || undefined,
-      department_id: data.department || undefined,
+      notes: data.notes,
       salary: (data.salary || []).map((comp) => ({
         ...comp,
         amount: Number(comp.amount) || 0,
       })),
     };
 
-    const { department, ...finalSubmitData } = submitData;
+    const finalSubmitData = submitData;
 
     try {
       if (editMode) {
@@ -243,6 +248,21 @@ export function EmployeeForm({
   if (typeof window !== "undefined") {
     (window as any).employeeForm = form;
   }
+
+  const departmentOptions =
+    departments?.map((department) => ({
+      label: department.name,
+      value: department.id,
+    })) || [];
+
+  const jobOptions =
+    jobs?.map((job) => ({
+      label: job.title,
+      value: job.id,
+      occupied_positions: job.occupied_positions,
+      total_positions: job.total_positions,
+      department: job.department,
+    })) || [];
 
   return (
     <>
@@ -327,42 +347,45 @@ export function EmployeeForm({
 
               <FormField
                 control={form.control}
-                name="position"
+                name="job_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Employees.form.position.label")} *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t("Employees.form.position.placeholder")}
-                        disabled={isEmployeeSaving}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="department"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Employees.form.department.label")}</FormLabel>
+                    <FormLabel>{t("Employees.form.job.label")} *</FormLabel>
                     <FormControl>
                       <ComboboxAdd
-                        data={departmentOptions}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        data={jobOptions}
                         defaultValue={field.value ?? undefined}
                         onChange={field.onChange}
-                        isLoading={departmentsLoading}
+                        isLoading={jobsLoading}
                         disabled={isEmployeeSaving}
                         texts={{
-                          placeholder: t("Employees.form.department.placeholder"),
-                          searchPlaceholder: t("Employees.form.department.searchPlaceholder"),
-                          noItems: t("Employees.form.department.no_departments"),
+                          placeholder: t("Employees.form.job.placeholder"),
+                          searchPlaceholder: t("Pages.Jobs.search"),
+                          noItems: t("Pages.Jobs.no_jobs"),
                         }}
-                        addText={t("Departments.add_new")}
-                        onAddClick={() => setIsDepartmentDialogOpen(true)}
+                        addText={t("Pages.Jobs.add")}
+                        onAddClick={() => setIsJobDialogOpen(true)}
+                        renderOption={(option) => (
+                          <div className="flex flex-row items-center justify-between gap-2">
+                            <div className="flex flex-col">
+                              <span>{option.label}</span>
+                              <span className="text-xs text-gray-500">{option.department}</span>
+                            </div>
+                            <Tooltip delayDuration={500}>
+                              <TooltipTrigger>
+                                <span className="text-xs text-gray-500">
+                                  {option.occupied_positions} / {option.total_positions}
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {t("Jobs.form.occupied_positions.label") +
+                                  " / " +
+                                  t("Jobs.form.total_positions.label")}
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        )}
                       />
                     </FormControl>
                     <FormMessage />
@@ -383,6 +406,31 @@ export function EmployeeForm({
                         onSelect={field.onChange}
                         disabled={isEmployeeSaving}
                         ariaInvalid={form.formState.errors.hire_date !== undefined}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="nationality"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.nationality.label")} *</FormLabel>
+                    <FormControl>
+                      <CountryInput
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        disabled={isEmployeeSaving}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        labelKey={locale === "ar" ? "arabic_label" : "label"}
+                        texts={{
+                          placeholder: t("Employees.form.nationality.placeholder"),
+                          searchPlaceholder: t("Forms.country.search_placeholder"),
+                          noItems: t("Forms.country.no_items"),
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -423,18 +471,14 @@ export function EmployeeForm({
             </div>
           </div>
 
-          <div className="bg-muted sticky top-12 z-10 flex !min-h-12 items-center justify-between gap-4 border-y border-b px-2">
-            <h2 className="ms-2 text-xl font-bold">{t("Employees.salary_section_title")}</h2>
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => append({ type: "", amount: 0 })}
-              disabled={isEmployeeSaving}
-            >
-              <PlusCircle className="me-2 size-4" />
-              {t("Employees.form.salary.add_component")}
-            </Button>
-          </div>
+          <FormSectionHeader
+            title={t("Employees.salary_section_title")}
+            onCreate={() => append({ type: "", amount: 0 })}
+            onCreateText={t("Employees.form.salary.add_component")}
+            onCreateDisabled={isEmployeeSaving}
+            isError={false}
+            inDialog={editMode || nestedForm}
+          />
 
           <div className="form-container">
             <FormLabel>{t("Employees.form.salary.label")}</FormLabel>
@@ -517,14 +561,34 @@ export function EmployeeForm({
             </div>
           </div>
 
-          <NotesSection control={form.control} title={t("Employees.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode || nestedForm}
+            control={form.control}
+            title={t("Employees.form.notes.label")}
+          />
         </form>
       </Form>
 
       <FormDialog
+        open={isJobDialogOpen}
+        onOpenChange={setIsJobDialogOpen}
+        title={t("Pages.Jobs.add")}
+        formId="job-form"
+        cancelText={t("General.cancel")}
+        submitText={t("General.save")}
+        loadingSave={isJobSaving}
+      >
+        <JobForm
+          formHtmlId="job-form"
+          onSuccess={() => {
+            setIsJobDialogOpen(false);
+          }}
+        />
+      </FormDialog>
+      <FormDialog
         open={isDepartmentDialogOpen}
         onOpenChange={setIsDepartmentDialogOpen}
-        title={t("Departments.add_new")}
+        title={t("Pages.Departments.add")}
         formId="department-form"
         cancelText={t("General.cancel")}
         submitText={t("General.save")}

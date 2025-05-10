@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -96,8 +96,11 @@ export default function ServersPage() {
   }
   return (
     <div>
-      <CustomPageMeta title={t("Servers.title")} description={t("Servers.description")} />
-      <DataPageLayout>
+      <CustomPageMeta
+        title={t("Pages.Servers.title")}
+        description={t("Pages.Servers.description")}
+      />
+      <DataPageLayout count={servers?.length} itemsText={t("Pages.Servers.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -110,11 +113,10 @@ export default function ServersPage() {
             store={useServerStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Servers.title")}
+            title={t("Pages.Servers.title")}
             onAddClick={canCreateServers ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Servers.create_new")}
-            searchPlaceholder={t("Servers.search_servers")}
-            count={servers?.length}
+            createLabel={t("Pages.Servers.add")}
+            searchPlaceholder={t("Pages.Servers.search")}
             hideOptions={servers?.length === 0}
           />
         )}
@@ -133,7 +135,7 @@ export default function ServersPage() {
                 data={sortedServers}
                 isLoading={loadingFetchServers}
                 error={error as Error | null}
-                emptyMessage={t("Servers.no_servers_found")}
+                emptyMessage={t("Pages.Servers.no_servers_found")}
                 renderItem={(server) => <ServerCard key={server.id} server={server} />}
                 gridCols="3"
               />
@@ -144,7 +146,7 @@ export default function ServersPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Servers.add_new")}
+          title={actionableServer ? t("Pages.Servers.edit") : t("Pages.Servers.add")}
           formId="server-form"
           loadingSave={loadingSaveServer}
         >
@@ -173,9 +175,9 @@ export default function ServersPage() {
   );
 }
 
-ServersPage.messages = ["Pages", "Servers", "General"];
+ServersPage.messages = ["Notes", "Pages", "Servers", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

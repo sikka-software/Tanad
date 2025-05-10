@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 
 export default function LegalPage() {
   return (
@@ -11,7 +11,7 @@ export default function LegalPage() {
 
 LegalPage.messages = ["Pages", "General", "Legal"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, LegalPage.messages),

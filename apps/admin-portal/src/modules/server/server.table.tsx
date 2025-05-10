@@ -69,6 +69,7 @@ const ServersTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
     { accessorKey: "notes", header: t("Servers.form.notes.label"), validationSchema: notesSchema },
     {
       accessorKey: "status",
+      maxSize: 80,
       cellType: "status",
       options: [
         { label: t("Servers.form.status.active"), value: "active" },
@@ -126,6 +127,7 @@ const ServersTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditServer}
       canDuplicateAction={canDuplicateServer}
       canViewAction={canViewServer}

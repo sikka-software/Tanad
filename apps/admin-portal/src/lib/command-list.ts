@@ -2,7 +2,7 @@ import { ModulesOptions } from "../../tanad.config";
 
 export const commandList = [
   {
-    heading: "Administration.title",
+    heading: "Pages.Administration.title",
     items: [
       {
         icon: ModulesOptions.dashboard.icon,
@@ -43,7 +43,7 @@ export const commandList = [
     ],
   },
   {
-    heading: "Sales.title",
+    heading: "Pages.Sales.title",
     items: [
       {
         icon: ModulesOptions.invoices.icon,
@@ -67,7 +67,7 @@ export const commandList = [
     ],
   },
   {
-    heading: "Locations.title",
+    heading: "Pages.Locations.title",
     items: [
       {
         icon: ModulesOptions.offices.icon,
@@ -90,7 +90,7 @@ export const commandList = [
     ],
   },
   {
-    heading: "HumanResources.title",
+    heading: "Pages.HumanResources.title",
     items: [
       {
         icon: ModulesOptions.employees.icon,
@@ -132,7 +132,7 @@ export const commandList = [
     ],
   },
   {
-    heading: "Internet.title",
+    heading: "Pages.Internet.title",
     items: [
       {
         icon: ModulesOptions.domains.icon,
@@ -162,7 +162,7 @@ export const commandList = [
     ],
   },
   {
-    heading: "Fleet.title",
+    heading: "Pages.Fleet.title",
     items: [
       {
         icon: ModulesOptions.cars.icon,
@@ -180,7 +180,7 @@ export const commandList = [
     ],
   },
   {
-    heading: "Navigation.organization",
+    heading: "Pages.SystemAdmin.title",
     items: [
       {
         icon: ModulesOptions.users.icon,

@@ -1,6 +1,6 @@
 import useDomainStore from "@root/src/modules/domain/domain.store";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -35,15 +35,15 @@ export default function AddDomainPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Domains.add_new")} />
+      <CustomPageMeta title={t("Pages.Domains.add")} />
       <PageTitle
         formButtons
         formId="domain-form"
         loading={isLoading}
         onCancel={() => router.push("/domains")}
         texts={{
-          title: t("Domains.add_new"),
-          submit_form: t("Domains.add_new"),
+          title: t("Pages.Domains.add"),
+          submit_form: t("Pages.Domains.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
@@ -60,9 +60,9 @@ export default function AddDomainPage() {
   );
 }
 
-AddDomainPage.messages = ["Pages", "Domains", "General"];
+AddDomainPage.messages = ["Pages", "Domains", "Notes", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -23,21 +23,28 @@ export default function AddPurchasePage() {
     const dummyData = generateDummyData();
     const form = (window as any).purchaseForm;
     if (form) {
-      form.setValue("purchase_number", dummyData.randomNumber);
+      form.setValue("purchase_number", dummyData.randomString);
+      form.setValue("description", dummyData.randomString);
+      form.setValue("amount", dummyData.randomNumber);
+      form.setValue("category", dummyData.randomString);
+      form.setValue("status", dummyData.randomPicker(["pending", "paid", "overdue", "cancelled"]));
+      form.setValue("issue_date", String(dummyData.randomDate));
+      form.setValue("due_date", String(dummyData.randomDate));
+      form.setValue("incurred_at", String(dummyData.randomDate));
     }
   };
 
   return (
     <div>
-      <CustomPageMeta title={t("Purchases.add_new")} />
+      <CustomPageMeta title={t("Pages.Purchases.add")} />
       <PageTitle
         formButtons
         formId="purchase-form"
         loading={isLoading}
         onCancel={() => router.push("/purchases")}
         texts={{
-          title: t("Purchases.add_new"),
-          submit_form: t("Purchases.add_new"),
+          title: t("Pages.Purchases.add"),
+          submit_form: t("Pages.Purchases.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
@@ -54,9 +61,9 @@ export default function AddPurchasePage() {
   );
 }
 
-AddPurchasePage.messages = ["Pages", "Purchases", "General"];
+AddPurchasePage.messages = ["Notes", "Pages", "Purchases", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

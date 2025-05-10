@@ -51,6 +51,7 @@ export function ClientForm({
   onSuccess,
   defaultValues,
   editMode = false,
+  nestedForm,
 }: ModuleFormProps<ClientCreateData | ClientUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
@@ -118,7 +119,7 @@ export function ClientForm({
               region: data.region?.trim() || null,
               country: data.country?.trim() || null,
               zip_code: data.zip_code?.trim() || null,
-              notes: data.notes?.trim() || null,
+              notes: data.notes,
             },
           },
           {
@@ -143,7 +144,7 @@ export function ClientForm({
             region: data.region?.trim() || null,
             country: data.country?.trim() || null,
             zip_code: data.zip_code?.trim() || null,
-            notes: data.notes?.trim() || null,
+            notes: data.notes,
             additional_number: null,
             user_id: user?.id || "",
             enterprise_id: membership?.enterprise_id || "",
@@ -198,17 +199,17 @@ export function ClientForm({
                     <FormLabel>{t("Clients.form.company.label")}</FormLabel>
                     <FormControl>
                       <ComboboxAdd
-                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={companyOptions}
                         isLoading={companiesLoading}
                         defaultValue={field.value || ""}
                         onChange={(value) => field.onChange(value || null)}
                         texts={{
                           placeholder: t("Clients.form.company.placeholder"),
-                          searchPlaceholder: t("Clients.form.company.search_placeholder"),
+                          searchPlaceholder: t("Pages.Companies.search"),
                           noItems: t("Clients.form.company.no_companies"),
                         }}
-                        addText={t("Companies.add_new")}
+                        addText={t("Pages.Companies.add")}
                         onAddClick={() => setIsCompanyDialogOpen(true)}
                       />
                     </FormControl>
@@ -259,21 +260,31 @@ export function ClientForm({
           </div>
 
           <AddressFormSection
+            dir={locale === "ar" ? "rtl" : "ltr"}
+            inDialog={editMode || nestedForm}
             title={t("Clients.form.address.label")}
             control={form.control}
             isLoading={isLoading}
           />
-          <NotesSection control={form.control} title={t("Clients.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode || nestedForm}
+            control={form.control}
+            title={t("Clients.form.notes.label")}
+          />
         </form>
       </Form>
 
       <FormDialog
         open={isCompanyDialogOpen}
         onOpenChange={setIsCompanyDialogOpen}
-        title={t("Companies.add_new")}
+        title={t("Pages.Companies.add")}
         formId="company-form"
       >
-        <CompanyForm formHtmlId="company-form" onSuccess={() => setIsCompanyDialogOpen(false)} />
+        <CompanyForm
+          nestedForm
+          formHtmlId="company-form"
+          onSuccess={() => setIsCompanyDialogOpen(false)}
+        />
       </FormDialog>
     </>
   );

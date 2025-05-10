@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
 
 // import TOSAr from "@/components/legal/tos-ar.mdx";
@@ -25,7 +25,7 @@ export default function TermsPage() {
 
 TermsPage.messages = ["Pages", "Terms", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, TermsPage.messages),

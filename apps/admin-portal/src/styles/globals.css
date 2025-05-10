@@ -85,7 +85,7 @@ body {
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-md: calc(var(--radius));
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
@@ -186,7 +186,6 @@ body {
   .rounded-inner-4 {
     border-radius: calc(var(--radius) - 1rem); /* 16px */
   }
-  /* You can add more specific utilities here as needed */
 }
 
 @layer base {
@@ -203,7 +202,24 @@ body {
   .form-container {
     @apply mx-auto flex max-w-2xl flex-col gap-4 p-4;
   }
+
+  .form-fields-cols-1 {
+    @apply grid grid-cols-1 items-start gap-4;
+  }
+  .form-fields-cols-2 {
+    @apply grid grid-cols-1 items-start gap-4 md:grid-cols-2;
+  }
+  .form-fields-cols-3 {
+    @apply grid grid-cols-1 items-start gap-4 md:grid-cols-3;
+  }
 }
+
+.tiny-scrollbar {
+  scrollbar-width: thin;
+
+  scrollbar-color: var(--color-border) var(--color-background);
+}
+
 /* Hide arrows from number input */
 
 /* Chrome, Safari, Edge, Opera */

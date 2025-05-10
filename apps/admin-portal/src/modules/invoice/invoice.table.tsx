@@ -48,7 +48,6 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canPreviewInvoice = true;
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-  console.log("data is ", data);
   const columns: ExtendedColumnDef<Invoice>[] = [
     {
       accessorKey: "invoice_number",
@@ -102,6 +101,10 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       accessorKey: "status",
       header: t("Invoices.form.status.label"),
       validationSchema: z.string().min(1, t("Invoices.form.status.required")),
+      cell: ({ row }) => {
+        const status = row.original.status;
+        return <div className="text-sm font-medium">{t(`Invoices.form.status.${status}`)}</div>;
+      },
     },
   ];
 
@@ -159,6 +162,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditInvoice}
       canDuplicateAction={canDuplicateInvoice}
       canViewAction={canViewInvoice}

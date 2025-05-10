@@ -371,6 +371,7 @@ export type Database = {
           enterprise_id: string
           id: string
           name: string
+          notes: Json | null
           status: Database["public"]["Enums"]["common_status"] | null
           updated_at: string | null
           user_id: string
@@ -381,6 +382,7 @@ export type Database = {
           enterprise_id: string
           id?: string
           name: string
+          notes?: Json | null
           status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string | null
           user_id: string
@@ -391,6 +393,7 @@ export type Database = {
           enterprise_id?: string
           id?: string
           name?: string
+          notes?: Json | null
           status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string | null
           user_id?: string
@@ -558,16 +561,16 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string | null
-          department_id: string | null
           email: string
           enterprise_id: string
           first_name: string
           hire_date: string | null
           id: string
+          job_id: string | null
           last_name: string
+          nationality: string | null
           notes: Json | null
           phone: string | null
-          position: string | null
           region: string | null
           salary: Json | null
           short_address: string | null
@@ -584,16 +587,16 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
-          department_id?: string | null
           email: string
           enterprise_id: string
           first_name: string
           hire_date?: string | null
           id?: string
+          job_id?: string | null
           last_name: string
+          nationality?: string | null
           notes?: Json | null
           phone?: string | null
-          position?: string | null
           region?: string | null
           salary?: Json | null
           short_address?: string | null
@@ -610,16 +613,16 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
-          department_id?: string | null
           email?: string
           enterprise_id?: string
           first_name?: string
           hire_date?: string | null
           id?: string
+          job_id?: string | null
           last_name?: string
+          nationality?: string | null
           notes?: Json | null
           phone?: string | null
-          position?: string | null
           region?: string | null
           salary?: Json | null
           short_address?: string | null
@@ -632,10 +635,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "employees_department_id_departments_id_fk"
-            columns: ["department_id"]
+            foreignKeyName: "employees_job_id_jobs_id_fk"
+            columns: ["job_id"]
             isOneToOne: false
-            referencedRelation: "departments"
+            referencedRelation: "jobs"
             referencedColumns: ["id"]
           },
         ]
@@ -967,12 +970,14 @@ export type Database = {
           enterprise_id: string
           id: string
           location: string | null
+          occupied_positions: number
           requirements: string | null
           responsibilities: string | null
           salary: number | null
           start_date: string | null
           status: Database["public"]["Enums"]["common_status"] | null
           title: string
+          total_positions: number
           type: string
           updated_at: string
           user_id: string
@@ -986,12 +991,14 @@ export type Database = {
           enterprise_id: string
           id?: string
           location?: string | null
+          occupied_positions?: number
           requirements?: string | null
           responsibilities?: string | null
           salary?: number | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["common_status"] | null
           title: string
+          total_positions?: number
           type: string
           updated_at?: string
           user_id: string
@@ -1005,12 +1012,14 @@ export type Database = {
           enterprise_id?: string
           id?: string
           location?: string | null
+          occupied_positions?: number
           requirements?: string | null
           responsibilities?: string | null
           salary?: number | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["common_status"] | null
           title?: string
+          total_positions?: number
           type?: string
           updated_at?: string
           user_id?: string
@@ -1444,6 +1453,7 @@ export type Database = {
         Row: {
           client_id: string
           created_at: string | null
+          created_by: string | null
           enterprise_id: string
           expiry_date: string
           id: string
@@ -1460,6 +1470,7 @@ export type Database = {
         Insert: {
           client_id: string
           created_at?: string | null
+          created_by?: string | null
           enterprise_id: string
           expiry_date: string
           id?: string
@@ -1476,6 +1487,7 @@ export type Database = {
         Update: {
           client_id?: string
           created_at?: string | null
+          created_by?: string | null
           enterprise_id?: string
           expiry_date?: string
           id?: string
@@ -1496,6 +1508,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_enterprises"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -1657,6 +1683,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscription_reactivations: {
+        Row: {
+          created_at: string
+          id: string
+          subscription_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          subscription_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          subscription_id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       templates: {
         Row: {

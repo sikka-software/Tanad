@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -94,8 +94,11 @@ export default function ClientsPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Clients.title")} description={t("Clients.description")} />
-      <DataPageLayout>
+      <CustomPageMeta
+        title={t("Pages.Clients.title")}
+        description={t("Pages.Clients.description")}
+      />
+      <DataPageLayout count={clients?.length} itemsText={t("Pages.Clients.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -108,11 +111,10 @@ export default function ClientsPage() {
             store={useClientStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Clients.title")}
+            title={t("Pages.Clients.title")}
             onAddClick={canCreateClients ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Clients.add_new")}
-            searchPlaceholder={t("Clients.search_clients")}
-            count={clients?.length}
+            createLabel={t("Pages.Clients.add")}
+            searchPlaceholder={t("Pages.Clients.search")}
             hideOptions={clients?.length === 0}
           />
         )}
@@ -142,7 +144,7 @@ export default function ClientsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Clients.edit_client")}
+          title={actionableClient ? t("Pages.Clients.edit") : t("Pages.Clients.add")}
           formId="client-form"
           loadingSave={loadingSaveClient}
         >
@@ -152,9 +154,6 @@ export default function ClientsPage() {
               setIsFormDialogOpen(false);
               setActionableClient(null);
               setLoadingSaveClient(false);
-              toast.success(t("General.successful_operation"), {
-                description: t("Clients.success.update"),
-              });
             }}
             defaultValues={actionableClient}
             editMode={true}
@@ -174,9 +173,9 @@ export default function ClientsPage() {
   );
 }
 
-ClientsPage.messages = ["Pages", "Clients", "General"];
+ClientsPage.messages = ["Notes", "Pages", "Clients", "General", "Forms"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

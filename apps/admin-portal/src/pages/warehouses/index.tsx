@@ -1,7 +1,7 @@
 import { FormDialog } from "@root/src/components/ui/form-dialog";
 import { WarehouseForm } from "@root/src/modules/warehouse/warehouse.form";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -98,8 +98,11 @@ export default function WarehousesPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Warehouses.title")} description={t("Warehouses.description")} />
-      <DataPageLayout>
+      <CustomPageMeta
+        title={t("Pages.Warehouses.title")}
+        description={t("Pages.Warehouses.description")}
+      />
+      <DataPageLayout count={warehouses?.length} itemsText={t("Pages.Warehouses.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -112,13 +115,12 @@ export default function WarehousesPage() {
             store={useWarehouseStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Warehouses.title")}
+            title={t("Pages.Warehouses.title")}
             onAddClick={
               canCreateWarehouses ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("Warehouses.create_warehouse")}
-            searchPlaceholder={t("Warehouses.search_warehouses")}
-            count={warehouses?.length}
+            createLabel={t("Pages.Warehouses.create")}
+            searchPlaceholder={t("Pages.Warehouses.search")}
             hideOptions={warehouses?.length === 0}
           />
         )}
@@ -148,7 +150,7 @@ export default function WarehousesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Warehouses.edit_warehouse")}
+          title={actionableWarehouse ? t("Pages.Warehouses.edit") : t("Pages.Warehouses.add")}
           formId="warehouse-form"
           loadingSave={loadingSaveWarehouse}
         >
@@ -177,9 +179,9 @@ export default function WarehousesPage() {
   );
 }
 
-WarehousesPage.messages = ["Pages", "Warehouses", "General"];
+WarehousesPage.messages = ["Notes", "Pages", "Warehouses", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

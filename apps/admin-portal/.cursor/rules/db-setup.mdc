@@ -3,6 +3,9 @@ description:
 globs: 
 alwaysApply: true
 ---
+If you need to make changes to the db, check [schema.ts](mdc:src/db/schema.ts) first.
+if the changes you want to make to the db involve [schema.ts](mdc:src/db/schema.ts) then make the changes to that file and after that run the command `pnpm db:generate` and then if you need to make other changes that don't involve the schema.ts, then run `supabase migration new FILE_NAME` and add the changes to that sql 
+
 - if you want to know what's currently in the db, run use the execute_sql mcp tool with project_id: vcbrjspzfsvzgtjndjat
 - Anytime you want to understand our db schema refer to [schema.ts](mdc:src/db/schema.ts)
 - Anytime you want to make changes to the db run `supabase migration new FILE_NAME`

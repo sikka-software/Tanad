@@ -1,31 +1,20 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Resolver } from "react-hook-form";
+import * as z from "zod";
+
 // UI
 import { Button } from "@/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/ui/form";
 import { Textarea } from "@/ui/textarea";
-// Utils
-import { cn } from "@/lib/utils";
+
 // Types
 import { TextInputType } from "@/lib/types";
+// Utils
+import { cn } from "@/lib/utils";
 
 type ContactFormData = { name: string; email: string; message: string } & {
   [key: string]: string;
@@ -78,25 +67,22 @@ export const ContactForm: React.FC<ContactFormProps> = ({
   ...props
 }) => {
   const customFieldsSchema = z.object({
-    ...customFields?.reduce(
-      (acc: { [key: string]: z.ZodType<any, any> }, curr: CustomField) => {
-        switch (curr.type) {
-          case "text":
-            acc[curr.name] = z.string().optional().default("");
-            break;
-          case "number":
-            acc[curr.name] = z.string().optional().default("");
-            break;
-          case "select":
-            acc[curr.name] = z.string().optional().default("");
-            break;
-          default:
-            break;
-        }
-        return acc;
-      },
-      {}
-    ),
+    ...customFields?.reduce((acc: { [key: string]: z.ZodType<any, any> }, curr: CustomField) => {
+      switch (curr.type) {
+        case "text":
+          acc[curr.name] = z.string().optional().default("");
+          break;
+        case "number":
+          acc[curr.name] = z.string().optional().default("");
+          break;
+        case "select":
+          acc[curr.name] = z.string().optional().default("");
+          break;
+        default:
+          break;
+      }
+      return acc;
+    }, {}),
   });
 
   const contactFormSchema = z.object({
@@ -122,7 +108,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
       acc[curr.name] = "";
       return acc;
     },
-    {}
+    {},
   );
   const MainSchema = contactFormSchema.merge(customFieldsSchema);
 
@@ -148,7 +134,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         form.reset();
       }
     } else {
-      console.log("Form is submitted but onSubmit prop is missing");
+      // console.log("Form is submitted but onSubmit prop is missing");
     }
   };
 
@@ -157,7 +143,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
       className={cn(
         "w-full",
         cardless && "border-none bg-transparent shadow-none drop-shadow-none",
-        classNames?.container
+        classNames?.container,
       )}
       style={cardless ? { boxShadow: "none" } : undefined}
     >
@@ -195,10 +181,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                     <FormItem className="w-full">
                       <FormLabel>{texts?.name.label}</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder={texts?.name.placeholder}
-                          {...field}
-                        />
+                        <Input placeholder={texts?.name.placeholder} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -211,10 +194,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                     <FormItem className="w-full">
                       <FormLabel>{texts?.email.label}</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder={texts?.email.placeholder}
-                          {...field}
-                        />
+                        <Input placeholder={texts?.email.placeholder} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -230,7 +210,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                     <FormLabel>{texts?.message.label}</FormLabel>
                     <FormControl>
                       <Textarea
-                        className="min-h-40 h-ful"
+                        className="h-ful min-h-40"
                         placeholder={texts?.message.placeholder}
                         {...field}
                       />
@@ -240,10 +220,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                 )}
               />
 
-              <Button
-                type="submit"
-                className={cn("w-full", classNames?.submitButton)}
-              >
+              <Button type="submit" className={cn("w-full", classNames?.submitButton)}>
                 {texts?.submit || "Submit"}
               </Button>
             </form>

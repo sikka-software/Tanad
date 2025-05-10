@@ -45,6 +45,9 @@ interface EnterpriseType {
   id: string;
   name: string;
   created_at: string;
+  email: string | null;
+  industry: string | null;
+  size: string | null;
 }
 
 interface MembershipType {
@@ -217,11 +220,11 @@ const useUserStore = create<UserState>((set, get) => ({
             const permissions = permissionsData.map((p) => p.permission_name);
             set({ permissions });
           }
-          console.log("user", session.user);
-          console.log("profile", profileData);
-          console.log("permissions", permissionsData);
-          console.log("membership", membershipData);
-          console.log("enterprise", enterpriseData);
+          // console.log("user", session.user);
+          // console.log("profile", profileData);
+          // console.log("permissions", permissionsData);
+          // console.log("membership", membershipData);
+          // console.log("enterprise", enterpriseData);
         }
       }
 

@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 
 import CustomersSection from "@/ui/customers-section";
@@ -52,7 +52,7 @@ export default function LandingPage() {
 
 LandingPage.messages = ["Pages", "General", "Landing"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, LandingPage.messages),

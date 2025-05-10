@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
@@ -109,8 +109,11 @@ export default function PurchasesPage() {
   }
   return (
     <div>
-      <CustomPageMeta title={t("Purchases.title")} description={t("Purchases.description")} />
-      <DataPageLayout>
+      <CustomPageMeta
+        title={t("Pages.Purchases.title")}
+        description={t("Pages.Purchases.description")}
+      />
+      <DataPageLayout count={purchases?.length} itemsText={t("Pages.Purchases.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -123,13 +126,12 @@ export default function PurchasesPage() {
             store={usePurchaseStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Purchases.title")}
+            title={t("Pages.Purchases.title")}
             onAddClick={
               canCreatePurchases ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("Purchases.create_new")}
-            searchPlaceholder={t("Purchases.search_purchases")}
-            count={displayData?.length}
+            createLabel={t("Pages.Purchases.add")}
+            searchPlaceholder={t("Pages.Purchases.search")}
             hideOptions={displayData?.length === 0}
           />
         )}
@@ -159,7 +161,7 @@ export default function PurchasesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Purchases.add_new")}
+          title={actionablePurchase ? t("Pages.Purchases.edit") : t("Pages.Purchases.add")}
           formId="purchase-form"
           loadingSave={loadingSavePurchase}
         >
@@ -188,9 +190,9 @@ export default function PurchasesPage() {
   );
 }
 
-PurchasesPage.messages = ["Pages", "Purchases", "General"];
+PurchasesPage.messages = ["Notes", "Pages", "Purchases", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -34,7 +34,6 @@ export const useDeleteHandler = () => {
         options.onSuccess?.(data, variables);
       } catch (error) {
         const err = error as any; // Treat as any to access potential JSON properties
-        console.log("error is ", err);
         const errorHandled = options.onError?.(err, variables);
 
         if (!errorHandled) {

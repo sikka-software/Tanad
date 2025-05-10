@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
@@ -106,8 +106,11 @@ export default function WebsitesPage() {
   }
   return (
     <div>
-      <CustomPageMeta title={t("Websites.title")} description={t("Websites.description")} />
-      <DataPageLayout>
+      <CustomPageMeta
+        title={t("Pages.Websites.title")}
+        description={t("Pages.Websites.description")}
+      />
+      <DataPageLayout count={websites?.length} itemsText={t("Pages.Websites.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -120,11 +123,10 @@ export default function WebsitesPage() {
             store={useWebsiteStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Websites.title")}
+            title={t("Pages.Websites.title")}
             onAddClick={canCreateWebsites ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Websites.create_new")}
-            searchPlaceholder={t("Websites.search_websites")}
-            count={displayData?.length}
+            createLabel={t("Pages.Websites.add")}
+            searchPlaceholder={t("Pages.Websites.search")}
             hideOptions={displayData?.length === 0}
           />
         )}
@@ -154,7 +156,7 @@ export default function WebsitesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableWebsite?.id ? t("Websites.edit_title") : t("Websites.add_new")}
+          title={actionableWebsite?.id ? t("Pages.Websites.edit") : t("Pages.Websites.add")}
           formId="website-form"
           loadingSave={loadingSaveWebsite}
         >
@@ -174,10 +176,7 @@ export default function WebsitesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          // handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          handleConfirmDelete={() => {
-            console.log("pretend");
-          }}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Websites.confirm_delete", { count: selectedRows.length })}
           description={t("Websites.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}
@@ -187,9 +186,9 @@ export default function WebsitesPage() {
   );
 }
 
-WebsitesPage.messages = ["Pages", "Websites", "General"];
+WebsitesPage.messages = ["Notes", "Pages", "Websites", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

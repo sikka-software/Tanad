@@ -1,6 +1,6 @@
 import useCarStore from "@root/src/modules/car/car.store";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -38,15 +38,15 @@ export default function AddCarPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Cars.add_new")} />
+      <CustomPageMeta title={t("Pages.Cars.add")} />
       <PageTitle
         formButtons
         formId="car-form"
         loading={isLoading}
         onCancel={() => router.push("/cars")}
         texts={{
-          title: t("Cars.add_new"),
-          submit_form: t("Cars.add_new"),
+          title: t("Pages.Cars.add"),
+          submit_form: t("Pages.Cars.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
@@ -63,9 +63,9 @@ export default function AddCarPage() {
   );
 }
 
-AddCarPage.messages = ["Pages", "Cars", "General"];
+AddCarPage.messages = ["Pages", "Cars", "Notes", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

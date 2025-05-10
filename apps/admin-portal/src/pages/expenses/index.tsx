@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -95,7 +95,7 @@ export default function ExpensesPage() {
   return (
     <div>
       <CustomPageMeta title={t("Expenses.title")} description={t("Expenses.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={expenses?.length} itemsText={t("Pages.Expenses.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -108,11 +108,10 @@ export default function ExpensesPage() {
             store={useExpenseStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Expenses.title")}
+            title={t("Pages.Expenses.title")}
             onAddClick={canCreateExpenses ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Expenses.add_new")}
-            searchPlaceholder={t("Expenses.search_expenses")}
-            count={expenses?.length}
+            createLabel={t("Pages.Expenses.add")}
+            searchPlaceholder={t("Pages.Expenses.search")}
             hideOptions={expenses?.length === 0}
           />
         )}
@@ -131,7 +130,7 @@ export default function ExpensesPage() {
                 data={sortedExpenses}
                 isLoading={loadingFetchExpenses}
                 error={error instanceof Error ? error : null}
-                emptyMessage={t("Expenses.no_expenses_found")}
+                emptyMessage={t("Pages.Expenses.no_expenses_found")}
                 renderItem={(expense) => <ExpenseCard expense={expense} />}
                 gridCols="3"
               />
@@ -142,7 +141,7 @@ export default function ExpensesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Expenses.edit_expense")}
+          title={actionableExpense ? t("Pages.Expenses.edit") : t("Pages.Expenses.add")}
           formId="expense-form"
           loadingSave={loadingSaveExpense}
         >
@@ -174,8 +173,8 @@ export default function ExpensesPage() {
   );
 }
 
-ExpensesPage.messages = ["Pages", "Expenses", "General"];
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+ExpensesPage.messages = ["Notes", "Pages", "Expenses", "Forms", "General"];
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

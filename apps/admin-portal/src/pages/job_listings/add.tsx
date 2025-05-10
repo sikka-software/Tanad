@@ -1,3 +1,4 @@
+import CustomPageMeta from "@root/src/components/landing/CustomPageMeta";
 import { pick } from "lodash";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -15,14 +16,16 @@ export default function AddJobListingPage() {
 
   return (
     <div>
+      <CustomPageMeta title={t("Pages.JobListings.add")} />
+
       <PageTitle
         formButtons
         formId="job-listing-form"
         loading={loading}
         onCancel={() => router.push("/job_listings")}
         texts={{
-          title: t("JobListings.add_new"),
-          submit_form: t("JobListings.add_new"),
+          title: t("Pages.JobListings.add"),
+          submit_form: t("Pages.JobListings.add"),
           cancel: t("General.cancel"),
         }}
       />
@@ -38,7 +41,7 @@ export default function AddJobListingPage() {
   );
 }
 
-AddJobListingPage.messages = ["Pages", "JobListings", "General"];
+AddJobListingPage.messages = ["Notes", "Pages", "JobListings", "Settings", "Jobs", "General"];
 
 export const getStaticProps = async ({ locale }: { locale: string }) => {
   return {

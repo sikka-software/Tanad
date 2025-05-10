@@ -37,7 +37,7 @@ type ComboboxTypes<T> = {
   defaultValue?: string;
   preview?: boolean;
   hideInput?: boolean;
-  direction?: "rtl" | "ltr";
+  dir?: "rtl" | "ltr";
   inputProps?: React.ComponentPropsWithoutRef<typeof CommandInput>;
   //   TODO: fix this
   //   inputProps?: CommandInputProps;
@@ -52,6 +52,7 @@ type ComboboxTypes<T> = {
   renderOption?: (item: T) => React.ReactNode;
   renderSelected?: (item: T) => React.ReactNode;
   ariaInvalid?: boolean;
+  filter?: (value: string, search: string) => number;
 };
 export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
   (
@@ -60,7 +61,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
       valueKey = "value",
       defaultValue,
       popoverClassName,
-      direction,
+      dir,
       labelProps,
       inputProps,
       data,
@@ -69,6 +70,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
       renderSelected,
       value: controlledValue,
       onChange: onValueChange,
+      filter,
       ...props
     },
     ref,
@@ -174,19 +176,23 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
               props.helperText && "-mt-4",
               popoverClassName,
             )}
-            dir={direction}
+            dir={dir}
             // container={containerRef.current}
           >
             <Command
-              filter={(value, search) => {
-                if (value.toLowerCase().includes(search.toLowerCase())) return 1;
-                return 0;
-              }}
+              filter={
+                filter
+                  ? filter
+                  : (value, search) => {
+                      if (value.toLowerCase().includes(search.toLowerCase())) return 1;
+                      return 0;
+                    }
+              }
             >
               {!props.hideInput && (
                 <CommandInput
                   {...inputProps}
-                  dir={direction}
+                  dir={dir}
                   placeholder={props.texts?.searchPlaceholder || "Search"}
                 />
               )}

@@ -24,7 +24,6 @@ import { ModuleFormProps } from "@/types/common.type";
 import { ClientForm } from "@/client/client.form";
 import { useClients } from "@/client/client.hooks";
 import useClientStore from "@/client/client.store";
-import { Client } from "@/client/client.type";
 
 import { Product } from "@/product/product.type";
 
@@ -230,7 +229,7 @@ export function QuoteForm({
       toast.error(t("Quotes.error.save"));
       setIsLoading(false);
     }
-    console.log("Form Data:", formData);
+    // console.log("Form Data:", formData);
   };
 
   if (typeof window !== "undefined") {
@@ -260,7 +259,7 @@ export function QuoteForm({
                           searchPlaceholder: t("Quotes.clients.search_clients"),
                           noItems: t("Quotes.clients.no_clients"),
                         }}
-                        addText={t("Clients.add_new")}
+                        addText={t("Pages.Clients.add")}
                         onAddClick={() => setIsDialogOpen(true)}
                       />
                     </FormControl>
@@ -480,21 +479,22 @@ export function QuoteForm({
               </div>
             </div>
           </div> */}
-          <NotesSection control={form.control} title={t("Quotes.notes")} />
+          <NotesSection inDialog={editMode} control={form.control} title={t("Quotes.notes")} />
         </form>
       </Form>
 
       <FormDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        title={t("Clients.add_new")}
+        title={t("Pages.Clients.add")}
         formId="client-form-quote"
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
       >
         <ClientForm
+          nestedForm
           formHtmlId="client-form-quote"
-          onSuccess={(newClientData?: Client) => {
+          onSuccess={() => {
             setIsClientSaving(false);
             setIsClientDialogOpen(false);
           }}

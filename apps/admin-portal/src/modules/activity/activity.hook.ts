@@ -32,7 +32,9 @@ export function useActivityLogs(page: number, pageSize: number, filters?: Activi
   return useQuery<{ logs: ActivityLogListData[]; totalCount: number }, Error>({
     queryKey: activityLogKeys.list(filters, page, pageSize),
     queryFn: () => listActivities(page, pageSize, filters),
-    placeholderData: (previousData: { logs: ActivityLogListData[]; totalCount: number } | undefined) => previousData,
+    placeholderData: (
+      previousData: { logs: ActivityLogListData[]; totalCount: number } | undefined,
+    ) => previousData,
     // keepPreviousData: true, // TanStack Query v5 uses placeholderData
   });
 }

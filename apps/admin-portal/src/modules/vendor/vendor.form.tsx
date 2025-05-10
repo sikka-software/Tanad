@@ -118,7 +118,7 @@ export function VendorForm({
               region: data.region?.trim() || undefined,
               country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
-              notes: data.notes?.trim() || null,
+              notes: data.notes,
             },
           },
           {
@@ -147,7 +147,7 @@ export function VendorForm({
             enterprise_id: membership?.enterprise_id || "",
             user_id: profile?.id || "",
             updated_at: new Date().toISOString(),
-            notes: data.notes?.trim() || null,
+            notes: data.notes,
           },
           {
             onSuccess: async () => {
@@ -199,17 +199,17 @@ export function VendorForm({
                     <FormLabel>{t("Vendors.form.company.label")}</FormLabel>
                     <FormControl>
                       <ComboboxAdd
-                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={companyOptions.map((opt) => ({ ...opt, value: opt.label }))}
                         isLoading={companiesLoading}
                         defaultValue={field.value}
                         onChange={(value) => field.onChange(value || null)}
                         texts={{
                           placeholder: t("Vendors.form.company.placeholder"),
-                          searchPlaceholder: t("Companies.search_companies"),
-                          noItems: t("Companies.no_companies_found"),
+                          searchPlaceholder: t("Pages.Companies.search"),
+                          noItems: t("Pages.Companies.no_companies_found"),
                         }}
-                        addText={t("Companies.add_new")}
+                        addText={t("Pages.Companies.add")}
                         onAddClick={() => setIsCompanyDialogOpen(true)}
                       />
                     </FormControl>
@@ -261,24 +261,30 @@ export function VendorForm({
           </div>
 
           <AddressFormSection
+            dir={locale === "ar" ? "rtl" : "ltr"}
+            inDialog={editMode}
             title={t("Vendors.form.address.label")}
             control={form.control}
             isLoading={isLoading}
           />
 
-          <NotesSection control={form.control} title={t("Vendors.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode}
+            control={form.control}
+            title={t("Vendors.form.notes.label")}
+          />
         </form>
       </Form>
 
       <FormDialog
         open={isCompanyDialogOpen}
         onOpenChange={setIsCompanyDialogOpen}
-        title={t("Companies.add_new")}
+        title={t("Pages.Companies.add")}
         formId="company-form"
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
       >
-        <CompanyForm formHtmlId="company-form" />
+        <CompanyForm formHtmlId="company-form" nestedForm />
       </FormDialog>
     </>
   );

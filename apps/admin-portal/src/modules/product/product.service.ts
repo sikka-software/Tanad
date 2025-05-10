@@ -26,9 +26,9 @@ export async function createProduct(product: ProductCreateData): Promise<Product
       body: JSON.stringify(product),
     });
 
-    console.log("Response:", response);
+    // console.log("Response:", response);
     if (!response.ok) {
-      console.log("Response not ok:", response);
+      // console.log("Response not ok:", response);
       throw new Error("Failed to create product", { cause: response.statusText });
     }
     return response.json();

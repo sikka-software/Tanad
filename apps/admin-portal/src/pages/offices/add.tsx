@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -29,20 +29,21 @@ export default function AddOfficePage() {
       form.setValue("street_name", dummyData.city);
       form.setValue("city", dummyData.state);
       form.setValue("zip_code", String(dummyData.zip_code));
+      form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
     }
   };
 
   return (
     <div>
-      <CustomPageMeta title={t("Pages.Offices.add_new")} />
+      <CustomPageMeta title={t("Pages.Offices.add")} />
       <PageTitle
         formButtons
         formId="office-form"
         loading={isLoading}
         onCancel={() => router.push("/offices")}
         texts={{
-          title: t("Pages.Offices.add_new"),
-          submit_form: t("Pages.Offices.add_new"),
+          title: t("Pages.Offices.add"),
+          submit_form: t("Pages.Offices.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
@@ -60,9 +61,9 @@ export default function AddOfficePage() {
   );
 }
 
-AddOfficePage.messages = ["Offices", "Pages", "General", "Forms"];
+AddOfficePage.messages = ["Offices", "Employees", "Pages", "Notes", "General", "Forms"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

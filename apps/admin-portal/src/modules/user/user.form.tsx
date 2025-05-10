@@ -352,7 +352,7 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
                 <FormLabel>{t("Users.form.role.label")}</FormLabel>
                 <FormControl>
                   <ComboboxAdd
-                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    dir={locale === "ar" ? "rtl" : "ltr"}
                     // Use role name as value, consistent with previous Select
                     data={allRoles.roles.map((role) => ({
                       label: predefinedRoles(t, role.name)?.name || role.name, // Pass role.name to predefinedRoles
@@ -366,7 +366,7 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
                       searchPlaceholder: t("Users.form.role.search_placeholder"),
                       noItems: t("Roles.no_roles_available"),
                     }}
-                    addText={t("Roles.add_new")} // Use Role translation
+                    addText={t("Pages.Roles.add")} // Use Role translation
                     onAddClick={() => setIsRoleDialogOpen(true)} // Open dialog
                     disabled={isFormSubmitting}
                   />
@@ -378,20 +378,16 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
         </div>
       </form>
 
-      {/* Role Creation Dialog */}
       <FormDialog
         open={isRoleDialogOpen}
         onOpenChange={setIsRoleDialogOpen}
-        title={t("Roles.add_new")} // Use Role translation
-        formId="role-form" // ID for the RoleForm inside
+        title={t("Pages.Roles.add")}
+        formId="role-form"
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
         loadingSave={isSavingRole}
       >
-        <RoleForm
-          formHtmlId="role-form" // Match the FormDialog's formId
-          onSuccess={handleRoleCreated} // Callback on successful creation
-        />
+        <RoleForm formHtmlId="role-form" onSuccess={handleRoleCreated} nestedForm />
       </FormDialog>
     </Form>
   );

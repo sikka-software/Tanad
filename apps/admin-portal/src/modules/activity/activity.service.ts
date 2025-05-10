@@ -97,21 +97,21 @@ export async function listActivities(
       // Add logging for date comparison
       const fromDate = dateRange?.from ? startOfDay(dateRange.from) : null;
       const toDate = dateRange?.to ? endOfDay(dateRange.to) : null;
-      console.log(
-        `Filtering Log ID: ${log.id}, Log Date: ${logDate.toISOString()}, Filter From: ${fromDate?.toISOString() || "N/A"}, Filter To: ${toDate?.toISOString() || "N/A"}`,
-      );
+      // console.log(
+      //   `Filtering Log ID: ${log.id}, Log Date: ${logDate.toISOString()}, Filter From: ${fromDate?.toISOString() || "N/A"}, Filter To: ${toDate?.toISOString() || "N/A"}`,
+      // );
 
       // Date range filter
       if (fromDate) {
-        console.log(
-          `Comparing: ${logDate.toISOString()} < ${fromDate.toISOString()} = ${logDate < fromDate}`,
-        );
+        // console.log(
+        //   `Comparing: ${logDate.toISOString()} < ${fromDate.toISOString()} = ${logDate < fromDate}`,
+        // );
         if (logDate < fromDate) return false;
       }
       if (toDate) {
-        console.log(
-          `Comparing: ${logDate.toISOString()} > ${toDate.toISOString()} = ${logDate > toDate}`,
-        );
+        // console.log(
+        //   `Comparing: ${logDate.toISOString()} > ${toDate.toISOString()} = ${logDate > toDate}`,
+        // );
         if (logDate > toDate) return false;
       }
 
@@ -120,9 +120,6 @@ export async function listActivities(
         return false;
       }
 
-      console.log("useuuuuuur", user);
-      console.log("log.user_id", log);
-      console.log("is included? user.includes(log.user_id)", user.includes(log.user_id));
       // User filter (using the user ID array)
       if (user && user.length > 0 && !user.includes(log.user_id)) {
         return false; // If user filter is set and log's user is not in the selected list, exclude it

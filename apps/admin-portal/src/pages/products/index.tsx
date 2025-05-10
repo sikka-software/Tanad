@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -80,7 +80,6 @@ export default function ProductsPage() {
       setIsDeleteDialogOpen(false);
     },
     onError: (error: Error) => {
-      console.log("error is ", error);
       if (
         error?.message?.includes("violates foreign key constraint") &&
         error?.message?.includes("invoice_items_product_id_fkey")
@@ -108,8 +107,11 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Products.title")} description={t("Products.description")} />
-      <DataPageLayout>
+      <CustomPageMeta
+        title={t("Pages.Products.title")}
+        description={t("Pages.Products.description")}
+      />
+      <DataPageLayout count={products?.length} itemsText={t("Pages.Products.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -122,11 +124,10 @@ export default function ProductsPage() {
             store={useProductStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Products.title")}
+            title={t("Pages.Products.title")}
             onAddClick={canCreateProducts ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Products.add_new")}
-            searchPlaceholder={t("Products.search_products")}
-            count={products?.length}
+            createLabel={t("Pages.Products.add")}
+            searchPlaceholder={t("Pages.Products.search")}
             hideOptions={products?.length === 0}
           />
         )}
@@ -157,7 +158,7 @@ export default function ProductsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Products.add_new")}
+          title={actionableProduct ? t("Pages.Products.edit") : t("Pages.Products.add")}
           formId="product-form"
           loadingSave={loadingSaveProduct}
         >
@@ -186,9 +187,9 @@ export default function ProductsPage() {
   );
 }
 
-ProductsPage.messages = ["Pages", "Products", "General"];
+ProductsPage.messages = ["Notes", "Pages", "Products", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

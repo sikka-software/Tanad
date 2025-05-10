@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -98,8 +98,11 @@ export default function DepartmentsPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Departments.title")} description={t("Departments.description")} />
-      <DataPageLayout>
+      <CustomPageMeta
+        title={t("Pages.Departments.title")}
+        description={t("Pages.Departments.description")}
+      />
+      <DataPageLayout count={departments?.length} itemsText={t("Pages.Departments.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -112,13 +115,12 @@ export default function DepartmentsPage() {
             store={useDepartmentsStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Departments.title")}
+            title={t("Pages.Departments.title")}
             onAddClick={
               canCreateDepartments ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("Departments.add_new")}
-            searchPlaceholder={t("Departments.search_departments")}
-            count={departments?.length}
+            createLabel={t("Pages.Departments.add")}
+            searchPlaceholder={t("Pages.Departments.search")}
             hideOptions={departments?.length === 0}
           />
         )}
@@ -150,7 +152,7 @@ export default function DepartmentsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Departments.edit_department")}
+          title={actionableDepartment ? t("Pages.Departments.edit") : t("Pages.Departments.add")}
           formId="department-form"
           loadingSave={loadingSaveDepartment}
         >
@@ -182,9 +184,9 @@ export default function DepartmentsPage() {
   );
 }
 
-DepartmentsPage.messages = ["Pages", "Departments", "General"];
+DepartmentsPage.messages = ["Notes", "Pages", "Departments", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

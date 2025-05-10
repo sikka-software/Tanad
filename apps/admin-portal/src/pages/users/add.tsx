@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
@@ -40,7 +40,7 @@ export default function AddUserPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Users.add_new")} />
+      <CustomPageMeta title={t("Pages.Users.add")} />
       <PageTitle
         formButtons
         formId="user-form"
@@ -48,8 +48,8 @@ export default function AddUserPage() {
         onCancel={() => router.push("/users")}
         dummyButton={handleDummyData}
         texts={{
-          title: t("Users.add_new"),
-          submit_form: t("Users.add_new"),
+          title: t("Pages.Users.add"),
+          submit_form: t("Pages.Users.add"),
           cancel: t("General.cancel"),
         }}
       />
@@ -58,9 +58,9 @@ export default function AddUserPage() {
   );
 }
 
-AddUserPage.messages = ["Pages", "Users", "General"];
+AddUserPage.messages = ["Notes", "Pages", "Users", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -37,7 +37,7 @@ type ComboboxAddTypes<T> = {
   defaultValue?: string;
   preview?: boolean;
   hideInput?: boolean;
-  direction?: "rtl" | "ltr";
+  dir?: "rtl" | "ltr";
   inputProps?: any;
   id?: string;
   /** The label of the input field   */
@@ -63,13 +63,13 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
       defaultValue = "",
       containerClassName,
       popoverClassName,
-      direction,
+      dir,
       labelProps,
       inputProps,
       data,
       renderOption,
       renderSelected,
-      addText = "Add Category",
+      addText = "Add New",
       ariaInvalid,
       inCell = false,
       buttonClassName,
@@ -79,6 +79,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
   ) => {
     const [open, setOpen] = React.useState(false);
     const [selectedValue, setSelectedValue] = React.useState(defaultValue);
+    const inputRef = React.useRef<HTMLInputElement>(null);
 
     React.useEffect(() => {
       setSelectedValue(defaultValue);
@@ -98,7 +99,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
 
     return (
       <div
-        dir={direction}
+        dir={dir}
         className={cn(
           "relative flex h-fit flex-col gap-2",
           props.width === "fit" ? "w-fit" : "w-full",
@@ -171,8 +172,13 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
               props.helperText && "-mt-4",
               popoverClassName,
             )}
-            dir={direction}
-            onOpenAutoFocus={(e) => e.preventDefault()}
+            dir={dir}
+            onOpenAutoFocus={(e) => {
+              e.preventDefault();
+              if (!props.hideInput && inputRef.current) {
+                inputRef.current.focus();
+              }
+            }}
           >
             <Command
               filter={(value, search) => {
@@ -187,15 +193,15 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
               {!props.hideInput && (
                 <CommandInput
                   {...inputProps}
-                  dir={direction}
+                  ref={inputRef}
+                  dir={dir}
                   placeholder={props.texts?.searchPlaceholder || "Search"}
                 />
               )}
-              <CommandEmpty>{props.texts?.noItems || "No items found."}</CommandEmpty>
               <div className="flex flex-row items-center gap-2">
                 <Button
                   variant="outline"
-                  className="w-full rounded-none !text-blue-500 dark:!text-blue-400"
+                  className="w-full cursor-pointer rounded-none border-x-0 border-t-0 border-b bg-blue-100 !text-blue-600 hover:bg-blue-200 hover:!text-blue-600 dark:bg-blue-900 dark:!text-blue-300 hover:dark:bg-blue-800 hover:dark:!text-white"
                   onClick={() => {
                     setOpen(false);
                     props.onAddClick?.();
@@ -205,6 +211,8 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
                   <Plus className="size-4" />
                 </Button>
               </div>
+              <CommandEmpty>{props.texts?.noItems || "No items found."}</CommandEmpty>
+
               <CommandList>
                 <CommandGroup className={cn("max-h-[200px]", data.length > 0 && "overflow-y-auto")}>
                   {data.map((item: any, i) => (
@@ -238,11 +246,11 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
                             ? "opacity-100"
                             : "opacity-0",
                         )}
-                        style={{ marginInlineEnd: "0.5rem" }}
+                        style={{ marginInlineEnd: "0rem" }}
                       >
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      <span className="truncate">
+                      <span className="truncate w-full">
                         {renderOption ? renderOption(item) : getProperty(item, labelKey)}
                       </span>
                     </CommandItem>

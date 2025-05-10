@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 
 import DepartmentBox from "../components/landing/pricing/department-box";
 import PricingCalculator from "../components/landing/pricing/pricing-calculator";
@@ -31,7 +31,7 @@ export default CustomPricingPage;
 
 CustomPricingPage.messages = ["Pages", "Pricing", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -20,8 +20,6 @@ interface Props {
 export default function InvoicePreviewPage({ invoice }: Props) {
   const t = useTranslations("Invoices");
 
-  console.log("invoice is ", invoice);
-
   return (
     <div className="mx-auto max-w-4xl p-8">
       <div className="mb-8 flex items-start justify-between">
@@ -62,15 +60,13 @@ export default function InvoicePreviewPage({ invoice }: Props) {
   );
 }
 
-InvoicePreviewPage.messages = ["Pages", "Invoices", "General"];
+InvoicePreviewPage.messages = ["Notes", "Pages", "Invoices", "General"];
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { params, locale, req, res } = context;
   const invoice_id = params?.id as string;
-  console.log(">>> Fetching invoice for ID:", invoice_id);
 
   if (!invoice_id) {
-    console.log(">>> No invoice ID provided in params.");
     return { notFound: true };
   }
 
@@ -89,18 +85,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     const invoiceData = await supabase.from("invoices").select("*").eq("id", invoice_id).single();
 
-    console.log(">>> Base invoice data fetched:", invoiceData);
-
     if (!invoiceData) {
-      console.log(">>> Invoice not found or RLS prevented access.");
       return { notFound: true };
     }
 
     const invoiceItems = await db.query.invoice_items.findMany({
       where: eq(schema.invoice_items.invoice_id, invoice_id),
     });
-
-    console.log(">>> Invoice items fetched:", invoiceItems);
 
     const fullInvoice: Invoice = {
       ...(invoiceData as unknown as Omit<Invoice, "items">),

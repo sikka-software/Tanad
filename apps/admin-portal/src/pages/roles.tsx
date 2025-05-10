@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
@@ -164,7 +164,6 @@ export default function RolesPage() {
             }}
             createLabel={t("Roles.create_role")}
             searchPlaceholder={t("Roles.search_roles")}
-            count={allRoles?.length}
             hideOptions={allRoles?.length === 0}
           />
         )}
@@ -198,7 +197,7 @@ export default function RolesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={editingRole ? t("Roles.edit_role") : t("Roles.add_new")}
+          title={editingRole ? t("Pages.Roles.edit") : t("Pages.Roles.add")}
           formId="role-form"
           loadingSave={loadingSaveRole}
         >
@@ -227,9 +226,9 @@ export default function RolesPage() {
   );
 }
 
-RolesPage.messages = ["Pages", "Roles", "General"];
+RolesPage.messages = ["Pages", "Roles", "Notes", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, RolesPage.messages),

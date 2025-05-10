@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -38,15 +38,15 @@ export default function AddBranchPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Branches.add_new")} />
+      <CustomPageMeta title={t("Pages.Branches.add")} />
       <PageTitle
         formButtons
         formId="branch-form"
         loading={isLoading}
         onCancel={() => router.push("/branches")}
         texts={{
-          title: t("Branches.add_new"),
-          submit_form: t("Branches.add_new"),
+          title: t("Pages.Branches.add"),
+          submit_form: t("Pages.Branches.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
@@ -63,9 +63,9 @@ export default function AddBranchPage() {
   );
 }
 
-AddBranchPage.messages = ["Pages", "Branches", "General"];
+AddBranchPage.messages = ["Pages", "Branches", "Forms", "Notes", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

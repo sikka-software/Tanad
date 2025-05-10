@@ -116,7 +116,7 @@ export default function PhoneInput({
             </div>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[240px] p-0">
+        <PopoverContent className="w-[240px] p-0" align="start">
           <Command>
             <CommandInput placeholder={t("General.search_country")} />
             <CommandList>
@@ -128,7 +128,8 @@ export default function PhoneInput({
                   // depending on your i18n setup.
                   // Using a generic key structure for now.
                   const translatedLabel =
-                    t(`Country.${country.label.replace(/ /g, "_").toLowerCase()}`) || country.label;
+                    t(`Forms.Country.${country.label.replace(/ /g, "_").toLowerCase()}`) ||
+                    country.label;
                   const searchValue =
                     `${country.value} ${country.label} ${translatedLabel} ${country.code}`.toLowerCase();
 

@@ -10,8 +10,8 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import LanguageSwitcher from "@/components/ui/language-switcher";
-import ThemeSwitcher from "@/components/ui/theme-switcher";
+
+import CustomPageMeta from "../landing/CustomPageMeta";
 
 export function JobListingNotFound() {
   const [mounted, setMounted] = useState(false);
@@ -35,15 +35,19 @@ export function JobListingNotFound() {
   return (
     <div
       dir={lang === "ar" ? "rtl" : "ltr"}
-      className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-white to-slate-50 p-4 dark:from-slate-900 dark:to-slate-800"
+      className="flex flex-col items-center justify-center bg-transparent p-4 shadow-none"
     >
+      <CustomPageMeta
+        title={t("JobListings.not_found.title")}
+        description={t("JobListings.not_found.desc")}
+      />
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="flex w-full max-w-xl flex-col gap-4"
       >
-        <Card className="overflow-hidden border-0 shadow-lg">
+        <Card className="overflow-hidden border-0 bg-transparent shadow-none">
           {/* Simple gradient accent */}
           {/* <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 to-purple-600" /> */}
 
@@ -123,10 +127,6 @@ export function JobListingNotFound() {
             </div>
           </CardFooter>
         </Card>
-        <div className="flex flex-row justify-between">
-          <LanguageSwitcher />
-          <ThemeSwitcher />
-        </div>
       </motion.div>
     </div>
   );

@@ -63,12 +63,8 @@ export function createGenericStore<T extends { id: string }>(
 
     getSortedData: (data: T[]) => {
       const { sortRules, sortCaseSensitive, sortNullsFirst } = get();
-      console.log(
-        `[GenericStore] getSortedData called for ${storeName}. Data length: ${data?.length}. Rules:`,
-        JSON.stringify(sortRules),
-      );
+
       if (!data || data.length === 0) {
-        console.log(`[GenericStore] getSortedData for ${storeName} received empty data.`);
         return [];
       }
       return applySort(storeName, data, sortRules, {
@@ -78,7 +74,6 @@ export function createGenericStore<T extends { id: string }>(
     },
 
     setSortRules: (sortRules) => {
-      console.log(`[GenericStore] setSortRules called. New rules:`, JSON.stringify(sortRules));
       set({ sortRules });
     },
     setSortCaseSensitive: (sortCaseSensitive) => set({ sortCaseSensitive }),

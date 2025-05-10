@@ -2,6 +2,7 @@
   "General": {
     "sikka": "سِكَّة",
     "tanad": "تند",
+    "tagline": "العمود الفقري لتجارتك",
     "dark": "داكن",
     "ready": "جاهز",
     "light": "فاتح",
@@ -14,6 +15,7 @@
     "characters": "الأحرف",
     "clear_editor_description": "هل أنت متأكد أنك تريد مسح المحرر؟",
     "convert_from_markdown": "تحويل إلى Markdown",
+    "error_alert_title": "خطأ",
     "words": "الكلمات",
     "filters": "الفرز",
     "random": "عشوائي",
@@ -247,8 +249,8 @@
   },
 
   "Pages": {
-    "Activity": {
-      "title": "سجلات النشاط",
+    "ActivityLogs": {
+      "title": "سجل الأنشطة",
       "description": "إدارة السجلات الخاصة بالنشاطات"
     },
     "Settings": {
@@ -263,6 +265,10 @@
       "title": "الفواتير",
       "description": "إدارة الفواتير"
     },
+    "Finance": { "title": "المالية" },
+    "CRM": { "title": "المبيعات والتسويق" },
+    "Operations": { "title": "العمليات" },
+    "IT": { "title": "تقنية المعلومات" },
     "Administration": { "title": "الإدارة" },
     "Accounting": { "title": "المحاسبة" },
     "HumanResources": { "title": "الموارد البشرية" },
@@ -276,124 +282,253 @@
     "Help": { "title": "المساعدة" },
     "Products": {
       "title": "المنتجات",
-      "add_new": "إضافة منتج جديد"
+      "add": "إضافة منتج جديد",
+      "create": "إنشاء منتج",
+      "edit": "تعديل المنتج",
+      "search": "بحث عن منتج",
+      "no_products_found": "لا يوجد منتجات"
     },
     "Invoices": {
       "title": "الفواتير",
-      "add_new": "إضافة فاتورة جديدة"
+      "add": "إضافة فاتورة جديدة",
+      "create": "إنشاء فاتورة",
+      "edit": "تعديل الفاتورة",
+      "search": "بحث عن فاتورة",
+      "no_invoices_found": "لا يوجد فواتير"
     },
     "Sales": {
       "title": "المبيعات",
-      "add_new": "إضافة مبيعة جديدة"
+      "add": "إضافة مبيعة جديدة",
+      "create": "إنشاء مبيعة",
+      "edit": "تعديل المبيعة",
+      "search": "بحث عن مبيعة",
+      "no_sales_found": "لا يوجد مبيعات"
     },
     "Quotes": {
       "title": "عروض الأسعار",
-      "add_new": "إضافة عرض أسعار جديد"
+      "add": "إضافة عرض أسعار جديد",
+      "create": "إنشاء عرض أسعار",
+      "edit": "تعديل العرض الأسعاري",
+      "search": "بحث عن عرض أسعار",
+      "no_quotes_found": "لا يوجد عروض أسعار"
     },
     "Contacts": {
       "title": "جهات الإتصال",
-      "add_new": "إضافة جهة إتصال جديدة"
+      "add": "إضافة جهة إتصال جديدة",
+      "create": "إنشاء جهة إتصال",
+      "edit": "تعديل الجهة",
+      "search": "بحث عن جهة إتصال",
+      "no_contacts_found": "لا يوجد جهات إتصال"
     },
     "EmployeeRequests": {
       "title": "طلبات الموظفين",
-      "add_new": "إضافة طلب جديد"
+      "add": "إضافة طلب جديد",
+      "create": "إنشاء طلب",
+      "edit": "تعديل الطلب",
+      "search": "بحث عن طلب",
+      "no_employee_requests_found": "لا يوجد طلبات موظفين"
     },
     "Clients": {
       "title": "العملاء",
-      "add_new": "إضافة عميل جديد"
+      "add": "إضافة عميل جديد",
+      "create": "إنشاء عميل",
+      "edit": "تعديل العميل",
+      "search": "بحث عن عميل",
+      "no_clients_found": "لا يوجد عملاء"
     },
     "Warehouses": {
       "title": "المستودعات",
-      "add_new": "إضافة مستودع جديد"
+      "add": "إضافة مستودع جديد",
+      "create": "إنشاء مستودع",
+      "edit": "تعديل المستودع",
+      "search": "بحث عن مستودع",
+      "no_warehouses_found": "لا يوجد مستودعات"
     },
     "Branches": {
       "title": "الفروع",
-      "add_new": "إضافة فرع جديد"
+      "add": "إضافة فرع جديد",
+      "create": "إنشاء فرع",
+      "edit": "تعديل الفرع",
+      "search": "بحث عن فرع",
+      "no_branches_found": "لا يوجد فروع"
     },
     "Vendors": {
       "title": "الموردين",
-      "add_new": "إضافة مورد جديد"
+      "add": "إضافة مورد جديد",
+      "create": "إنشاء مورد",
+      "edit": "تعديل المورد",
+      "search": "بحث عن مورد",
+      "no_vendors_found": "لا يوجد موردين"
     },
     "Attendance": {
       "title": "الحضور",
-      "add_new": "إضافة حضور جديد"
+      "add": "إضافة حضور جديد",
+      "create": "إنشاء حضور",
+      "edit": "تعديل الحضور",
+      "search": "بحث عن حضور",
+      "no_attendance_found": "لا يوجد حضور"
+    },
+    "Applicants": {
+      "title": "المتقدمين",
+      "add": "إضافة متقدم جديد",
+      "create": "إنشاء متقدم",
+      "edit": "تعديل المتقدم",
+      "search": "بحث عن متقدم",
+      "no_applicants_found": "لا يوجد متقدمين"
     },
     "Users": {
       "title": "المستخدمين",
-      "add_new": "إضافة مستخدم جديد"
+      "add": "إضافة مستخدم جديد",
+      "create": "إنشاء مستخدم",
+      "edit": "تعديل المستخدم",
+      "search": "بحث عن مستخدم",
+      "no_users_found": "لا يوجد مستخدمين"
     },
     "Locations": {
       "title": "المواقع",
-      "add_new": "إضافة موقع جديد"
+      "add": "إضافة موقع جديد",
+      "create": "إنشاء موقع",
+      "edit": "تعديل الموقع",
+      "search": "بحث عن موقع",
+      "no_locations_found": "لا يوجد مواقع"
     },
     "Offices": {
       "title": "المكاتب",
-      "add_new": "إضافة مكتب جديد"
+      "add": "إضافة مكتب جديد",
+      "create": "إنشاء مكتب",
+      "edit": "تعديل المكتب",
+      "search": "بحث عن مكتب",
+      "no_offices_found": "لا يوجد مكاتب"
     },
     "Employees": {
       "all": "جميع الموظفين",
       "title": "الموظفين",
-      "add_new": "إضافة موظف جديد"
+      "add": "إضافة موظف جديد",
+      "create": "إنشاء موظف",
+      "edit": "تعديل الموظف",
+      "search": "بحث عن موظف",
+      "no_employees_found": "لا يوجد موظفين"
     },
     "Roles": {
       "title": "الأدوار",
-      "add_new": "إضافة دور جديد"
+      "add": "إضافة دور جديد",
+      "create": "إنشاء دور",
+      "edit": "تعديل الدور",
+      "search": "بحث عن دور",
+      "no_roles_found": "لا يوجد دور"
     },
     "Permissions": {
       "title": "الصلاحيات",
-      "add_new": "إضافة صلاحية جديدة"
+      "add": "إضافة صلاحية جديدة",
+      "create": "إنشاء صلاحية",
+      "edit": "تعديل الصلاحية",
+      "search": "بحث عن صلاحية",
+      "no_permissions_found": "لا يوجد صلاحيات"
     },
     "Departments": {
       "title": "الأقسام",
-      "add_new": "إضافة قسم جديد"
+      "add": "إضافة قسم جديد",
+      "create": "إنشاء قسم",
+      "edit": "تعديل القسم",
+      "search": "بحث عن قسم",
+      "no_departments_found": "لا يوجد قسم"
     },
     "Jobs": {
       "title": "الوظائف",
-      "add_new": "إضافة وظيفة جديدة"
+      "add": "إضافة وظيفة جديدة",
+      "create": "إنشاء وظيفة",
+      "edit": "تعديل الوظيفة",
+      "search": "بحث عن وظيفة",
+      "no_jobs_found": "لا يوجد وظائف"
     },
     "Cars": {
       "title": "السيارات",
-      "add_new": "إضافة سيارة جديدة"
+      "add": "إضافة سيارة جديدة",
+      "create": "إنشاء سيارة",
+      "edit": "تعديل السيارة",
+      "search": "بحث عن سيارة",
+      "no_cars_found": "لا يوجد سيارات"
     },
     "Companies": {
       "title": "الشركات",
-      "add_new": "إضافة شركة جديدة"
+      "add": "إضافة شركة جديدة",
+      "create": "إنشاء شركة",
+      "edit": "تعديل الشركة",
+      "search": "بحث عن شركة",
+      "no_companies_found": "لا يوجد شركات"
     },
     "Domains": {
       "title": "النطاقات",
-      "add_new": "إضافة نطاق جديد"
+      "add": "إضافة نطاق جديد",
+      "create": "إنشاء نطاق",
+      "edit": "تعديل النطاق",
+      "search": "بحث عن نطاق",
+      "no_domains_found": "لا يوجد نطاقات"
     },
     "Expenses": {
       "title": "المصروفات",
-      "add_new": "إضافة مصروف جديد"
+      "add": "إضافة مصروف جديد",
+      "create": "إنشاء مصروف",
+      "edit": "تعديل المصروف",
+      "search": "بحث عن مصروف",
+      "no_expenses_found": "لا يوجد مصروفات"
     },
     "JobListings": {
       "title": "صفحات التوظيف",
-      "add_new": "إضافة صفحة توظيف جديدة"
+      "single": "صفحة توظيف",
+      "add": "إضافة صفحة توظيف جديدة",
+      "create": "إنشاء صفحة توظيف",
+      "edit": "تعديل الصفحة التوظيفية",
+      "search": "بحث عن صفحة توظيف",
+      "no_job_listings_found": "لا يوجد صفحات توظيف"
     },
     "OnlineStores": {
       "title": "المتاجر الإلكترونية",
-      "add_new": "إضافة متجر إلكتروني جديد"
+      "add": "إضافة متجر إلكتروني جديد",
+      "create": "إنشاء متجر إلكتروني",
+      "edit": "تعديل المتجر الإلكتروني",
+      "search": "بحث عن متجر إلكتروني",
+      "no_online_stores_found": "لا يوجد متاجر إلكترونية"
     },
     "Purchases": {
       "title": "المشتريات",
-      "add_new": "إضافة مشتري جديد"
+      "add": "إضافة طلب شراء",
+      "create": "إنشاء طلب شراء",
+      "edit": "تعديل طلب الشراء",
+      "search": "بحث عن طلب الشراء",
+      "no_purchases_found": "لا توجد طلبات شراء"
     },
     "Salaries": {
       "title": "الرواتب",
-      "add_new": "إضافة راتب جديد"
+      "add": "إضافة راتب جديد",
+      "create": "إنشاء راتب",
+      "edit": "تعديل الراتب",
+      "search": "بحث عن راتب",
+      "no_salaries_found": "لا يوجد رواتب"
     },
     "Servers": {
       "title": "الخوادم",
-      "add_new": "إضافة خادم جديد"
+      "add": "إضافة خادم جديد",
+      "create": "إنشاء خادم",
+      "edit": "تعديل الخادم",
+      "search": "بحث عن خادم",
+      "no_servers_found": "لا يوجد خوادم"
     },
     "Trucks": {
       "title": "الشاحنات",
-      "add_new": "إضافة شاحنة جديدة"
+      "add": "إضافة شاحنة جديدة",
+      "create": "إنشاء شاحنة",
+      "edit": "تعديل الشاحنة",
+      "search": "بحث عن شاحنة",
+      "no_trucks_found": "لا يوجد شاحنات"
     },
     "Websites": {
       "title": "المواقع الإلكترونية",
-      "add_new": "إضافة موقع إلكتروني جديد"
+      "add": "إضافة موقع إلكتروني جديد",
+      "create": "إنشاء موقع إلكتروني",
+      "edit": "تعديل الموقع الإلكتروني",
+      "search": "بحث عن موقع إلكتروني",
+      "no_websites_found": "لا يوجد مواقع إلكترونية"
     }
   },
   "Flags": {
@@ -473,6 +608,8 @@
     "appearence": "تصميم {puklaName}"
   },
   "Landing": {
+    "sign_in": "تسجيل الدخول",
+    "sign_up": "إنشاء حساب",
     "directory": "الدليل",
     "hero": {
       "title": "العمود الفقري لتجارتك",
@@ -504,9 +641,6 @@
       "subtitle": "اجمع جميع روابطك في رابط واحد الآن",
       "title": "جاهز لإنشاء رابطك الشخصي؟",
       "action-1-text": "يلا نبدأ"
-    },
-    "footer": {
-      "tagline": "العمود الفقري لتجارتك"
     },
     "feature-design": {
       "tiny-1": "لون الخلفية",
@@ -1995,7 +2129,6 @@
   },
   "Products": {
     "title": "المنتجات",
-    "add_new": "منتج جديد",
     "edit_product": "تعديل المنتج",
     "search_products": "بحث عن منتجات",
     "product_details": "تفاصيل المنتج",
@@ -2044,6 +2177,10 @@
         "label": "الكمية المتوفرة",
         "required": "الكمية المتوفرة مطلوبة",
         "placeholder": "أدخل الكمية المتوفرة"
+      },
+      "notes": {
+        "label": "ملاحظات المنتج",
+        "placeholder": "أدخل الملاحظات"
       }
     },
     "products": {
@@ -2084,40 +2221,9 @@
     }
   },
   "Invoices": {
-    "title": "الفواتير",
-    "add_new": "فاتورة جديدة",
-    "edit_invoice": "تعديل الفاتورة",
-    "update_invoice": "تحديث الفاتورة",
     "invoice_details": "تفاصيل الفاتورة",
-    "invoice_number": "فاتورة #{number}",
-    "enter_invoice_number": "أدخل رقم الفاتورة",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {فاتورة} =1 {هذه الفاتورة} other {# فواتير}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {فاتورة} =1 {هذه الفاتورة} other {# فواتير}}",
-    "description": "الوصف",
-    "enter_description": "أدخل وصف الفاتورة",
-    "search_invoices": "بحث عن فواتير",
-    "price": "السعر",
-    "price_required": "السعر مطلوب",
-    "stock_quantity": "كمية المخزون",
-    "stock_quantity_required": "كمية المخزون مطلوبة",
-    "sku": "رمز المنتج",
-    "enter_sku": "أدخل رمز المنتج (اختياري)",
-    "no_description": "لا يوجد وصف",
-    "sku_label": "رمز المنتج: {value}",
-    "stock_label": "المخزون: {value}",
-    "create_new": "إنشاء فاتورة",
-    "creating": "جاري الإنشاء...",
-    "no_invoices_found": "لم يتم العثور على فواتير",
-    "add_first_invoice": "أضف أول فاتورة",
-    "client": "العميل",
-    "select_client": "اختر عميل",
-    "search_clients": "بحث عن عملاء...",
-    "no_clients": "لا يوجد عملاء",
-    "add_new_client": "عميل جديد",
-    "edit_client": "تعديل العميل",
-    "amount": "المبلغ",
-    "due_date": "تاريخ الاستحقاق",
-    "select_status": "اختر حالة",
     "success": {
       "create": "تم إنشاء الفاتورة بنجاح",
       "update": "تم تحديث الفاتورة بنجاح",
@@ -2144,16 +2250,9 @@
       "overdue": "متأخرة",
       "cancelled": "ملغاة"
     },
-    "notes": "ملاحظات",
-    "enter_notes": "أدخل أي ملاحظات إضافية",
-    "client_added": "تمت إضافة العميل بنجاح",
-    "submitting": "جاري الإرسال...",
-    "invoice_hash": "فاتورة #{number}",
-    "issue_date": "تاريخ الإصدار",
     "form": {
       "invoice_number": {
         "label": "رقم الفاتورة",
-
         "placeholder": "أدخل رقم الفاتورة",
         "required": "رقم الفاتورة مطلوب"
       },
@@ -2191,7 +2290,8 @@
         "pending": "قيد الانتظار",
         "paid": "مدفوعة",
         "overdue": "متأخرة",
-        "cancelled": "ملغاة"
+        "cancelled": "ملغاة",
+        "partially_paid": "مدفوع جزئيا"
       },
       "subtotal": {
         "label": "المجموع الفرعي"
@@ -2203,29 +2303,38 @@
         "label": "ملاحظات",
         "placeholder": "أدخل ملاحظاتك"
       }
-    },
-    "actions": {
-      "preview": "معاينة"
-    },
-    "products": {
-      "title": "المنتجات",
-      "add_product": "إضافة منتج",
-      "no_products": "لا توجد منتجات مضافة",
-      "product": "المنتج",
-      "quantity": "الكمية",
-      "unit_price": "سعر الوحدة",
-      "subtotal": "المجموع الفرعي",
-      "select_product": "اختر منتج",
-      "search_products": "بحث عن منتجات",
-      "no_products_found": "لم يتم العثور على منتجات",
-      "add_new_product": "منتج جديد",
-      "edit_product": "تعديل المنتج",
-      "product_description": "وصف المنتج"
     }
+  },
+
+  "ProductsFormSection": {
+    "title": "المنتجات",
+    "description": {
+      "label": "الوصف",
+      "placeholder": "أدخل وصف المنتج"
+    },
+    "add_product": "إضافة منتج",
+    "no_products": "لا توجد منتجات مضافة",
+    "product": "المنتج",
+    "quantity": {
+      "label": "الكمية",
+      "placeholder": "أدخل الكمية",
+      "invalid": "الكمية يجب أن تكون رقماً موجباً"
+    },
+    "unit_price": {
+      "label": "سعر الوحدة",
+      "placeholder": "أدخل سعر الوحدة",
+      "invalid": "السعر يجب أن يكون رقماً موجباً"
+    },
+    "subtotal": "المجموع الفرعي",
+    "select_product": "اختر منتج",
+    "search_products": "بحث عن منتجات",
+    "no_products_found": "لم يتم العثور على منتجات",
+    "add_new_product": "منتج جديد",
+    "edit_product": "تعديل المنتج",
+    "product_description": "وصف المنتج"
   },
   "Sales": {
     "title": "المبيعات",
-    "add_new": "مبيعة جديدة",
     "update_sale": "تحديث المبيعة",
     "edit_sale": "تعديل المبيعة",
     "sale_details": "تفاصيل المبيعة",
@@ -2289,7 +2398,6 @@
   "Quotes": {
     "title": "عروض الأسعار",
     "create_quote": "إنشاء عرض سعر",
-    "add_new": "عرض سعر جديد",
     "edit_quote": "تعديل عرض السعر",
     "update_quote": "تحديث عرض السعر",
     "back_to_list": "العودة إلى عروض الأسعار",
@@ -2392,7 +2500,6 @@
   "EmployeeRequests": {
     "title": "طلبات الموظفين",
     "description": "طلبات الموظفين",
-    "add_new": "طلب موظف جديد",
     "edit_employee_request": "تعديل طلب الموظف",
     "update_employee_request": "تحديث طلب الموظف",
     "no_employee_requests_found": "لا توجد طلبات موظفين",
@@ -2483,7 +2590,6 @@
   },
   "Clients": {
     "title": "العملاء",
-    "add_new": "عميل جديد",
     "edit_client": "تعديل العميل",
     "update_client": "تحديث العميل",
     "create_client": "إضافة عميل",
@@ -2521,26 +2627,6 @@
         "placeholder": "اختر أو أضف شركة",
         "search_placeholder": "ابحث عن الشركات...",
         "no_companies": "لم يتم العثور على شركات"
-      },
-      "address": {
-        "label": "عنوان العميل",
-        "placeholder": "أدخل عنوان العميل"
-      },
-      "city": {
-        "label": "المدينة",
-        "placeholder": "أدخل المدينة"
-      },
-      "state": {
-        "label": "المنطقة",
-        "placeholder": "أدخل المنطقة"
-      },
-      "zip_code": {
-        "label": "الرمز البريدي",
-        "placeholder": "أدخل الرمز البريدي"
-      },
-      "notes": {
-        "label": "ملاحظات",
-        "placeholder": "أدخل أي ملاحظات إضافية"
       }
     },
     "success": {
@@ -2567,7 +2653,6 @@
   "Warehouses": {
     "title": "المستودعات",
     "singular": "مستودع",
-    "add_new": "مستودع جديد",
     "update_warehouse": "تحديث المستودع",
     "edit_warehouse": "تعديل المستودع",
     "warehouse_details": "تفاصيل المستودع",
@@ -2616,26 +2701,6 @@
         "placeholder": "أدخل رمز المستودع",
         "required": "الرمز مطلوب"
       },
-      "address": {
-        "label": "عنوان المستودع",
-        "placeholder": "أدخل عنوان المستودع",
-        "required": "عنوان المستودع مطلوب"
-      },
-      "city": {
-        "label": "المدينة",
-        "placeholder": "أدخل المدينة",
-        "required": "المدينة مطلوبة"
-      },
-      "state": {
-        "label": "المنطقة",
-        "placeholder": "أدخل المنطقة",
-        "required": "المنطقة مطلوبة"
-      },
-      "zip_code": {
-        "label": "الرمز البريدي",
-        "placeholder": "أدخل الرمز البريدي",
-        "required": "الرمز البريدي مطلوب"
-      },
       "capacity": {
         "label": "السعة",
         "placeholder": "أدخل سعة المستودع"
@@ -2647,10 +2712,7 @@
         "placeholder": "اختر الحالة",
         "required": "الحالة مطلوبة"
       },
-      "notes": {
-        "label": "ملاحظات",
-        "placeholder": "أدخل الملاحظات"
-      },
+
       "create_button": "إنشاء مستودع",
       "update_button": "تحديث المستودع"
     },
@@ -2674,19 +2736,14 @@
     }
   },
   "Branches": {
-    "title": "الفروع",
     "singular": "فرع",
-    "add_new": "فرع جديد",
-    "edit_branch": "تعديل الفرع",
-    "update_branch": "تحديث الفرع",
     "branch_details": "تفاصيل الفرع",
-    "create_new": "إنشاء فرع",
-    "no_branches_found": "لا توجد فروع",
-    "search_branches": "بحث عن فروع...",
     "description": "الوصف",
     "enter_description": "أدخل وصف الفرع",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {فرع} =1 {هذا الفرع} other {# فروع}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {فرع} =1 {هذا الفرع} other {# فروع}}",
+    "update_button": "تحديث الفرع",
+    "create_button": "إنشاء فرع",
     "manager": "المدير",
     "status": {
       "active": "نشط",
@@ -2703,26 +2760,7 @@
         "placeholder": "أدخل رمز الفرع",
         "required": "الرمز مطلوب"
       },
-      "address": {
-        "label": "عنوان الفرع",
-        "placeholder": "أدخل عنوان الفرع",
-        "required": "عنوان الفرع مطلوب"
-      },
-      "city": {
-        "label": "المدينة",
-        "placeholder": "أدخل المدينة",
-        "required": "المدينة مطلوبة"
-      },
-      "state": {
-        "label": "المنطقة",
-        "placeholder": "أدخل المنطقة",
-        "required": "المنطقة مطلوبة"
-      },
-      "zip_code": {
-        "label": "الرمز البريدي",
-        "placeholder": "أدخل الرمز البريدي",
-        "required": "الرمز البريدي مطلوب"
-      },
+
       "phone": {
         "label": "الهاتف",
         "placeholder": "أدخل رقم الهاتف"
@@ -2744,13 +2782,7 @@
         "inactive": "غير نشط",
         "placeholder": "اختر الحالة",
         "required": "الحالة مطلوبة"
-      },
-      "notes": {
-        "label": "ملاحظات",
-        "placeholder": "أدخل ملاحظات"
-      },
-      "update_button": "تحديث الفرع",
-      "create_button": "إنشاء فرع"
+      }
     },
     "success": {
       "create": "تم إنشاء الفرع بنجاح",
@@ -2774,7 +2806,6 @@
   "Vendors": {
     "title": "الموردين",
     "singular": "مورد",
-    "add_new": "مورد جديد",
     "edit_vendor": "تعديل المورد",
     "update_vendor": "تحديث المورد",
     "back_to_list": "الرجوع للقائمة",
@@ -2805,33 +2836,9 @@
         "placeholder": "أدخل رقم الهاتف",
         "required": "رقم الهاتف مطلوب"
       },
-      "address": {
-        "label": "عنوان المورد",
-        "placeholder": "أدخل عنوان المورد",
-        "required": "عنوان المورد مطلوب"
-      },
-      "city": {
-        "label": "المدينة",
-        "placeholder": "أدخل المدينة",
-        "required": "المدينة مطلوبة"
-      },
-      "state": {
-        "label": "المنطقة",
-        "placeholder": "أدخل المنطقة",
-        "required": "المنطقة مطلوبة"
-      },
-      "zip_code": {
-        "label": "الرمز البريدي",
-        "placeholder": "أدخل الرمز البريدي",
-        "required": "الرمز البريدي مطلوب"
-      },
       "products": {
         "label": "المنتجات/الخدمات",
         "placeholder": "أدخل المنتجات أو الخدمات"
-      },
-      "notes": {
-        "label": "ملاحظات",
-        "placeholder": "أدخل ملاحظات"
       }
     },
     "success": {
@@ -2891,9 +2898,140 @@
       "error": "حدث خطأ أثناء معالجة طلبك"
     }
   },
+  "Users": {
+    "title": "المستخدمون",
+    "edit_user": "تعديل المستخدم",
+    "update_user": "تحديث المستخدم",
+    "user_details": "تفاصيل المستخدم",
+    "login_details": "تفاصيل تسجيل الدخول",
+    "personal_info": "المعلومات الشخصية",
+    "permissions": "الصلاحيات",
+    "no_users": "لا يوجد مستخدمين",
+    "active_users": "المستخدمون النشطون",
+    "inactive_users": "المستخدمون غير النشطين",
+    "search_placeholder": "بحث عن مستخدمين...",
+    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {مستخدم} =1 {هذا المستخدم} other {# مستخدمين}}؟",
+    "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {مستخدم} =1 {هذا المستخدم} other {# مستخدمين}}",
+    "add_dialog": {
+      "title": "مستخدم جديد",
+      "description": "املأ التفاصيل لإنشاء مستخدم جديد. سينتمي إلى نفس المؤسسة."
+    },
+    "permissions_popover": "الصلاحيات",
+    "created_at_never": "أبدًا",
+    "actions": {
+      "open_menu": "فتح القائمة",
+      "edit": "تعديل المستخدم",
+      "delete": "حذف المستخدم",
+      "activate": "تفعيل المستخدم",
+      "deactivate": "تعطيل المستخدم",
+      "reset_password": "إعادة تعيين كلمة المرور"
+    },
+    "edit_dialog": {
+      "title": "تعديل المستخدم",
+      "description": "قم بإجراء تغييرات على ملف تعريف المستخدم هنا.",
+      "email_label": "البريد الإلكتروني",
+      "role_label": "الدور",
+      "select_role_placeholder": "اختر الدور",
+      "save_button": "حفظ التغييرات"
+    },
+    "delete_dialog": {
+      "title": "حذف المستخدم",
+      "description": "هل أنت متأكد أنك تريد حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.",
+      "user_prefix": "المستخدم: ",
+      "no_email": "لا يوجد بريد إلكتروني",
+      "delete_button": "حذف"
+    },
+
+    "form": {
+      "first_name": {
+        "label": "الاسم الأول",
+        "placeholder": "أدخل الاسم الأول",
+        "required": "الاسم الأول مطلوب"
+      },
+      "last_name": {
+        "label": "الاسم الأخير",
+        "placeholder": "أدخل الاسم الأخير",
+        "required": "الاسم الأخير مطلوب"
+      },
+      "name": {
+        "label": "الاسم الكامل",
+        "placeholder": "أدخل الاسم الكامل",
+        "required": "الاسم الكامل مطلوب"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل البريد الإلكتروني",
+        "required": "البريد الإلكتروني مطلوب",
+        "invalid": "البريد الإلكتروني غير صالح"
+      },
+      "password": {
+        "label": "كلمة المرور",
+        "placeholder": "أدخل كلمة المرور",
+        "required": "كلمة المرور مطلوبة",
+        "min_length": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+        "confirm": "تأكيد كلمة المرور",
+        "confirm_placeholder": "تأكيد كلمة المرور",
+        "mismatch": "كلمات المرور غير متطابقة"
+      },
+      "role": {
+        "label": "الدور",
+        "placeholder": "اختر دورًا",
+        "required": "الدور مطلوب",
+        "admin": "مدير النظام",
+        "manager": "مدير",
+        "employee": "موظف",
+        "user": "مستخدم عادي",
+        "search_placeholder": "بحث عن دور..."
+      },
+      "status": {
+        "label": "الحالة",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "suspended": "معلق"
+      },
+      "phone": {
+        "label": "رقم الهاتف",
+        "placeholder": "أدخل رقم الهاتف"
+      },
+      "department": {
+        "label": "القسم",
+        "placeholder": "اختر القسم"
+      },
+      "avatar": {
+        "label": "الصورة الشخصية",
+        "upload": "رفع صورة",
+        "remove": "إزالة الصورة"
+      },
+      "permissions": {
+        "label": "الصلاحيات",
+        "placeholder": "اختر الصلاحيات"
+      },
+      "created_at": {
+        "label": "تاريخ الإنشاء"
+      },
+      "updated_at": {
+        "label": "تاريخ التحديث"
+      }
+    },
+    "messages": {
+      "create": "تم إنشاء المستخدم بنجاح",
+      "update": "تم تحديث المستخدم بنجاح",
+      "delete": "تم حذف المستخدم بنجاح",
+      "error": "حدث خطأ أثناء معالجة طلبك"
+    },
+    "success": {
+      "create": "تم إنشاء المستخدم بنجاح",
+      "update": "تم تحديث المستخدم بنجاح",
+      "delete": "تم حذف المستخدم بنجاح"
+    },
+    "error": {
+      "create": "حدث خطأ أثناء إنشاء المستخدم",
+      "update": "حدث خطأ أثناء تحديث المستخدم",
+      "delete": "حدث خطأ أثناء حذف المستخدم"
+    }
+  },
   "Locations": {
     "title": "المواقع",
-    "add_new": "موقع جديد",
     "edit_location": "تعديل الموقع",
     "update_location": "تحديث الموقع",
     "search_locations": "البحث عن مواقع...",
@@ -2906,7 +3044,6 @@
   },
   "Salaries": {
     "title": "الرواتب",
-    "add_new": "راتب جديد",
     "edit_salary": "تعديل الراتب",
     "update_salary": "تحديث الراتب",
     "create_salary": "إضافة راتب",
@@ -3008,19 +3145,14 @@
   },
 
   "Jobs": {
-    "title": "الوظائف",
-    "create_job": "إنشاء وظيفة",
-    "add_job": "إضافة وظيفة",
     "job_details": "تفاصيل الوظيفة",
-    "update_job": "تحديث الوظيفة",
-    "add_new": "وظيفة جديدة",
-    "edit_job": "تعديل الوظيفة",
     "back_to_list": "العودة إلى القائمة",
-    "no_jobs_found": "لم يتم العثور على وظائف",
     "failed_to_fetch_jobs": "فشل في جلب الوظائف",
-    "search_jobs": "البحث في الوظائف...",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {وظيفة} =1 {هذه الوظيفة} other {# وظائف}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {وظيفة} =1 {هذه الوظيفة} other {# وظائف}}",
+    "search_jobs": "ابحث عن وظائف...",
+    "department_placeholder": "القسم",
+    "all_departments": "جميع الأقسام",
     "form": {
       "title": {
         "label": "عنوان الوظيفة",
@@ -3030,6 +3162,14 @@
       "description": {
         "label": "الوصف",
         "placeholder": "أدخل وصف الوظيفة"
+      },
+      "total_positions": {
+        "label": "المناصب المتاحة",
+        "placeholder": "أدخل المناصب المتاحة"
+      },
+      "occupied_positions": {
+        "label": "المناصب المشغولة",
+        "placeholder": "أدخل المناصب المشغولة"
       },
       "requirements": {
         "label": "المتطلبات",
@@ -3079,6 +3219,14 @@
       },
       "updated_at": {
         "label": "تاريخ التحديث"
+      },
+      "benefits": {
+        "label": "المزايا",
+        "placeholder": "أدخل المزايا"
+      },
+      "responsibilities": {
+        "label": "المسؤوليات",
+        "placeholder": "أدخل المسؤوليات"
       }
     },
     "success": {
@@ -3104,15 +3252,13 @@
     "title": "إدارة النظام"
   },
   "JobListings": {
-    "title": "صفحات التوظيف",
-    "create_listing": "إنشاء صفحة توظيف",
-    "add_new": "صفحة توظيف جديدة",
-    "edit_listing": "تعديل صفحة التوظيف",
-    "update_listing": "تحديث صفحة التوظيف",
-    "search_listings": "البحث في صفحات التوظيف...",
     "listing_details": "تفاصيل صفحة التوظيف",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {صفحة توظيف} =1 {هذه الصفحة التوظيفية} other {# صفحات توظيف}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {صفحة توظيف} =1 {هذه الصفحة التوظيفية} other {# صفحات توظيف}}",
+    "location_placeholder": "الموقع",
+    "all_locations": "جميع المواقع",
+    "no_jobs_found": "لم يتم العثور على وظائف",
+    "adjust_filters": "حاول تعديل البحث أو الفلاتر",
     "jobs_section": {
       "title": "الوظائف",
       "subtitle": "إختر الوظائف التي تريد نشرها في هذه الصفحة",
@@ -3134,7 +3280,6 @@
       "enableSearchFilteringPlaceholder": "تفعيل البحث والتصفية",
       "searchFilteringDescription": "يمكنك تفعيل البحث والتصفية لصفحة التوظيف للمستخدمين للبحث عن الوظائف التي يحتاجونها"
     },
-
     "status": {
       "title": "الحالة",
       "active": "نشط",
@@ -3201,10 +3346,37 @@
       "duplicate": "جاري تكرار الصفحة..."
     }
   },
+  "JobCard": {
+    "posted": "نشر في {date, date, medium}",
+    "view_details": "عرض التفاصيل"
+  },
+  "JobDetails": {
+    "posted": "نشر في {date, date, medium}",
+    "job_details_tab": "تفاصيل الوظيفة",
+    "apply_now_tab": "قدم الآن",
+    "overview": "نظرة عامة",
+    "responsibilities": "المسؤوليات",
+    "requirements": "المتطلبات",
+    "benefits": "المزايا",
+    "apply_for_position_button": "تقدم لهذه الوظيفة"
+  },
+  "JobListingPreview": {
+    "loading": "جاري التحميل...",
+    "meta_description_default": "اطلع على تفاصيل الوظيفة وقدم الآن."
+  },
+
+  "Status": {
+    "active": "نشط",
+    "inactive": "غير نشط"
+  },
+  "Visibility": {
+    "public": "عام",
+    "private": "خاص"
+  },
+
   "Expenses": {
     "title": "المصروفات",
     "description": "إدارة وتتبع المصروفات",
-    "add_new": "مصروف جديد",
     "edit_expense": "تعديل المصروف",
     "update_expense": "تحديث المصروف",
     "search_expenses": "البحث في المصروفات",
@@ -3277,7 +3449,6 @@
   },
   "Applicants": {
     "title": "المتقدمين",
-    "add_new": "متقدم جديد",
     "edit_applicant": "تعديل المتقدم",
     "update_applicant": "تحديث المتقدم",
     "applicant_details": "تفاصيل المتقدم",
@@ -3384,7 +3555,6 @@
   },
   "Employees": {
     "title": "الموظفين",
-    "add_new": "موظف جديد",
     "edit_employee": "تعديل الموظف",
     "add_employee": "إضافة موظف",
     "update_employee": "تعديل الموظف",
@@ -3455,10 +3625,14 @@
         "placeholder": "أدخل رقم الهاتف",
         "required": "رقم الهاتف مطلوب"
       },
-      "position": {
-        "label": "المنصب",
-        "placeholder": "أدخل المنصب",
-        "required": "المنصب مطلوب"
+      "nationality": {
+        "label": "الجنسية",
+        "placeholder": "أدخل الجنسية"
+      },
+      "job": {
+        "label": "الوظيفة",
+        "placeholder": "اختر الوظيفة",
+        "required": "الوظيفة مطلوبة"
       },
       "department": {
         "label": "القسم",
@@ -3505,13 +3679,16 @@
   "Contacts": {
     "title": "جهات الاتصال",
     "all": "جميع جهات الاتصال",
-    "add_new": "جهة إتصال جديدة",
     "edit_contact": "تعديل جهة إتصال",
     "update_contact": "تحديث جهة إتصال",
     "name": "الاسم",
     "email": "البريد الإلكتروني",
     "phone": "الهاتف",
     "address": "العنوان"
+  },
+  "Notes": {
+    "label": "ملاحظات",
+    "placeholder": "أدخل الملاحظات"
   },
   "Forms": {
     "description": {
@@ -3526,7 +3703,6 @@
       "label": "تاريخ التحديث",
       "placeholder": "أدخل تاريخ التحديث"
     },
-
     "name": {
       "label": "الاسم",
       "placeholder": "أدخل اسم الشركة"
@@ -3571,19 +3747,17 @@
       "label": "المنطقة",
       "placeholder": "أدخل المنطقة"
     },
-
     "city": {
       "label": "المدينة",
       "placeholder": "أدخل المدينة"
     },
     "country": {
       "label": "الدولة",
-      "placeholder": "أدخل الدولة"
+      "placeholder": "أدخل الدولة",
+      "search_placeholder": "ابحث عن دولة",
+      "no_items": "لا يوجد دول"
     },
-    "state": {
-      "label": "المنطقة",
-      "placeholder": "أدخل المنطقة"
-    },
+
     "zip_code": {
       "label": "الرمز البريدي",
       "placeholder": "أدخل الرمز البريدي"
@@ -3611,11 +3785,207 @@
       "name_required": "اسم الشركة مطلوب",
       "email_required": "البريد الإلكتروني مطلوب",
       "email_invalid": "البريد الإلكتروني غير صالح"
+    },
+    "Country": {
+      "afghanistan": "أفغانستان",
+      "albania": "ألبانيا",
+      "algeria": "الجزائر",
+      "andorra": "أندورا",
+      "angola": "أنغولا",
+      "antigua_and_barbuda": "أنتيغوا وبربودا",
+      "argentina": "الأرجنتين",
+      "armenia": "أرمينيا",
+      "australia": "أستراليا",
+      "austria": "النمسا",
+      "azerbaijan": "أذربيجان",
+      "bahamas": "جزر البهاما",
+      "bahrain": "البحرين",
+      "bangladesh": "بنغلاديش",
+      "barbados": "بربادوس",
+      "belarus": "بيلاروسيا",
+      "belgium": "بلجيكا",
+      "belize": "بليز",
+      "benin": "بنين",
+      "bhutan": "بوتان",
+      "bolivia": "بوليفيا",
+      "bosnia_and_herzegovina": "البوسنة والهرسك",
+      "botswana": "بوتسوانا",
+      "brazil": "البرازيل",
+      "brunei": "بروناي",
+      "bulgaria": "بلغاريا",
+      "burkina_faso": "بوركينا فاسو",
+      "burundi": "بوروندي",
+      "cambodia": "كمبوديا",
+      "cameroon": "الكاميرون",
+      "canada": "كندا",
+      "cape_verde": "الرأس الأخضر",
+      "central_african_republic": "جمهورية أفريقيا الوسطى",
+      "chad": "تشاد",
+      "chile": "تشيلي",
+      "china": "الصين",
+      "colombia": "كولومبيا",
+      "comoros": "جزر القمر",
+      "congo": "الكونغو",
+      "costa_rica": "كوستاريكا",
+      "croatia": "كرواتيا",
+      "cuba": "كوبا",
+      "cyprus": "قبرص",
+      "czech_republic": "جمهورية التشيك",
+      "denmark": "الدنمارك",
+      "djibouti": "جيبوتي",
+      "dominica": "دومينيكا",
+      "dominican_republic": "جمهورية الدومينيكان",
+      "east_timor": "تيمور الشرقية",
+      "ecuador": "الإكوادور",
+      "egypt": "مصر",
+      "el_salvador": "السلفادور",
+      "equatorial_guinea": "غينيا الاستوائية",
+      "eritrea": "إريتريا",
+      "estonia": "إستونيا",
+      "ethiopia": "إثيوبيا",
+      "fiji": "فيجي",
+      "finland": "فنلندا",
+      "france": "فرنسا",
+      "gabon": "الغابون",
+      "gambia": "غامبيا",
+      "georgia": "جورجيا",
+      "germany": "ألمانيا",
+      "ghana": "غانا",
+      "greece": "اليونان",
+      "grenada": "غرينادا",
+      "guatemala": "غواتيمالا",
+      "guinea": "غينيا",
+      "guinea_bissau": "غينيا بيساو",
+      "guyana": "غيانا",
+      "haiti": "هايتي",
+      "honduras": "هندوراس",
+      "hungary": "المجر",
+      "iceland": "آيسلندا",
+      "india": "الهند",
+      "indonesia": "إندونيسيا",
+      "iran": "إيران",
+      "iraq": "العراق",
+      "ireland": "أيرلندا",
+      "israel": "إسرائيل",
+      "italy": "إيطاليا",
+      "ivory_coast": "ساحل العاج",
+      "jamaica": "جامايكا",
+      "japan": "اليابان",
+      "jordan": "الأردن",
+      "kazakhstan": "كازاخستان",
+      "kenya": "كينيا",
+      "kiribati": "كيريباتي",
+      "kuwait": "الكويت",
+      "kyrgyzstan": "قيرغيزستان",
+      "laos": "لاوس",
+      "latvia": "لاتفيا",
+      "lebanon": "لبنان",
+      "lesotho": "ليسوتو",
+      "liberia": "ليبيريا",
+      "libya": "ليبيا",
+      "liechtenstein": "ليختنشتاين",
+      "lithuania": "ليتوانيا",
+      "luxembourg": "لوكسمبورغ",
+      "madagascar": "مدغشقر",
+      "malawi": "ملاوي",
+      "malaysia": "ماليزيا",
+      "maldives": "جزر المالديف",
+      "mali": "مالي",
+      "malta": "مالطا",
+      "marshall_islands": "جزر مارشال",
+      "mauritania": "موريتانيا",
+      "mauritius": "موريشيوس",
+      "mexico": "المكسيك",
+      "micronesia": "ميكرونيزيا",
+      "moldova": "مولدوفا",
+      "monaco": "موناكو",
+      "mongolia": "منغوليا",
+      "montenegro": "الجبل الأسود",
+      "morocco": "المغرب",
+      "mozambique": "موزمبيق",
+      "myanmar": "ميانمار",
+      "namibia": "ناميبيا",
+      "nauru": "ناورو",
+      "nepal": "نيبال",
+      "netherlands": "هولندا",
+      "new_zealand": "نيوزيلندا",
+      "nicaragua": "نيكاراغوا",
+      "hong_kong": "هونغ كونغ",
+      "niger": "النيجر",
+      "nigeria": "نيجيريا",
+      "north_korea": "كوريا الشمالية",
+      "north_macedonia": "مقدونيا الشمالية",
+      "norway": "النرويج",
+      "oman": "عمان",
+      "pakistan": "باكستان",
+      "palau": "بالاو",
+      "palestine": "فلسطين",
+      "panama": "بنما",
+      "papua_new_guinea": "بابوا غينيا الجديدة",
+      "paraguay": "باراغواي",
+      "peru": "بيرو",
+      "philippines": "الفلبين",
+      "poland": "بولندا",
+      "portugal": "البرتغال",
+      "qatar": "قطر",
+      "romania": "رومانيا",
+      "russia": "روسيا",
+      "rwanda": "رواندا",
+      "saint_kitts_and_nevis": "سانت كيتس ونيفيس",
+      "saint_lucia": "سانت لوسيا",
+      "saint_vincent_and_the_grenadines": "سانت فنسنت وجزر غرينادين",
+      "samoa": "ساموا",
+      "san_marino": "سان مارينو",
+      "sao_tome_and_principe": "ساو تومي وبرينسيبي",
+      "saudi_arabia": "المملكة العربية السعودية",
+      "senegal": "السنغال",
+      "serbia": "صربيا",
+      "seychelles": "سيشيل",
+      "sierra_leone": "سيراليون",
+      "singapore": "سنغافورة",
+      "slovakia": "سلوفاكيا",
+      "slovenia": "سلوفينيا",
+      "solomon_islands": "جزر سليمان",
+      "somalia": "الصومال",
+      "south_africa": "جنوب أفريقيا",
+      "south_korea": "كوريا الجنوبية",
+      "south_sudan": "جنوب السودان",
+      "spain": "إسبانيا",
+      "sri_lanka": "سريلانكا",
+      "sudan": "السودان",
+      "suriname": "سورينام",
+      "sweden": "السويد",
+      "switzerland": "سويسرا",
+      "syria": "سوريا",
+      "taiwan": "تايوان",
+      "tajikistan": "طاجيكستان",
+      "tanzania": "تنزانيا",
+      "thailand": "تايلاند",
+      "togo": "توغو",
+      "tonga": "تونغا",
+      "trinidad_and_tobago": "ترينيداد وتوباغو",
+      "tunisia": "تونس",
+      "turkey": "تركيا",
+      "turkmenistan": "تركمانستان",
+      "tuvalu": "توفالو",
+      "uganda": "أوغندا",
+      "ukraine": "أوكرانيا",
+      "united_arab_emirates": "الإمارات العربية المتحدة",
+      "united_kingdom": "المملكة المتحدة",
+      "united_states": "الولايات المتحدة الأمريكية",
+      "uruguay": "أوروغواي",
+      "uzbekistan": "أوزبكستان",
+      "vanuatu": "فانواتو",
+      "vatican_city": "الفاتيكان",
+      "venezuela": "فنزويلا",
+      "vietnam": "فيتنام",
+      "yemen": "اليمن",
+      "zambia": "زامبيا",
+      "zimbabwe": "زيمبابوي"
     }
   },
   "Companies": {
     "title": "الشركات",
-    "add_new": "شركة جديدة",
     "update_company": "تحديث الشركة",
     "company_details": "تفاصيل الشركة",
     "create_company": "إنشاء شركة",
@@ -3671,7 +4041,6 @@
         "label": "المنطقة",
         "placeholder": "أدخل المنطقة"
       },
-
       "city": {
         "label": "المدينة",
         "placeholder": "أدخل المدينة"
@@ -3819,14 +4188,14 @@
       "duplicate": "تم تكرار المكتب بنجاح"
     },
     "success": {
-      "created": "تم إنشاء المكتب بنجاح",
+      "create": "تم إنشاء المكتب بنجاح",
       "update": "تم تحديث المكتب بنجاح",
       "delete": "تم حذف المكتب بنجاح",
       "duplicate": "تم تكرار المكتب بنجاح"
     },
     "loading": {
-      "duplicating": "جاري تكرار المكتب...",
-      "deleting": "جاري حذف المكتب..."
+      "duplicate": "جاري تكرار المكتب...",
+      "delete": "جاري حذف المكتب..."
     },
     "error": {
       "create": "حدث خطأ أثناء إنشاء المكتب",
@@ -3836,7 +4205,6 @@
   },
   "Departments": {
     "title": "الإدارات",
-    "add_new": "إدارة جديدة",
     "edit_department": "تعديل الإدارة",
     "update_department": "تحديث الإدارة",
     "search_departments": "بحث عن الإدارات",
@@ -3872,6 +4240,10 @@
       "created_at": {
         "label": "تاريخ الإنشاء",
         "placeholder": "أدخل تاريخ الإنشاء"
+      },
+      "notes": {
+        "label": "ملاحظات القسم",
+        "placeholder": "أدخل الملاحظات"
       }
     },
     "messages": {
@@ -3905,14 +4277,65 @@
   },
   "Purchases": {
     "title": "المشتريات",
-    "add_new": "مشترية جديدة",
     "edit_purchase": "تعديل المشترية",
     "update_purchase": "تحديث المشترية",
     "search_purchases": "بحث عن المشتريات",
     "purchase_details": "تفاصيل المشترية",
+    "no_purchases_found": "لم يتم العثور على مشتريات",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {مشترية} =1 {هذه المشترية} other {# مشتريات}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {مشترية} =1 {هذه المشترية} other {# مشتريات}}",
-    "form": {},
+    "form": {
+      "purchase_number": {
+        "label": "رقم الشراء",
+        "placeholder": "أدخل رقم الشراء",
+        "required": "رقم الشراء مطلوب"
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "أدخل الوصف",
+        "required": "الوصف مطلوب"
+      },
+      "amount": {
+        "label": "المبلغ",
+        "placeholder": "أدخل المبلغ",
+        "required": "المبلغ مطلوب",
+        "invalid": "المبلغ غير صالح",
+        "positive": "يجب أن يكون المبلغ رقمًا موجبًا"
+      },
+      "category": {
+        "label": "الفئة",
+        "placeholder": "أدخل الفئة",
+        "required": "الفئة مطلوبة"
+      },
+      "status": {
+        "label": "الحالة",
+        "placeholder": "اختر الحالة",
+        "required": "الحالة مطلوبة",
+        "pending": "قيد الانتظار",
+        "paid": "مدفوع",
+        "overdue": "متأخر",
+        "cancelled": "ملغى"
+      },
+      "issue_date": {
+        "label": "تاريخ الإصدار",
+        "placeholder": "أدخل تاريخ الإصدار",
+        "invalid": "تاريخ الإصدار غير صالح"
+      },
+      "due_date": {
+        "label": "تاريخ الاستحقاق",
+        "placeholder": "أدخل تاريخ الاستحقاق",
+        "invalid": "تاريخ الاستحقاق غير صالح"
+      },
+      "incurred_at": {
+        "label": "تاريخ التحمل",
+        "placeholder": "أدخل تاريخ التحمل",
+        "invalid": "تاريخ التحمل غير صالح"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل ملاحظاتك هنا"
+      }
+    },
     "success": {
       "create": "تم إنشاء المشترية بنجاح",
       "update": "تم تحديث المشترية بنجاح",

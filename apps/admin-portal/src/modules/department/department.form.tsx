@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import NotesSection from "@root/src/components/forms/notes-section";
 import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -306,6 +307,12 @@ export default function DepartmentForm({
             )}
           />
         </div>
+
+        <NotesSection
+          inDialog={editMode}
+          control={form.control}
+          title={t("Departments.form.notes.label")}
+        />
       </form>
     </Form>
   );

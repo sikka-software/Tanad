@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -97,8 +97,8 @@ export default function JobsPage() {
   }
   return (
     <div>
-      <CustomPageMeta title={t("Jobs.title")} description={t("Jobs.description")} />
-      <DataPageLayout>
+      <CustomPageMeta title={t("Pages.Jobs.title")} description={t("Pages.Jobs.description")} />
+      <DataPageLayout count={jobs?.length} itemsText={t("Pages.Jobs.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -111,11 +111,10 @@ export default function JobsPage() {
             store={useJobsStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Jobs.title")}
+            title={t("Pages.Jobs.title")}
             onAddClick={canCreateJobs ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Jobs.create_job")}
-            searchPlaceholder={t("Jobs.search_jobs")}
-            count={jobs?.length}
+            createLabel={t("Pages.Jobs.add")}
+            searchPlaceholder={t("Pages.Jobs.search")}
             hideOptions={jobs?.length === 0}
           />
         )}
@@ -145,7 +144,7 @@ export default function JobsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Jobs.edit_job")}
+          title={actionableJob ? t("Pages.Jobs.edit") : t("Pages.Jobs.add")}
           formId="job-form"
           loadingSave={isLoading}
         >
@@ -177,9 +176,9 @@ export default function JobsPage() {
   );
 }
 
-JobsPage.messages = ["Pages", "Jobs", "General"];
+JobsPage.messages = ["Notes", "Pages", "Jobs", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../../locales/${locale}.json`)).default, JobsPage.messages),

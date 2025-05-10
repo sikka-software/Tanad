@@ -45,8 +45,8 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
       header: t("Jobs.form.type.label"),
       cellType: "select",
       options: [
-        { label: t("Jobs.form.type.full_time"), value: "full-time" },
-        { label: t("Jobs.form.type.part_time"), value: "part-time" },
+        { label: t("Jobs.form.type.full_time"), value: "full_time" },
+        { label: t("Jobs.form.type.part_time"), value: "part_time" },
         { label: t("Jobs.form.type.contract"), value: "contract" },
         { label: t("Jobs.form.type.internship"), value: "internship" },
         { label: t("Jobs.form.type.temporary"), value: "temporary" },
@@ -82,7 +82,28 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
         ),
     },
     {
+      accessorKey: "total_positions",
+      header: t("Jobs.form.total_positions.label"),
+      cell: (props: CellContext<Job, unknown>) => {
+        const value = props.row.original.total_positions;
+        if (value === null || value === undefined) return "N/A";
+        const num = typeof value === "number" ? value : parseInt(value, 10);
+        return isNaN(num) ? "N/A" : num;
+      },
+    },
+    {
+      accessorKey: "occupied_positions",
+      header: t("Jobs.form.occupied_positions.label"),
+      cell: (props: CellContext<Job, unknown>) => {
+        const value = props.row.original.occupied_positions;
+        if (value === null || value === undefined) return "N/A";
+        const num = typeof value === "number" ? value : parseInt(value, 10);
+        return isNaN(num) ? "N/A" : num;
+      },
+    },
+    {
       accessorKey: "status",
+      maxSize: 80,
       header: t("Jobs.form.status.label"),
       validationSchema: z.boolean(),
       cellType: "status",
@@ -143,6 +164,7 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditJob}
       canDuplicateAction={canDuplicateJob}
       canViewAction={canViewJob}

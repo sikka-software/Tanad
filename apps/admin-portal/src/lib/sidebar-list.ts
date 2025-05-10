@@ -1,16 +1,10 @@
 import { ModulesOptions } from "@root/tanad.config";
 import {
   Users,
-  Settings,
   LucideIcon,
   LayoutDashboard,
-  Package,
   BarChart,
-  CreditCard,
-  Briefcase,
   MapPin,
-  SaudiRiyal,
-  ShieldPlus,
   FileUser,
   TableOfContents,
 } from "lucide-react";
@@ -90,7 +84,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
     },
     {
       title: "Activity Logs",
-      translationKey: "Pages.Activity.title",
+      translationKey: "Pages.ActivityLogs.title",
       url: "/activity",
       icon: TableOfContents,
       is_active: pathname.startsWith("/activity"),
@@ -423,6 +417,7 @@ function getFleetMenus(pathname: string): SidebarMenuGroupProps["items"] {
       icon: ModulesOptions.cars.icon,
       url: ModulesOptions.cars.url,
       is_active: pathname === ModulesOptions.cars.url,
+      action: ModulesOptions.cars.url + "/add",
     },
     {
       title: ModulesOptions.trucks.label,
@@ -430,6 +425,7 @@ function getFleetMenus(pathname: string): SidebarMenuGroupProps["items"] {
       icon: ModulesOptions.trucks.icon,
       url: ModulesOptions.trucks.url,
       is_active: pathname === ModulesOptions.trucks.url,
+      action: ModulesOptions.trucks.url + "/add",
     },
   ];
 }

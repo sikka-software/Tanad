@@ -12,10 +12,15 @@ interface MetaProps {
 const CustomPageMeta: React.FC<MetaProps> = ({ title, description, keywords, author }) => {
   const t = useTranslations();
 
-  const defaultTitle = t("SEO.landing.title");
-  const defaultDescription = t("SEO.landing.description");
-  const defaultKeywords = t("SEO.landing.keywords");
-  const defaultAuthor = t("SEO.landing.author");
+  const defaultTitle = "Tanad";
+  const defaultDescription = "The backbone of your business";
+  const defaultKeywords =
+    "business, management, inventory, sales, purchase, accounting, finance, payroll, human resource, CRM, ERP, inventory management, sales management, purchase management, accounting management, finance management, payroll management, human resource management, CRM management, ERP management";
+  const defaultAuthor = "Sikka Software";
+  // const defaultTitle = t("SEO.landing.title");
+  // const defaultDescription = t("SEO.landing.description");
+  // const defaultKeywords = t("SEO.landing.keywords");
+  // const defaultAuthor = t("SEO.landing.author");
 
   return (
     <Head>

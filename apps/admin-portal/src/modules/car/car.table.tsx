@@ -127,6 +127,7 @@ const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditCar}
       canDuplicateAction={canDuplicateCar}
       canViewAction={canViewCar}

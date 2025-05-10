@@ -69,11 +69,7 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       header: t("Expenses.form.category.label"),
       validationSchema: z.string().min(1, t("Expenses.form.category.required")),
     },
-    {
-      accessorKey: "notes",
-      header: t("Expenses.form.notes.label"),
-      validationSchema: z.string().nullable(),
-    },
+
     {
       accessorKey: "status",
       header: t("Expenses.form.status.label"),
@@ -136,6 +132,7 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditExpense}
       canDuplicateAction={canDuplicateExpense}
       canViewAction={canViewExpense}

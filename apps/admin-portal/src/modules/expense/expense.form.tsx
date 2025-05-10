@@ -98,7 +98,7 @@ export function ExpenseForm({
             category: data.category.trim(),
             // ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
             status: data.status || "pending",
-            notes: data.notes?.trim(),
+            notes: data.notes,
             user_id: user?.id,
           },
           {
@@ -291,7 +291,11 @@ export function ExpenseForm({
         /> */}
         </div>
 
-        <NotesSection control={form.control} title={t("Expenses.form.notes.label")} />
+        <NotesSection
+          inDialog={editMode}
+          control={form.control}
+          title={t("Expenses.form.notes.label")}
+        />
       </form>
     </Form>
   );

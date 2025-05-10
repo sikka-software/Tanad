@@ -4,7 +4,13 @@ import { Card, CardContent, CardHeader } from "@/ui/card";
 
 import { Employee } from "@/employee/employee.types";
 
-const EmployeeCard = ({ employee }: { employee: Employee }) => {
+const EmployeeCard = ({
+  employee,
+  position,
+}: {
+  employee: Employee;
+  position: string | undefined;
+}) => {
   const t = useTranslations();
   return (
     <Card key={employee.id} className="transition-shadow hover:shadow-lg">
@@ -12,7 +18,7 @@ const EmployeeCard = ({ employee }: { employee: Employee }) => {
         <h3 className="text-lg font-semibold">
           {employee.first_name} {employee.last_name}
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{employee.position}</p>
+        {position && <p className="text-sm text-gray-600 dark:text-gray-400">{position}</p>}{" "}
       </CardHeader>
       <CardContent>
         <div className="space-y-3">

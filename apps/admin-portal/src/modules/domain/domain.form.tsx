@@ -95,7 +95,7 @@ export function DomainForm({
               annual_cost: data.annual_cost || 0,
               payment_cycle: data.payment_cycle?.trim() as "monthly" | "annual" | null,
               status: data.status?.trim() as "active" | "inactive" | null,
-              notes: data.notes?.trim() || null,
+              notes: data.notes,
             },
           },
           {
@@ -115,7 +115,7 @@ export function DomainForm({
             annual_cost: data.annual_cost || 0,
             payment_cycle: data.payment_cycle?.trim() as "monthly" | "annual" | null,
             status: data.status?.trim() as "active" | "inactive" | null,
-            notes: data.notes?.trim() || null,
+            notes: data.notes,
             user_id: user?.id,
             updated_at: new Date().toISOString(),
             enterprise_id: membership?.enterprise_id || "",
@@ -279,7 +279,11 @@ export function DomainForm({
             />
           </div>
         </div>
-        <NotesSection control={form.control} title={t("Domains.form.notes.label")} />
+        <NotesSection
+          inDialog={editMode}
+          control={form.control}
+          title={t("Domains.form.notes.label")}
+        />
       </form>
     </Form>
   );

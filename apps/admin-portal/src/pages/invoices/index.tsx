@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -98,7 +98,7 @@ export default function InvoicesPage() {
   return (
     <div>
       <CustomPageMeta title={t("Invoices.title")} description={t("Invoices.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={invoices?.length} itemsText={t("Pages.Invoices.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -111,11 +111,10 @@ export default function InvoicesPage() {
             store={useInvoiceStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Invoices.title")}
+            title={t("Pages.Invoices.title")}
             onAddClick={canCreateInvoices ? () => router.push("/invoices/add") : undefined}
-            createLabel={t("Invoices.create_new")}
-            searchPlaceholder={t("Invoices.search_invoices")}
-            count={invoices?.length}
+            createLabel={t("Pages.Invoices.add")}
+            searchPlaceholder={t("Pages.Invoices.search")}
             hideOptions={invoices?.length === 0}
           />
         )}
@@ -146,7 +145,7 @@ export default function InvoicesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Invoices.edit_invoice")}
+          title={actionableInvoice ? t("Pages.Invoices.edit") : t("Pages.Invoices.add")}
           formId="invoice-form"
           loadingSave={loadingSaveInvoice}
         >
@@ -178,8 +177,8 @@ export default function InvoicesPage() {
   );
 }
 
-InvoicesPage.messages = ["Pages", "Invoices", "General"];
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+InvoicesPage.messages = ["Notes", "Pages", "Invoices", "General", "ProductsFormSection"];
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

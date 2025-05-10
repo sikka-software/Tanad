@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -20,15 +20,15 @@ export default function AddQuotePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Quotes.add_new")} />
+      <CustomPageMeta title={t("Pages.Quotes.add")} />
       <PageTitle
         formButtons
         formId="quote-form"
         loading={isLoading}
         onCancel={() => router.push("/quotes")}
         texts={{
-          title: t("Quotes.add_new"),
-          submit_form: t("Quotes.add_new"),
+          title: t("Pages.Quotes.add"),
+          submit_form: t("Pages.Quotes.add"),
           cancel: t("General.cancel"),
         }}
       />
@@ -44,9 +44,9 @@ export default function AddQuotePage() {
   );
 }
 
-AddQuotePage.messages = ["Pages", "Quotes", "General"];
+AddQuotePage.messages = ["Notes", "Pages", "Quotes", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

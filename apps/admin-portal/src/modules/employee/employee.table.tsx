@@ -8,6 +8,8 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
+import { useJobs } from "@/job/job.hooks";
+
 import { useDepartments } from "@/department/department.hooks";
 
 import { useUpdateEmployee } from "@/employee/employee.hooks";
@@ -24,6 +26,7 @@ const EmployeesTable = ({
 }: ModuleTableProps<Employee>) => {
   const t = useTranslations();
   const { data: departments } = useDepartments();
+  const { data: jobs } = useJobs();
   const { mutateAsync: updateEmployee } = useUpdateEmployee();
   const selectedRows = useEmployeeStore((state) => state.selectedRows);
   const setSelectedRows = useEmployeeStore((state) => state.setSelectedRows);
@@ -52,6 +55,7 @@ const EmployeesTable = ({
     },
     {
       accessorKey: "email",
+      dir: "ltr",
       header: t("Employees.form.email.label"),
       validationSchema: z.string().email(t("Employees.form.email.invalid")),
     },
@@ -61,26 +65,24 @@ const EmployeesTable = ({
       validationSchema: z.string().optional(),
     },
     {
-      accessorKey: "position",
-      header: t("Employees.form.position.label"),
-      validationSchema: z.string().min(1, t("Employees.form.position.required")),
-    },
-    {
-      accessorKey: "department_id",
-      header: t("Employees.form.department.label"),
-      validationSchema: z.string().optional(),
-      cellType: "select",
-      options: departments?.map((department) => ({
-        label: department.name,
-        value: department.id,
-      })),
+      accessorKey: "job_id",
+      header: t("Employees.form.job.label"),
+      validationSchema: z.string().min(1, t("Employees.form.job.required")),
       cell: ({ row }) => {
-        const department = departments?.find((d) => d.id === row.original.department_id);
-        return department?.name || "";
+        const jobId = row.original.job_id;
+        const job = jobs?.find((j) => j.id === jobId);
+        return job ? job.title : jobId || "-";
       },
     },
     {
+      accessorKey: "nationality",
+      header: t("Employees.form.nationality.label"),
+      maxSize: 100,
+      validationSchema: z.string().min(1, t("Employees.form.nationality.required")),
+    },
+    {
       accessorKey: "status",
+      maxSize: 100,
       header: t("Employees.form.status.label"),
       validationSchema: z.enum(["active", "inactive", "on_leave", "terminated", "resigned"]),
       cellType: "select",
@@ -114,21 +116,18 @@ const EmployeesTable = ({
       let updates: EmployeeUpdateData = {};
 
       if (columnId === "department_id") {
-        // For department changes, handle department_id and department name
-        const department_id = value as string;
-        const department = departments?.find((d) => d.id === department_id);
-
-        if (department) {
-          updates = {
-            department_id: department_id,
-            // department: department.name, // Set both department_id and department name
-          };
-        } else {
-          updates = {
-            department_id: null,
-            // deFpartment: null,
-          };
-        }
+        // Removed department_id update logic
+        // const department_id = value as string;
+        // const department = departments?.find((d) => d.id === department_id);
+        // if (department) {
+        //   updates = {
+        //     department_id: department_id,
+        //   };
+        // } else {
+        //   updates = {
+        //     department_id: null,
+        //   };
+        // }
       } else if (columnId === "status") {
         updates.status = value as "active" | "inactive" | "on_leave" | "terminated";
       } else {
@@ -212,6 +211,7 @@ const EmployeesTable = ({
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditEmployee}
       canDuplicateAction={canDuplicateEmployee}
       canViewAction={canViewEmployee}

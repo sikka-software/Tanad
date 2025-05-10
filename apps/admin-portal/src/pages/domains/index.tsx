@@ -9,7 +9,7 @@ import useDomainStore from "@root/src/modules/domain/domain.store";
 import DomainsTable from "@root/src/modules/domain/domain.table";
 import { DomainUpdateData } from "@root/src/modules/domain/domain.type";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -97,7 +97,7 @@ export default function DomainsPage() {
   return (
     <div>
       <CustomPageMeta title={t("Domains.title")} description={t("Domains.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={domains?.length} itemsText={t("Pages.Domains.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -110,11 +110,10 @@ export default function DomainsPage() {
             store={useDomainStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Domains.title")}
+            title={t("Pages.Domains.title")}
             onAddClick={canCreateDomains ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Domains.create_new")}
-            searchPlaceholder={t("Domains.search_domains")}
-            count={domains?.length}
+            createLabel={t("Pages.Domains.add")}
+            searchPlaceholder={t("Pages.Domains.search")}
             hideOptions={domains?.length === 0}
           />
         )}
@@ -144,7 +143,7 @@ export default function DomainsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Domains.edit_domain")}
+          title={actionableDomain ? t("Pages.Domains.edit") : t("Pages.Domains.add")}
           formId="domain-form"
           loadingSave={loadingSaveDomain}
         >
@@ -173,9 +172,9 @@ export default function DomainsPage() {
   );
 }
 
-DomainsPage.messages = ["Pages", "Domains", "General"];
+DomainsPage.messages = ["Pages", "Domains", "Notes", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -29,11 +29,14 @@ import EmployeesTable from "@/employee/employee.table";
 
 import { EmployeeForm } from "@/modules/employee/employee.form";
 import { Employee } from "@/modules/employee/employee.types";
+import { useJobs } from "@/modules/job/job.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 export default function EmployeesPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const { data: jobs } = useJobs();
 
   const canReadEmployees = useUserStore((state) => state.hasPermission("employees.read"));
   const canCreateEmployees = useUserStore((state) => state.hasPermission("employees.create"));
@@ -101,7 +104,7 @@ export default function EmployeesPage() {
   return (
     <div>
       <CustomPageMeta title={t("Employees.title")} description={t("Employees.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={employees?.length} itemsText={t("Pages.Employees.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -114,13 +117,12 @@ export default function EmployeesPage() {
             store={useEmployeesStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Employees.title")}
+            title={t("Pages.Employees.title")}
             onAddClick={
               canCreateEmployees ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("Employees.add_new")}
-            searchPlaceholder={t("Employees.search_employees")}
-            count={employees?.length}
+            createLabel={t("Pages.Employees.add")}
+            searchPlaceholder={t("Pages.Employees.search")}
             hideOptions={employees?.length === 0}
           />
         )}
@@ -138,8 +140,13 @@ export default function EmployeesPage() {
                 data={sortedEmployees}
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
-                emptyMessage={t("Employees.no_employees_found")}
-                renderItem={(employee) => <EmployeeCard employee={employee} />}
+                emptyMessage={t("Pages.Employees.no_employees_found")}
+                renderItem={(employee) => (
+                  <EmployeeCard
+                    position={jobs?.find((j) => j.id === employee.job_id)?.title}
+                    employee={employee}
+                  />
+                )}
                 gridCols="3"
               />
             </div>
@@ -149,7 +156,7 @@ export default function EmployeesPage() {
         <FormSheet
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Employees.edit_employee")}
+          title={t("Pages.Employees.edit")}
           formId="employee-form"
           loadingSave={loadingSaveEmployee}
         >
@@ -177,9 +184,9 @@ export default function EmployeesPage() {
   );
 }
 
-EmployeesPage.messages = ["Pages", "Employees", "General"];
+EmployeesPage.messages = ["Notes", "Pages", "Employees", "Jobs", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

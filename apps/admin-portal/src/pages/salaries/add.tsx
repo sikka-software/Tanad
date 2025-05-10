@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -26,8 +26,8 @@ export default function AddSalaryPage() {
         loading={loading}
         onCancel={() => router.push("/salaries")}
         texts={{
-          title: t("Salaries.add_new"),
-          submit_form: t("Salaries.add_new"),
+          title: t("Pages.Salaries.add"),
+          submit_form: t("Pages.Salaries.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={generateDummySalary}
@@ -45,9 +45,9 @@ export default function AddSalaryPage() {
   );
 }
 
-AddSalaryPage.messages = ["Pages", "Salaries", "General"];
+AddSalaryPage.messages = ["Notes", "Pages", "Salaries", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

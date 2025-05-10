@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -100,7 +100,7 @@ export default function OnlineStoresPage() {
   return (
     <div>
       <CustomPageMeta title={t("OnlineStores.title")} description={t("OnlineStores.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={onlineStores?.length} itemsText={t("Pages.OnlineStores.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -117,9 +117,8 @@ export default function OnlineStoresPage() {
             onAddClick={
               canCreateOnlineStores ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("OnlineStores.create_new")}
-            searchPlaceholder={t("OnlineStores.search_online_stores")}
-            count={onlineStores?.length}
+            createLabel={t("Pages.OnlineStores.add")}
+            searchPlaceholder={t("Pages.OnlineStores.search")}
             hideOptions={onlineStores?.length === 0}
           />
         )}
@@ -138,7 +137,7 @@ export default function OnlineStoresPage() {
                 data={sortedOnlineStores}
                 isLoading={loadingFetchOnlineStores}
                 error={error as Error | null}
-                emptyMessage={t("OnlineStores.no_online_stores_found")}
+                emptyMessage={t("Pages.OnlineStores.no_online_stores_found")}
                 renderItem={(onlineStore) => (
                   <OnlineStoreCard key={onlineStore.id} onlineStore={onlineStore} />
                 )}
@@ -151,7 +150,7 @@ export default function OnlineStoresPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("OnlineStores.add_new")}
+          title={actionableOnlineStore ? t("Pages.OnlineStores.edit") : t("Pages.OnlineStores.add")}
           formId="online-store-form"
           loadingSave={loadingSaveOnlineStore}
         >
@@ -180,9 +179,9 @@ export default function OnlineStoresPage() {
   );
 }
 
-OnlineStoresPage.messages = ["Pages", "OnlineStores", "General"];
+OnlineStoresPage.messages = ["Notes", "Pages", "OnlineStores", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

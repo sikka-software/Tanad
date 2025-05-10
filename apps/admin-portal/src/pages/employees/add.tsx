@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -36,15 +36,15 @@ export default function AddEmployeePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Employees.add_new")} />
+      <CustomPageMeta title={t("Pages.Employees.add")} />
       <PageTitle
         formButtons
         formId="employee-form"
         loading={loadingSave}
         onCancel={() => router.push("/employees")}
         texts={{
-          title: t("Employees.add_new"),
-          submit_form: t("Employees.add_new"),
+          title: t("Pages.Employees.add"),
+          submit_form: t("Pages.Employees.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
@@ -61,9 +61,9 @@ export default function AddEmployeePage() {
   );
 }
 
-AddEmployeePage.messages = ["Pages", "Employees", "General"];
+AddEmployeePage.messages = ["Notes", "Pages", "Employees", "Forms", "Jobs", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

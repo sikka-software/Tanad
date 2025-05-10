@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -91,8 +91,8 @@ export default function QuotesPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Quotes.title")} description={t("Quotes.description")} />
-      <DataPageLayout>
+      <CustomPageMeta title={t("Pages.Quotes.title")} description={t("Pages.Quotes.description")} />
+      <DataPageLayout count={quotes?.length} itemsText={t("Pages.Quotes.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -105,11 +105,10 @@ export default function QuotesPage() {
             store={useQuotesStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Quotes.title")}
+            title={t("Pages.Quotes.title")}
             onAddClick={canCreateQuotes ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Quotes.add_new")}
-            searchPlaceholder={t("Quotes.search_quotes")}
-            count={quotes?.length}
+            createLabel={t("Pages.Quotes.add")}
+            searchPlaceholder={t("Pages.Quotes.search")}
             hideOptions={quotes?.length === 0}
           />
         )}
@@ -150,8 +149,8 @@ export default function QuotesPage() {
   );
 }
 
-QuotesPage.messages = ["Pages", "Quotes", "General"];
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+QuotesPage.messages = ["Notes", "Pages", "Quotes", "General"];
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

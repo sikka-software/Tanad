@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import NumberInputWithButtons from "@root/src/components/ui/number-input-buttons";
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2, ShoppingCart, Store, Warehouse } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -59,6 +60,7 @@ const createJobFormSchema = (t: (key: string) => string) =>
     start_date: z.date().optional(),
     end_date: z.date().optional(),
     status: z.string().default("active"),
+    total_positions: z.string().optional(),
   });
 
 export type JobFormValues = z.input<ReturnType<typeof createJobFormSchema>>;
@@ -100,11 +102,15 @@ export function JobForm({
       benefits: defaultValues?.benefits || "",
       location: defaultValues?.location || "",
       department: defaultValues?.department || "",
-      type: defaultValues?.type || "full-time",
+      type: defaultValues?.type || "full_time",
       salary: defaultValues?.salary ? String(defaultValues.salary) : undefined,
       start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
       end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
       status: defaultValues?.status || "active",
+      total_positions:
+        defaultValues && typeof (defaultValues as any).total_positions !== "undefined"
+          ? String((defaultValues as any).total_positions)
+          : "1",
     },
   });
 
@@ -140,6 +146,10 @@ export function JobForm({
               status: data.status as "active" | "inactive" | "draft" | "archived" | null,
               start_date: data.start_date?.toISOString() || null,
               end_date: data.end_date?.toISOString() || null,
+              total_positions:
+                data.total_positions && data.total_positions.trim() !== ""
+                  ? Number(data.total_positions)
+                  : undefined,
             },
           },
           {
@@ -166,6 +176,10 @@ export function JobForm({
             status: data.status as "active" | "inactive" | "draft" | "archived" | null,
             start_date: data.start_date?.toISOString() || null,
             end_date: data.end_date?.toISOString() || null,
+            total_positions:
+              data.total_positions && data.total_positions.trim() !== ""
+                ? Number(data.total_positions)
+                : undefined,
             user_id: user?.id,
           },
           {
@@ -195,7 +209,7 @@ export function JobForm({
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <div className="form-container">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="title"
@@ -228,8 +242,8 @@ export function JobForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="full-time">{t("Jobs.form.type.full_time")}</SelectItem>
-                      <SelectItem value="part-time">{t("Jobs.form.type.part_time")}</SelectItem>
+                      <SelectItem value="full_time">{t("Jobs.form.type.full_time")}</SelectItem>
+                      <SelectItem value="part_time">{t("Jobs.form.type.part_time")}</SelectItem>
                       <SelectItem value="contract">{t("Jobs.form.type.contract")}</SelectItem>
                       <SelectItem value="internship">{t("Jobs.form.type.internship")}</SelectItem>
                       <SelectItem value="temporary">{t("Jobs.form.type.temporary")}</SelectItem>
@@ -241,7 +255,7 @@ export function JobForm({
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="department"
@@ -250,17 +264,17 @@ export function JobForm({
                   <FormLabel>{t("Jobs.form.department.label")}</FormLabel>
                   <FormControl>
                     <ComboboxAdd
-                      direction={locale === "ar" ? "rtl" : "ltr"}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
                       data={departmentOptions}
                       isLoading={departmentsLoading}
                       defaultValue={field.value || ""}
                       onChange={(value) => field.onChange(value || null)}
                       texts={{
                         placeholder: t("Jobs.form.department.placeholder"),
-                        searchPlaceholder: t("Departments.search_departments"),
-                        noItems: t("Departments.no_departments"),
+                        searchPlaceholder: t("Pages.Departments.search"),
+                        noItems: t("Pages.Departments.no_departments_found"),
                       }}
-                      addText={t("Departments.add_new")}
+                      addText={t("Pages.Departments.add")}
                       onAddClick={() => {
                         setChosenForm("Departments");
                         setIsDepartmentDialogOpen(true);
@@ -280,17 +294,17 @@ export function JobForm({
                   <FormLabel>{t("Jobs.form.location.label")}</FormLabel>
                   <FormControl>
                     <ComboboxAdd
-                      direction={locale === "ar" ? "rtl" : "ltr"}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
                       data={departmentOptions}
                       isLoading={departmentsLoading}
                       defaultValue={field.value || ""}
                       onChange={(value) => field.onChange(value || null)}
                       texts={{
                         placeholder: t("Jobs.form.location.placeholder"),
-                        searchPlaceholder: t("Locations.search_locations"),
-                        noItems: t("Locations.no_locations"),
+                        searchPlaceholder: t("Pages.Locations.search"),
+                        noItems: t("Pages.Locations.no_locations"),
                       }}
-                      addText={t("Locations.add_new")}
+                      addText={t("Pages.Locations.add")}
                       onAddClick={() => setIsChooseLocationDialogOpen(true)}
                     />
                     {/* <Input placeholder={t("Jobs.form.location.placeholder")} {...field} /> */}
@@ -301,7 +315,7 @@ export function JobForm({
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="start_date"
@@ -340,6 +354,33 @@ export function JobForm({
               )}
             />
           </div>
+
+          <FormField
+            control={form.control}
+            name="total_positions"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Jobs.form.total_positions.label")}</FormLabel>
+                <FormControl>
+                  <NumberInputWithButtons
+                    value={(() => {
+                      const stringToParse: string = field.value || "";
+                      return parseInt(stringToParse, 10);
+                    })()}
+                    minValue={0}
+                    onChange={(numericValue) => {
+                      if (isNaN(numericValue)) {
+                        field.onChange("");
+                      } else {
+                        field.onChange(numericValue.toString());
+                      }
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}
@@ -507,13 +548,14 @@ export function JobForm({
       <FormDialog
         open={isDepartmentDialogOpen}
         onOpenChange={setIsDepartmentDialogOpen}
-        title={t(`${chosenForm}.add_new`)}
+        title={t(`Pages.${chosenForm}.add`)}
         formId="department-form"
         loadingSave={isDepartmentSaving}
         // dummyData={() => process.env.NODE_ENV === "development" && generateDummyDepartment()} // Commented out
       >
         {chosenForm === "Warehouses" && (
           <WarehouseForm
+            nestedForm
             formHtmlId="warehouse-form"
             onSuccess={() => {
               setIsDepartmentSaving(false);
@@ -523,6 +565,7 @@ export function JobForm({
         )}
         {chosenForm === "Offices" && (
           <OfficeForm
+            nestedForm
             formHtmlId="office-form"
             onSuccess={() => {
               setIsDepartmentSaving(false);
@@ -532,6 +575,7 @@ export function JobForm({
         )}
         {chosenForm === "Branches" && (
           <BranchForm
+            nestedForm
             formHtmlId="branch-form"
             onSuccess={() => {
               setIsDepartmentSaving(false);
@@ -541,6 +585,7 @@ export function JobForm({
         )}
         {chosenForm === "Departments" && (
           <DepartmentForm
+            nestedForm
             formHtmlId="department-form"
             onSuccess={() => {
               setIsDepartmentSaving(false);

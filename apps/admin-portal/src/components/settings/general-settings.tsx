@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Flag } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
@@ -12,7 +11,6 @@ import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Separator } from "@/ui/separator";
 import { Skeleton } from "@/ui/skeleton";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
 
@@ -129,7 +127,7 @@ const GeneralSettings = ({
       // If email has changed, you might need to update it through auth system
       if (data.email !== user?.email) {
         // Handle email update through auth provider if needed
-        console.log("Email changed, might need additional auth updates");
+        // console.log("Email changed, might need additional auth updates");
       }
 
       // Reset the form with the current data to clear dirty state
@@ -182,7 +180,7 @@ const GeneralSettings = ({
                       <FormLabel>{t("Settings.general.profile.name")}</FormLabel>
                       <FormControl>
                         {isLoadingProfile ? (
-                          <Skeleton className="h-10 w-full" />
+                          <Skeleton className="h-9 w-full" />
                         ) : (
                           <Input {...field} disabled={isSaving} />
                         )}
@@ -199,7 +197,7 @@ const GeneralSettings = ({
                       <FormLabel>{t("Settings.general.profile.email")}</FormLabel>
                       <FormControl>
                         {isLoadingProfile ? (
-                          <Skeleton className="h-10 w-full" />
+                          <Skeleton className="h-9 w-full" />
                         ) : (
                           <Input type="email" {...field} disabled={true} />
                         )}
@@ -223,7 +221,7 @@ const GeneralSettings = ({
                     <FormItem>
                       <FormLabel>{t("Settings.general.regional.language")}</FormLabel>
                       {isLoadingProfile ? (
-                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-9 w-full" />
                       ) : (
                         <Select
                           disabled={isSaving}
@@ -260,7 +258,7 @@ const GeneralSettings = ({
                       <FormItem>
                         <FormLabel>{t("Settings.general.regional.timezone")}</FormLabel>
                         {isLoadingProfile ? (
-                          <Skeleton className="h-10 w-full" />
+                          <Skeleton className="h-9 w-full" />
                         ) : (
                           <BetaFlag
                             title={t("Flags.timezone_soon.title")}

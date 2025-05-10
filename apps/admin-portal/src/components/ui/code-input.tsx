@@ -28,7 +28,7 @@ const CodeInput = ({ children, onSerial, onRandom }: CodeInputProps) => {
             <Hash className="size-6" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={onSerial}>
             <DiamondPlus /> {t("General.next_number")}
           </DropdownMenuItem>

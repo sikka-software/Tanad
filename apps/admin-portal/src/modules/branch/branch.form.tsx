@@ -68,6 +68,7 @@ export function BranchForm({
   onSuccess,
   defaultValues,
   editMode,
+  nestedForm,
 }: ModuleFormProps<BranchUpdateData | BranchCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
@@ -128,27 +129,24 @@ export function BranchForm({
     }
 
     // Helper to convert empty string/null to null
-    const optionalString = (val: string | null | undefined): string | null => {
-      return val && val.trim() !== "" ? val.trim() : null;
-    };
 
     // Prepare payload - ensure optional fields are null if empty and required fields are present
     const payload: BranchCreateData = {
       name: data.name.trim(),
       code: data.code?.trim() || null,
-      phone: optionalString(data.phone) ?? null,
-      email: optionalString(data.email) ?? null,
+      phone: data.phone,
+      email: data.email,
       manager: data.manager && data.manager.trim() !== "" ? data.manager : null,
       notes: data.notes ?? null,
       status: data.status,
-      short_address: optionalString(data.short_address) ?? null,
-      building_number: optionalString(data.building_number) ?? null,
-      street_name: optionalString(data.street_name) ?? null,
-      city: optionalString(data.city) ?? null,
-      region: optionalString(data.region) ?? null,
-      country: optionalString(data.country) ?? null,
-      zip_code: optionalString(data.zip_code) ?? null,
-      additional_number: optionalString((data as any).additional_number) ?? null,
+      short_address: data.short_address,
+      building_number: data.building_number,
+      street_name: data.street_name,
+      city: data.city,
+      region: data.region,
+      country: data.country,
+      zip_code: data.zip_code,
+      additional_number: data.additional_number,
       user_id: user.id,
       enterprise_id: enterprise.id,
     };
@@ -202,7 +200,6 @@ export function BranchForm({
     <div>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-          {/* <FormSectionHeader inDialog title={t("Branches.form.details.label")} /> */}
           <div className="form-container">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
@@ -308,7 +305,7 @@ export function BranchForm({
                     <FormLabel>{t("Branches.form.manager.label")}</FormLabel>
                     <FormControl>
                       <ComboboxAdd
-                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={employeeOptions}
                         isLoading={employeesLoading}
                         defaultValue={field.value || ""}
@@ -320,7 +317,7 @@ export function BranchForm({
                           searchPlaceholder: t("Employees.search_employees"),
                           noItems: t("Branches.form.manager.no_employees"),
                         }}
-                        addText={t("Employees.add_new")}
+                        addText={t("Pages.Employees.add")}
                         onAddClick={() => setIsEmployeeDialogOpen(true)}
                         ariaInvalid={!!form.formState.errors.manager}
                       />
@@ -337,7 +334,7 @@ export function BranchForm({
                     <FormLabel>{t("Branches.form.status.label")}</FormLabel>
                     <FormControl>
                       <CommandSelect
-                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={[
                           { label: t("Branches.form.status.active"), value: "active" },
                           { label: t("Branches.form.status.inactive"), value: "inactive" },
@@ -364,22 +361,29 @@ export function BranchForm({
           </div>
 
           <AddressFormSection
+            dir={locale === "ar" ? "rtl" : "ltr"}
+            inDialog={editMode || nestedForm}
             title={t("Branches.form.address.label")}
             control={form.control}
             isLoading={isLoading}
           />
-          <NotesSection control={form.control} title={t("Branches.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode || nestedForm}
+            control={form.control}
+            title={t("Branches.form.notes.label")}
+          />
         </form>
       </Form>
 
       <FormDialog
         open={isEmployeeDialogOpen}
         onOpenChange={setIsEmployeeDialogOpen}
-        title={t("Employees.add_new")}
+        title={t("Pages.Employees.add")}
         formId="employee-form"
         loadingSave={isEmployeeSaving}
       >
         <EmployeeForm
+          nestedForm
           formHtmlId="employee-form"
           onSuccess={() => {
             setIsEmployeeSaving(false);

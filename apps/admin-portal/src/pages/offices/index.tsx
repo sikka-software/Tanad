@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -97,7 +97,7 @@ export default function OfficesPage() {
         title={t("Pages.Offices.title")}
         description={t("Pages.Offices.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={offices?.length} itemsText={t("Pages.Offices.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -112,9 +112,8 @@ export default function OfficesPage() {
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Offices.title")}
             onAddClick={canCreateOffices ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Pages.Offices.add_new")}
-            searchPlaceholder={t("Offices.search_offices")}
-            count={offices?.length}
+            createLabel={t("Pages.Offices.add")}
+            searchPlaceholder={t("Pages.Offices.search")}
             hideOptions={offices?.length === 0}
           />
         )}
@@ -133,7 +132,7 @@ export default function OfficesPage() {
                 data={sortedOffices}
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
-                emptyMessage={t("Offices.no_offices_found")}
+                emptyMessage={t("Pages.Offices.no_offices_found")}
                 renderItem={(office) => <OfficeCard office={office} />}
                 gridCols="3"
               />
@@ -144,7 +143,7 @@ export default function OfficesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Offices.edit_office")}
+          title={actionableOffice ? t("Pages.Offices.edit") : t("Pages.Offices.add")}
           formId="office-form"
           loadingSave={loadingSaveOffice}
         >
@@ -176,9 +175,9 @@ export default function OfficesPage() {
   );
 }
 
-OfficesPage.messages = ["Offices", "Pages", "General"];
+OfficesPage.messages = ["Offices", "Pages", "Forms", "General", "Notes"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

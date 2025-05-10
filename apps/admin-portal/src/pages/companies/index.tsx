@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -93,8 +93,11 @@ export default function CompaniesPage() {
   }
   return (
     <div>
-      <CustomPageMeta title={t("Companies.title")} description={t("Companies.description")} />
-      <DataPageLayout>
+      <CustomPageMeta
+        title={t("Pages.Companies.title")}
+        description={t("Pages.Companies.description")}
+      />
+      <DataPageLayout count={companies?.length} itemsText={t("Pages.Companies.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -107,13 +110,12 @@ export default function CompaniesPage() {
             store={useCompanyStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Companies.title")}
+            title={t("Pages.Companies.title")}
             onAddClick={
               canCreateCompanies ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("Companies.create_company")}
-            searchPlaceholder={t("Companies.search_companies")}
-            count={companies?.length}
+            createLabel={t("Pages.Companies.create")}
+            searchPlaceholder={t("Pages.Companies.search")}
             hideOptions={companies?.length === 0}
           />
         )}
@@ -143,7 +145,7 @@ export default function CompaniesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Companies.edit_company")}
+          title={actionableCompany ? t("Pages.Companies.edit") : t("Pages.Companies.add")}
           formId="company-form"
           loadingSave={loadingSaveCompany}
         >
@@ -176,9 +178,9 @@ export default function CompaniesPage() {
   );
 }
 
-CompaniesPage.messages = ["Pages", "General", "Companies", "Forms"];
+CompaniesPage.messages = ["Notes", "Pages", "General", "Companies", "Forms"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

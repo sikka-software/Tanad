@@ -1,6 +1,6 @@
 import { E_COMMERCE_PLATFORMS } from "@root/src/lib/constants";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -25,7 +25,6 @@ export default function AddOnlineStorePage() {
     const form = (window as any).onlineStoreForm;
     if (form) {
       let dd = dummyData.randomPicker(E_COMMERCE_PLATFORMS);
-      console.log(dd.value);
       form.setValue("domain_name", dummyData.first_name.toLowerCase() + ".com");
       form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
       form.setValue("platform", dd.value);
@@ -35,15 +34,15 @@ export default function AddOnlineStorePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("OnlineStores.add_new")} />
+      <CustomPageMeta title={t("Pages.OnlineStores.add")} />
       <PageTitle
         formButtons
         formId="online-store-form"
         loading={isLoading}
         onCancel={() => router.push("/online_stores")}
         texts={{
-          title: t("OnlineStores.add_new"),
-          submit_form: t("OnlineStores.add_new"),
+          title: t("Pages.OnlineStores.add"),
+          submit_form: t("Pages.OnlineStores.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
@@ -60,9 +59,9 @@ export default function AddOnlineStorePage() {
   );
 }
 
-AddOnlineStorePage.messages = ["Pages", "OnlineStores", "General"];
+AddOnlineStorePage.messages = ["Notes", "Pages", "OnlineStores", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

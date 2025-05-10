@@ -1,11 +1,18 @@
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
-import { Tabs, TabsList, TabsTrigger, TabsContent, TabsContents } from "@/ui/tabs";
+
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContents,
+  TabsContent,
+} from "@/components/animate-ui/components/tabs";
 
 export const DepartmentsFeatures = () => {
   return (
-    <Tabs defaultValue="account" className="bg-muted mx-auto rounded-lg mb-24">
+    <Tabs defaultValue="account" className="bg-muted mx-auto mb-24 rounded-lg">
       <TabsList className="gap-4">
         <TabsTrigger value="invoicing">Invoicing</TabsTrigger>
         <TabsTrigger value="crm">CRM</TabsTrigger>

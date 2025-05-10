@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -107,10 +107,10 @@ export default function EmployeeRequestsPage() {
   return (
     <div>
       <CustomPageMeta
-        title={t("EmployeeRequests.title")}
-        description={t("EmployeeRequests.description")}
+        title={t("Pages.EmployeeRequests.title")}
+        description={t("Pages.EmployeeRequests.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={requests?.length} itemsText={t("Pages.EmployeeRequests.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -123,13 +123,12 @@ export default function EmployeeRequestsPage() {
             store={useEmployeeRequestsStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("EmployeeRequests.title")}
+            title={t("Pages.EmployeeRequests.title")}
             onAddClick={
               canCreateEmployeeRequests ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("EmployeeRequests.add_new")}
-            searchPlaceholder={t("EmployeeRequests.search_requests")}
-            count={requests?.length}
+            createLabel={t("Pages.EmployeeRequests.add")}
+            searchPlaceholder={t("Pages.EmployeeRequests.search")}
             hideOptions={requests?.length === 0}
           />
         )}
@@ -187,8 +186,8 @@ export default function EmployeeRequestsPage() {
   );
 }
 
-EmployeeRequestsPage.messages = ["Pages", "EmployeeRequests", "General"];
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+EmployeeRequestsPage.messages = ["Notes", "Pages", "EmployeeRequests", "General"];
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

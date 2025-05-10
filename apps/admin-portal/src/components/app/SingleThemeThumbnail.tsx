@@ -34,7 +34,7 @@ export function SingleThemeThumbnail({
       )}
     >
       {locked && (
-        <div className="absolute end-2 top-2 z-20 flex items-center justify-center gap-2 rounded bg-black/75 p-1 px-2 text-sm text-white">
+        <div className="absolute end-2 top-2 z-20 flex items-center justify-center gap-2 rounded-md bg-black/75 p-1 px-2 text-sm text-white">
           <Lock className="w-4" /> <span>{t("General.upgrade")}</span>
         </div>
       )}

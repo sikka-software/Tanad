@@ -51,18 +51,15 @@ const createRequestSchema = (t: (key: string) => string) =>
     notes: z.any().optional().nullable(),
   });
 
-// Infer the type from the Zod schema for form values
 type EmployeeRequestFormSchema = ReturnType<typeof createRequestSchema>;
-// Use z.infer for the final validated shape
 export type EmployeeRequestFormValues = z.infer<EmployeeRequestFormSchema>;
-// Use z.input for the initial/input shape (allows undefined for defaulted fields)
-type EmployeeRequestFormInput = z.input<EmployeeRequestFormSchema>;
 
 export function EmployeeRequestForm({
   formHtmlId,
   onSuccess,
   defaultValues,
   editMode,
+  nestedForm,
 }: ModuleFormProps<EmployeeRequestUpdateData | EmployeeRequestCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
@@ -116,7 +113,7 @@ export function EmployeeRequestForm({
       ...data,
       title: data.title.trim(),
       description: data.description?.trim() || undefined,
-      notes: data.notes?.trim() || undefined,
+      notes: data.notes,
       start_date: data.start_date ? data.start_date.toISOString() : undefined,
       end_date: data.end_date ? data.end_date.toISOString() : undefined,
     };
@@ -181,7 +178,7 @@ export function EmployeeRequestForm({
                   <FormControl>
                     <ComboboxAdd
                       ariaInvalid={form.formState.errors.employee_id !== undefined}
-                      direction={locale === "ar" ? "rtl" : "ltr"}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
                       data={employeeOptions}
                       disabled={isLoadingSave}
                       isLoading={employeesLoading}
@@ -203,7 +200,7 @@ export function EmployeeRequestForm({
                         searchPlaceholder: t("Employees.search_employees"),
                         noItems: t("EmployeeRequests.form.employee.no_employees"),
                       }}
-                      addText={t("Employees.add_new")}
+                      addText={t("Employees.add")}
                       onAddClick={() => setIsEmployeeDialogOpen(true)}
                     />
                   </FormControl>
@@ -373,18 +370,23 @@ export function EmployeeRequestForm({
               )}
             />
           </div>
-          <NotesSection control={form.control} title={t("EmployeeRequests.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode || nestedForm}
+            control={form.control}
+            title={t("EmployeeRequests.form.notes.label")}
+          />
         </form>
       </Form>
 
       <FormDialog
         open={isEmployeeDialogOpen}
         onOpenChange={setIsEmployeeDialogOpen}
-        title={t("Employees.add_new")}
+        title={t("Pages.Employees.add")}
         formId="employee-form"
         loadingSave={isLoadingCreateEmployee}
       >
         <EmployeeForm
+          nestedForm
           formHtmlId="employee-form"
           onSuccess={() => {
             setIsEmployeeDialogOpen(false);

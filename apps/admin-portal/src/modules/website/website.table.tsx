@@ -61,6 +61,7 @@ const WebsitesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     },
     {
       accessorKey: "status",
+      maxSize: 80,
       header: t("Websites.form.status.label"),
       validationSchema: z.enum(["active", "inactive"]),
       cellType: "status",
@@ -132,6 +133,7 @@ const WebsitesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditWebsite}
       canDuplicateAction={canDuplicateWebsite}
       canViewAction={canViewWebsite}

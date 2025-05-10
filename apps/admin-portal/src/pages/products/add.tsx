@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
@@ -43,15 +43,15 @@ export default function AddProductPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Products.add_new")} />
+      <CustomPageMeta title={t("Pages.Products.add")} />
       <PageTitle
         formButtons
         formId="product-form"
         loading={isLoading}
         onCancel={() => router.push("/products")}
         texts={{
-          title: t("Products.add_new"),
-          submit_form: t("Products.add_new"),
+          title: t("Pages.Products.add"),
+          submit_form: t("Pages.Products.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
@@ -62,9 +62,9 @@ export default function AddProductPage() {
   );
 }
 
-AddProductPage.messages = ["Pages", "Products", "General"];
+AddProductPage.messages = ["Notes", "Pages", "Products", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

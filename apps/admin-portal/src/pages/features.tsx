@@ -1,6 +1,6 @@
 import settings from "@root/landing.config";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 
 import BottomCTA from "@/components/landing/BottomCTA";
@@ -51,7 +51,7 @@ export default function FeaturesPage() {
 
 FeaturesPage.messages = ["Pages", "General", "Features"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, FeaturesPage.messages),

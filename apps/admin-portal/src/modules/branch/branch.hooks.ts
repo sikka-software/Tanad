@@ -231,7 +231,7 @@ export function useBranchDatasheet(initialData: Branch[] = []) {
                 created_at: _createdAt,
                 ...updatePayload
               } = changedBranch;
-              console.log("Updating branch:", changedBranchId, updatePayload);
+              // console.log("Updating branch:", changedBranchId, updatePayload);
               updateMutation.mutate({
                 id: changedBranchId,
                 data: updatePayload as BranchUpdateData,

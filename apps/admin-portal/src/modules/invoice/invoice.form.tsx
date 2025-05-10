@@ -52,17 +52,17 @@ const createInvoiceSchema = (t: (key: string) => string) =>
           product_id: z.string().optional(),
           description: z.string(),
           quantity: z
-            .number({ invalid_type_error: t("Invoices.form.quantity.invalid") })
-            .min(1, t("Invoices.form.quantity.required")),
+            .number({ invalid_type_error: t("ProductsFormSection.quantity.invalid") })
+            .min(1, t("ProductsFormSection.quantity.required")),
           unit_price: z
-            .number({ invalid_type_error: t("Invoices.form.price.invalid") })
-            .min(0, t("Invoices.form.price.required")),
+            .number({ invalid_type_error: t("ProductsFormSection.unit_price.invalid") })
+            .min(0, t("ProductsFormSection.unit_price.required")),
         }),
       )
-      .min(1, t("Invoices.form.items.required"))
+      .min(1, t("ProductsFormSection.items.required"))
       .refine(
         (items) => items.every((item) => item.description?.trim() !== "" || item.product_id),
-        t("Invoices.form.items.required"),
+        t("ProductsFormSection.items.required"),
       ),
   });
 
@@ -73,6 +73,7 @@ export function InvoiceForm({
   editMode,
   onSuccess,
   defaultValues,
+  nestedForm,
 }: ModuleFormProps<InvoiceUpdateData | InvoiceCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
@@ -471,33 +472,37 @@ export function InvoiceForm({
             remove={remove}
             onAddNewProduct={() => setIsNewProductDialogOpen(true)}
             handleProductSelection={handleProductSelection}
-            title={t("Invoices.products.title")}
+            title={t("ProductsFormSection.title")}
             isLoading={loading}
             isError={form.formState.errors.items as FieldError}
           />
-          <NotesSection control={form.control} title={t("Invoices.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode || nestedForm}
+            control={form.control}
+            title={t("Invoices.form.notes.label")}
+          />
         </form>
       </Form>
 
       <FormDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        title={t("Clients.add_new")}
+        title={t("Pages.Clients.add")}
         formId="client-form"
         cancelText={t("cancel")}
         submitText={t("save")}
       >
-        <ClientForm formHtmlId="client-form" />
+        <ClientForm formHtmlId="client-form" nestedForm />
       </FormDialog>
       <FormDialog
         open={isNewProductDialogOpen}
         onOpenChange={setIsNewProductDialogOpen}
-        title={t("Products.add_new")}
+        title={t("Pages.Products.add")}
         formId="product-form"
         cancelText={t("cancel")}
         submitText={t("save")}
       >
-        <ProductForm formHtmlId="product-form" />
+        <ProductForm formHtmlId="product-form" nestedForm />
       </FormDialog>
     </>
   );

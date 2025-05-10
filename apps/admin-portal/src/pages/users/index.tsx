@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -102,12 +102,12 @@ export default function UsersPage() {
     return <NoPermission />;
   }
 
-  const formDialogTitle = actionableUser ? t("Users.edit_user") : t("Users.add_new");
+  const formDialogTitle = actionableUser ? t("Pages.Users.edit") : t("Pages.Users.add");
 
   return (
     <div>
-      <CustomPageMeta title={t("Users.title")} description={t("Users.description")} />
-      <DataPageLayout>
+      <CustomPageMeta title={t("Pages.Users.title")} description={t("Pages.Users.description")} />
+      <DataPageLayout count={users?.length} itemsText={t("Pages.Users.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -120,11 +120,10 @@ export default function UsersPage() {
             store={useEnterpriseUsersStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Users.title")}
+            title={t("Pages.Users.title")}
             onAddClick={handleAddClick}
-            createLabel={t("Users.add_new")}
-            searchPlaceholder={t("Users.search_placeholder")}
-            count={users?.length}
+            createLabel={t("Pages.Users.add")}
+            searchPlaceholder={t("Pages.Users.search")}
             hideOptions={users?.length === 0}
           />
         )}
@@ -143,7 +142,7 @@ export default function UsersPage() {
                 data={sortedUsers}
                 isLoading={isLoading}
                 error={error as Error | null}
-                emptyMessage={t("Users.no_users_found")}
+                emptyMessage={t("Pages.Users.no_users_found")}
                 renderItem={(user) => <UserCard key={user.id} user={user} />}
                 gridCols="3"
               />
@@ -154,7 +153,7 @@ export default function UsersPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={formDialogTitle}
+          title={actionableUser ? t("Pages.Users.edit") : t("Pages.Users.add")}
           formId="user-form"
           loadingSave={loadingSaveUser}
         >
@@ -183,9 +182,9 @@ export default function UsersPage() {
   );
 }
 
-UsersPage.messages = ["Pages", "Users", "General"];
+UsersPage.messages = ["Notes", "Pages", "Users", "Roles", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../../locales/${locale}.json`)).default, UsersPage.messages),

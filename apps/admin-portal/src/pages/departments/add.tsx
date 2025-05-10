@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
@@ -32,7 +32,7 @@ export default function AddDepartmentPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Departments.add_new")} />
+      <CustomPageMeta title={t("Pages.Departments.add")} />
       <PageTitle
         formButtons
         formId="department-form"
@@ -40,8 +40,8 @@ export default function AddDepartmentPage() {
         onCancel={() => router.push("/departments")}
         dummyButton={handleDummyData}
         texts={{
-          title: t("Departments.add_new"),
-          submit_form: t("Departments.add_new"),
+          title: t("Pages.Departments.add"),
+          submit_form: t("Pages.Departments.add"),
           cancel: t("General.cancel"),
         }}
       />
@@ -58,9 +58,9 @@ export default function AddDepartmentPage() {
   );
 }
 
-AddDepartmentPage.messages = ["Pages", "Departments", "General"];
+AddDepartmentPage.messages = ["Notes", "Pages", "Departments", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

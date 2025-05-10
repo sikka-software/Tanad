@@ -56,7 +56,7 @@ const modelMap: Record<string, ModelConfig> = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { model, id } = req.query;
-  console.log("API Handler - Received request for model:", model, "with ID:", id);
+  // console.log("API Handler - Received request for model:", model, "with ID:", id);
   // Validate model
   if (typeof model !== "string" || !(model in modelMap)) {
     return res.status(404).json({ message: "Model not found" });
@@ -86,7 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  console.log(`API Handler - Authenticated user ID: ${user.id}`);
+  // console.log(`API Handler - Authenticated user ID: ${user.id}`);
 
   // Handle GET request
   if (req.method === "GET") {
@@ -95,7 +95,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where: eq(table[idField], id),
       });
 
-      console.log("record is ", record);
+      // console.log("record is ", record);
 
       if (!record) {
         return res.status(404).json({ message: `${model} not found` });
@@ -108,7 +108,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   // Handle PUT request
   if (req.method === "PUT") {
-    console.log("API Handler - PUT request received");
+    // console.log("API Handler - PUT request received");
     try {
       const existingRecord = await query.findFirst({
         where: eq(table[idField], id),
@@ -118,7 +118,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ message: `${model} not found` });
       }
 
-      console.log("API Handler - Existing record found:", JSON.stringify(existingRecord, null, 2));
+      // console.log("API Handler - Existing record found:", JSON.stringify(existingRecord, null, 2));
 
       // Check ownership if the model has a user_id field (Example - adjust if needed)
       // Assuming enterprise_id implies ownership/permission in this context
@@ -135,7 +135,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(403).json({ error: `Failed to verify authorization for ${model}` });
         }
 
-        console.log(`API Handler - User's membership enterprise ID: ${membership.enterprise_id}`);
+        // console.log(`API Handler - User's membership enterprise ID: ${membership.enterprise_id}`);
 
         if (existingRecord.enterprise_id !== membership.enterprise_id) {
           console.error(
@@ -145,7 +145,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
 
-      console.log("API Handler - req.body before update:", JSON.stringify(req.body, null, 2));
+      // console.log("API Handler - req.body before update:", JSON.stringify(req.body, null, 2));
 
       // --- Explicitly define fields to update ---
       const {
@@ -166,10 +166,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
       // --- End Explicit Update Definition ---
 
-      console.log(
-        "API Handler - Data being sent to Supabase update:",
-        JSON.stringify(updatableData, null, 2),
-      );
+      // console.log(
+      //   "API Handler - Data being sent to Supabase update:",
+      //   JSON.stringify(updatableData, null, 2),
+      // );
 
       // Perform the update using the AUTHENTICATED supabase client
       // Use the actual model name string from the query param
@@ -180,7 +180,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .select()
         .single(); // Assuming you expect one record back
 
-      console.log("API Handler - Updated record:", JSON.stringify(updatedRecord, null, 2));
+      // console.log("API Handler - Updated record:", JSON.stringify(updatedRecord, null, 2));
       if (updateError) {
         console.error(`Supabase update error for ${model}:`, updateError);
         // Throw the specific Supabase error for better debugging

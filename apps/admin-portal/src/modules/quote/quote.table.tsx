@@ -134,6 +134,7 @@ const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditQuote}
       canDuplicateAction={canDuplicateQuote}
       canViewAction={canViewQuote}

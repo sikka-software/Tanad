@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { convertToPascalCase } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -58,14 +59,13 @@ export function RoleForm({
   const permissionsByCategory = permissions.reduce<
     Record<string, Array<Permission>> // Use the imported Permission type
   >((acc, permission) => {
-    // Use permission.category which is already derived in the hook
-    const displayCategory = permission.category;
+    let moduleName = convertToPascalCase(permission.id.split(".")[0]);
 
-    if (!acc[displayCategory]) {
-      acc[displayCategory] = [];
+    if (!acc[moduleName]) {
+      acc[moduleName] = [];
     }
     // Push the *entire permission object*
-    acc[displayCategory].push(permission);
+    acc[moduleName].push(permission);
     return acc;
   }, {});
 
@@ -196,19 +196,14 @@ export function RoleForm({
                   <AccordionItem key={category} value={category}>
                     <AccordionTrigger className="py-2">
                       <div className="flex w-full items-center justify-between pe-4">
-                        {/* Display the capitalized category name */}
-                        <span>{t(`${category}.title`)}</span>
+                        <span>{t(`Pages.${category}.title`)}</span>
                         <div className="flex items-center space-x-2">
                           <Checkbox
-                            // Check if all permissions in this category are selected by permission.id
                             checked={perms.every((p) => selectedPermissions.includes(p.id))}
-                            // Pass the display category name (e.g., "Companies")
                             onCheckedChange={() => toggleCategoryPermissions(category)}
                             onClick={(e) => e.stopPropagation()}
-                            // Add an id for accessibility if needed, e.g., `category-${category}-select-all`
                           />
                           <span className="text-muted-foreground text-xs">
-                            {/* Count selected permissions in this category by permission.id */}
                             {perms.filter((p) => selectedPermissions.includes(p.id)).length}/
                             {perms.length}
                           </span>

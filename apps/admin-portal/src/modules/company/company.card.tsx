@@ -17,7 +17,7 @@ const CompanyCard = ({ company }: { company: Company }) => {
             {company.industry && <p className="text-sm text-gray-500">{company.industry}</p>}
           </div>
           <Badge variant={company.status === "active" ? "default" : "secondary"}>
-            {company.status === "active" ? t("Companies.active") : t("Companies.inactive")}
+            {t(`Companies.form.status.${company.status}`)}
           </Badge>
         </div>
       </CardHeader>

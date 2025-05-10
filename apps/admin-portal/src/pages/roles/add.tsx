@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -22,15 +22,15 @@ export default function AddRolePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Roles.add_new")} />
+      <CustomPageMeta title={t("Pages.Roles.add")} />
       <PageTitle
         formButtons
         formId="role-form"
         loading={isLoading}
         onCancel={() => router.push("/roles")}
         texts={{
-          title: t("Roles.add_new"),
-          submit_form: t("Roles.add_new"),
+          title: t("Pages.Roles.add"),
+          submit_form: t("Pages.Roles.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
@@ -50,9 +50,9 @@ export default function AddRolePage() {
   );
 }
 
-AddRolePage.messages = ["Pages", "Roles", "General"];
+AddRolePage.messages = ["Notes", "Pages", "Roles", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

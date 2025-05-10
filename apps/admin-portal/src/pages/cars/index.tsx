@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -92,7 +92,7 @@ export default function CarsPage() {
   return (
     <div>
       <CustomPageMeta title={t("Cars.title")} description={t("Cars.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={cars?.length} itemsText={t("Pages.Cars.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -105,11 +105,10 @@ export default function CarsPage() {
             store={useCarStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Cars.title")}
+            title={t("Pages.Cars.title")}
             onAddClick={canCreateCars ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Cars.create_new")}
-            searchPlaceholder={t("Cars.search_cars")}
-            count={cars?.length}
+            createLabel={t("Pages.Cars.add")}
+            searchPlaceholder={t("Pages.Cars.search")}
             hideOptions={cars?.length === 0}
           />
         )}
@@ -139,7 +138,7 @@ export default function CarsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Cars.edit_car")}
+          title={actionableCar ? t("Pages.Cars.edit") : t("Pages.Cars.add")}
           formId="car-form"
           loadingSave={loadingSaveCar}
         >
@@ -168,9 +167,9 @@ export default function CarsPage() {
   );
 }
 
-CarsPage.messages = ["Pages", "Cars", "General"];
+CarsPage.messages = ["Pages", "Cars", "Notes", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../../locales/${locale}.json`)).default, CarsPage.messages),

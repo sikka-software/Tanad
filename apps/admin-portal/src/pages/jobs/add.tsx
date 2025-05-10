@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -34,7 +34,7 @@ export default function AddJobPage() {
       form.setValue("department", dummyData.job_department);
       form.setValue(
         "type",
-        dummyData.randomPicker(["full-time", "part-time", "contract", "internship", "temporary"]),
+        dummyData.randomPicker(["full_time", "part_time", "contract", "internship", "temporary"]),
       );
       form.setValue("salary", dummyData.job_salary);
       form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
@@ -45,15 +45,15 @@ export default function AddJobPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Jobs.add_new")} />
+      <CustomPageMeta title={t("Pages.Jobs.add")} />
       <PageTitle
         formButtons
         formId="job-form"
         loading={isLoading}
         onCancel={() => router.push("/jobs")}
         texts={{
-          title: t("Jobs.add_new"),
-          submit_form: t("Jobs.add_new"),
+          title: t("Pages.Jobs.add"),
+          submit_form: t("Pages.Jobs.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
@@ -70,9 +70,9 @@ export default function AddJobPage() {
   );
 }
 
-AddJobPage.messages = ["Pages", "Jobs", "General"];
+AddJobPage.messages = ["Notes", "Pages", "Jobs", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

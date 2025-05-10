@@ -88,7 +88,7 @@ export function ServerForm({
       os: data.os?.trim() || null,
       status: data.status?.trim() || undefined,
       tags: Array.isArray(data.tags) && data.tags.length > 0 ? data.tags : null,
-      notes: data.notes?.trim() || null,
+      notes: data.notes,
     };
 
     try {
@@ -209,7 +209,7 @@ export function ServerForm({
                   <FormLabel>{t("Servers.form.location.label")}</FormLabel>
                   <FormControl>
                     <Combobox
-                      direction={lang === "ar" ? "rtl" : "ltr"}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
                       data={countries || []}
                       labelKey="label"
                       inputProps={{ disabled: isLoading }}
@@ -221,10 +221,14 @@ export function ServerForm({
                         noItems: t("Servers.form.location.no_items"),
                       }}
                       renderOption={(item) => (
-                        <div>{t(`Country.${item.label.toLowerCase().split(" ").join("_")}`)}</div>
+                        <div>
+                          {t(`Forms.Country.${item.label.toLowerCase().split(" ").join("_")}`)}
+                        </div>
                       )}
                       renderSelected={(item) => (
-                        <div>{t(`Country.${item.label.toLowerCase().split(" ").join("_")}`)}</div>
+                        <div>
+                          {t(`Forms.Country.${item.label.toLowerCase().split(" ").join("_")}`)}
+                        </div>
                       )}
                       onChange={field.onChange}
                     />
@@ -242,7 +246,7 @@ export function ServerForm({
                   <FormLabel>{t("Servers.form.provider.label")}</FormLabel>
                   <FormControl>
                     <Combobox
-                      direction={lang === "ar" ? "rtl" : "ltr"}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
                       data={SERVER_PROVIDERS || []}
                       labelKey="label"
                       valueKey="value"
@@ -271,7 +275,7 @@ export function ServerForm({
                   <FormLabel>{t("Servers.form.os.label")}</FormLabel>
                   <FormControl>
                     <Combobox
-                      direction={lang === "ar" ? "rtl" : "ltr"}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
                       data={SERVER_OS || []}
                       labelKey="label"
                       valueKey="value"
@@ -293,7 +297,11 @@ export function ServerForm({
             />
           </div>
         </div>
-        <NotesSection control={form.control} title={t("Servers.form.notes.label")} />
+        <NotesSection
+          inDialog={editMode}
+          control={form.control}
+          title={t("Servers.form.notes.label")}
+        />
       </form>
     </Form>
   );

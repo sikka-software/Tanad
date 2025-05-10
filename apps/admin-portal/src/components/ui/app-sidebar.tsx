@@ -151,7 +151,7 @@ export function AppSidebar() {
 
     // Get the English label from the translation key
     const getEnglishLabel = (translationKey: string) => {
-      return translationKey.split(".")[0];
+      return translationKey.split(".")[1];
     };
 
     const filterGroup = (group: any) => {

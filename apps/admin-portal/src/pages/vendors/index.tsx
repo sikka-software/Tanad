@@ -3,7 +3,7 @@ import { BranchForm } from "@root/src/modules/branch/branch.form";
 import { Branch, BranchUpdateData } from "@root/src/modules/branch/branch.type";
 import { VendorForm } from "@root/src/modules/vendor/vendor.form";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -100,7 +100,7 @@ export default function VendorsPage() {
   return (
     <div>
       <CustomPageMeta title={t("Vendors.title")} description={t("Vendors.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={vendors?.length} itemsText={t("Pages.Vendors.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -113,11 +113,10 @@ export default function VendorsPage() {
             store={useVendorStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Vendors.title")}
+            title={t("Pages.Vendors.title")}
             onAddClick={canCreateVendors ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Vendors.add_new")}
-            searchPlaceholder={t("Vendors.search_vendors")}
-            count={vendors?.length}
+            createLabel={t("Pages.Vendors.add")}
+            searchPlaceholder={t("Pages.Vendors.search")}
             hideOptions={vendors?.length === 0}
           />
         )}
@@ -146,7 +145,7 @@ export default function VendorsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Vendors.edit_vendor")}
+          title={actionableVendor ? t("Pages.Vendors.edit") : t("Pages.Vendors.add")}
           formId="vendor-form"
           loadingSave={loadingSaveVendor}
         >
@@ -175,9 +174,9 @@ export default function VendorsPage() {
   );
 }
 
-VendorsPage.messages = ["Pages", "Vendors", "General"];
+VendorsPage.messages = ["Notes", "Pages", "Vendors", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

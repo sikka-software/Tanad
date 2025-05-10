@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
@@ -48,7 +48,7 @@ export default function AddCompanyPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Companies.add_new")} />
+      <CustomPageMeta title={t("Pages.Companies.add")} />
       <PageTitle
         formButtons
         formId="company-form"
@@ -56,8 +56,8 @@ export default function AddCompanyPage() {
         onCancel={() => router.push("/companies")}
         dummyButton={handleDummyData}
         texts={{
-          title: t("Companies.add_new"),
-          submit_form: t("Companies.add_new"),
+          title: t("Pages.Companies.add"),
+          submit_form: t("Pages.Companies.add"),
           cancel: t("General.cancel"),
         }}
       />
@@ -66,9 +66,9 @@ export default function AddCompanyPage() {
   );
 }
 
-AddCompanyPage.messages = ["Pages", "General", "Companies", "Forms"];
+AddCompanyPage.messages = ["Notes", "Pages", "General", "Companies", "Forms"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

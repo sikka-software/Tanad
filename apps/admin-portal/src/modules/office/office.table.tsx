@@ -74,7 +74,7 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
         const office = row.original;
         return (
           <ComboboxAdd
-            direction={locale === "ar" ? "rtl" : "ltr"}
+            dir={locale === "ar" ? "rtl" : "ltr"}
             inCell
             data={employeeOptions}
             isLoading={employeesLoading}
@@ -90,10 +90,10 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
             }}
             texts={{
               placeholder: ". . .",
-              searchPlaceholder: t("Employees.search_employees"),
+              searchPlaceholder: t("Pages.Employees.search"),
               noItems: t("Offices.form.manager.no_employees"),
             }}
-            addText={t("Employees.add_new")}
+            addText={t("Pages.Employees.add")}
             ariaInvalid={false}
           />
         );
@@ -102,27 +102,23 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
 
     {
       accessorKey: "city",
-      header: t("Offices.form.city.label"),
-      validationSchema: z.string().min(1, t("Offices.form.city.required")),
+      header: t("Forms.city.label"),
+      validationSchema: z.string().min(1, t("Forms.city.required")),
     },
     {
-      accessorKey: "state",
-      header: t("Offices.form.state.label"),
-      validationSchema: z.string().min(1, t("Offices.form.state.required")),
+      accessorKey: "region",
+      header: t("Forms.region.label"),
+      validationSchema: z.string().min(1, t("Forms.region.required")),
     },
     {
       accessorKey: "zip_code",
-      header: t("Offices.form.zip_code.label"),
-      validationSchema: z.string().min(1, t("Offices.form.zip_code.required")),
-    },
-    {
-      accessorKey: "notes",
-      header: t("Offices.form.notes.label"),
-      validationSchema: z.string().optional(),
+      header: t("Forms.zip_code.label"),
+      validationSchema: z.string().min(1, t("Forms.zip_code.required")),
     },
 
     {
       accessorKey: "status",
+      maxSize: 80,
       header: t("Offices.form.status.label"),
       validationSchema: z.enum(["active", "inactive"]),
       cellType: "status",
@@ -181,6 +177,7 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditOffice}
       canDuplicateAction={canDuplicateOffice}
       canViewAction={canViewOffice}

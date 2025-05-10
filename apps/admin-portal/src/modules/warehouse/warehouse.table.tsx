@@ -1,5 +1,4 @@
 import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
-import { CommandSelect } from "@root/src/components/ui/command-select";
 import { useLocale, useTranslations } from "next-intl";
 import React from "react";
 import { z } from "zod";
@@ -82,7 +81,7 @@ const WarehouseTable = ({
         const warehouse = row.original;
         return (
           <ComboboxAdd
-            direction={locale === "ar" ? "rtl" : "ltr"}
+            dir={locale === "ar" ? "rtl" : "ltr"}
             inCell
             data={employeeOptions}
             isLoading={employeesLoading}
@@ -98,10 +97,13 @@ const WarehouseTable = ({
             }}
             texts={{
               placeholder: ". . .",
-              searchPlaceholder: t("Employees.search_employees"),
+              searchPlaceholder: t("Pages.Employees.search"),
               noItems: t("Warehouses.form.manager.no_employees"),
             }}
-            addText={t("Employees.add_new")}
+            renderSelected={(value) => {
+              return <p className="pe-2 text-start">{value.label}</p>;
+            }}
+            addText={t("Pages.Employees.add")}
             ariaInvalid={false}
           />
         );
@@ -110,26 +112,23 @@ const WarehouseTable = ({
 
     {
       accessorKey: "city",
-      header: t("Warehouses.form.city.label"),
-      validationSchema: z.string().min(1, t("Warehouses.form.city.required")),
+      header: t("Forms.city.label"),
+      validationSchema: z.string().min(1, t("Forms.city.required")),
     },
     {
-      accessorKey: "state",
-      header: t("Warehouses.form.state.label"),
-      validationSchema: z.string().min(1, t("Warehouses.form.state.required")),
+      accessorKey: "region",
+      header: t("Forms.region.label"),
+      validationSchema: z.string().min(1, t("Forms.region.required")),
     },
     {
       accessorKey: "zip_code",
-      header: t("Warehouses.form.zip_code.label"),
-      validationSchema: z.string().min(1, t("Warehouses.form.zip_code.required")),
+      header: t("Forms.zip_code.label"),
+      validationSchema: z.string().min(1, t("Forms.zip_code.required")),
     },
-    {
-      accessorKey: "notes",
-      header: t("Warehouses.form.notes.label"),
-      validationSchema: z.string().optional(),
-    },
+
     {
       accessorKey: "status",
+      maxSize: 80,
       header: t("Warehouses.form.status.label"),
       validationSchema: z.enum(["active", "inactive"]),
       cellType: "status",
@@ -189,6 +188,7 @@ const WarehouseTable = ({
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditWarehouse}
       canDuplicateAction={canDuplicateWarehouse}
       canViewAction={canViewWarehouse}

@@ -1,9 +1,9 @@
 import { JobListingNotFound } from "@root/src/components/app/job-listing-not-found";
 import JobCard from "@root/src/components/jobs/job-card";
 import JobDetailsModal from "@root/src/components/jobs/job-details-dialog";
+import CustomPageMeta from "@root/src/components/landing/CustomPageMeta";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useTranslations } from "next-intl";
-import Head from "next/head";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -31,67 +31,14 @@ type JobListingWithJobs = Omit<JobListing, "jobs"> & {
   job_listing_jobs: {
     jobs: Job; // Expecting full Job object nested here based on query
   }[];
+  enterprises: { name: string } | null; // Added to include enterprise data
 };
 
 interface JobListingPreviewProps {
   jobListing: JobListingWithJobs | null;
+  enterpriseName?: string | null; // Allow null for enterpriseName
   error?: string;
 }
-
-export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = async (context) => {
-  const { id } = context.params || {};
-  const supabase = createClient(context);
-
-  if (!id || typeof id !== "string") {
-    return { notFound: true }; // Or handle invalid ID appropriately
-  }
-
-  try {
-    // Fetch the job listing and nest the full job details through the junction table
-    const { data, error } = await supabase
-      .from("job_listings")
-      .select(
-        `
-        *,
-        job_listing_jobs (
-          jobs (
-            *
-          )
-        )
-      `,
-      )
-      .eq("id", id)
-      .single();
-
-    console.log("data is ", data);
-
-    if (error) {
-      // Handle specific errors like not found (PGRST116) or others
-      if (error.code === "PGRST116") {
-        console.warn(`Job listing not found for ID: ${id}`);
-        return { props: { jobListing: null } }; // Return null if not found
-      }
-      console.error(`Error fetching job listing ${id}:`, error);
-      throw new Error(error.message); // Rethrow other errors
-    }
-
-    return {
-      props: {
-        jobListing: data as JobListingWithJobs, // Cast to the expected structure
-        messages: (await import(`../../../../locales/${context.locale}.json`)).default,
-      },
-    };
-  } catch (error: any) {
-    console.error("Failed in getServerSideProps:", error);
-    return {
-      props: {
-        jobListing: null,
-        error: error.message || "Failed to load job listing.",
-        messages: (await import(`../../../../locales/${context.locale}.json`)).default,
-      },
-    };
-  }
-};
 
 // --- Helper function to adapt Job to JobCard/Modal expected props ---
 // Adjust this based on the actual props needed by JobCard and JobDetailsModal
@@ -115,8 +62,10 @@ const adaptJobForCard = (job: Job): any => ({
 export default function JobListingPreviewPage({
   jobListing,
   error,
+  enterpriseName, // Destructure enterpriseName
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const t = useTranslations();
+  const locale = useLocale();
   const router = useRouter();
 
   // State from job-listings.tsx
@@ -126,7 +75,7 @@ export default function JobListingPreviewPage({
   const [selectedJob, setSelectedJob] = useState<Job | null>(null); // Use Job type
 
   if (router.isFallback) {
-    return <div>Loading...</div>; // Handle fallback state if using getStaticProps with fallback: true
+    return <div>{t("JobListingPreview.loading")}</div>; // Handle fallback state if using getStaticProps with fallback: true
   }
 
   if (!jobListing) {
@@ -140,7 +89,6 @@ export default function JobListingPreviewPage({
       </Alert>
     );
   }
-  console.log("jobListing is ", jobListing);
 
   // Extract jobs from the nested structure
   const jobs: Job[] = jobListing?.job_listing_jobs.map((jlj) => jlj.jobs).filter(Boolean) || [];
@@ -173,14 +121,11 @@ export default function JobListingPreviewPage({
 
   return (
     <main className="bg-background min-h-screen">
-      <Head>
-        {/* Add Head details if needed, e.g., listing title */}
-        <title>{jobListing.title || "Career Opportunities"}</title>
-        <meta
-          name="description"
-          content={jobListing.description || "View available job positions."}
-        />
-      </Head>
+      <CustomPageMeta
+        title={`${enterpriseName} | ${jobListing.title}`}
+        description={jobListing.description || t("JobListingPreview.meta_description_default")}
+      />
+
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8">
           <h1 className="text-foreground mb-2 text-3xl font-bold">{jobListing.title}</h1>
@@ -198,7 +143,7 @@ export default function JobListingPreviewPage({
         </header>
 
         {/* Filter UI from job-listings.tsx */}
-        <div className="bg-background border-border mb-8 rounded-lg border p-6 shadow-sm">
+        <div className="bg--500 border-border mb-8 rounded-md border p-6 shadow-sm">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
               <Input
@@ -209,7 +154,11 @@ export default function JobListingPreviewPage({
               />
             </div>
             <div>
-              <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+              <Select
+                dir={locale === "ar" ? "rtl" : "ltr"}
+                value={selectedDepartment}
+                onValueChange={setSelectedDepartment}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder={t("Jobs.department_placeholder") || "Department"} />
                 </SelectTrigger>
@@ -226,7 +175,11 @@ export default function JobListingPreviewPage({
               </Select>
             </div>
             <div>
-              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+              <Select
+                dir={locale === "ar" ? "rtl" : "ltr"}
+                value={selectedLocation}
+                onValueChange={setSelectedLocation}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder={t("JobListings.location_placeholder") || "Location"} />
                 </SelectTrigger>
@@ -279,3 +232,78 @@ export default function JobListingPreviewPage({
     </main>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = async (context) => {
+  const { id } = context.params || {};
+  const supabase = createClient(context);
+
+  if (!id || typeof id !== "string") {
+    return { notFound: true };
+  }
+
+  let enterpriseName: string | null = null;
+
+  try {
+    // Step 1: Fetch the job listing
+    const { data: jobListingData, error: jobListingError } = await supabase
+      .from("job_listings")
+      .select(
+        `
+        *,
+        job_listing_jobs (
+          jobs (
+            *
+          )
+        )
+      `,
+      )
+      .eq("id", id)
+      .single();
+
+    if (jobListingError) {
+      if (jobListingError.code === "PGRST116") {
+        console.warn(`Job listing not found for ID: ${id}`);
+        return { props: { jobListing: null, enterpriseName: null } };
+      }
+      console.error(`Error fetching job listing ${id}:`, jobListingError);
+      throw new Error(jobListingError.message);
+    }
+
+    // Step 2: If job listing is found and has an enterprise_id, fetch the enterprise name
+    if (jobListingData && jobListingData.enterprise_id) {
+      const { data: enterpriseData, error: enterpriseError } = await supabase
+        .from("enterprises")
+        .select("name")
+        .eq("id", jobListingData.enterprise_id)
+        .single();
+
+      if (enterpriseError) {
+        // Log error but don't fail the whole page if enterprise isn't found
+        console.warn(
+          `Could not fetch enterprise ${jobListingData.enterprise_id} for job listing ${id}:`,
+          enterpriseError.message,
+        );
+      } else if (enterpriseData) {
+        enterpriseName = enterpriseData.name;
+      }
+    }
+
+    return {
+      props: {
+        jobListing: jobListingData as JobListingWithJobs,
+        enterpriseName,
+        messages: (await import(`../../../../locales/${context.locale}.json`)).default,
+      },
+    };
+  } catch (error: any) {
+    console.error("Failed in getServerSideProps:", error);
+    return {
+      props: {
+        jobListing: null,
+        enterpriseName: null,
+        error: error.message || "Failed to load job listing.",
+        messages: (await import(`../../../../locales/${context.locale}.json`)).default,
+      },
+    };
+  }
+};
