@@ -3042,6 +3042,10 @@
         "label": "الوصف",
         "placeholder": "أدخل وصف الوظيفة"
       },
+      "nationality": {
+        "label": "الجنسية",
+        "placeholder": "أدخل الجنسية"
+      },
       "total_positions": {
         "label": "المناصب المتاحة",
         "placeholder": "أدخل المناصب المتاحة"

@@ -66,18 +66,9 @@ const EmployeesTable = ({
       validationSchema: z.string().min(1, t("Employees.form.job.required")),
     },
     {
-      accessorKey: "department_id",
-      header: t("Employees.form.department.label"),
-      validationSchema: z.string().optional(),
-      cellType: "select",
-      options: departments?.map((department) => ({
-        label: department.name,
-        value: department.id,
-      })),
-      cell: ({ row }) => {
-        const department = departments?.find((d) => d.id === row.original.department_id);
-        return department?.name || "";
-      },
+      accessorKey: "nationality",
+      header: t("Employees.form.nationality.label"),
+      validationSchema: z.string().min(1, t("Employees.form.nationality.required")),
     },
     {
       accessorKey: "status",
@@ -114,21 +105,18 @@ const EmployeesTable = ({
       let updates: EmployeeUpdateData = {};
 
       if (columnId === "department_id") {
-        // For department changes, handle department_id and department name
-        const department_id = value as string;
-        const department = departments?.find((d) => d.id === department_id);
-
-        if (department) {
-          updates = {
-            department_id: department_id,
-            // department: department.name, // Set both department_id and department name
-          };
-        } else {
-          updates = {
-            department_id: null,
-            // deFpartment: null,
-          };
-        }
+        // Removed department_id update logic
+        // const department_id = value as string;
+        // const department = departments?.find((d) => d.id === department_id);
+        // if (department) {
+        //   updates = {
+        //     department_id: department_id,
+        //   };
+        // } else {
+        //   updates = {
+        //     department_id: null,
+        //   };
+        // }
       } else if (columnId === "status") {
         updates.status = value as "active" | "inactive" | "on_leave" | "terminated";
       } else {

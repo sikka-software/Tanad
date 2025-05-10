@@ -121,12 +121,12 @@ export function EmployeeForm({
         }, t("Employees.form.email.duplicate")),
       phone: z.string().optional(),
       job_id: z.string().min(1, t("Employees.form.job.required")),
-      department: z.string().nullable(),
       hire_date: z.date({
         required_error: t("Employees.form.hire_date.required"),
       }),
       salary: z.array(salaryComponentSchema).optional(),
       status: z.enum(["active", "inactive", "on_leave", "terminated"]),
+      nationality: z.string().optional(),
       notes: z.any().optional().nullable(),
     });
   };
@@ -139,7 +139,6 @@ export function EmployeeForm({
       email: defaultValues?.email || "",
       phone: defaultValues?.phone ?? "",
       job_id: defaultValues?.job_id || "",
-      department: defaultValues?.department_id || null,
       hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
       salary: defaultValues?.salary as { type: string; amount: number }[] | undefined,
       status: (["active", "inactive", "on_leave", "terminated"].includes(
@@ -148,6 +147,7 @@ export function EmployeeForm({
         ? defaultValues?.status
         : "active") as "active" | "inactive" | "on_leave" | "terminated",
       notes: getNotesValue(defaultValues) || "",
+      nationality: defaultValues?.nationality || "",
     },
   });
 
@@ -168,6 +168,7 @@ export function EmployeeForm({
         salary:
           (defaultValues.salary as { type: string; amount: number }[] | undefined) || undefined,
         notes: getNotesValue(defaultValues) || "",
+        nationality: defaultValues.nationality || "",
       });
     } else {
       // Optionally reset to empty if defaultValues becomes null (e.g., switching modes)
@@ -210,14 +211,13 @@ export function EmployeeForm({
       phone: data.phone?.trim() || undefined,
       hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
       notes: data.notes,
-      department_id: data.department || undefined,
       salary: (data.salary || []).map((comp) => ({
         ...comp,
         amount: Number(comp.amount) || 0,
       })),
     };
 
-    const { department, ...finalSubmitData } = submitData;
+    const finalSubmitData = submitData;
 
     try {
       if (editMode) {
@@ -394,34 +394,6 @@ export function EmployeeForm({
 
               <FormField
                 control={form.control}
-                name="department"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Employees.form.department.label")}</FormLabel>
-                    <FormControl>
-                      <ComboboxAdd
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={departmentOptions}
-                        defaultValue={field.value ?? undefined}
-                        onChange={field.onChange}
-                        isLoading={departmentsLoading}
-                        disabled={isEmployeeSaving}
-                        texts={{
-                          placeholder: t("Employees.form.department.placeholder"),
-                          searchPlaceholder: t("Pages.Departments.search"),
-                          noItems: t("Pages.Departments.no_departments_found"),
-                        }}
-                        addText={t("Pages.Departments.add")}
-                        onAddClick={() => setIsDepartmentDialogOpen(true)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="hire_date"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
@@ -435,6 +407,38 @@ export function EmployeeForm({
                         ariaInvalid={form.formState.errors.hire_date !== undefined}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="nationality"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.nationality.label")} *</FormLabel>
+                    <Select
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isEmployeeSaving}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Employees.form.nationality.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="active">{t("Employees.form.status.active")}</SelectItem>
+                        <SelectItem value="inactive">
+                          {t("Employees.form.status.inactive")}
+                        </SelectItem>
+                        <SelectItem value="on_leave">
+                          {t("Employees.form.status.on_leave")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

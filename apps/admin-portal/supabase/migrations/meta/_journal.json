@@ -407,6 +407,20 @@
       "when": 1746854313703,
       "tag": "0057_strange_skrulls",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1746856023549,
+      "tag": "0058_cuddly_killraven",
+      "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1746856297010,
+      "tag": "0059_careless_starbolt",
+      "breakpoints": true
     }
   ]
 }

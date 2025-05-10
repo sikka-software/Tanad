@@ -561,7 +561,6 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string | null
-          department_id: string | null
           email: string
           enterprise_id: string
           first_name: string
@@ -569,6 +568,7 @@ export type Database = {
           id: string
           job_id: string | null
           last_name: string
+          nationality: string | null
           notes: Json | null
           phone: string | null
           region: string | null
@@ -587,7 +587,6 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
-          department_id?: string | null
           email: string
           enterprise_id: string
           first_name: string
@@ -595,6 +594,7 @@ export type Database = {
           id?: string
           job_id?: string | null
           last_name: string
+          nationality?: string | null
           notes?: Json | null
           phone?: string | null
           region?: string | null
@@ -613,7 +613,6 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
-          department_id?: string | null
           email?: string
           enterprise_id?: string
           first_name?: string
@@ -621,6 +620,7 @@ export type Database = {
           id?: string
           job_id?: string | null
           last_name?: string
+          nationality?: string | null
           notes?: Json | null
           phone?: string | null
           region?: string | null
@@ -634,13 +634,6 @@ export type Database = {
           zip_code?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "employees_department_id_departments_id_fk"
-            columns: ["department_id"]
-            isOneToOne: false
-            referencedRelation: "departments"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "employees_job_id_jobs_id_fk"
             columns: ["job_id"]
