@@ -15,6 +15,7 @@ import { Input } from "@/ui/input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
+import BooleanTabs from "@/components/ui/boolean-tabs";
 import CodeInput from "@/components/ui/code-input";
 import PhoneInput from "@/components/ui/phone-input";
 
@@ -322,7 +323,11 @@ export function OfficeForm({
                   <FormItem>
                     <FormLabel>{t("Offices.form.status.label")}</FormLabel>
                     <FormControl>
-                      <CommandSelect
+                      <BooleanTabs
+                        trueText={t("Offices.form.status.active")}
+                        falseText={t("Offices.form.status.inactive")}
+                      />
+                      {/* <CommandSelect
                         direction={locale === "ar" ? "rtl" : "ltr"}
                         data={[
                           { label: t("Offices.form.status.active"), value: "active" },
@@ -340,7 +345,7 @@ export function OfficeForm({
                           return <div>{item.label}</div>;
                         }}
                         ariaInvalid={!!form.formState.errors.status}
-                      />
+                      /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -373,9 +373,9 @@ function SheetTable<
   const locale = useLocale();
 
   /**
-   * Ensure a minimum of 10 rows are displayed, padding with empty rows if needed.
+   * Ensure a minimum of 30 rows are displayed, padding with empty rows if needed.
    */
-  const MIN_ROWS = 30;
+  const MIN_ROWS = 0;
   const data = React.useMemo(() => {
     if (initialData.length < MIN_ROWS) {
       const emptyRowsNeeded = MIN_ROWS - initialData.length;
