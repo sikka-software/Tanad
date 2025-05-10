@@ -326,6 +326,11 @@ export function OfficeForm({
                       <BooleanTabs
                         trueText={t("Offices.form.status.active")}
                         falseText={t("Offices.form.status.inactive")}
+                        value={field.value === "active"}
+                        onValueChange={(newValue) => {
+                          field.onChange(newValue ? "active" : "inactive");
+                        }}
+                        listClassName="w-full"
                       />
                       {/* <CommandSelect
                         direction={locale === "ar" ? "rtl" : "ltr"}
