@@ -177,7 +177,7 @@ export default function EmployeesPage() {
   );
 }
 
-EmployeesPage.messages = ["Notes", "Pages", "Employees", "General"];
+EmployeesPage.messages = ["Notes", "Pages", "Employees", "Jobs", "General"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

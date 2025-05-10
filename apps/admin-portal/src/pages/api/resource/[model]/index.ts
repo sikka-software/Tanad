@@ -90,7 +90,86 @@ const modelMap: Record<string, ModelConfig> = {
   },
   offices: { tableName: "offices" },
   warehouses: { tableName: "warehouses" },
-  employees: { tableName: "employees" },
+  employees: {
+    tableName: "employees",
+    customHandlers: {
+      POST: async (supabase, user_id, enterprise_id, req) => {
+        const { job_id, ...employeeData } = req.body;
+        // 1. Insert employee
+        const { data: employee, error: employeeError } = await supabase
+          .from("employees")
+          .insert({ ...employeeData, job_id, user_id, enterprise_id })
+          .select()
+          .single();
+        if (employeeError) throw employeeError;
+        // 2. If job_id present, increment occupied_positions
+        if (job_id) {
+          const { data: job, error: jobFetchError } = await supabase
+            .from("jobs")
+            .select("occupied_positions")
+            .eq("id", job_id)
+            .maybeSingle();
+          if (jobFetchError) throw jobFetchError;
+          const newOccupied = (job?.occupied_positions || 0) + 1;
+          const { error: jobError } = await supabase
+            .from("jobs")
+            .update({ occupied_positions: newOccupied })
+            .eq("id", job_id);
+          if (jobError) throw jobError;
+        }
+        return employee;
+      },
+      PUT: async (supabase, user_id, req, id) => {
+        // 1. Get the current employee
+        const { data: currentEmployee, error: fetchError } = await supabase
+          .from("employees")
+          .select("job_id")
+          .eq("id", id)
+          .maybeSingle();
+        if (fetchError) throw fetchError;
+        const prevJobId = currentEmployee?.job_id;
+        const { job_id, ...updateData } = req.body;
+        // 2. Update the employee
+        const { data: updatedEmployee, error: updateError } = await supabase
+          .from("employees")
+          .update({ ...updateData, job_id })
+          .eq("id", id)
+          .select()
+          .single();
+        if (updateError) throw updateError;
+        // 3. If job_id changed, update occupied_positions
+        if (prevJobId && prevJobId !== job_id) {
+          // Decrement old job, but not below 0
+          const { data: oldJob, error: oldJobFetchError } = await supabase
+            .from("jobs")
+            .select("occupied_positions")
+            .eq("id", prevJobId)
+            .maybeSingle();
+          if (oldJobFetchError) throw oldJobFetchError;
+          const newOccupied = Math.max((oldJob?.occupied_positions || 1) - 1, 0);
+          await supabase
+            .from("jobs")
+            .update({ occupied_positions: newOccupied })
+            .eq("id", prevJobId);
+        }
+        if (job_id && prevJobId !== job_id) {
+          // Increment new job
+          const { data: newJob, error: newJobFetchError } = await supabase
+            .from("jobs")
+            .select("occupied_positions")
+            .eq("id", job_id)
+            .maybeSingle();
+          if (newJobFetchError) throw newJobFetchError;
+          const newOccupied = (newJob?.occupied_positions || 0) + 1;
+          await supabase
+            .from("jobs")
+            .update({ occupied_positions: newOccupied })
+            .eq("id", job_id);
+        }
+        return updatedEmployee;
+      },
+    },
+  },
   products: { tableName: "products" },
   invoices: {
     tableName: "invoices",

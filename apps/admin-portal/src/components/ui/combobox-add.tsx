@@ -246,11 +246,11 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
                             ? "opacity-100"
                             : "opacity-0",
                         )}
-                        style={{ marginInlineEnd: "0.5rem" }}
+                        style={{ marginInlineEnd: "0rem" }}
                       >
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      <span className="truncate">
+                      <span className="truncate w-full">
                         {renderOption ? renderOption(item) : getProperty(item, labelKey)}
                       </span>
                     </CommandItem>

@@ -95,7 +95,7 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
       accessorKey: "occupied_positions",
       header: t("Jobs.form.occupied_positions.label"),
       cell: (props: CellContext<Job, unknown>) => {
-        const value = props.row.original.total_positions;
+        const value = props.row.original.occupied_positions;
         if (value === null || value === undefined) return "N/A";
         const num = typeof value === "number" ? value : parseInt(value, 10);
         return isNaN(num) ? "N/A" : num;

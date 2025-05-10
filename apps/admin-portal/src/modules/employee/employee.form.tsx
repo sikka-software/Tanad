@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import NotesSection from "@root/src/components/forms/notes-section";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@root/src/components/ui/tooltip";
 import { getNotesValue } from "@root/src/lib/utils";
 import { PlusCircle, Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -257,6 +258,9 @@ export function EmployeeForm({
     jobs?.map((job) => ({
       label: job.title,
       value: job.id,
+      occupied_positions: job.occupied_positions,
+      total_positions: job.total_positions,
+      department: job.department,
     })) || [];
 
   return (
@@ -361,6 +365,26 @@ export function EmployeeForm({
                         }}
                         addText={t("Pages.Jobs.add")}
                         onAddClick={() => setIsJobDialogOpen(true)}
+                        renderOption={(option) => (
+                          <div className="flex flex-row items-center justify-between gap-2">
+                            <div className="flex flex-col">
+                              <span>{option.label}</span>
+                              <span className="text-xs text-gray-500">{option.department}</span>
+                            </div>
+                            <Tooltip delayDuration={500}>
+                              <TooltipTrigger>
+                                <span className="text-xs text-gray-500">
+                                  {option.occupied_positions} / {option.total_positions}
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {t("Jobs.form.occupied_positions.label") +
+                                  " / " +
+                                  t("Jobs.form.total_positions.label")}
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        )}
                       />
                     </FormControl>
                     <FormMessage />
@@ -384,8 +408,8 @@ export function EmployeeForm({
                         disabled={isEmployeeSaving}
                         texts={{
                           placeholder: t("Employees.form.department.placeholder"),
-                          searchPlaceholder: t("Employees.form.department.searchPlaceholder"),
-                          noItems: t("Employees.form.department.no_departments"),
+                          searchPlaceholder: t("Pages.Departments.search"),
+                          noItems: t("Pages.Departments.no_departments_found"),
                         }}
                         addText={t("Pages.Departments.add")}
                         onAddClick={() => setIsDepartmentDialogOpen(true)}
