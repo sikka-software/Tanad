@@ -59,7 +59,7 @@ export default function AddClientPage() {
   );
 }
 
-AddClientPage.messages = ["Pages", "Clients", "Forms", "Notes", "General"];
+AddClientPage.messages = ["Pages", "Clients", "Companies", "Forms", "Notes", "General"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CommandSelect } from "@root/src/components/ui/command-select";
 import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -16,7 +17,7 @@ import { createAddressSchema } from "@/components/forms/address-schema";
 import NotesSection from "@/components/forms/notes-section";
 import PhoneInput from "@/components/ui/phone-input";
 
-import { ModuleFormProps } from "@/types/common.type";
+import { ModuleFormProps, CommonStatus } from "@/types/common.type";
 
 import { useCreateClient, useUpdateClient } from "@/client/client.hooks";
 import useClientStore from "@/client/client.store";
@@ -36,6 +37,7 @@ export const createClientSchema = (t: (key: string) => string) => {
       .email(t("Clients.form.validation.email_invalid")),
     phone: z.string().min(1, t("Clients.form.validation.phone_required")),
     company: z.string().nullish(),
+    status: 
     notes: z.any().optional().nullable(),
   });
 
@@ -79,6 +81,7 @@ export function ClientForm({
       country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
       notes: getNotesValue(defaultValues) || "",
+      status: defaultValues?.status || "active",
     },
   });
 
@@ -119,6 +122,7 @@ export function ClientForm({
               region: data.region?.trim() || null,
               country: data.country?.trim() || null,
               zip_code: data.zip_code?.trim() || null,
+              status: data.status,
               notes: data.notes,
             },
           },
@@ -144,6 +148,7 @@ export function ClientForm({
             region: data.region?.trim() || null,
             country: data.country?.trim() || null,
             zip_code: data.zip_code?.trim() || null,
+            status: data.status,
             notes: data.notes,
             additional_number: null,
             user_id: user?.id || "",
@@ -190,33 +195,6 @@ export function ClientForm({
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="company"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Clients.form.company.label")}</FormLabel>
-                    <FormControl>
-                      <ComboboxAdd
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={companyOptions}
-                        isLoading={companiesLoading}
-                        defaultValue={field.value || ""}
-                        onChange={(value) => field.onChange(value || null)}
-                        texts={{
-                          placeholder: t("Clients.form.company.placeholder"),
-                          searchPlaceholder: t("Pages.Companies.search"),
-                          noItems: t("Clients.form.company.no_companies"),
-                        }}
-                        addText={t("Pages.Companies.add")}
-                        onAddClick={() => setIsCompanyDialogOpen(true)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -250,6 +228,66 @@ export function ClientForm({
                         value={field.value || ""}
                         onChange={field.onChange}
                         ariaInvalid={form.formState.errors.phone !== undefined}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="form-fields-cols-2">
+              <FormField
+                control={form.control}
+                name="company"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Clients.form.company.label")}</FormLabel>
+                    <FormControl>
+                      <ComboboxAdd
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        data={companyOptions}
+                        isLoading={companiesLoading}
+                        defaultValue={field.value || ""}
+                        onChange={(value) => field.onChange(value || null)}
+                        texts={{
+                          placeholder: t("Clients.form.company.placeholder"),
+                          searchPlaceholder: t("Pages.Companies.search"),
+                          noItems: t("Clients.form.company.no_companies"),
+                        }}
+                        addText={t("Pages.Companies.add")}
+                        onAddClick={() => setIsCompanyDialogOpen(true)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Clients.form.status.label")}</FormLabel>
+                    <FormControl>
+                      <CommandSelect
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        data={[
+                          { label: t("Clients.form.status.active"), value: "active" },
+                          { label: t("Clients.form.status.inactive"), value: "inactive" },
+                        ]}
+                        isLoading={false}
+                        defaultValue={field.value || ""}
+                        onChange={(value) => {
+                          field.onChange(value || null);
+                        }}
+                        texts={{
+                          placeholder: t("Clients.form.status.placeholder"),
+                        }}
+                        renderOption={(item) => {
+                          return <div>{item.label}</div>;
+                        }}
+                        // ariaInvalid={!!form.formState.errors.manager}
                       />
                     </FormControl>
                     <FormMessage />

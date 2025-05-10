@@ -362,7 +362,7 @@ export function EmployeeForm({
                         texts={{
                           placeholder: t("Employees.form.job.placeholder"),
                           searchPlaceholder: t("Pages.Jobs.search"),
-                          noItems: t("Pages.Jobs.no_jobs"),
+                          noItems: t("Pages.Jobs.no_jobs_found"),
                         }}
                         addText={t("Pages.Jobs.add")}
                         onAddClick={() => setIsJobDialogOpen(true)}

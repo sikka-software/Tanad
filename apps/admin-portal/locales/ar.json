@@ -441,7 +441,7 @@
       "create": "إنشاء وظيفة",
       "edit": "تعديل الوظيفة",
       "search": "بحث عن وظيفة",
-      "no_jobs_found": "لا يوجد وظائف"
+      "no_jobs_found": "لا توجد وظائف"
     },
     "Cars": {
       "title": "السيارات",
@@ -2619,6 +2619,8 @@
         "state_required": "المنطقة مطلوبة",
         "zip_code_required": "الرمز البريدي مطلوب"
       },
+      "address": { "label": "عنوان العميل" },
+      "notes": { "label": "ملاحظات العميل" },
       "name": {
         "label": "الاسم",
         "placeholder": "أدخل اسم العميل"

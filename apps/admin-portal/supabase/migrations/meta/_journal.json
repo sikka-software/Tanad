@@ -428,6 +428,13 @@
       "when": 1746870148060,
       "tag": "0060_right_black_tom",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1746908011318,
+      "tag": "0061_tiny_medusa",
+      "breakpoints": true
     }
   ]
 }

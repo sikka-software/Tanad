@@ -175,7 +175,16 @@ export default function OfficesPage() {
   );
 }
 
-OfficesPage.messages = ["Offices", "Pages", "Forms", "General", "Notes"];
+OfficesPage.messages = [
+  "Offices",
+  "Pages",
+  "Employees",
+  "Jobs",
+  "Forms",
+  "Departments",
+  "General",
+  "Notes",
+];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

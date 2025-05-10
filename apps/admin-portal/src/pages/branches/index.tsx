@@ -177,7 +177,16 @@ export default function BranchesPage() {
   );
 }
 
-BranchesPage.messages = ["Pages", "Branches", "Forms", "Notes", "General"];
+BranchesPage.messages = [
+  "Branches",
+  "Employees",
+  "Jobs",
+  "Departments",
+  "Pages",
+  "Notes",
+  "General",
+  "Forms",
+];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

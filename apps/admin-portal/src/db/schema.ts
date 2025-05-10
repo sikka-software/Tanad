@@ -277,6 +277,7 @@ export const clients = pgTable(
     region: text(),
     country: text(),
     zip_code: text(),
+    status: common_status().default("active"),
     notes: jsonb(),
     user_id: uuid().notNull(),
     company: uuid(),

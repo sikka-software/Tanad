@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
+import { convertToPascalCase } from "@root/src/lib/utils";
 import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -119,7 +120,7 @@ export default function DepartmentForm({
 
   const renderLocationOption = (option: MultiSelectOption<LocationValue>) => {
     const type = (option as LocationOption).metadata?.type;
-    const typeLabel = type ? t(`Locations.types.${type}`) : "";
+    const typeLabel = type ? t(`Pages.${convertToPascalCase(type)}s.title`) : "";
     let typeIcon;
     switch (type) {
       case "office":
@@ -134,7 +135,7 @@ export default function DepartmentForm({
     }
     return (
       <div className="flex flex-col">
-        <span className="text-muted-foreground flex items-center gap-2 text-xs capitalize">
+        <span className="text-muted-foreground flex items-center gap-2 text-xs">
           {typeIcon}
           {typeLabel}
         </span>

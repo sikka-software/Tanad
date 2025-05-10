@@ -205,6 +205,7 @@ export type Database = {
           phone: string
           region: string | null
           short_address: string | null
+          status: Database["public"]["Enums"]["common_status"] | null
           street_name: string | null
           user_id: string
           zip_code: string | null
@@ -224,6 +225,7 @@ export type Database = {
           phone: string
           region?: string | null
           short_address?: string | null
+          status?: Database["public"]["Enums"]["common_status"] | null
           street_name?: string | null
           user_id: string
           zip_code?: string | null
@@ -243,6 +245,7 @@ export type Database = {
           phone?: string
           region?: string | null
           short_address?: string | null
+          status?: Database["public"]["Enums"]["common_status"] | null
           street_name?: string | null
           user_id?: string
           zip_code?: string | null

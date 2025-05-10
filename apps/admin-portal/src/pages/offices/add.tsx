@@ -61,7 +61,16 @@ export default function AddOfficePage() {
   );
 }
 
-AddOfficePage.messages = ["Offices", "Employees", "Pages", "Notes", "General", "Forms"];
+AddOfficePage.messages = [
+  "Offices",
+  "Employees",
+  "Jobs",
+  "Departments",
+  "Pages",
+  "Notes",
+  "General",
+  "Forms",
+];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

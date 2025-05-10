@@ -44,11 +44,7 @@ const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       header: t("Clients.form.phone.label"),
       validationSchema: z.string().min(1, t("Clients.form.phone.required")),
     },
-    {
-      accessorKey: "address",
-      header: t("Forms.address.label"),
-      validationSchema: z.string().min(1, t("Forms.address.required")),
-    },
+
     {
       accessorKey: "city",
       header: t("Forms.city.label"),

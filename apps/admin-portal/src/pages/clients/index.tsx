@@ -173,7 +173,7 @@ export default function ClientsPage() {
   );
 }
 
-ClientsPage.messages = ["Notes", "Pages", "Clients", "General", "Forms"];
+ClientsPage.messages = ["Notes", "Pages", "Clients", "Companies", "General", "Forms"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

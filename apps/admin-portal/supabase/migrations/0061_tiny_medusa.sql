@@ -1,0 +1,1 @@
+ALTER TABLE "clients" ADD COLUMN "status" "common_status" DEFAULT 'active';
