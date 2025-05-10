@@ -31,10 +31,12 @@ type JobListingWithJobs = Omit<JobListing, "jobs"> & {
   job_listing_jobs: {
     jobs: Job; // Expecting full Job object nested here based on query
   }[];
+  enterprises: { name: string } | null; // Added to include enterprise data
 };
 
 interface JobListingPreviewProps {
   jobListing: JobListingWithJobs | null;
+  enterpriseName?: string | null; // Allow null for enterpriseName
   error?: string;
 }
 
@@ -60,6 +62,7 @@ const adaptJobForCard = (job: Job): any => ({
 export default function JobListingPreviewPage({
   jobListing,
   error,
+  enterpriseName, // Destructure enterpriseName
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const t = useTranslations();
   const router = useRouter();
@@ -120,8 +123,9 @@ export default function JobListingPreviewPage({
       <Head>
         {/* Add Head details if needed, e.g., listing title */}
         <title>
-          {t("Pages.JobListings.single") + " | " + jobListing.title ||
-            t("Pages.JobListings.single")}
+          {enterpriseName && jobListing?.title
+            ? `${enterpriseName} | ${jobListing.title}`
+            : jobListing?.title || t("Pages.JobListings.single")}
         </title>
         <meta
           name="description"
@@ -232,12 +236,14 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
   const supabase = createClient(context);
 
   if (!id || typeof id !== "string") {
-    return { notFound: true }; // Or handle invalid ID appropriately
+    return { notFound: true };
   }
 
+  let enterpriseName: string | null = null;
+
   try {
-    // Fetch the job listing and nest the full job details through the junction table
-    const { data, error } = await supabase
+    // Step 1: Fetch the job listing
+    const { data: jobListingData, error: jobListingError } = await supabase
       .from("job_listings")
       .select(
         `
@@ -252,19 +258,38 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
       .eq("id", id)
       .single();
 
-    if (error) {
-      // Handle specific errors like not found (PGRST116) or others
-      if (error.code === "PGRST116") {
+    if (jobListingError) {
+      if (jobListingError.code === "PGRST116") {
         console.warn(`Job listing not found for ID: ${id}`);
-        return { props: { jobListing: null } }; // Return null if not found
+        return { props: { jobListing: null, enterpriseName: null } };
       }
-      console.error(`Error fetching job listing ${id}:`, error);
-      throw new Error(error.message); // Rethrow other errors
+      console.error(`Error fetching job listing ${id}:`, jobListingError);
+      throw new Error(jobListingError.message);
+    }
+
+    // Step 2: If job listing is found and has an enterprise_id, fetch the enterprise name
+    if (jobListingData && jobListingData.enterprise_id) {
+      const { data: enterpriseData, error: enterpriseError } = await supabase
+        .from("enterprises")
+        .select("name")
+        .eq("id", jobListingData.enterprise_id)
+        .single();
+
+      if (enterpriseError) {
+        // Log error but don't fail the whole page if enterprise isn't found
+        console.warn(
+          `Could not fetch enterprise ${jobListingData.enterprise_id} for job listing ${id}:`,
+          enterpriseError.message,
+        );
+      } else if (enterpriseData) {
+        enterpriseName = enterpriseData.name;
+      }
     }
 
     return {
       props: {
-        jobListing: data as JobListingWithJobs, // Cast to the expected structure
+        jobListing: jobListingData as JobListingWithJobs,
+        enterpriseName,
         messages: (await import(`../../../../locales/${context.locale}.json`)).default,
       },
     };
@@ -273,6 +298,7 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
     return {
       props: {
         jobListing: null,
+        enterpriseName: null,
         error: error.message || "Failed to load job listing.",
         messages: (await import(`../../../../locales/${context.locale}.json`)).default,
       },

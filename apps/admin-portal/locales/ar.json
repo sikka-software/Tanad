@@ -3087,11 +3087,6 @@
     "title": "إدارة النظام"
   },
   "JobListings": {
-    "title": "صفحات التوظيف",
-    "create_listing": "إنشاء صفحة توظيف",
-    "edit_listing": "تعديل صفحة التوظيف",
-    "update_listing": "تحديث صفحة التوظيف",
-    "search_listings": "البحث في صفحات التوظيف...",
     "listing_details": "تفاصيل صفحة التوظيف",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {صفحة توظيف} =1 {هذه الصفحة التوظيفية} other {# صفحات توظيف}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {صفحة توظيف} =1 {هذه الصفحة التوظيفية} other {# صفحات توظيف}}",
@@ -3116,7 +3111,6 @@
       "enableSearchFilteringPlaceholder": "تفعيل البحث والتصفية",
       "searchFilteringDescription": "يمكنك تفعيل البحث والتصفية لصفحة التوظيف للمستخدمين للبحث عن الوظائف التي يحتاجونها"
     },
-
     "status": {
       "title": "الحالة",
       "active": "نشط",
