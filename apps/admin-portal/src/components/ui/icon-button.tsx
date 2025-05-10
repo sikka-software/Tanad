@@ -32,7 +32,7 @@ const IconButton = ({
           <Button
             variant={variant || "outline"}
             size={size || "icon"}
-            className={cn("relative size-8", props.className)}
+            className={cn("relative size-8 cursor-pointer", props.className)}
             type={buttonType || "button"}
             disabled={disabled}
             {...props}

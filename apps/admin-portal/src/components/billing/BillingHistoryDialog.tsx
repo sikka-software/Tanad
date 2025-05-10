@@ -22,6 +22,7 @@ import {
 
 import useUserStore from "@/stores/use-user-store";
 
+import IconButton from "../ui/icon-button";
 // Import the subscription event constant
 import { SUBSCRIPTION_UPDATED_EVENT } from "./CurrentPlan";
 
@@ -285,142 +286,171 @@ export function BillingHistoryDialog({ open, onOpenChange, user }: BillingHistor
             <DialogTitle>
               {t("Billing.billing_history.title", { fallback: "Billing History" })}
             </DialogTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.preventDefault();
-                fetchBillingHistory();
-              }}
-              disabled={isLoadingHistory}
-              className="h-8 w-8"
-              aria-label={t("Billing.current_plan.refresh", { fallback: "Refresh" })}
-            >
-              <RefreshCcw className={`h-4 w-4 ${isLoadingHistory ? "animate-spin" : ""}`} />
-            </Button>
           </div>
         </DialogHeader>
 
         <div className="mt-4">
-          {isLoadingHistory ? (
+          {/* {isLoadingHistory ? (
             <div className="py-8">
               <Skeleton className="mb-2 h-12 w-full" />
               <Skeleton className="mb-2 h-12 w-full" />
               <Skeleton className="h-12 w-full" />
             </div>
-          ) : billingHistory.length > 0 ? (
-            <>
-              <p className="text-muted-foreground mb-4 text-sm">
+          )  */}
+
+          <>
+            <div className="flex flex-row items-center justify-between py-4">
+              <p className="text-muted-foreground text-sm">
                 {t("Billing.billing_history.description", {
                   fallback: "Your billing history and past invoices",
                 })}
               </p>
-              <div className="max-h-[50vh] overflow-auto">
-                <div className="w-full overflow-x-auto">
-                  <Table className="w-full">
-                    <TableHeader className="bg-background sticky top-0">
+              <IconButton
+                label={t("General.refresh")}
+                icon={<RefreshCcw className="h-4 w-4" />}
+                aria-label={t("Billing.current_plan.refresh", { fallback: "Refresh" })}
+                onClick={(e) => {
+                  e.preventDefault();
+                  fetchBillingHistory();
+                }}
+                disabled={isLoadingHistory}
+                className="h-8 w-8"
+              />
+            </div>
+            <div className="max-h-[50vh] overflow-auto">
+              <div className="w-full overflow-x-auto rounded-md border">
+                <Table className="w-full">
+                  <TableHeader className="bg-background sticky top-0">
+                    <TableRow>
+                      <TableHead className="whitespace-nowrap">
+                        {t("Billing.billing_history.invoice_date", { fallback: "Date" })}
+                      </TableHead>
+                      <TableHead className="whitespace-nowrap">
+                        {t("Billing.billing_history.invoice_number", { fallback: "Invoice" })}
+                      </TableHead>
+                      <TableHead className="whitespace-nowrap">
+                        {t("Billing.billing_history.invoice_amount", { fallback: "Amount" })}
+                      </TableHead>
+                      <TableHead className="whitespace-nowrap">
+                        {t("Billing.billing_history.invoice_status", { fallback: "Status" })}
+                      </TableHead>
+                      <TableHead className="whitespace-nowrap">
+                        {t("Billing.billing_history.invoice_plan", { fallback: "Plan" })}
+                      </TableHead>
+                      <TableHead className="text-right whitespace-nowrap">
+                        {t("Billing.billing_history.actions", { fallback: "Actions" })}
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {isLoadingHistory && (
                       <TableRow>
-                        <TableHead className="whitespace-nowrap">
-                          {t("Billing.billing_history.invoice_date", { fallback: "Date" })}
-                        </TableHead>
-                        <TableHead className="whitespace-nowrap">
-                          {t("Billing.billing_history.invoice_number", { fallback: "Invoice" })}
-                        </TableHead>
-                        <TableHead className="whitespace-nowrap">
-                          {t("Billing.billing_history.invoice_amount", { fallback: "Amount" })}
-                        </TableHead>
-                        <TableHead className="whitespace-nowrap">
-                          {t("Billing.billing_history.invoice_status", { fallback: "Status" })}
-                        </TableHead>
-                        <TableHead className="whitespace-nowrap">
-                          {t("Billing.billing_history.invoice_plan", { fallback: "Plan" })}
-                        </TableHead>
-                        <TableHead className="text-right whitespace-nowrap">
-                          {t("Billing.billing_history.actions", { fallback: "Actions" })}
-                        </TableHead>
+                        <TableCell>
+                          <Skeleton className="h-8" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-8" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-8" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-8" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-8" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-8" />
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {billingHistory.map((invoice) => (
-                        <TableRow key={invoice.id}>
-                          <TableCell className="whitespace-nowrap">
-                            {formatDate(invoice.date)}
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap">{invoice.number}</TableCell>
-                          <TableCell className="whitespace-nowrap">{invoice.amount}</TableCell>
-                          <TableCell className="whitespace-nowrap">
-                            {getStatusBadge(invoice.status)}
-                          </TableCell>
-                          <TableCell className="max-w-[150px] truncate">
-                            {formatBillingHistoryPlanName(invoice.planName)}
-                          </TableCell>
-                          <TableCell className="text-right whitespace-nowrap">
-                            <div className="flex items-center justify-end gap-2">
-                              {invoice.pdfUrl && (
-                                <a
-                                  href={invoice.pdfUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-primary hover:text-primary/80 inline-flex items-center"
-                                  aria-label={t("Billing.billing_history.view_invoice", {
-                                    fallback: "View Invoice",
-                                  })}
-                                >
-                                  <Eye className="h-4 w-4" />
-                                  <span className="sr-only">
-                                    {t("Billing.billing_history.view_invoice", {
-                                      fallback: "View Invoice",
+                    )}
+                    {billingHistory.length > 0
+                      ? billingHistory.map((invoice) => (
+                          <TableRow key={invoice.id}>
+                            <TableCell className="whitespace-nowrap">
+                              {formatDate(invoice.date)}
+                            </TableCell>
+                            <TableCell className="whitespace-nowrap">{invoice.number}</TableCell>
+                            <TableCell className="whitespace-nowrap">{invoice.amount}</TableCell>
+                            <TableCell className="whitespace-nowrap">
+                              {getStatusBadge(invoice.status)}
+                            </TableCell>
+                            <TableCell className="max-w-[150px] truncate">
+                              {formatBillingHistoryPlanName(invoice.planName)}
+                            </TableCell>
+                            <TableCell className="text-right whitespace-nowrap">
+                              <div className="flex items-center justify-end gap-2">
+                                {invoice.pdfUrl && (
+                                  <a
+                                    href={invoice.pdfUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    download
+                                    className="cursor-pointer"
+                                    aria-label={t("Billing.billing_history.download_invoice", {
+                                      fallback: "Download Invoice",
                                     })}
-                                  </span>
-                                </a>
-                              )}
-                              {invoice.pdfUrl && (
-                                <a
-                                  href={invoice.pdfUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download
-                                  className="text-primary hover:text-primary/80 inline-flex items-center"
-                                  aria-label={t("Billing.billing_history.download_invoice", {
-                                    fallback: "Download Invoice",
-                                  })}
-                                >
-                                  <Download className="h-4 w-4" />
+                                  >
+                                    <IconButton
+                                      label={t("General.download")}
+                                      icon={<Download className="h-4 w-4" />}
+                                      aria-label={t("Billing.billing_history.download_invoice", {
+                                        fallback: "Download Invoice",
+                                      })}
+                                    />
+
+                                    {/* <Download className="h-4 w-4" />
                                   <span className="sr-only">
                                     {t("Billing.billing_history.download_invoice", {
                                       fallback: "Download Invoice",
                                     })}
-                                  </span>
-                                </a>
-                              )}
-                              {invoice.hostedInvoiceUrl && !invoice.pdfUrl && (
-                                <a
-                                  href={invoice.hostedInvoiceUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-primary hover:text-primary/80 inline-flex items-center"
-                                  aria-label={t("Billing.billing_history.view_invoice", {
-                                    fallback: "View Invoice",
-                                  })}
-                                >
-                                  <Eye className="h-4 w-4" />
-                                  <span className="sr-only">
-                                    {t("Billing.billing_history.view_invoice", {
+                                  </span> */}
+                                  </a>
+                                )}
+                                {invoice.hostedInvoiceUrl && !invoice.pdfUrl && (
+                                  <a
+                                    href={invoice.hostedInvoiceUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-primary hover:text-primary/80 inline-flex items-center"
+                                    aria-label={t("Billing.billing_history.view_invoice", {
                                       fallback: "View Invoice",
                                     })}
-                                  </span>
-                                </a>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                    <span className="sr-only">
+                                      {t("Billing.billing_history.view_invoice", {
+                                        fallback: "View Invoice",
+                                      })}
+                                    </span>
+                                  </a>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      : null}
+
+                    {billingHistory.length === 0 && !isLoadingHistory && (
+                      <div className="text-muted-foreground flex flex-col items-center py-8 text-center">
+                        <AlertCircle className="text-muted-foreground/70 mb-2 h-12 w-12" />
+                        <p className="mb-1">
+                          {t("Billing.no_history", { fallback: "No billing history found" })}
+                        </p>
+                        <p className="text-sm">
+                          {t("Billing.no_history_description", {
+                            fallback: "Your invoices will appear here once you've been billed",
+                          })}
+                        </p>
+                      </div>
+                    )}
+                  </TableBody>
+                </Table>
               </div>
-            </>
-          ) : (
+            </div>
+          </>
+          {/* ) : (
             <div className="text-muted-foreground flex flex-col items-center py-8 text-center">
               <AlertCircle className="text-muted-foreground/70 mb-2 h-12 w-12" />
               <p className="mb-1">
@@ -432,7 +462,7 @@ export function BillingHistoryDialog({ open, onOpenChange, user }: BillingHistor
                 })}
               </p>
             </div>
-          )}
+          )} */}
         </div>
       </DialogContent>
     </Dialog>

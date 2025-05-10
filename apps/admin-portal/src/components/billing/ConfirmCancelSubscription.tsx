@@ -16,6 +16,7 @@ interface ConfirmCancelSubscriptionDialogProps {
   onOpenChange: (open: boolean) => void;
   isCanceling: boolean;
   onConfirm: () => Promise<void>;
+  dir?: "ltr" | "rtl";
 }
 
 export function ConfirmCancelSubscriptionDialog({
@@ -23,12 +24,13 @@ export function ConfirmCancelSubscriptionDialog({
   onOpenChange,
   isCanceling,
   onConfirm,
+  dir,
 }: ConfirmCancelSubscriptionDialogProps) {
   const t = useTranslations();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" dir={dir}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="text-destructive h-5 w-5" />
@@ -59,7 +61,7 @@ export function ConfirmCancelSubscriptionDialog({
             {isCanceling ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t("canceling", { fallback: "جاري الإلغاء..." })}
+                {t("General.canceling", { fallback: "جاري الإلغاء..." })}
               </>
             ) : (
               t("Billing.cancel_subscription.confirm", { fallback: "نعم، إلغاء" })

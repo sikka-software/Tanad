@@ -1,4 +1,4 @@
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -19,6 +19,7 @@ export interface ConfirmReactivateSubscriptionProps {
   isReactivating: boolean;
   onConfirm: () => Promise<void>;
   planName: string;
+  dir?: "ltr" | "rtl";
 }
 
 export function ConfirmReactivateSubscriptionDialog({
@@ -27,9 +28,9 @@ export function ConfirmReactivateSubscriptionDialog({
   isReactivating,
   onConfirm,
   planName,
+  dir,
 }: ConfirmReactivateSubscriptionProps) {
   const t = useTranslations();
-  const locale = useLocale();
   const [error, setError] = useState<string | null>(null);
 
   const handleReactivate = async () => {
@@ -52,7 +53,7 @@ export function ConfirmReactivateSubscriptionDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent dir={locale === "ar" ? "rtl" : "ltr"}>
+      <AlertDialogContent dir={dir}>
         <AlertDialogHeader>
           <AlertDialogTitle>
             {t("Billing.reactivate_subscription.title", { fallback: "Reactivate Subscription" })}

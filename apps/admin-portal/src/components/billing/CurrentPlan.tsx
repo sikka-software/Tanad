@@ -212,7 +212,7 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
   const isLoading = isPageLoading !== undefined ? isPageLoading : subscription.loading || !user;
 
   if (isLoading) {
-    return <Skeleton className="h-[180px] w-full flex-1 rounded-lg" />;
+    return <Skeleton className="h-[180px] w-full flex-1 rounded-md" />;
   }
 
   // Format the next billing date if available
@@ -322,7 +322,7 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
 
   return (
     <>
-      <div className="bg-background relative flex-1 rounded-lg border p-6">
+      <div className="bg-background relative flex-1 rounded-md border p-6">
         <div className="flex flex-col space-y-4">
           <div className="flex items-start justify-between">
             <div>
@@ -538,6 +538,7 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
 
       {/* Cancel Subscription Dialog */}
       <ConfirmCancelSubscriptionDialog
+        dir={locale === "ar" ? "rtl" : "ltr"}
         open={isCancelDialogOpen}
         onOpenChange={setIsCancelDialogOpen}
         isCanceling={isCanceling}
@@ -546,6 +547,7 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
 
       {/* Reactivate Subscription Dialog */}
       <ConfirmReactivateSubscriptionDialog
+        dir={locale === "ar" ? "rtl" : "ltr"}
         open={isReactivateDialogOpen}
         onOpenChange={setIsReactivateDialogOpen}
         isReactivating={isReactivating}

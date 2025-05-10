@@ -1,6 +1,5 @@
 "use client";
 
-// Components
 import { pick } from "lodash";
 import { Info } from "lucide-react";
 import { GetServerSideProps } from "next";
