@@ -1,6 +1,7 @@
 "use client";
 
 import { Calendar, MapPin, Briefcase } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,8 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Job } from "@/job/job.type";
 
 export default function JobCard({ job, onClick }: { job: Job; onClick: () => void }) {
+  const t = useTranslations();
+
   return (
     <Card className="flex h-full flex-col transition-shadow hover:shadow-md">
       <CardHeader className="pb-2">
@@ -29,14 +32,14 @@ export default function JobCard({ job, onClick }: { job: Job; onClick: () => voi
           </div>
           <div className="flex items-center">
             <Calendar className="me-2 h-4 w-4 text-gray-400" />
-            <span>Posted {job.created_at}</span>
+            <span>{t("JobCard.posted", { date: job.created_at })}</span>
           </div>
         </div>
         <p className="mt-4 line-clamp-3 text-gray-600">{job.description}</p>
       </CardContent>
       <CardFooter>
         <Button variant="outline" className="w-full" onClick={onClick}>
-          View Details
+          {t("JobCard.view_details")}
         </Button>
       </CardFooter>
     </Card>

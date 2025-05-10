@@ -74,7 +74,7 @@ export default function JobListingPreviewPage({
   const [selectedJob, setSelectedJob] = useState<Job | null>(null); // Use Job type
 
   if (router.isFallback) {
-    return <div>Loading...</div>; // Handle fallback state if using getStaticProps with fallback: true
+    return <div>{t("JobListingPreview.loading")}</div>; // Handle fallback state if using getStaticProps with fallback: true
   }
 
   if (!jobListing) {
@@ -129,7 +129,7 @@ export default function JobListingPreviewPage({
         </title>
         <meta
           name="description"
-          content={jobListing.description || "View available job positions."}
+          content={jobListing.description || t("JobListingPreview.meta_description_default")}
         />
       </Head>
       <div className="container mx-auto px-4 py-8">

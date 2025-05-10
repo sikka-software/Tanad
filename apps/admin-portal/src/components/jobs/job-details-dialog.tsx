@@ -1,6 +1,7 @@
 "use client";
 
 import { Calendar, MapPin, Briefcase, DollarSign } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +28,7 @@ export default function JobDetailsModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
+  const t = useTranslations();
   if (!job) return null;
   const [activeTab, setActiveTab] = useState("details");
 
@@ -45,7 +47,7 @@ export default function JobDetailsModal({
                   <MapPin className="me-1 h-4 w-4" /> {job.location}
                 </span>
                 <span className="flex items-center text-sm text-gray-500">
-                  <Calendar className="me-1 h-4 w-4" /> Posted {job.created_at}
+                  <Calendar className="me-1 h-4 w-4" /> {t("JobDetails.posted", { date: job.created_at })}
                 </span>
                 {job.salary && (
                   <span className="flex items-center text-sm text-gray-500">
@@ -62,39 +64,41 @@ export default function JobDetailsModal({
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="details">Job Details</TabsTrigger>
-            <TabsTrigger value="apply">Apply Now</TabsTrigger>
+            <TabsTrigger value="details">{t("JobDetails.job_details_tab")}</TabsTrigger>
+            <TabsTrigger value="apply">{t("JobDetails.apply_now_tab")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="details" className="mt-4 space-y-6">
             <div>
-              <h3 className="mb-2 text-lg font-medium">Overview</h3>
+              <h3 className="mb-2 text-lg font-medium">{t("JobDetails.overview")}</h3>
               <p className="text-gray-700">{job.description}</p>
             </div>
 
             {job.responsibilities && (
               <div>
-                <h3 className="mb-2 text-lg font-medium">Responsibilities</h3>
+                <h3 className="mb-2 text-lg font-medium">{t("JobDetails.responsibilities")}</h3>
                 {job.responsibilities}
               </div>
             )}
 
             {job.requirements && (
               <div>
-                <h3 className="mb-2 text-lg font-medium">Requirements</h3>
+                <h3 className="mb-2 text-lg font-medium">{t("JobDetails.requirements")}</h3>
                 {job.requirements}
               </div>
             )}
 
             {job.benefits && (
               <div>
-                <h3 className="mb-2 text-lg font-medium">Benefits</h3>
+                <h3 className="mb-2 text-lg font-medium">{t("JobDetails.benefits")}</h3>
                 {job.benefits}
               </div>
             )}
 
             <div className="pt-4">
-              <Button onClick={() => setActiveTab("apply")}>Apply for this position</Button>
+              <Button onClick={() => setActiveTab("apply")}>
+                {t("JobDetails.apply_for_position_button")}
+              </Button>
             </div>
           </TabsContent>
 
