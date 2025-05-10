@@ -170,19 +170,19 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
                 filter
                   ? filter
                   : (value, search) => {
-                      // Default: match search against both label and arabic_label
+                      if (!search) return 1; // Show all if search is empty
                       const item = countries.find((i) => getProperty(i, valueKey) === value);
                       if (!item) return 0;
-                      const searchNorm = (search || "").toLowerCase();
-                      const label =
-                        typeof labelKey === "function"
-                          ? labelKey(item)
-                          : getProperty(item, labelKey);
-                      const arabicLabel = getProperty(item, "arabic_label");
-                      return (label && label.toLowerCase().includes(searchNorm)) ||
-                        (arabicLabel && arabicLabel.toLowerCase().includes(searchNorm))
-                        ? 1
-                        : 0;
+                      const searchNorm = (search || "").trim().toLowerCase();
+                      const label = getProperty(item, "label")?.toString().toLowerCase();
+                      const arabicLabel = getProperty(item, "arabic_label")?.toString().toLowerCase();
+                      if (
+                        (label && label.includes(searchNorm)) ||
+                        (arabicLabel && arabicLabel.includes(searchNorm))
+                      ) {
+                        return 1;
+                      }
+                      return 0;
                     }
               }
             >
@@ -201,6 +201,7 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
                   {countries.map((item: any, i) => (
                     <CommandItem
                       key={i}
+                      value={getProperty(item, valueKey)}
                       onSelect={() => {
                         const newValue = getProperty(item, valueKey);
                         if (onValueChange) {

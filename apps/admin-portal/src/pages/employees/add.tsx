@@ -61,7 +61,7 @@ export default function AddEmployeePage() {
   );
 }
 
-AddEmployeePage.messages = ["Notes", "Pages", "Employees", "Jobs", "General"];
+AddEmployeePage.messages = ["Notes", "Pages", "Employees", "Forms", "Jobs", "General"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

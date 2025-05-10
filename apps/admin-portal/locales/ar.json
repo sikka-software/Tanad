@@ -3042,10 +3042,6 @@
         "label": "الوصف",
         "placeholder": "أدخل وصف الوظيفة"
       },
-      "nationality": {
-        "label": "الجنسية",
-        "placeholder": "أدخل الجنسية"
-      },
       "total_positions": {
         "label": "المناصب المتاحة",
         "placeholder": "أدخل المناصب المتاحة"
@@ -3508,6 +3504,10 @@
         "placeholder": "أدخل رقم الهاتف",
         "required": "رقم الهاتف مطلوب"
       },
+      "nationality": {
+        "label": "الجنسية",
+        "placeholder": "أدخل الجنسية"
+      },
       "job": {
         "label": "الوظيفة",
         "placeholder": "اختر الوظيفة",
@@ -3582,7 +3582,6 @@
       "label": "تاريخ التحديث",
       "placeholder": "أدخل تاريخ التحديث"
     },
-
     "name": {
       "label": "الاسم",
       "placeholder": "أدخل اسم الشركة"
