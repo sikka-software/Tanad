@@ -52,6 +52,7 @@ type ComboboxTypes<T> = {
   renderOption?: (item: T) => React.ReactNode;
   renderSelected?: (item: T) => React.ReactNode;
   ariaInvalid?: boolean;
+  filter?: (value: string, search: string) => number;
 };
 export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
   (
@@ -69,6 +70,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
       renderSelected,
       value: controlledValue,
       onChange: onValueChange,
+      filter,
       ...props
     },
     ref,
@@ -178,10 +180,14 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
             // container={containerRef.current}
           >
             <Command
-              filter={(value, search) => {
-                if (value.toLowerCase().includes(search.toLowerCase())) return 1;
-                return 0;
-              }}
+              filter={
+                filter
+                  ? filter
+                  : (value, search) => {
+                      if (value.toLowerCase().includes(search.toLowerCase())) return 1;
+                      return 0;
+                    }
+              }
             >
               {!props.hideInput && (
                 <CommandInput

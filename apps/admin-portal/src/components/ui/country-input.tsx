@@ -1,6 +1,5 @@
 import { countries } from "@root/src/lib/constants/countries";
 import React from "react";
-
 import { Combobox } from "./combobox";
 
 interface CountryInputProps {
@@ -30,7 +29,7 @@ const CountryInput: React.FC<CountryInputProps> = ({
     <Combobox
       dir={dir}
       data={countries}
-      labelKey="label"
+      labelKey={(item: any) => `${item.label} ${item.arabic_label}`}
       valueKey="value"
       value={value}
       onChange={onChange}
