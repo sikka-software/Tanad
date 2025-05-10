@@ -319,7 +319,7 @@ export function JobListingForm({
             loadingDepartments={isLoadingDepartments}
           />
 
-          <FormSectionHeader
+          {/* <FormSectionHeader
             inDialog={editMode}
             title={t("JobListings.jobs_section.title")}
             subtitle={t("JobListings.jobs_section.subtitle")}
@@ -334,7 +334,7 @@ export function JobListingForm({
               name="jobs"
               render={() => (
                 <FormItem>
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
                     {jobs?.map((job: Job) => (
                       <div
                         key={job.id}
@@ -367,7 +367,7 @@ export function JobListingForm({
                 </FormItem>
               )}
             />
-          </div>
+          </div> */}
         </form>
       </Form>
       <FormDialog
