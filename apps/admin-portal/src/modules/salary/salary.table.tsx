@@ -54,7 +54,7 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
         const salary = row.original;
         return (
           <ComboboxAdd
-            direction={locale === "ar" ? "rtl" : "ltr"}
+            dir={locale === "ar" ? "rtl" : "ltr"}
             inCell
             data={employeeOptions}
             isLoading={employeesLoading}

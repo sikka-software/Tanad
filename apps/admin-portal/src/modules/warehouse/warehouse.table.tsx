@@ -81,7 +81,7 @@ const WarehouseTable = ({
         const warehouse = row.original;
         return (
           <ComboboxAdd
-            direction={locale === "ar" ? "rtl" : "ltr"}
+            dir={locale === "ar" ? "rtl" : "ltr"}
             inCell
             data={employeeOptions}
             isLoading={employeesLoading}

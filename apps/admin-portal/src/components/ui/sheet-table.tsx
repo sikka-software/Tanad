@@ -776,7 +776,7 @@ function SheetTable<
                   )}
                 >
                   <CommandSelect
-                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    dir={locale === "ar" ? "rtl" : "ltr"}
                     data={colDef.options}
                     inCell
                     isLoading={false}
@@ -832,7 +832,7 @@ function SheetTable<
                   )}
                 >
                   <CommandSelect
-                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    dir={locale === "ar" ? "rtl" : "ltr"}
                     data={colDef.options}
                     inCell
                     isLoading={false}

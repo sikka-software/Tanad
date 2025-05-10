@@ -37,7 +37,7 @@ type ComboboxTypes<T> = {
   defaultValue?: string;
   preview?: boolean;
   hideInput?: boolean;
-  direction?: "rtl" | "ltr";
+  dir?: "rtl" | "ltr";
   inputProps?: React.ComponentPropsWithoutRef<typeof CommandInput>;
   //   TODO: fix this
   //   inputProps?: CommandInputProps;
@@ -60,7 +60,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
       valueKey = "value",
       defaultValue,
       popoverClassName,
-      direction,
+      dir,
       labelProps,
       inputProps,
       data,
@@ -174,7 +174,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
               props.helperText && "-mt-4",
               popoverClassName,
             )}
-            dir={direction}
+            dir={dir}
             // container={containerRef.current}
           >
             <Command
@@ -186,7 +186,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
               {!props.hideInput && (
                 <CommandInput
                   {...inputProps}
-                  dir={direction}
+                  dir={dir}
                   placeholder={props.texts?.searchPlaceholder || "Search"}
                 />
               )}

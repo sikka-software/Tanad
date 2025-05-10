@@ -288,7 +288,7 @@ export function PurchaseForm({
                     <FormControl>
                       <CommandSelect
                         disabled={isLoading}
-                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={[
                           { label: t("Purchases.form.status.pending"), value: "pending" },
                           { label: t("Purchases.form.status.paid"), value: "paid" },

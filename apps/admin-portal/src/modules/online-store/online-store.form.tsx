@@ -159,7 +159,7 @@ export function OnlineStoreForm({
                   <FormLabel>{t("OnlineStores.form.platform.label")}</FormLabel>
                   <FormControl>
                     <Combobox
-                      direction={lang === "ar" ? "rtl" : "ltr"}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
                       data={E_COMMERCE_PLATFORMS || []}
                       labelKey="label"
                       valueKey="value"

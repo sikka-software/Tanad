@@ -352,7 +352,7 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
                 <FormLabel>{t("Users.form.role.label")}</FormLabel>
                 <FormControl>
                   <ComboboxAdd
-                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    dir={locale === "ar" ? "rtl" : "ltr"}
                     // Use role name as value, consistent with previous Select
                     data={allRoles.roles.map((role) => ({
                       label: predefinedRoles(t, role.name)?.name || role.name, // Pass role.name to predefinedRoles

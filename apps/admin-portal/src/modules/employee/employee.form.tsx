@@ -34,6 +34,9 @@ import type { EmployeeCreateData, EmployeeUpdateData } from "@/employee/employee
 
 import useUserStore from "@/stores/use-user-store";
 
+import { JobForm } from "../job/job.form";
+import { useJobs } from "../job/job.hooks";
+import useJobStore from "../job/job.store";
 import { useCreateEmployee } from "./employee.hooks";
 import { useUpdateEmployee } from "./employee.hooks";
 
@@ -57,10 +60,15 @@ export function EmployeeForm({
   const t = useTranslations();
   const locale = useLocale();
 
-  const isDepartmentSaving = useDepartmentStore((state) => state.isLoading);
-  const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
+  const isDepartmentSaving = useDepartmentStore((state) => state.isLoading);
+  const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
+
+  const [isJobDialogOpen, setIsJobDialogOpen] = useState(false);
+  const { data: jobs, isLoading: jobsLoading } = useJobs();
+  const isJobSaving = useJobStore((state) => state.isLoading);
+  const setIsJobSaving = useJobStore((state) => state.setIsLoading);
 
   const { mutateAsync: updateEmployeeMutate, isPending: isUpdatingEmployee } = useUpdateEmployee();
   const { mutateAsync: createEmployeeMutate, isPending: isCreatingEmployee } = useCreateEmployee();
@@ -175,12 +183,6 @@ export function EmployeeForm({
   const totalSalary =
     salaryComponents?.reduce((sum, comp) => sum + (Number(comp.amount) || 0), 0) || 0;
 
-  const departmentOptions =
-    departments?.map((department) => ({
-      label: department.name,
-      value: department.id,
-    })) || [];
-
   const handleSubmit = async (data: z.input<ReturnType<typeof createEmployeeFormSchema>>) => {
     setIsEmployeeSaving(true);
     // Log dirtyFields for debugging
@@ -245,6 +247,18 @@ export function EmployeeForm({
   if (typeof window !== "undefined") {
     (window as any).employeeForm = form;
   }
+
+  const departmentOptions =
+    departments?.map((department) => ({
+      label: department.name,
+      value: department.id,
+    })) || [];
+
+  const jobOptions =
+    jobs?.map((job) => ({
+      label: job.title,
+      value: job.id,
+    })) || [];
 
   return (
     <>
@@ -334,11 +348,27 @@ export function EmployeeForm({
                   <FormItem>
                     <FormLabel>{t("Employees.form.position.label")} *</FormLabel>
                     <FormControl>
-                      <Input
+                      <ComboboxAdd
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        data={jobOptions}
+                        defaultValue={field.value ?? undefined}
+                        onChange={field.onChange}
+                        isLoading={jobsLoading}
+                        disabled={isEmployeeSaving}
+                        texts={{
+                          placeholder: t("Employees.form.job.placeholder"),
+                          searchPlaceholder: t("Pages.Jobs.search"),
+                          noItems: t("Pages.Jobs.no_jobs"),
+                        }}
+                        addText={t("Pages.Jobs.add")}
+                        onAddClick={() => setIsJobDialogOpen(true)}
+                      />
+
+                      {/* <Input
                         placeholder={t("Employees.form.position.placeholder")}
                         disabled={isEmployeeSaving}
                         {...field}
-                      />
+                      /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -353,6 +383,7 @@ export function EmployeeForm({
                     <FormLabel>{t("Employees.form.department.label")}</FormLabel>
                     <FormControl>
                       <ComboboxAdd
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={departmentOptions}
                         defaultValue={field.value ?? undefined}
                         onChange={field.onChange}
@@ -523,6 +554,22 @@ export function EmployeeForm({
         </form>
       </Form>
 
+      <FormDialog
+        open={isJobDialogOpen}
+        onOpenChange={setIsJobDialogOpen}
+        title={t("Pages.Jobs.add")}
+        formId="job-form"
+        cancelText={t("General.cancel")}
+        submitText={t("General.save")}
+        loadingSave={isJobSaving}
+      >
+        <JobForm
+          formHtmlId="job-form"
+          onSuccess={() => {
+            setIsJobDialogOpen(false);
+          }}
+        />
+      </FormDialog>
       <FormDialog
         open={isDepartmentDialogOpen}
         onOpenChange={setIsDepartmentDialogOpen}

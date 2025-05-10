@@ -82,6 +82,16 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
         ),
     },
     {
+      accessorKey: "available_positions",
+      header: t("Jobs.form.available_positions.label"),
+      cell: (props: CellContext<Job, unknown>) => {
+        const value = props.row.original.available_positions;
+        if (value === null || value === undefined || value === "") return "N/A";
+        const num = typeof value === "number" ? value : parseInt(value, 10);
+        return isNaN(num) ? "N/A" : num;
+      },
+    },
+    {
       accessorKey: "status",
       header: t("Jobs.form.status.label"),
       validationSchema: z.boolean(),

@@ -199,7 +199,7 @@ export function VendorForm({
                     <FormLabel>{t("Vendors.form.company.label")}</FormLabel>
                     <FormControl>
                       <ComboboxAdd
-                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={companyOptions.map((opt) => ({ ...opt, value: opt.label }))}
                         isLoading={companiesLoading}
                         defaultValue={field.value}

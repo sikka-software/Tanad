@@ -178,7 +178,7 @@ export function EmployeeRequestForm({
                   <FormControl>
                     <ComboboxAdd
                       ariaInvalid={form.formState.errors.employee_id !== undefined}
-                      direction={locale === "ar" ? "rtl" : "ltr"}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
                       data={employeeOptions}
                       disabled={isLoadingSave}
                       isLoading={employeesLoading}

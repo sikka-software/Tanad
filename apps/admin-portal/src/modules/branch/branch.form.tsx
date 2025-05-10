@@ -305,7 +305,7 @@ export function BranchForm({
                     <FormLabel>{t("Branches.form.manager.label")}</FormLabel>
                     <FormControl>
                       <ComboboxAdd
-                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={employeeOptions}
                         isLoading={employeesLoading}
                         defaultValue={field.value || ""}
@@ -334,7 +334,7 @@ export function BranchForm({
                     <FormLabel>{t("Branches.form.status.label")}</FormLabel>
                     <FormControl>
                       <CommandSelect
-                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={[
                           { label: t("Branches.form.status.active"), value: "active" },
                           { label: t("Branches.form.status.inactive"), value: "inactive" },

@@ -102,7 +102,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
               <FormItem className="space-y-0">
                 <FormControl>
                   <ComboboxAdd
-                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    dir={locale === "ar" ? "rtl" : "ltr"}
                     data={productOptions || []}
                     disabled={isLoading}
                     containerClassName="min-w-[150px] w-full"

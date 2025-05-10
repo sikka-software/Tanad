@@ -74,7 +74,7 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
         const office = row.original;
         return (
           <ComboboxAdd
-            direction={locale === "ar" ? "rtl" : "ltr"}
+            dir={locale === "ar" ? "rtl" : "ltr"}
             inCell
             data={employeeOptions}
             isLoading={employeesLoading}

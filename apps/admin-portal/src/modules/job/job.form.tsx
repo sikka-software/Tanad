@@ -255,7 +255,7 @@ export function JobForm({
                   <FormLabel>{t("Jobs.form.department.label")}</FormLabel>
                   <FormControl>
                     <ComboboxAdd
-                      direction={locale === "ar" ? "rtl" : "ltr"}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
                       data={departmentOptions}
                       isLoading={departmentsLoading}
                       defaultValue={field.value || ""}
@@ -285,7 +285,7 @@ export function JobForm({
                   <FormLabel>{t("Jobs.form.location.label")}</FormLabel>
                   <FormControl>
                     <ComboboxAdd
-                      direction={locale === "ar" ? "rtl" : "ltr"}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
                       data={departmentOptions}
                       isLoading={departmentsLoading}
                       defaultValue={field.value || ""}

@@ -209,7 +209,7 @@ export function ServerForm({
                   <FormLabel>{t("Servers.form.location.label")}</FormLabel>
                   <FormControl>
                     <Combobox
-                      direction={lang === "ar" ? "rtl" : "ltr"}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
                       data={countries || []}
                       labelKey="label"
                       inputProps={{ disabled: isLoading }}
@@ -246,7 +246,7 @@ export function ServerForm({
                   <FormLabel>{t("Servers.form.provider.label")}</FormLabel>
                   <FormControl>
                     <Combobox
-                      direction={lang === "ar" ? "rtl" : "ltr"}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
                       data={SERVER_PROVIDERS || []}
                       labelKey="label"
                       valueKey="value"
@@ -275,7 +275,7 @@ export function ServerForm({
                   <FormLabel>{t("Servers.form.os.label")}</FormLabel>
                   <FormControl>
                     <Combobox
-                      direction={lang === "ar" ? "rtl" : "ltr"}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
                       data={SERVER_OS || []}
                       labelKey="label"
                       valueKey="value"

@@ -37,7 +37,7 @@ type ComboboxAddTypes<T> = {
   defaultValue?: string;
   preview?: boolean;
   hideInput?: boolean;
-  direction?: "rtl" | "ltr";
+  dir?: "rtl" | "ltr";
   inputProps?: any;
   id?: string;
   /** The label of the input field   */
@@ -63,7 +63,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
       defaultValue = "",
       containerClassName,
       popoverClassName,
-      direction,
+      dir,
       labelProps,
       inputProps,
       data,
@@ -99,7 +99,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
 
     return (
       <div
-        dir={direction}
+        dir={dir}
         className={cn(
           "relative flex h-fit flex-col gap-2",
           props.width === "fit" ? "w-fit" : "w-full",
@@ -172,7 +172,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
               props.helperText && "-mt-4",
               popoverClassName,
             )}
-            dir={direction}
+            dir={dir}
             onOpenAutoFocus={(e) => {
               e.preventDefault();
               if (!props.hideInput && inputRef.current) {
@@ -194,7 +194,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
                 <CommandInput
                   {...inputProps}
                   ref={inputRef}
-                  dir={direction}
+                  dir={dir}
                   placeholder={props.texts?.searchPlaceholder || "Search"}
                 />
               )}

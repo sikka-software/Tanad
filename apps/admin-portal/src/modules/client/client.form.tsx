@@ -199,7 +199,7 @@ export function ClientForm({
                     <FormLabel>{t("Clients.form.company.label")}</FormLabel>
                     <FormControl>
                       <ComboboxAdd
-                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={companyOptions}
                         isLoading={companiesLoading}
                         defaultValue={field.value || ""}

@@ -214,7 +214,7 @@ export function SalaryForm({
                   <FormLabel>{t("Salaries.form.employee_name.label")} *</FormLabel>
                   <FormControl>
                     <ComboboxAdd
-                      direction={locale === "ar" ? "rtl" : "ltr"}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
                       data={employeeOptions}
                       isLoading={employeesLoading}
                       defaultValue={field.value}

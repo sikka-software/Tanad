@@ -300,7 +300,7 @@ export function OfficeForm({
                     <FormLabel>{t("Offices.form.manager.label")}</FormLabel>
                     <FormControl>
                       <ComboboxAdd
-                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={employeeOptions}
                         isLoading={employeesLoading}
                         defaultValue={field.value || ""}
@@ -338,7 +338,7 @@ export function OfficeForm({
                         listClassName="w-full"
                       />
                       {/* <CommandSelect
-                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
                         data={[
                           { label: t("Offices.form.status.active"), value: "active" },
                           { label: t("Offices.form.status.inactive"), value: "inactive" },
