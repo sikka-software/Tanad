@@ -47,6 +47,10 @@ const DebugTools = () => {
                 <div className="text-xs break-all">{profile?.stripe_customer_id}</div>
               </div>
               <div>
+                <div className="text-xs font-bold">Subscribed to</div>
+                <div className="text-xs break-all">{profile?.subscribed_to}</div>
+              </div>
+              <div>
                 <div className="text-xs font-bold">User Settings</div>
                 <div className="flex flex-col gap-1">
                   {Object.entries(profile?.user_settings || {}).map(([key, value]) => (

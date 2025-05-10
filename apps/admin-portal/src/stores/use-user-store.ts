@@ -59,7 +59,7 @@ interface MembershipType {
 }
 
 interface UserState {
-  user: any | null;
+  user: User | null;
   profile: ProfileType | null;
   enterprise: EnterpriseType | null;
   membership: MembershipType | null;

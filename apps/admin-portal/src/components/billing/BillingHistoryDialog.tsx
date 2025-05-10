@@ -55,10 +55,11 @@ interface BillingHistoryDialogProps {
 export function BillingHistoryDialog({ open, onOpenChange, user }: BillingHistoryDialogProps) {
   const t = useTranslations();
   const locale = useLocale();
+
   const [billingHistory, setBillingHistory] = useState<BillingHistoryItem[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState<number>(Date.now());
-  const { fetchUserAndProfile } = useUserStore();
+  const profile = useUserStore((state) => state.profile);
   const subscription = useSubscription();
 
   // Fetch billing history when dialog opens
@@ -131,28 +132,7 @@ export function BillingHistoryDialog({ open, onOpenChange, user }: BillingHistor
     setBillingHistory([]); // Clear previous data when loading
 
     try {
-      const supabase = createClient();
-
-      // Get the current profile data without refreshing the entire user state
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("stripe_customer_id")
-        .eq("id", user.id)
-        .single();
-
-      if (profileError) {
-        console.error("Error fetching profile:", profileError);
-      } else {
-        console.log("Profile stripe customer ID:", profile.stripe_customer_id);
-      }
-
-      // Try to get Stripe customer ID from multiple sources
-      let stripeCustomerId =
-        profile?.stripe_customer_id || user.stripe_customer_id || user.profile?.stripe_customer_id;
-
-      console.log("Using customer ID for invoices:", stripeCustomerId);
-
-      if (!stripeCustomerId) {
+      if (!profile?.stripe_customer_id) {
         console.error("No customer ID available");
         toast.error("No billing information available. Please try adding a payment method first.");
         setIsLoadingHistory(false);
@@ -163,12 +143,12 @@ export function BillingHistoryDialog({ open, onOpenChange, user }: BillingHistor
       const cacheBuster = Date.now();
 
       // Now fetch invoices with the customer ID
-      console.log("Fetching billing history with customer ID:", stripeCustomerId);
+      console.log("Fetching billing history with customer ID:", profile?.stripe_customer_id);
       const response = await fetch(`/api/stripe/get-invoices?t=${cacheBuster}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: stripeCustomerId,
+          customerId: profile?.stripe_customer_id,
           forceRefresh: true,
         }),
       });

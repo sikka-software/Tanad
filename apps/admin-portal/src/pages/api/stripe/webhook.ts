@@ -3,7 +3,7 @@ import Stripe from "stripe";
 
 import { createClient } from "@/utils/supabase/component";
 
-import { sendEmailViaWebhook } from "@/lib/email!";
+import { sendEmailViaWebhook } from "@/lib/email";
 import { getStripeInstance } from "@/lib/stripe-admin";
 
 export const config = {
