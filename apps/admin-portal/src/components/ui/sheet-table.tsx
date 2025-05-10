@@ -705,7 +705,10 @@ function SheetTable<
           )}
           {/* Row actions */}
           {enableRowActions && (
-            <TableCell className="bg-background sticky start-8 z-2 w-8 !max-w-8 min-w-8 border-y p-0">
+            <TableCell
+              className="bg-background sticky start-8 z-2 border-y p-0"
+              style={{ width: "30px", minWidth: "30px", maxWidth: "30px" }}
+            >
               <div className="flex h-auto min-h-9 items-center justify-center">
                 <RowActionsPopover
                   texts={texts}
@@ -753,7 +756,7 @@ function SheetTable<
             } else {
               // Set default width if not specified
               if (!colDef.size && !colDef.minSize && !colDef.maxSize) {
-                style.width = "10px";
+                style.width = "150px";
               }
             }
 
@@ -945,7 +948,10 @@ function SheetTable<
                 </TableHead>
               )}
               {enableRowActions && (
-                <TableHead className="bg-muted sticky start-8 top-0 !z-20 border-e border-none text-start" />
+                <TableHead
+                  className="bg-muted sticky start-8 top-0 !z-20 border-e border-none text-start"
+                  style={{ width: "30px", minWidth: "30px", maxWidth: "30px" }}
+                />
               )}
 
               {table.getHeaderGroups().map((headerGroup) =>
@@ -961,7 +967,7 @@ function SheetTable<
                     // Set default width if not specified
                     const col = header.column.columnDef;
                     if (!col.size && !col.minSize && !col.maxSize) {
-                      style.width = "10px";
+                      style.width = "150px";
                     }
                   }
 
