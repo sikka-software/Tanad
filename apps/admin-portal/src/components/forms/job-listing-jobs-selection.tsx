@@ -1,4 +1,30 @@
-const JobListingJobsSelection = () => {
+import { FieldError, UseFormReturn } from "react-hook-form";
+
+import FormSectionHeader from "@/components/forms/form-section-header";
+import { FormField, FormItem } from "@/components/ui/form";
+
+import { JobListingFormValues } from "@/modules/job-listing/job-listing.form";
+import { Job } from "@/modules/job/job.type";
+
+interface JobListingJobsSelectionProps {
+  editMode?: boolean;
+  t: (key: string) => string;
+  setIsJobDialogOpen: (isOpen: boolean) => void;
+  form: UseFormReturn<JobListingFormValues>;
+  jobs: Job[] | undefined;
+  selectedJobs: string[];
+  handleJobSelect: (jobId: string) => void;
+}
+
+const JobListingJobsSelection = ({
+  editMode,
+  t,
+  setIsJobDialogOpen,
+  form,
+  jobs,
+  selectedJobs,
+  handleJobSelect,
+}: JobListingJobsSelectionProps) => {
   return (
     <div>
       <FormSectionHeader

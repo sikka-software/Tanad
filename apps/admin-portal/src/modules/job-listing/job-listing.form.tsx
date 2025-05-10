@@ -3,7 +3,7 @@ import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import { FormDialog } from "@root/src/components/ui/form-dialog";
 import { useTranslations } from "next-intl";
 import { useState, useMemo, useEffect } from "react";
-import { useForm, FieldError } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
+import JobListingJobsSelection from "@/components/forms/job-listing-jobs-selection";
 import JobListingOptionsSection from "@/components/forms/job-listing-options-section";
 
 import { ModuleFormProps } from "@/types/common.type";
@@ -29,7 +30,6 @@ import useUserStore from "@/stores/use-user-store";
 
 import { JobForm } from "../job/job.form";
 import useJobStore from "../job/job.store";
-import { Job } from "../job/job.type";
 import { bulkAssociateJobsWithListing, updateListingJobAssociations } from "./job-listing.service";
 
 export const createJobListingFormSchema = (t: (key: string) => string) =>
@@ -318,56 +318,15 @@ export function JobListingForm({
             loadingLocations={isLoadingLocations}
             loadingDepartments={isLoadingDepartments}
           />
-
-          {/* <FormSectionHeader
-            inDialog={editMode}
-            title={t("JobListings.jobs_section.title")}
-            subtitle={t("JobListings.jobs_section.subtitle")}
-            onCreateText={t("Pages.Jobs.add")}
-            onCreate={() => setIsJobDialogOpen(true)}
-            isError={form.formState.errors.jobs as FieldError}
-            onErrorText={t("JobListings.form.jobs.required")}
+          <JobListingJobsSelection
+            editMode={editMode}
+            t={t}
+            setIsJobDialogOpen={setIsJobDialogOpen}
+            form={form}
+            jobs={jobs}
+            selectedJobs={selectedJobs}
+            handleJobSelect={handleJobSelect}
           />
-          <div className="form-container">
-            <FormField
-              control={form.control}
-              name="jobs"
-              render={() => (
-                <FormItem>
-                  <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
-                    {jobs?.map((job: Job) => (
-                      <div
-                        key={job.id}
-                        className={`cursor-pointer rounded-lg border p-4 transition-all ${
-                          selectedJobs.includes(job.id)
-                            ? "border-primary bg-primary/5"
-                            : "hover:shadow-md"
-                        }`}
-                        onClick={() => handleJobSelect(job.id)}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h4 className="font-semibold">{job.title}</h4>
-                            <p className="text-sm text-gray-500">{job.type}</p>
-                          </div>
-                          {selectedJobs.includes(job.id) && (
-                            <div className="bg-primary h-4 w-4 rounded-full" />
-                          )}
-                        </div>
-                        <div className="mt-2 space-y-1">
-                          {job.department && (
-                            <p className="text-sm text-gray-600">{job.department}</p>
-                          )}
-                          {job.location && <p className="text-sm text-gray-600">{job.location}</p>}
-                          {job.salary && <p className="text-sm text-gray-600">{job.salary}</p>}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </FormItem>
-              )}
-            />
-          </div> */}
         </form>
       </Form>
       <FormDialog
