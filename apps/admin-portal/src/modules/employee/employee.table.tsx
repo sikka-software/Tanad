@@ -81,6 +81,7 @@ const EmployeesTable = ({
     },
     {
       accessorKey: "status",
+      maxSize: 10,
       header: t("Employees.form.status.label"),
       validationSchema: z.enum(["active", "inactive", "on_leave", "terminated", "resigned"]),
       cellType: "select",

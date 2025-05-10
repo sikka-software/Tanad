@@ -758,6 +758,10 @@ function SheetTable<
               if (!colDef.size && !colDef.minSize && !colDef.maxSize) {
                 style.width = "150px";
               }
+              // Set minimum width if not specified
+              if (!colDef.minSize && !style.minWidth) {
+                style.minWidth = "120px";
+              }
             }
 
             // Render cell content with customizations for the first cell
@@ -924,9 +928,27 @@ function SheetTable<
     [renderRow],
   );
 
+  // Calculate total min width for the table
+  const totalMinWidth = React.useMemo(() => {
+    let minWidth = 0;
+    // Checkbox column
+    if (enableRowSelection) minWidth += 30;
+    // Actions column
+    if (enableRowActions) minWidth += 30;
+    // Data columns
+    columns.forEach((col) => {
+      if (col.minSize) {
+        minWidth += typeof col.minSize === 'number' ? col.minSize : parseInt(col.minSize, 10);
+      } else {
+        minWidth += 120; // default min width
+      }
+    });
+    return minWidth;
+  }, [columns, enableRowSelection, enableRowActions]);
+
   return (
     <div ref={parentRef} className="relative max-h-[calc(100vh-5rem)] overflow-auto p-0 pb-2">
-      <Table id={id}>
+      <Table id={id} style={{ minWidth: totalMinWidth }}>
         {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
         {/* Primary header */}
         {showHeader && (
@@ -968,6 +990,10 @@ function SheetTable<
                     const col = header.column.columnDef;
                     if (!col.size && !col.minSize && !col.maxSize) {
                       style.width = "150px";
+                    }
+                    // Set minimum width if not specified
+                    if (!col.minSize && !style.minWidth) {
+                      style.minWidth = "120px";
                     }
                   }
 
