@@ -10,7 +10,7 @@ env:
 jobs:
   admin-portal:
     name: "Admin Portal"
-    runs-on: [self-hosted, linux, x64, A01]
+    runs-on: [self-hosted, linux, x64, A02]
     permissions:
       contents: read
       packages: write
