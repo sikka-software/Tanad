@@ -1,5 +1,6 @@
 import CustomPageMeta from "@root/src/components/landing/CustomPageMeta";
 import { pick } from "lodash";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -43,7 +44,7 @@ export default function AddJobListingPage() {
 
 AddJobListingPage.messages = ["Notes", "Pages", "JobListings", "Settings", "Jobs", "General"];
 
-export const getStaticProps = async ({ locale }: { locale: string }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

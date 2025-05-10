@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -186,7 +187,7 @@ export default function JobListingsPage() {
 
 JobListingsPage.messages = ["Notes", "Pages", "JobListings", "Settings", "Jobs", "General"];
 
-export const getStaticProps = async ({ locale }: { locale: string }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(
