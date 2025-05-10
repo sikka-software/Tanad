@@ -1439,15 +1439,16 @@
     "delete_actions": "الحذف"
   },
   "Billing": {
-    "pro_plan": "الخطة الاحترافية",
+    "pro_plan": "الباقة الإحترافية",
+    "only_for_enterprise_users": "لباقة المؤسسات فقط",
+    "upgrade_to_enterprise_for_advanced_analytics": "قم بالترقية لباقة المؤسسات للوصول إلى التحليلات المتقدمة",
+    "enterprise_plan": "باقة المؤسسات",
+    "title": "الدفع",
     "tanad_free": "تند مجاني",
     "tanad_pro": "تند برو",
     "tanad_business": "تند للأعمال",
     "tanad_enterprise": "تند للمؤسسات",
-    "only_for_enterprise_users": "لمستخدمي الخطة المؤسسية فقط",
     "manage_billing_description": "إدارة معلومات الفوترة وطرق الدفع",
-    "upgrade_to_enterprise_for_advanced_analytics": "قم بالترقية إلى الخطة المؤسسية للحصول على تحليلات متقدمة",
-    "enterprise_plan": "الخطة المؤسسية",
     "update_plan": "تحديث الخطة",
     "need_custom_solution": "هل تحتاج إلى حل مخصص؟",
     "contact_sales_description": "اتصل بفريق المبيعات للحصول على حل مخصص لعملك",
@@ -1501,8 +1502,14 @@
       "invoice_status_cancelled": "ملغية",
       "actions": "إجراءات"
     },
-    "title": "الفوترة",
     "description": "إدارة جميع طرق الدفع الخاصة بك",
+    "upgrade_dialog": {
+      "title": "ترقية إلى المستوى التالي",
+      "description": "قم بترقية خطتك لإنشاء المزيد من البكلات",
+      "unlimited_puklas": "إنشاء عدد لا محدود من البكلات",
+      "custom_design_and_colors": "تصميم خاص وألوان مخصصة",
+      "advanced_analytics": "تحليلات متقدمة ودعم بالبريد الإلكتروني"
+    },
     "current_plan": {
       "title": "الخطة الحالية",
       "description": "إدارة خطتك الحالية",
@@ -4353,580 +4360,627 @@
       "update": "حدث خطأ أثناء تحديث المشترية",
       "delete": "حدث خطأ أثناء حذف المشترية",
       "duplicate": "حدث خطأ أثناء تكرار المشترية"
+    }
+  },
+  "Roles": {
+    "title": "الأدوار",
+    "your_role": "دورك",
+    "create_role": "إنشاء دور جديد",
+    "add_new": "دور جديد",
+    "update_role": "تحديث الدور",
+    "search_roles": "بحث عن الدور",
+    "role_details": "تفاصيل الدور",
+    "no_permissions": "لا يوجد صلاحيات",
+    "permissions": {
+      "title": "الصلاحيات",
+      "description": "الصلاحيات المتاحة للدور",
+      "read": "القراءة",
+      "create": "إنشاء",
+      "update": "تحديث",
+      "delete": "حذف",
+      "duplicate": "تكرار",
+      "view": "عرض",
+      "manage": "إدارة",
+      "approve": "موافقة",
+      "process": "معالجة",
+      "report": "تقرير",
+      "configure": "تكوين",
+      "manage_users": "إدارة المستخدمين",
+      "invite": "دعوة",
+      "export": "تصدير",
+      "import": "استيراد",
+      "print": "طباعة",
+      "send": "إرسال",
+      "receive": "استلام",
+      "assign": "تعيين",
+      "unassign": "إلغاء التعيين",
+      "edit": "تعديل"
     },
-    "Roles": {
-      "title": "الأدوار",
-      "your_role": "دورك",
-      "create_role": "إنشاء دور جديد",
-      "add_new": "دور جديد",
-      "edit_role": "تعديل الدور",
-      "update_role": "تحديث الدور",
-      "search_roles": "بحث عن الدور",
-      "role_details": "تفاصيل الدور",
-      "no_permissions": "لا يوجد صلاحيات",
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "placeholder": "أدخل اسم الدور",
+        "required": "الاسم مطلوب",
+        "format": "يجب أن يحتوي اسم الدور على أحرف صغيرة وأرقام وشرطات سفلية فقط"
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "أدخل وصف الدور",
+        "required": "الوصف مطلوب"
+      },
       "permissions": {
-        "title": "الصلاحيات",
-        "description": "الصلاحيات المتاحة للدور",
-        "read": "القراءة",
-        "create": "إنشاء",
-        "update": "تحديث",
-        "delete": "حذف",
-        "duplicate": "تكرار",
-        "view": "عرض",
-        "manage": "إدارة",
-        "approve": "موافقة",
-        "process": "معالجة",
-        "report": "تقرير",
-        "configure": "تكوين",
-        "manage_users": "إدارة المستخدمين",
-        "invite": "دعوة",
-        "export": "تصدير",
-        "import": "استيراد",
-        "print": "طباعة",
-        "send": "إرسال",
-        "receive": "استلام",
-        "assign": "تعيين",
-        "unassign": "إلغاء التعيين",
-        "edit": "تعديل"
-      },
-      "form": {
-        "name": {
-          "label": "الاسم",
-          "placeholder": "أدخل اسم الدور",
-          "required": "الاسم مطلوب",
-          "format": "يجب أن يحتوي اسم الدور على أحرف صغيرة وأرقام وشرطات سفلية فقط"
-        },
-        "description": {
-          "label": "الوصف",
-          "placeholder": "أدخل وصف الدور",
-          "required": "الوصف مطلوب"
-        },
-        "permissions": {
-          "label": "الصلاحيات"
-        }
-      },
-      "predefined": {
-        "system": "نظام",
-        "superadmin": {
-          "title": "مدير النظام",
-          "description": "مدير النظام لديه جميع الصلاحيات للتحكم في النظام والمستخدمين"
-        },
-        "admin": {
-          "title": "مدير المؤسسة",
-          "description": "مدير المؤسسة لديه جميع الصلاحيات للتحكم في المؤسسة والمستخدمين"
-        },
-        "employee": {
-          "title": "موظف",
-          "description": "الموظف لديه صلاحيات الوصول إلى البيانات الخاصة به"
-        },
-        "human_resources": {
-          "title": "مسؤول الموارد البشرية",
-          "description": "موظف الموارد البشرية لديه صلاحيات الوصول إلى البيانات الخاصة بالموارد البشرية"
-        },
-        "accounting": {
-          "title": "مسؤول المحاسبة",
-          "description": "موظف المحاسبة لديه صلاحيات الوصول إلى البيانات الخاصة بالمحاسبة"
-        }
-      },
-      "roles": {
-        "superadmin": "مدير النظام",
-        "admin": "مدير المؤسسة",
-        "employee": "موظف",
-        "hr": "موظف الموارد البشرية",
-        "accounting": "موظف المحاسبة"
-      },
-      "success": {
-        "create": "تم إنشاء الدور بنجاح",
-        "update": "تم تحديث الدور بنجاح",
-        "delete": "تم حذف الدور بنجاح",
-        "duplicate": "تم تكرار الدور بنجاح"
-      },
-      "loading": {
-        "create": "جاري إنشاء الدور...",
-        "update": "جاري تحديث الدور...",
-        "delete": "جاري حذف الدور...",
-        "duplicate": "جاري تكرار الدور..."
-      },
-      "error": {
-        "create": "حدث خطأ أثناء إنشاء الدور",
-        "update": "حدث خطأ أثناء تحديث الدور",
-        "delete": "حدث خطأ أثناء حذف الدور",
-        "duplicate": "حدث خطأ أثناء تكرار الدور"
+        "label": "الصلاحيات"
       }
     },
-    "OnlineShops": {
-      "title": "المتاجر الإلكترونية",
-      "singular": "متجر إلكتروني"
+    "predefined": {
+      "system": "نظام",
+      "superadmin": {
+        "title": "مدير النظام",
+        "description": "مدير النظام لديه جميع الصلاحيات للتحكم في النظام والمستخدمين"
+      },
+      "admin": {
+        "title": "مدير المؤسسة",
+        "description": "مدير المؤسسة لديه جميع الصلاحيات للتحكم في المؤسسة والمستخدمين"
+      },
+      "employee": {
+        "title": "موظف",
+        "description": "الموظف لديه صلاحيات الوصول إلى البيانات الخاصة به"
+      },
+      "human_resources": {
+        "title": "مسؤول الموارد البشرية",
+        "description": "موظف الموارد البشرية لديه صلاحيات الوصول إلى البيانات الخاصة بالموارد البشرية"
+      },
+      "accounting": {
+        "title": "مسؤول المحاسبة",
+        "description": "موظف المحاسبة لديه صلاحيات الوصول إلى البيانات الخاصة بالمحاسبة"
+      }
     },
-    "ActivityLogs": {
-      "title": "سجل الأنشطة",
-      "description": "سجل الأنشطة التي تمت في المؤسسة خلال فترة محددة",
-      "dialog": {
-        "title": "تفاصيل النشاط"
-      },
-      "error_fetching": "حدث خطأ أثناء جلب الأنشطة",
-      "no_activity_logs_found": "لا توجد أنشطة",
-      "export": {
-        "exportAs": "{fileType} تصدير كملف",
-        "generatingPDF": "جاري إنشاء الملف المرفق...",
-        "downloadPDF": "{fileType} تحميل ملف",
-        "preparingPDF": "جاري إعادة ترتيب البيانات للطباعة...",
-        "preparingPDFShort": "جاري إعادة ترتيب البيانات للطباعة...",
-        "readyPDF": "تم إعادة ترتيب البيانات للطباعة",
-        "noData": "لا توجد بيانات لتصدير",
-        "errorPDF": "حدث خطأ أثناء إنشاء الملف المرفق",
-        "errorCSV": "حدث خطأ أثناء إنشاء الملف المرفق",
-        "successPDF": "تم إنشاء الملف المرفق بنجاح",
-        "successCSV": "تم إنشاء الملف المرفق بنجاح"
-      },
-      "filters": {
-        "date_range": "المدى الزمني",
-        "select_date_range": "اختر المدى الزمني",
-        "event_type": "نوع النشاط",
-        "select_event_type": "اختر نوع النشاط",
-        "all_events": "جميع الأنشطة",
-        "login": "تسجيل الدخول",
-        "logout": "تسجيل الخروج",
-        "create": "إنشاء",
-        "update": "تحديث",
-        "delete": "حذف",
-        "duplicate": "تكرار",
-        "view": "عرض",
-        "manage": "إدارة",
-        "approve": "موافقة",
-        "process": "معالجة",
-        "report": "تقرير",
-        "configure": "تكوين",
-        "manage_users": "إدارة المستخدمين",
-        "invite": "دعوة",
-        "export": "تصدير",
-        "import": "استيراد",
-        "print": "طباعة",
-        "send": "إرسال",
-        "receive": "استلام",
-        "assign": "تعيين",
-        "unassign": "إلغاء التعيين",
-        "edit": "تعديل",
-        "clearFilters": "مسح المرشحات",
-        "selectUser": "اختر المستخدم",
-        "selectTimeRange": "اختر المدى الزمني",
-        "lastHour": "الساعة الأخيرة",
-        "last24Hours": "الـ 24 ساعة",
-        "last7Days": "الـ 7 أيام",
-        "last30Days": "الـ 30 يوم",
-        "last90Days": "الـ 90 يوم",
-        "customRange": "مدى زمني مخصص",
-        "allUsers": "جميع المستخدمين",
-        "administrators": "المديرين",
-        "developers": "المبرمجين",
-        "viewers": "المشاهدين",
-        "user": "المستخدم",
-        "timeRange": "المدى الزمني",
-        "pickDate": "اختر التاريخ",
-        "filter": "المرشحات",
-        "search": "بحث"
-      },
+    "roles": {
+      "superadmin": "مدير النظام",
+      "admin": "مدير المؤسسة",
+      "employee": "موظف",
+      "hr": "موظف الموارد البشرية",
+      "accounting": "موظف المحاسبة"
+    },
+    "success": {
+      "create": "تم إنشاء الدور بنجاح",
+      "update": "تم تحديث الدور بنجاح",
+      "delete": "تم حذف الدور بنجاح",
+      "duplicate": "تم تكرار الدور بنجاح"
+    },
+    "loading": {
+      "create": "جاري إنشاء الدور...",
+      "update": "جاري تحديث الدور...",
+      "delete": "جاري حذف الدور...",
+      "duplicate": "جاري تكرار الدور..."
+    },
+    "error": {
+      "create": "حدث خطأ أثناء إنشاء الدور",
+      "update": "حدث خطأ أثناء تحديث الدور",
+      "delete": "حدث خطأ أثناء حذف الدور",
+      "duplicate": "حدث خطأ أثناء تكرار الدور"
+    }
+  },
+  "OnlineShops": {
+    "title": "المتاجر الإلكترونية",
+    "singular": "متجر إلكتروني"
+  },
+  "ActivityLogs": {
+    "title": "سجل الأنشطة",
+    "description": "سجل الأنشطة التي تمت في المؤسسة خلال فترة محددة",
+    "dialog": {
+      "title": "تفاصيل النشاط"
+    },
+    "error_fetching": "حدث خطأ أثناء جلب الأنشطة",
+    "no_activity_logs_found": "لا توجد أنشطة",
+    "export": {
+      "exportAs": "{fileType} تصدير كملف",
+      "generatingPDF": "جاري إنشاء الملف المرفق...",
+      "downloadPDF": "{fileType} تحميل ملف",
+      "preparingPDF": "جاري إعادة ترتيب البيانات للطباعة...",
+      "preparingPDFShort": "جاري إعادة ترتيب البيانات للطباعة...",
+      "readyPDF": "تم إعادة ترتيب البيانات للطباعة",
+      "noData": "لا توجد بيانات لتصدير",
+      "errorPDF": "حدث خطأ أثناء إنشاء الملف المرفق",
+      "errorCSV": "حدث خطأ أثناء إنشاء الملف المرفق",
+      "successPDF": "تم إنشاء الملف المرفق بنجاح",
+      "successCSV": "تم إنشاء الملف المرفق بنجاح"
+    },
+    "filters": {
+      "date_range": "المدى الزمني",
+      "select_date_range": "اختر المدى الزمني",
+      "event_type": "نوع النشاط",
+      "select_event_type": "اختر نوع النشاط",
+      "all_events": "جميع الأنشطة",
+      "login": "تسجيل الدخول",
+      "logout": "تسجيل الخروج",
+      "create": "إنشاء",
+      "update": "تحديث",
+      "delete": "حذف",
+      "duplicate": "تكرار",
+      "view": "عرض",
+      "manage": "إدارة",
+      "approve": "موافقة",
+      "process": "معالجة",
+      "report": "تقرير",
+      "configure": "تكوين",
+      "manage_users": "إدارة المستخدمين",
+      "invite": "دعوة",
+      "export": "تصدير",
+      "import": "استيراد",
+      "print": "طباعة",
+      "send": "إرسال",
+      "receive": "استلام",
+      "assign": "تعيين",
+      "unassign": "إلغاء التعيين",
+      "edit": "تعديل",
+      "clearFilters": "مسح المرشحات",
+      "selectUser": "اختر المستخدم",
+      "selectTimeRange": "اختر المدى الزمني",
+      "lastHour": "الساعة الأخيرة",
+      "last24Hours": "الـ 24 ساعة",
+      "last7Days": "الـ 7 أيام",
+      "last30Days": "الـ 30 يوم",
+      "last90Days": "الـ 90 يوم",
+      "customRange": "مدى زمني مخصص",
+      "allUsers": "جميع المستخدمين",
+      "administrators": "المديرين",
+      "developers": "المبرمجين",
+      "viewers": "المشاهدين",
+      "user": "المستخدم",
+      "timeRange": "المدى الزمني",
+      "pickDate": "اختر التاريخ",
+      "filter": "المرشحات",
+      "search": "بحث"
+    },
 
-      "fields": {
-        "id": "المعرف",
-        "user_full_name": "الاسم الكامل للمستخدم",
-        "user_email": "البريد الإلكتروني للمستخدم",
-        "action_type": "نوع العملية",
-        "target_type": "الهدف",
-        "target_name": "اسم الهدف",
-        "target_id": "معرف الهدف",
-        "details": "التفاصيل",
-        "created_at": "تاريخ الإنشاء",
-        "enterprise_id": "معرف المؤسسة",
-        "user_id": "معرف المستخدم"
-      },
-      "action_description": {
-        "created": "أنشئ {target} باسم {name}",
-        "updated": "تحديث {target} باسم {name}",
-        "deleted": "حذف {target} باسم {name}",
-        "unknown": "تنفيذ {action} على {target}"
-      }
+    "fields": {
+      "id": "المعرف",
+      "user_full_name": "الاسم الكامل للمستخدم",
+      "user_email": "البريد الإلكتروني للمستخدم",
+      "action_type": "نوع العملية",
+      "target_type": "الهدف",
+      "target_name": "اسم الهدف",
+      "target_id": "معرف الهدف",
+      "details": "التفاصيل",
+      "created_at": "تاريخ الإنشاء",
+      "enterprise_id": "معرف المؤسسة",
+      "user_id": "معرف المستخدم"
     },
-    "Internet": {
-      "title": "الإنترنت"
-    },
-    "Domains": {
-      "title": "النطاقات",
-      "add_new": "نطاق جديد",
-      "edit_domain": "تعديل النطاق",
-      "update_domain": "تحديث النطاق",
-      "singular": "نطاق",
-      "domain_details": "تفاصيل النطاق",
-      "create_new": "إنشاء نطاق",
-      "no_domains_found": "لا توجد نطاقات",
-      "search_domains": "بحث عن نطاقات...",
-      "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {نطاق} =1 {هذا النطاق} other {# نطاقات}}؟",
-      "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {نطاق} =1 {هذا النطاق} other {# نطاقات}}",
-      "manager": "المدير",
-      "edit": "تعديل النطاق",
+    "action_description": {
+      "created": "أنشئ {target} باسم {name}",
+      "updated": "تحديث {target} باسم {name}",
+      "deleted": "حذف {target} باسم {name}",
+      "unknown": "تنفيذ {action} على {target}"
+    }
+  },
+  "Internet": {
+    "title": "الإنترنت"
+  },
+  "Domains": {
+    "edit_domain": "تعديل النطاق",
+    "update_domain": "تحديث النطاق",
+    "singular": "نطاق",
+    "domain_details": "تفاصيل النطاق",
+    "no_domains_found": "لا توجد نطاقات",
+    "search_domains": "بحث عن نطاقات...",
+    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {نطاق} =1 {هذا النطاق} other {# نطاقات}}؟",
+    "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {نطاق} =1 {هذا النطاق} other {# نطاقات}}",
+    "manager": "المدير",
+    "edit": "تعديل النطاق",
 
-      "form": {
-        "domain_name": {
-          "label": "الاسم",
-          "placeholder": "أدخل اسم النطاق",
-          "required": "الاسم مطلوب"
-        },
-        "registrar": {
-          "label": "مزود التسجيل",
-          "placeholder": "أدخل مزود التسجيل",
-          "required": "مزود التسجيل مطلوب"
-        },
-        "status": {
-          "label": "الحالة",
-          "active": "نشط",
-          "inactive": "غير نشط"
-        },
-        "monthly_cost": {
-          "label": "التكلفة الشهرية",
-          "placeholder": "أدخل التكلفة الشهرية",
-          "required": "التكلفة الشهرية مطلوبة"
-        },
-        "annual_cost": {
-          "label": "التكلفة السنوية",
-          "placeholder": "أدخل التكلفة السنوية",
-          "required": "التكلفة السنوية مطلوبة"
-        },
-        "payment_cycle": {
-          "label": "دورة الدفع",
-          "placeholder": "أدخل دورة الدفع",
-          "required": "دورة الدفع مطلوبة",
-          "monthly": "شهري",
-          "annual": "سنوي"
-        },
-        "notes": {
-          "label": "الملاحظات",
-          "placeholder": "أدخل الملاحظات"
-        },
-        "update_button": "تحديث النطاق",
-        "create_button": "إنشاء نطاق"
+    "form": {
+      "domain_name": {
+        "label": "الاسم",
+        "placeholder": "أدخل اسم النطاق",
+        "required": "الاسم مطلوب"
       },
-      "success": {
-        "create": "تم إنشاء النطاق بنجاح",
-        "update": "تم تحديث النطاق بنجاح",
-        "delete": "تم حذف النطاق بنجاح",
-        "duplicate": "تم تكرار النطاق بنجاح"
+      "registrar": {
+        "label": "مزود التسجيل",
+        "placeholder": "أدخل مزود التسجيل",
+        "required": "مزود التسجيل مطلوب"
       },
-      "loading": {
-        "create": "جاري إنشاء النطاق...",
-        "update": "جاري تحديث النطاق...",
-        "delete": "جاري حذف النطاق...",
-        "duplicate": "جاري تكرار النطاق..."
-      },
-      "error": {
-        "create": "حدث خطأ أثناء إنشاء النطاق",
-        "update": "حدث خطأ أثناء تحديث النطاق",
-        "delete": "حدث خطأ أثناء حذف النطاق",
-        "duplicate": "حدث خطأ أثناء تكرار النطاق"
-      }
-    },
-    "Websites": {
-      "title": "المواقع الإلكترونية",
-      "add_new": "موقع إلكتروني جديد",
-      "edit_website": "تعديل الموقع الإلكتروني",
-      "update_website": "تحديث الموقع الإلكتروني",
-      "description": "إدارة مواقع الويب الخاصة بك.",
-      "create_new": "إنشاء موقع إلكتروني جديد",
-      "search_websites": "بحث في المواقع الإلكترونية...",
-      "no_websites_found": "لم يتم العثور على مواقع إلكترونية.",
-      "edit_title": "تعديل الموقع الإلكتروني",
-      "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {موقع إلكتروني} =1 {هذا الموقع الإلكتروني} other {# مواقع إلكترونية}}؟",
-      "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {موقع إلكتروني} =1 {هذا الموقع الإلكتروني} other {# مواقع إلكترونية}}",
       "status": {
+        "label": "الحالة",
         "active": "نشط",
         "inactive": "غير نشط"
       },
-      "form": {
-        "domain_name": {
-          "label": "اسم النطاق",
-          "placeholder": "أدخل اسم النطاق",
-          "required": "اسم النطاق مطلوب"
-        },
-        "status": {
-          "label": "الحالة",
-          "placeholder": "اختر الحالة",
-          "required": "الحالة مطلوبة",
-          "active": "نشط",
-          "inactive": "غير نشط"
-        },
-        "notes": {
-          "label": "ملاحظات",
-          "placeholder": "أدخل ملاحظاتك"
-        },
-        "created_at": {
-          "label": "تاريخ الإنشاء"
-        },
-        "updated_at": {
-          "label": "تاريخ التحديث"
-        }
+      "monthly_cost": {
+        "label": "التكلفة الشهرية",
+        "placeholder": "أدخل التكلفة الشهرية",
+        "required": "التكلفة الشهرية مطلوبة"
       },
-      "success": {
-        "create": "تم إنشاء الموقع الإلكتروني بنجاح.",
-        "update": "تم تحديث الموقع الإلكتروني بنجاح.",
-        "delete": "تم حذف الموقع (المواقع) الإلكتروني بنجاح.",
-        "duplicate": "تم نسخ الموقع الإلكتروني بنجاح."
+      "annual_cost": {
+        "label": "التكلفة السنوية",
+        "placeholder": "أدخل التكلفة السنوية",
+        "required": "التكلفة السنوية مطلوبة"
       },
-      "loading": {
-        "create": "جاري إنشاء الموقع الإلكتروني...",
-        "update": "جاري تحديث الموقع الإلكتروني...",
-        "delete": "جاري حذف الموقع (المواقع) الإلكتروني...",
-        "duplicate": "جاري نسخ الموقع الإلكتروني..."
+      "payment_cycle": {
+        "label": "دورة الدفع",
+        "placeholder": "أدخل دورة الدفع",
+        "required": "دورة الدفع مطلوبة",
+        "monthly": "شهري",
+        "annual": "سنوي"
       },
-      "error": {
-        "create": "حدث خطأ أثناء إنشاء الموقع الإلكتروني.",
-        "update": "حدث خطأ أثناء تحديث الموقع الإلكتروني.",
-        "delete": "حدث خطأ أثناء حذف الموقع (المواقع) الإلكتروني.",
-        "duplicate": "حدث خطأ أثناء نسخ الموقع الإلكتروني."
+      "notes": {
+        "label": "الملاحظات",
+        "placeholder": "أدخل الملاحظات"
       },
-      "toast": {
-        "update_error": "فشل تحديث الموقع الإلكتروني. يرجى المحاولة مرة أخرى.",
-        "create_error": "فشل إنشاء الموقع الإلكتروني. يرجى المحاولة مرة أخرى.",
-        "generic_error": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+      "update_button": "تحديث النطاق",
+      "create_button": "إنشاء نطاق"
+    },
+    "success": {
+      "create": "تم إنشاء النطاق بنجاح",
+      "update": "تم تحديث النطاق بنجاح",
+      "delete": "تم حذف النطاق بنجاح",
+      "duplicate": "تم تكرار النطاق بنجاح"
+    },
+    "loading": {
+      "create": "جاري إنشاء النطاق...",
+      "update": "جاري تحديث النطاق...",
+      "delete": "جاري حذف النطاق...",
+      "duplicate": "جاري تكرار النطاق..."
+    },
+    "error": {
+      "create": "حدث خطأ أثناء إنشاء النطاق",
+      "update": "حدث خطأ أثناء تحديث النطاق",
+      "delete": "حدث خطأ أثناء حذف النطاق",
+      "duplicate": "حدث خطأ أثناء تكرار النطاق"
+    }
+  },
+  "Websites": {
+    "title": "المواقع الإلكترونية",
+    "edit_website": "تعديل الموقع الإلكتروني",
+    "update_website": "تحديث الموقع الإلكتروني",
+    "description": "إدارة مواقع الويب الخاصة بك.",
+    "search_websites": "بحث في المواقع الإلكترونية...",
+    "no_websites_found": "لم يتم العثور على مواقع إلكترونية.",
+    "edit_title": "تعديل الموقع الإلكتروني",
+    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {موقع إلكتروني} =1 {هذا الموقع الإلكتروني} other {# مواقع إلكترونية}}؟",
+    "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {موقع إلكتروني} =1 {هذا الموقع الإلكتروني} other {# مواقع إلكترونية}}",
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "form": {
+      "domain_name": {
+        "label": "اسم النطاق",
+        "placeholder": "أدخل اسم النطاق",
+        "required": "اسم النطاق مطلوب"
+      },
+      "status": {
+        "label": "الحالة",
+        "placeholder": "اختر الحالة",
+        "required": "الحالة مطلوبة",
+        "active": "نشط",
+        "inactive": "غير نشط"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل ملاحظاتك"
+      },
+      "created_at": {
+        "label": "تاريخ الإنشاء"
+      },
+      "updated_at": {
+        "label": "تاريخ التحديث"
       }
     },
-    "Servers": {
-      "title": "الخوادم",
-      "add_new": "خادم جديد",
-      "edit_server": "تعديل الخادم",
-      "singular": "خادم",
-      "server_details": "تفاصيل الخادم",
-      "create_new": "إنشاء خادم",
-      "no_servers_found": "لا توجد خوادم",
-      "search_servers": "بحث عن خوادم...",
-      "manager": "المدير",
-      "edit": "تعديل الخادم",
-      "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {خادم} =1 {هذا الخادم} other {# خوادم}}؟",
-      "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {خادم} =1 {هذا الخادم} other {# خوادم}}",
+    "success": {
+      "create": "تم إنشاء الموقع الإلكتروني بنجاح.",
+      "update": "تم تحديث الموقع الإلكتروني بنجاح.",
+      "delete": "تم حذف الموقع (المواقع) الإلكتروني بنجاح.",
+      "duplicate": "تم نسخ الموقع الإلكتروني بنجاح."
+    },
+    "loading": {
+      "create": "جاري إنشاء الموقع الإلكتروني...",
+      "update": "جاري تحديث الموقع الإلكتروني...",
+      "delete": "جاري حذف الموقع (المواقع) الإلكتروني...",
+      "duplicate": "جاري نسخ الموقع الإلكتروني..."
+    },
+    "error": {
+      "create": "حدث خطأ أثناء إنشاء الموقع الإلكتروني.",
+      "update": "حدث خطأ أثناء تحديث الموقع الإلكتروني.",
+      "delete": "حدث خطأ أثناء حذف الموقع (المواقع) الإلكتروني.",
+      "duplicate": "حدث خطأ أثناء نسخ الموقع الإلكتروني."
+    },
+    "toast": {
+      "update_error": "فشل تحديث الموقع الإلكتروني. يرجى المحاولة مرة أخرى.",
+      "create_error": "فشل إنشاء الموقع الإلكتروني. يرجى المحاولة مرة أخرى.",
+      "generic_error": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+    }
+  },
+  "Servers": {
+    "title": "الخوادم",
+    "edit_server": "تعديل الخادم",
+    "singular": "خادم",
+    "server_details": "تفاصيل الخادم",
+    "no_servers_found": "لا توجد خوادم",
+    "search_servers": "بحث عن خوادم...",
+    "manager": "المدير",
+    "edit": "تعديل الخادم",
+    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {خادم} =1 {هذا الخادم} other {# خوادم}}؟",
+    "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {خادم} =1 {هذا الخادم} other {# خوادم}}",
 
-      "form": {
-        "name": {
-          "label": "الاسم",
-          "placeholder": "أدخل اسم الخادم",
-          "required": "الاسم مطلوب"
-        },
-        "ip_address": {
-          "label": "العنوان الأساسي",
-          "placeholder": "رمز الـ IP",
-          "required": "العنوان الأساسي مطلوب"
-        },
-        "location": {
-          "label": "الموقع الجغرافي",
-          "placeholder": "اختر الموقع الجغرافي",
-          "required": "الموقع الجغرافي مطلوب",
-          "no_items": "لا توجد مواقع جغرافية",
-          "search_placeholder": "بحث عن موقع جغرافي"
-        },
-        "provider": {
-          "label": "المزود",
-          "placeholder": "اختر المزود",
-          "required": "المزود مطلوب",
-          "no_items": "لا يوجد مزود",
-          "search_placeholder": "بحث عن مزود"
-        },
-        "os": {
-          "label": "نظام التشغيل",
-          "placeholder": "اختر نظام التشغيل",
-          "required": "نظام التشغيل مطلوب",
-          "no_items": "لا يوجد نظم تشغيل",
-          "search_placeholder": "بحث عن نظام تشغيل"
-        },
-        "status": {
-          "label": "الحالة",
-          "placeholder": "أدخل الحالة",
-          "required": "الحالة مطلوبة",
-          "active": "نشط",
-          "inactive": "غير نشط"
-        },
-        "tags": {
-          "label": "التصنيفات",
-          "placeholder": "أدخل التصنيفات",
-          "required": "التصنيفات مطلوبة"
-        },
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "placeholder": "أدخل اسم الخادم",
+        "required": "الاسم مطلوب"
+      },
+      "ip_address": {
+        "label": "العنوان الأساسي",
+        "placeholder": "رمز الـ IP",
+        "required": "العنوان الأساسي مطلوب"
+      },
+      "location": {
+        "label": "الموقع الجغرافي",
+        "placeholder": "اختر الموقع الجغرافي",
+        "required": "الموقع الجغرافي مطلوب",
+        "no_items": "لا توجد مواقع جغرافية",
+        "search_placeholder": "بحث عن موقع جغرافي"
+      },
+      "provider": {
+        "label": "المزود",
+        "placeholder": "اختر المزود",
+        "required": "المزود مطلوب",
+        "no_items": "لا يوجد مزود",
+        "search_placeholder": "بحث عن مزود"
+      },
+      "os": {
+        "label": "نظام التشغيل",
+        "placeholder": "اختر نظام التشغيل",
+        "required": "نظام التشغيل مطلوب",
+        "no_items": "لا يوجد نظم تشغيل",
+        "search_placeholder": "بحث عن نظام تشغيل"
+      },
+      "status": {
+        "label": "الحالة",
+        "placeholder": "أدخل الحالة",
+        "required": "الحالة مطلوبة",
+        "active": "نشط",
+        "inactive": "غير نشط"
+      },
+      "tags": {
+        "label": "التصنيفات",
+        "placeholder": "أدخل التصنيفات",
+        "required": "التصنيفات مطلوبة"
+      },
 
-        "notes": {
-          "label": "الملاحظات",
-          "placeholder": "أدخل الملاحظات"
-        },
-        "update_button": "تحديث الخادم",
-        "create_button": "إنشاء خادم"
+      "notes": {
+        "label": "الملاحظات",
+        "placeholder": "أدخل الملاحظات"
       },
-      "success": {
-        "create": "تم إنشاء الخادم بنجاح",
-        "update": "تم تحديث الخادم بنجاح",
-        "delete": "تم حذف الخادم بنجاح",
-        "duplicate": "تم تكرار الخادم بنجاح"
-      },
-      "loading": {
-        "create": "جاري إنشاء الخادم...",
-        "update": "جاري تحديث الخادم...",
-        "delete": "جاري حذف الخادم...",
-        "duplicate": "جاري تكرار الخادم..."
-      },
-      "error": {
-        "create": "حدث خطأ أثناء إنشاء الخادم",
-        "update": "حدث خطأ أثناء تحديث الخادم",
-        "delete": "حدث خطأ أثناء حذف الخادم",
-        "duplicate": "حدث خطأ أثناء تكرار الخادم"
-      }
+      "update_button": "تحديث الخادم",
+      "create_button": "إنشاء خادم"
     },
-    "OnlineStores": {
-      "title": "المتاجر الإلكترونية",
-      "add_new": "متجر إلكتروني جديد",
-      "edit_online_store": "تعديل المتجر الإلكتروني",
-      "update_online_store": "تحديث المتجر الإلكتروني",
-      "singular": "متجر إلكتروني",
-      "online_store_details": "تفاصيل المتجر الإلكتروني",
-      "create_new": "إنشاء متجر إلكتروني جديد",
-      "no_online_stores_found": "لا توجد متاجر إلكترونية",
-      "search_online_stores": "بحث عن متاجر إلكترونية...",
-      "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {متجر} =1 {هذا المتجر الإلكتروني} other {# متاجر إلكترونية}}؟",
-      "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {متجر} =1 {هذا المتجر الإلكتروني} other {# متاجر إلكترونية}}",
-      "form": {
-        "domain_name": {
-          "label": "اسم النطاق",
-          "placeholder": "أدخل اسم النطاق",
-          "required": "اسم النطاق مطلوب"
-        },
-        "platform": {
-          "label": "المنصة",
-          "search_placeholder": "بحث عن منصة",
-          "placeholder": "اختر المنصة",
-          "required": "المنصة مطلوبة",
-          "salla": "سلة",
-          "zid": "زد",
-          "shopify": "شوبفاي (Shopify)",
-          "wix": "ويكس (Wix)",
-          "magento": "ماجنتو (Magento)",
-          "prestashop": "بريستاشوب (PrestaShop)",
-          "bigcommerce": "بيج كوميرس (BigCommerce)",
-          "woocommerce": "وو كوميرس (WooCommerce)",
-          "open_cart": "أوبن كارت (OpenCart)",
-          "other": "أخرى"
-        },
-        "status": {
-          "label": "الحالة",
-          "placeholder": "اختر الحالة",
-          "required": "الحالة مطلوبة",
-          "active": "نشط",
-          "inactive": "غير نشط"
-        },
-        "notes": {
-          "label": "ملاحظات",
-          "placeholder": "أدخل الملاحظات"
-        },
-        "create_button": "إنشاء متجر إلكتروني",
-        "update_button": "تحديث المتجر الإلكتروني"
-      },
-      "success": {
-        "create": "تم إنشاء المتجر الإلكتروني بنجاح",
-        "update": "تم تحديث المتجر الإلكتروني بنجاح",
-        "delete": "تم حذف المتجر الإلكتروني بنجاح",
-        "duplicate": "تم تكرار المتجر الإلكتروني بنجاح"
-      },
-      "loading": {
-        "create": "جاري إنشاء المتجر الإلكتروني...",
-        "update": "جاري تحديث المتجر الإلكتروني...",
-        "delete": "جاري حذف المتجر الإلكتروني...",
-        "duplicate": "جاري تكرار المتجر الإلكتروني..."
-      },
-      "error": {
-        "create": "حدث خطأ أثناء إنشاء المتجر الإلكتروني",
-        "update": "حدث خطأ أثناء تحديث المتجر الإلكتروني",
-        "delete": "حدث خطأ أثناء حذف المتجر الإلكتروني",
-        "duplicate": "حدث خطأ أثناء تكرار المتجر الإلكتروني"
-      }
+    "success": {
+      "create": "تم إنشاء الخادم بنجاح",
+      "update": "تم تحديث الخادم بنجاح",
+      "delete": "تم حذف الخادم بنجاح",
+      "duplicate": "تم تكرار الخادم بنجاح"
     },
-    "Fleet": {
-      "title": "إدارة الأسطول"
+    "loading": {
+      "create": "جاري إنشاء الخادم...",
+      "update": "جاري تحديث الخادم...",
+      "delete": "جاري حذف الخادم...",
+      "duplicate": "جاري تكرار الخادم..."
     },
-    "Cars": {
-      "title": "السيارات",
-      "description": "إدارة جميع سياراتك من مكان واحد.",
-      "add_new": "إضافة سيارة جديدة",
-      "create_new": "إنشاء سيارة جديدة",
-      "edit_car": "تعديل السيارة",
-      "singular": "سيارة",
-      "search_cars": "ابحث في السيارات...",
-      "no_cars_found": "لم يتم العثور على أي سيارات.",
-      "confirm_delete": "تأكيد حذف السيارات",
-      "delete_description": "هل أنت متأكد أنك تريد حذف {count} سيارة (سيارات)؟ لا يمكن التراجع عن هذا الإجراء.",
-      "make": "الشركة المصنعة",
-      "model": "الموديل",
-      "year": "سنة الصنع",
-      "color": "اللون",
-      "vin": "رقم الهيكل (VIN)",
-      "licensePlate": "رقم لوحة الترخيص",
-      "code": "الرمز",
-      "form": {
-        "name": {
-          "label": "اسم السيارة",
-          "placeholder": "مثال: سيارتي، تويوتا كامري",
-          "required": "اسم السيارة مطلوب"
-        },
-        "make": {
-          "label": "الشركة المصنعة",
-          "placeholder": "مثال: تويوتا، فورد"
-        },
-        "model": {
-          "label": "الموديل",
-          "placeholder": "مثال: كامري، موستانج"
-        },
-        "year": {
-          "label": "سنة الصنع",
-          "placeholder": "مثال: ٢٠٢٣"
-        },
-        "color": {
-          "label": "اللون",
-          "placeholder": "مثال: أحمر، أزرق"
-        },
-        "vin": {
-          "label": "رقم الهيكل (VIN)",
-          "placeholder": "أدخل رقم الهيكل"
-        },
-        "code": {
-          "label": "الرمز التعريفي",
-          "placeholder": "أدخل الرمز التعريفي للسيارة"
-        },
-        "license_country": {
-          "label": "بلد الترخيص",
-          "placeholder": "مثال: المملكة العربية السعودية"
-        },
-        "license_plate": {
-          "label": "رقم لوحة الترخيص",
-          "placeholder": "أدخل رقم لوحة الترخيص"
-        },
-        "create_button": "إنشاء السيارة",
-        "update_button": "تحديث السيارة"
+    "error": {
+      "create": "حدث خطأ أثناء إنشاء الخادم",
+      "update": "حدث خطأ أثناء تحديث الخادم",
+      "delete": "حدث خطأ أثناء حذف الخادم",
+      "duplicate": "حدث خطأ أثناء تكرار الخادم"
+    }
+  },
+  "OnlineStores": {
+    "title": "المتاجر الإلكترونية",
+    "edit_online_store": "تعديل المتجر الإلكتروني",
+    "update_online_store": "تحديث المتجر الإلكتروني",
+    "singular": "متجر إلكتروني",
+    "online_store_details": "تفاصيل المتجر الإلكتروني",
+    "no_online_stores_found": "لا توجد متاجر إلكترونية",
+    "search_online_stores": "بحث عن متاجر إلكترونية...",
+    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {متجر} =1 {هذا المتجر الإلكتروني} other {# متاجر إلكترونية}}؟",
+    "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {متجر} =1 {هذا المتجر الإلكتروني} other {# متاجر إلكترونية}}",
+    "form": {
+      "domain_name": {
+        "label": "اسم النطاق",
+        "placeholder": "أدخل اسم النطاق",
+        "required": "اسم النطاق مطلوب"
       },
-      "success": {
-        "create": "تم إنشاء السيارة بنجاح.",
-        "update": "تم تحديث السيارة بنجاح.",
-        "delete": "تم حذف السيارة (السيارات) بنجاح.",
-        "duplicate": "تم نسخ السيارة بنجاح."
+      "platform": {
+        "label": "المنصة",
+        "search_placeholder": "بحث عن منصة",
+        "placeholder": "اختر المنصة",
+        "required": "المنصة مطلوبة",
+        "salla": "سلة",
+        "zid": "زد",
+        "shopify": "شوبفاي (Shopify)",
+        "wix": "ويكس (Wix)",
+        "magento": "ماجنتو (Magento)",
+        "prestashop": "بريستاشوب (PrestaShop)",
+        "bigcommerce": "بيج كوميرس (BigCommerce)",
+        "woocommerce": "وو كوميرس (WooCommerce)",
+        "open_cart": "أوبن كارت (OpenCart)",
+        "other": "أخرى"
       },
-      "loading": {
-        "create": "جاري إنشاء السيارة...",
-        "update": "جاري تحديث السيارة...",
-        "delete": "جاري حذف السيارة (السيارات)...",
-        "duplicate": "جاري نسخ السيارة..."
+      "status": {
+        "label": "الحالة",
+        "placeholder": "اختر الحالة",
+        "required": "الحالة مطلوبة",
+        "active": "نشط",
+        "inactive": "غير نشط"
       },
-      "error": {
-        "create": "حدث خطأ أثناء إنشاء السيارة.",
-        "update": "حدث خطأ أثناء تحديث السيارة.",
-        "delete": "حدث خطأ أثناء حذف السيارة (السيارات).",
-        "duplicate": "حدث خطأ أثناء نسخ السيارة."
-      }
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل الملاحظات"
+      },
+      "create_button": "إنشاء متجر إلكتروني",
+      "update_button": "تحديث المتجر الإلكتروني"
     },
-    "Trucks": {
-      "title": "الشاحنات",
-      "add_new": "شاحنة جديدة",
-      "edit_truck": "تعديل الشاحنة",
-      "update_truck": "تحديث الشاحنة",
-      "singular": "شاحنة"
+    "success": {
+      "create": "تم إنشاء المتجر الإلكتروني بنجاح",
+      "update": "تم تحديث المتجر الإلكتروني بنجاح",
+      "delete": "تم حذف المتجر الإلكتروني بنجاح",
+      "duplicate": "تم تكرار المتجر الإلكتروني بنجاح"
+    },
+    "loading": {
+      "create": "جاري إنشاء المتجر الإلكتروني...",
+      "update": "جاري تحديث المتجر الإلكتروني...",
+      "delete": "جاري حذف المتجر الإلكتروني...",
+      "duplicate": "جاري تكرار المتجر الإلكتروني..."
+    },
+    "error": {
+      "create": "حدث خطأ أثناء إنشاء المتجر الإلكتروني",
+      "update": "حدث خطأ أثناء تحديث المتجر الإلكتروني",
+      "delete": "حدث خطأ أثناء حذف المتجر الإلكتروني",
+      "duplicate": "حدث خطأ أثناء تكرار المتجر الإلكتروني"
+    }
+  },
+  "Fleet": {
+    "title": "إدارة الأسطول"
+  },
+  "Cars": {
+    "title": "السيارات",
+    "description": "إدارة جميع سياراتك من مكان واحد.",
+    "edit_car": "تعديل السيارة",
+    "singular": "سيارة",
+    "search_cars": "ابحث في السيارات...",
+    "no_cars_found": "لم يتم العثور على أي سيارات.",
+    "confirm_delete": "تأكيد حذف السيارات",
+    "delete_description": "هل أنت متأكد أنك تريد حذف {count} سيارة (سيارات)؟ لا يمكن التراجع عن هذا الإجراء.",
+    "make": "الشركة المصنعة",
+    "model": "الموديل",
+    "year": "سنة الصنع",
+    "color": "اللون",
+    "vin": "رقم الهيكل (VIN)",
+    "licensePlate": "رقم لوحة الترخيص",
+    "code": "الرمز",
+    "form": {
+      "name": {
+        "label": "اسم السيارة",
+        "placeholder": "مثال: سيارتي، تويوتا كامري",
+        "required": "اسم السيارة مطلوب"
+      },
+      "make": {
+        "label": "الشركة المصنعة",
+        "placeholder": "مثال: تويوتا، فورد"
+      },
+      "model": {
+        "label": "الموديل",
+        "placeholder": "مثال: كامري، موستانج"
+      },
+      "year": {
+        "label": "سنة الصنع",
+        "placeholder": "مثال: ٢٠٢٣"
+      },
+      "color": {
+        "label": "اللون",
+        "placeholder": "مثال: أحمر، أزرق"
+      },
+      "vin": {
+        "label": "رقم الهيكل (VIN)",
+        "placeholder": "أدخل رقم الهيكل"
+      },
+      "code": {
+        "label": "الرمز التعريفي",
+        "placeholder": "أدخل الرمز التعريفي للسيارة"
+      },
+      "license_country": {
+        "label": "بلد الترخيص",
+        "placeholder": "مثال: المملكة العربية السعودية"
+      },
+      "license_plate": {
+        "label": "رقم لوحة الترخيص",
+        "placeholder": "أدخل رقم لوحة الترخيص"
+      },
+      "create_button": "إنشاء السيارة",
+      "update_button": "تحديث السيارة"
+    },
+    "success": {
+      "create": "تم إنشاء السيارة بنجاح.",
+      "update": "تم تحديث السيارة بنجاح.",
+      "delete": "تم حذف السيارة (السيارات) بنجاح.",
+      "duplicate": "تم نسخ السيارة بنجاح."
+    },
+    "loading": {
+      "create": "جاري إنشاء السيارة...",
+      "update": "جاري تحديث السيارة...",
+      "delete": "جاري حذف السيارة (السيارات)...",
+      "duplicate": "جاري نسخ السيارة..."
+    },
+    "error": {
+      "create": "حدث خطأ أثناء إنشاء السيارة.",
+      "update": "حدث خطأ أثناء تحديث السيارة.",
+      "delete": "حدث خطأ أثناء حذف السيارة (السيارات).",
+      "duplicate": "حدث خطأ أثناء نسخ السيارة."
+    }
+  },
+  "Trucks": {
+    "title": "الشاحنات",
+    "description": "إدارة أسطول الشاحنات الخاص بك",
+    "no_trucks_found": "لم يتم العثور على شاحنات.",
+    "confirm_delete": "تأكيد الحذف",
+    "delete_description": "هل أنت متأكد أنك تريد حذف {count} شاحنة (شاحنات)؟",
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "placeholder": "مثال: شاحنة فولفو FH16",
+        "required": "الاسم مطلوب"
+      },
+      "make": {
+        "label": "الشركة المصنعة",
+        "placeholder": "مثال: فولفو، سكانيا"
+      },
+      "model": {
+        "label": "الموديل",
+        "placeholder": "مثال: FH, Actros"
+      },
+      "year": {
+        "label": "سنة الصنع",
+        "placeholder": "مثال: ٢٠٢٣"
+      },
+      "color": {
+        "label": "اللون",
+        "placeholder": "مثال: أحمر، أزرق"
+      },
+      "vin": {
+        "label": "رقم الهيكل (VIN)",
+        "placeholder": "أدخل رقم الهيكل"
+      },
+      "code": {
+        "label": "الرمز التعريفي",
+        "placeholder": "أدخل الرمز التعريفي للشاحنة"
+      },
+      "license_country": {
+        "label": "بلد الترخيص",
+        "placeholder": "مثال: المملكة العربية السعودية"
+      },
+      "license_plate": {
+        "label": "رقم لوحة الترخيص",
+        "placeholder": "أدخل رقم لوحة الترخيص"
+      },
+      "create_button": "إنشاء شاحنة",
+      "update_button": "تحديث شاحنة"
+    },
+    "success": {
+      "create": "تم إنشاء الشاحنة بنجاح.",
+      "update": "تم تحديث الشاحنة بنجاح.",
+      "delete": "تم حذف الشاحنة (الشاحنات) بنجاح.",
+      "duplicate": "تم نسخ الشاحنة بنجاح."
+    },
+    "loading": {
+      "create": "جاري إنشاء الشاحنة...",
+      "update": "جاري تحديث الشاحنة...",
+      "delete": "جاري حذف الشاحنة (الشاحنات)...",
+      "duplicate": "جاري نسخ الشاحنة..."
+    },
+    "error": {
+      "create": "حدث خطأ أثناء إنشاء الشاحنة.",
+      "update": "حدث خطأ أثناء تحديث الشاحنة.",
+      "delete": "حدث خطأ أثناء حذف الشاحنة (الشاحنات).",
+      "duplicate": "حدث خطأ أثناء نسخ الشاحنة."
     }
   }
 }

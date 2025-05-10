@@ -172,9 +172,7 @@ const useUserStore = create<UserState>((set, get) => ({
       // Get profile data
       const { data: profileData } = await supabase
         .from("profiles")
-        .select(
-          "id, email, full_name, created_at, stripe_customer_id, avatar_url, address, subscribed_to, price_id, username, user_settings",
-        )
+        .select("*")
         .eq("id", session.user.id)
         .single();
 
