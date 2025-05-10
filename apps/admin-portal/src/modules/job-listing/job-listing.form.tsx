@@ -320,7 +320,7 @@ export function JobListingForm({
           />
           <JobListingJobsSelection
             editMode={editMode}
-            t={t}
+            currency={form.watch("currency")}
             setIsJobDialogOpen={setIsJobDialogOpen}
             form={form}
             jobs={jobs}

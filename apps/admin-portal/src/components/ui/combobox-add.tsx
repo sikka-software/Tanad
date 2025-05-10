@@ -79,6 +79,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
   ) => {
     const [open, setOpen] = React.useState(false);
     const [selectedValue, setSelectedValue] = React.useState(defaultValue);
+    const inputRef = React.useRef<HTMLInputElement>(null);
 
     React.useEffect(() => {
       setSelectedValue(defaultValue);
@@ -172,7 +173,12 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
               popoverClassName,
             )}
             dir={direction}
-            onOpenAutoFocus={(e) => e.preventDefault()}
+            onOpenAutoFocus={(e) => {
+              e.preventDefault();
+              if (!props.hideInput && inputRef.current) {
+                inputRef.current.focus();
+              }
+            }}
           >
             <Command
               filter={(value, search) => {
@@ -187,6 +193,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
               {!props.hideInput && (
                 <CommandInput
                   {...inputProps}
+                  ref={inputRef}
                   dir={direction}
                   placeholder={props.texts?.searchPlaceholder || "Search"}
                 />

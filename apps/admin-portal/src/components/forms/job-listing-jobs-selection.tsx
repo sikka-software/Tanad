@@ -2,6 +2,7 @@ import { getCurrencySymbol } from "@root/src/lib/currency-utils";
 import { cn } from "@root/src/lib/utils";
 import useUserStore from "@root/src/stores/use-user-store";
 import { Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState, useMemo } from "react";
 import { FieldError, UseFormReturn } from "react-hook-form";
 
@@ -16,24 +17,24 @@ import { MoneyFormatter } from "../ui/currency-input";
 
 interface JobListingJobsSelectionProps {
   editMode?: boolean;
-  t: (key: string) => string;
   setIsJobDialogOpen: (isOpen: boolean) => void;
   form: UseFormReturn<JobListingFormValues>;
   jobs: Job[] | undefined;
   selectedJobs: string[];
   handleJobSelect: (jobId: string) => void;
+  currency: any;
 }
 
 const JobListingJobsSelection = ({
   editMode,
-  t,
   setIsJobDialogOpen,
   form,
   jobs,
   selectedJobs,
   handleJobSelect,
+  currency,
 }: JobListingJobsSelectionProps) => {
-  const currency = useUserStore((state) => state.profile?.user_settings.currency);
+  const t = useTranslations();
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredJobs = useMemo(() => {
@@ -95,7 +96,7 @@ const JobListingJobsSelection = ({
                       <div className="flex items-start justify-between">
                         <div>
                           <h4 className="font-semibold">{job.title}</h4>
-                          <p className="text-sm text-gray-500">{job.type}</p>
+                          <p className="text-sm text-gray-500">{t(`Jobs.form.type.${job.type}`)}</p>
                         </div>
                         {selectedJobs.includes(job.id) && (
                           <div className="bg-primary h-4 w-4 rounded-full" />

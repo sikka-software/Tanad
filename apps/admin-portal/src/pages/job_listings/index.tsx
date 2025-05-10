@@ -185,7 +185,7 @@ export default function JobListingsPage() {
   );
 }
 
-JobListingsPage.messages = ["Notes", "Pages", "JobListings", "Jobs", "General"];
+JobListingsPage.messages = ["Notes", "Pages", "JobListings", "Settings", "Jobs", "General"];
 
 export const getStaticProps = async ({ locale }: { locale: string }) => {
   return {
