@@ -17,7 +17,7 @@ export default function JobCard({ job, onClick }: { job: Job; onClick: () => voi
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <h3 className="text-foreground text-lg font-semibold">{job.title}</h3>
-          <Badge variant={job.type === "Full-time" ? "default" : "outline"}>{job.type}</Badge>
+          <Badge variant={job.type === "full_time" ? "default" : "outline"}>{job.type}</Badge>
         </div>
       </CardHeader>
       <CardContent className="flex-grow">

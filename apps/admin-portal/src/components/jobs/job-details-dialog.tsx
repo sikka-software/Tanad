@@ -61,7 +61,7 @@ export default function JobDetailsModal({
                 )}
               </DialogDescription>
             </div>
-            <Badge variant={job.type === "Full-time" ? "default" : "outline"} className="h-fit">
+            <Badge variant={job.type === "full_time" ? "default" : "outline"} className="h-fit">
               {job.type}
             </Badge>
           </div>

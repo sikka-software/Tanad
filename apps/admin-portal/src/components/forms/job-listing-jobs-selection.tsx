@@ -1,4 +1,6 @@
+import { getCurrencySymbol } from "@root/src/lib/currency-utils";
 import { cn } from "@root/src/lib/utils";
+import useUserStore from "@root/src/stores/use-user-store";
 import { Search } from "lucide-react";
 import { useState, useMemo } from "react";
 import { FieldError, UseFormReturn } from "react-hook-form";
@@ -31,6 +33,7 @@ const JobListingJobsSelection = ({
   selectedJobs,
   handleJobSelect,
 }: JobListingJobsSelectionProps) => {
+  const currency = useUserStore((state) => state.profile?.user_settings.currency);
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredJobs = useMemo(() => {
@@ -104,7 +107,10 @@ const JobListingJobsSelection = ({
                         )}
                         {job.location && <p className="text-sm text-gray-600">{job.location}</p>}
                         {job.salary && (
-                          <p className="text-sm text-gray-600">{MoneyFormatter(job.salary)}</p>
+                          <div className="flex flex-row items-center gap-1 text-sm text-gray-600">
+                            <span>{MoneyFormatter(job.salary, false)}</span>
+                            <span>{getCurrencySymbol(currency || "sar").symbol}</span>
+                          </div>
                         )}
                       </div>
                     </div>

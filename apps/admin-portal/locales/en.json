@@ -2712,8 +2712,8 @@
       "type": {
         "label": "Job Type",
         "placeholder": "Select job type",
-        "full_time": "Full-time",
-        "part_time": "Part-time",
+        "full_time": "Full Time",
+        "part_time": "Part Time",
         "contract": "Contract",
         "internship": "Internship",
         "temporary": "Temporary",

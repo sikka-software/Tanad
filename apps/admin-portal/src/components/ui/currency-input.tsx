@@ -10,11 +10,11 @@ import useUserStore from "@/stores/use-user-store";
 
 import { SARSymbol } from "./sar-symbol";
 
-export const MoneyFormatter = (value: number) => {
+export const MoneyFormatter = (value: number, showDecimals = true) => {
   return new Intl.NumberFormat("en-US", {
     style: "decimal",
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
+    maximumFractionDigits: showDecimals ? 2 : 0,
+    minimumFractionDigits: showDecimals ? 2 : 0,
   }).format(value);
 };
 

@@ -222,7 +222,7 @@ export const generateDummyData = () => {
 
   const fakeJobLocations = ["Office", "Branch", "Warehouse"];
   const fakeJobDepartments = ["Sales", "Marketing", "HR", "IT", "Finance"];
-  const fakeJobTypes = ["Full-Time", "Part-Time", "Contract", "Temporary"];
+  const fakeJobTypes = ["full_time", "part_time", "contract", "temporary"];
   const fakeJobSalaries = ["100000", "50000", "75000", "120000", "80000"];
   const fakeJobIsActive = [true, false];
 

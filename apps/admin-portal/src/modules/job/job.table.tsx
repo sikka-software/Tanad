@@ -45,8 +45,8 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
       header: t("Jobs.form.type.label"),
       cellType: "select",
       options: [
-        { label: t("Jobs.form.type.full_time"), value: "full-time" },
-        { label: t("Jobs.form.type.part_time"), value: "part-time" },
+        { label: t("Jobs.form.type.full_time"), value: "full_time" },
+        { label: t("Jobs.form.type.part_time"), value: "part_time" },
         { label: t("Jobs.form.type.contract"), value: "contract" },
         { label: t("Jobs.form.type.internship"), value: "internship" },
         { label: t("Jobs.form.type.temporary"), value: "temporary" },

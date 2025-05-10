@@ -100,7 +100,7 @@ export function JobForm({
       benefits: defaultValues?.benefits || "",
       location: defaultValues?.location || "",
       department: defaultValues?.department || "",
-      type: defaultValues?.type || "full-time",
+      type: defaultValues?.type || "full_time",
       salary: defaultValues?.salary ? String(defaultValues.salary) : undefined,
       start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
       end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
@@ -228,8 +228,8 @@ export function JobForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="full-time">{t("Jobs.form.type.full_time")}</SelectItem>
-                      <SelectItem value="part-time">{t("Jobs.form.type.part_time")}</SelectItem>
+                      <SelectItem value="full_time">{t("Jobs.form.type.full_time")}</SelectItem>
+                      <SelectItem value="part_time">{t("Jobs.form.type.part_time")}</SelectItem>
                       <SelectItem value="contract">{t("Jobs.form.type.contract")}</SelectItem>
                       <SelectItem value="internship">{t("Jobs.form.type.internship")}</SelectItem>
                       <SelectItem value="temporary">{t("Jobs.form.type.temporary")}</SelectItem>
@@ -257,8 +257,8 @@ export function JobForm({
                       onChange={(value) => field.onChange(value || null)}
                       texts={{
                         placeholder: t("Jobs.form.department.placeholder"),
-                        searchPlaceholder: t("Departments.search_departments"),
-                        noItems: t("Departments.no_departments"),
+                        searchPlaceholder: t("Pages.Departments.search"),
+                        noItems: t("Pages.Departments.no_departments_found"),
                       }}
                       addText={t("Pages.Departments.add")}
                       onAddClick={() => {
