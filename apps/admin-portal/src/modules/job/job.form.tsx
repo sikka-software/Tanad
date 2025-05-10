@@ -354,9 +354,18 @@ export function JobForm({
                 <FormLabel>{t("Jobs.form.available_positions.label")}</FormLabel>
                 <FormControl>
                   <NumberInputWithButtons
-                    defaultValue={field.value ? parseInt(field.value) : 0}
+                    value={(() => {
+                      const stringToParse: string = field.value || "";
+                      return parseInt(stringToParse, 10);
+                    })()}
                     minValue={0}
-                    onChange={(value) => field.onChange(value?.toString() || "")}
+                    onChange={(numericValue) => {
+                      if (isNaN(numericValue)) {
+                        field.onChange("");
+                      } else {
+                        field.onChange(numericValue.toString());
+                      }
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
