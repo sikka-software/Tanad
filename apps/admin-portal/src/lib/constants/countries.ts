@@ -10,7 +10,7 @@ export const countries = [
   {
     value: "ae",
     label: "United Arab Emirates",
-    arabic_label: "الإمارة العربية المتحدة",
+    arabic_label: "الإمارات العربية المتحدة",
     code: "+971",
     placeholder: "5X XXX XXXX",
   },

@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { ComboboxAdd } from "@/ui/combobox-add";
+import CountryInput from "@/ui/country-input";
 import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
@@ -40,8 +41,6 @@ import { useJobs } from "../job/job.hooks";
 import useJobStore from "../job/job.store";
 import { useCreateEmployee } from "./employee.hooks";
 import { useUpdateEmployee } from "./employee.hooks";
-
-import CountryInput from "@/ui/country-input";
 
 const salaryComponentSchema = z.object({
   type: z.string().min(1, "Type is required"),
@@ -426,11 +425,11 @@ export function EmployeeForm({
                         onChange={field.onChange}
                         disabled={isEmployeeSaving}
                         dir={locale === "ar" ? "rtl" : "ltr"}
-                        ariaInvalid={!!form.formState.errors.nationality}
-                        placeholder={t("Employees.form.nationality.placeholder")}
-                        searchPlaceholder={t("Forms.country.search_placeholder")}
-                        noItems={t("Forms.country.no_items")}
-                        t={t}
+                        texts={{
+                          placeholder: t("Employees.form.nationality.placeholder"),
+                          searchPlaceholder: t("Forms.country.search_placeholder"),
+                          noItems: t("Forms.country.no_items"),
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
