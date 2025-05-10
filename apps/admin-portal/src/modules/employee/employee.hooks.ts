@@ -91,26 +91,6 @@ export const useUpdateEmployee = () => {
       // Prepare updates to apply optimistically
       const optimisticUpdates = { ...updates };
 
-      // Handle department_id changes to also update the department name for UI
-      if (updates.department_id !== undefined) {
-        try {
-          // Get the current departments from the cache
-          const departments: any = queryClient.getQueryData(departmentKeys.lists());
-
-          if (departments && Array.isArray(departments)) {
-            // Find the department with the matching ID
-            const department = departments.find((d: any) => d.id === updates.department_id);
-
-            if (department) {
-              // Set the department name for the optimistic update
-              optimisticUpdates.department_id = department.name;
-            }
-          }
-        } catch (error) {
-          console.error("Error getting department name for optimistic update:", error);
-        }
-      }
-
       // Optimistically update the cache
       queryClient.setQueryData(employeeKeys.lists(), (old: Employee[] | undefined) => {
         if (!old) return old;

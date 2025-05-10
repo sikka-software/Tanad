@@ -29,11 +29,14 @@ import EmployeesTable from "@/employee/employee.table";
 
 import { EmployeeForm } from "@/modules/employee/employee.form";
 import { Employee } from "@/modules/employee/employee.types";
+import { useJobs } from "@/modules/job/job.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 export default function EmployeesPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const { data: jobs } = useJobs();
 
   const canReadEmployees = useUserStore((state) => state.hasPermission("employees.read"));
   const canCreateEmployees = useUserStore((state) => state.hasPermission("employees.create"));
@@ -138,7 +141,12 @@ export default function EmployeesPage() {
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
                 emptyMessage={t("Pages.Employees.no_employees_found")}
-                renderItem={(employee) => <EmployeeCard employee={employee} />}
+                renderItem={(employee) => (
+                  <EmployeeCard
+                    position={jobs?.find((j) => j.id === employee.job_id)?.title}
+                    employee={employee}
+                  />
+                )}
                 gridCols="3"
               />
             </div>
