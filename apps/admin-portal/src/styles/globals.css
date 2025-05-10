@@ -186,7 +186,9 @@ body {
   .rounded-inner-4 {
     border-radius: calc(var(--radius) - 1rem); /* 16px */
   }
-  /* You can add more specific utilities here as needed */
+
+
+
 }
 
 @layer base {
@@ -203,6 +205,17 @@ body {
   .form-container {
     @apply mx-auto flex max-w-2xl flex-col gap-4 p-4;
   }
+
+  .form-fields-cols-1 {
+    @apply grid grid-cols-1 gap-4 items-start;
+  }
+  .form-fields-cols-2 {
+    @apply grid grid-cols-1 gap-4 md:grid-cols-2 items-start;
+  }
+  .form-fields-cols-3 {
+    @apply grid grid-cols-1 gap-4 md:grid-cols-3 items-start;
+  }
+
 }
 /* Hide arrows from number input */
 

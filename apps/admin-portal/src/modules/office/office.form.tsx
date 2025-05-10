@@ -34,7 +34,11 @@ const createOfficeSchema = (t: (key: string) => string) => {
   const baseOfficeSchema = z.object({
     name: z.string().min(1, t("Offices.form.name.required")),
     code: z.string().optional().or(z.literal("")),
-    email: z.string().email().optional().or(z.literal("")),
+    email: z
+      .string()
+      .email({ message: t("Offices.form.email.invalid") })
+      .optional()
+      .or(z.literal("")),
     phone: z.string().optional().or(z.literal("")),
     manager: z
       .string({ invalid_type_error: t("Offices.form.manager.invalid_uuid") })
@@ -126,6 +130,7 @@ export function OfficeForm({
               region: data.region?.trim() || undefined,
               country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
+              status: data.status,
               notes: data.notes,
             },
           },
@@ -156,7 +161,7 @@ export function OfficeForm({
             country: data.country?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
             enterprise_id: membership.enterprise_id,
-            status: "active",
+            status: data.status,
             user_id: user.id,
             notes: data.notes,
           },
@@ -190,7 +195,7 @@ export function OfficeForm({
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="name"
@@ -245,7 +250,7 @@ export function OfficeForm({
                 )}
               />
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="email"
@@ -286,7 +291,7 @@ export function OfficeForm({
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="manager"
