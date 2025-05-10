@@ -3,23 +3,24 @@ import {
   pgTable,
   index,
   foreignKey,
-  unique,
   uuid,
   timestamp,
   text,
-  boolean,
-  date,
   jsonb,
+  unique,
   pgSchema,
   json,
   varchar,
   pgPolicy,
-  check,
   numeric,
   uniqueIndex,
+  check,
   bigserial,
+  boolean,
   smallint,
   inet,
+  date,
+  bigint,
   primaryKey,
   pgView,
   pgEnum,
@@ -85,7 +86,6 @@ export const activity_target_type = pgEnum("activity_target_type", [
   "EMPLOYEE_REQUEST",
   "DOMAIN",
   "WEBSITE",
-  "PURCHASE",
   "ONLINE_STORE",
   "CAR",
   "TRUCK",
@@ -249,7 +249,7 @@ export const app_permission = pgEnum("app_permission", [
   "trucks.duplicate",
 ]);
 export const app_role = pgEnum("app_role", ["superadmin", "admin", "accounting", "hr"]);
-export const payment_cycle = pgEnum("payment_cycle", ["monthly", "annual"]);
+export const common_status = pgEnum("common_status", ["active", "inactive", "draft", "archived"]);
 export const employee_status = pgEnum("employee_status", [
   "active",
   "inactive",
@@ -257,7 +257,47 @@ export const employee_status = pgEnum("employee_status", [
   "on_leave",
   "resigned",
 ]);
-export const common_status = pgEnum("common_status", ["active", "inactive", "draft", "archived"]);
+export const payment_cycle = pgEnum("payment_cycle", ["monthly", "annual"]);
+
+export const clients = pgTable(
+  "clients",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
+      sql`timezone('utc'::text, now())`,
+    ),
+    name: text().notNull(),
+    email: text(),
+    phone: text().notNull(),
+    short_address: text(),
+    additional_number: text(),
+    building_number: text(),
+    street_name: text(),
+    city: text(),
+    region: text(),
+    country: text(),
+    zip_code: text(),
+    notes: jsonb(),
+    user_id: uuid().notNull(),
+    company: uuid(),
+    enterprise_id: uuid().notNull(),
+  },
+  (table) => [
+    index("clients_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+    index("clients_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("clients_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("idx_clients_enterprise_id").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    foreignKey({
+      columns: [table.company],
+      foreignColumns: [companies.id],
+      name: "clients_company_fkey",
+    }),
+  ],
+);
+
 export const branches = pgTable(
   "branches",
   {
@@ -304,42 +344,50 @@ export const branches = pgTable(
   ],
 );
 
-export const clients = pgTable(
-  "clients",
+export const departments = pgTable(
+  "departments",
   {
-    id: uuid().defaultRandom().primaryKey().notNull(),
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     name: text().notNull(),
-    email: text(),
-    phone: text().notNull(),
-    short_address: text(),
-    additional_number: text(),
-    building_number: text(),
-    street_name: text(),
-    city: text(),
-    region: text(),
-    country: text(),
-    zip_code: text(),
-    notes: jsonb(),
+    description: text(),
     user_id: uuid().notNull(),
-    company: uuid(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }).default(
+      sql`timezone('utc'::text, now())`,
+    ),
+    status: common_status().default("active"),
     enterprise_id: uuid().notNull(),
+    notes: jsonb(),
   },
   (table) => [
-    index("clients_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-    index("clients_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("clients_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    index("idx_clients_enterprise_id").using(
+    index("departments_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("departments_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("idx_departments_enterprise_id").using(
       "btree",
       table.enterprise_id.asc().nullsLast().op("uuid_ops"),
     ),
-    foreignKey({
-      columns: [table.company],
-      foreignColumns: [companies.id],
-      name: "clients_company_fkey",
-    }),
+  ],
+);
+
+export const audit_log_entriesInAuth = auth.table(
+  "audit_log_entries",
+  {
+    instance_id: uuid(),
+    id: uuid().primaryKey().notNull(),
+    payload: json(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }),
+    ip_address: varchar({ length: 64 }).default(sql`NULL`),
+  },
+  (table) => [
+    index("audit_logs_instance_id_idx").using(
+      "btree",
+      table.instance_id.asc().nullsLast().op("uuid_ops"),
+    ),
   ],
 );
 
@@ -374,107 +422,11 @@ export const companies = pgTable(
   },
   (table) => [
     index("companies_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-    index("companies_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
+    index("companies_is_active_idx").using("btree", table.status.asc().nullsLast().op("enum_ops")),
     index("companies_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
     index("idx_companies_enterprise_id").using(
       "btree",
       table.enterprise_id.asc().nullsLast().op("uuid_ops"),
-    ),
-  ],
-);
-
-export const departments = pgTable(
-  "departments",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
-    name: text().notNull(),
-    description: text(),
-    user_id: uuid().notNull(),
-    updated_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
-    notes: jsonb(),
-    status: common_status().default("active"),
-    enterprise_id: uuid().notNull(),
-  },
-  (table) => [
-    index("departments_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("departments_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    index("idx_departments_enterprise_id").using(
-      "btree",
-      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
-    ),
-  ],
-);
-
-export const employees = pgTable(
-  "employees",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    first_name: text().notNull(),
-    last_name: text().notNull(),
-    email: text().notNull(),
-    phone: text(),
-    hire_date: date(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
-    user_id: uuid().notNull(),
-    enterprise_id: uuid().notNull(),
-    short_address: text(),
-    additional_number: text(),
-    building_number: text(),
-    street_name: text(),
-    city: text(),
-    region: text(),
-    country: text(),
-    zip_code: text(),
-    termination_date: date(),
-    status: employee_status().default("active"),
-    job_id: uuid(),
-    salary: jsonb().default([]),
-    nationality: text(),
-    notes: jsonb(),
-    updated_at: timestamp({ withTimezone: true, mode: "string" }),
-  },
-  (table) => [
-    index("employees_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-    index("employees_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    index("idx_employees_enterprise_id").using(
-      "btree",
-      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("employees_job_id_idx").using("btree", table.job_id.asc().nullsLast().op("uuid_ops")),
-    foreignKey({
-      columns: [table.job_id],
-      foreignColumns: [jobs.id],
-      name: "employees_job_id_jobs_id_fk",
-    }).onDelete("set null"),
-  ],
-);
-
-export const audit_log_entriesInAuth = auth.table(
-  "audit_log_entries",
-  {
-    instance_id: uuid(),
-    id: uuid().primaryKey().notNull(),
-    payload: json(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }),
-    ip_address: varchar({ length: 64 }).default(sql`NULL`),
-  },
-  (table) => [
-    index("audit_logs_instance_id_idx").using(
-      "btree",
-      table.instance_id.asc().nullsLast().op("uuid_ops"),
     ),
   ],
 );
@@ -539,69 +491,6 @@ export const enterprises = pgTable(
   ],
 );
 
-export const invoices = pgTable(
-  "invoices",
-  {
-    id: uuid().defaultRandom().primaryKey().notNull(),
-    enterprise_id: uuid(),
-    invoice_number: text().notNull(),
-    issue_date: date().default(sql`CURRENT_DATE`),
-    due_date: date(),
-    status: text().default("draft").notNull(),
-    subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
-    tax_rate: numeric({ precision: 5, scale: 2 }).default("0"),
-    tax_amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
-CASE
-    WHEN (tax_rate IS NULL) THEN (0)::numeric
-    ELSE round((subtotal * tax_rate), 2)
-END`),
-    total: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
-CASE
-    WHEN (tax_rate IS NULL) THEN subtotal
-    ELSE round((subtotal * ((1)::numeric + tax_rate)), 2)
-END`),
-    notes: jsonb(),
-    client_id: uuid().notNull(),
-    created_by: uuid(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
-    user_id: uuid(),
-  },
-  (table) => [
-    index("idx_invoices_enterprise_id").using(
-      "btree",
-      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("invoices_client_id_idx").using(
-      "btree",
-      table.client_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("invoices_invoice_number_idx").using(
-      "btree",
-      table.invoice_number.asc().nullsLast().op("text_ops"),
-    ),
-    index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
-    foreignKey({
-      columns: [table.client_id],
-      foreignColumns: [clients.id],
-      name: "invoices_client_id_fkey",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [table.created_by],
-      foreignColumns: [profiles.id],
-      name: "invoices_created_by_fkey",
-    }),
-    foreignKey({
-      columns: [table.enterprise_id],
-      foreignColumns: [enterprises.id],
-      name: "invoices_enterprise_id_fkey",
-    }).onDelete("cascade"),
-    check(
-      "invoices_status_check",
-      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'partially_paid'::text, 'overdue'::text, 'void'::text])`,
-    ),
-  ],
-);
-
 export const invoice_items = pgTable(
   "invoice_items",
   {
@@ -629,83 +518,6 @@ export const invoice_items = pgTable(
       foreignColumns: [products.id],
       name: "invoice_items_product_id_fkey",
     }),
-  ],
-);
-
-export const products = pgTable(
-  "products",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    name: text().notNull(),
-    description: text(),
-    price: numeric({ precision: 10, scale: 2 }).notNull(),
-    sku: text(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
-    user_id: uuid().notNull(),
-    enterprise_id: uuid().notNull(),
-    cost: numeric({ precision: 10, scale: 2 }),
-    stock_quantity: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
-    unit: text(),
-    status: common_status().default("active"),
-    notes: jsonb(),
-  },
-  (table) => [
-    index("idx_products_enterprise_id").using(
-      "btree",
-      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("products_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("products_sku_idx").using("btree", table.sku.asc().nullsLast().op("text_ops")),
-    index("products_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-  ],
-);
-
-export const offices = pgTable(
-  "offices",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
-    name: text().notNull(),
-    short_address: text(),
-    additional_number: text(),
-    building_number: text(),
-    street_name: text(),
-    city: text(),
-    region: text(),
-    country: text(),
-    zip_code: text(),
-    phone: text(),
-    email: text(),
-    manager: uuid(),
-    status: common_status().default("active"),
-    user_id: uuid().notNull(),
-    notes: jsonb(),
-    enterprise_id: uuid().notNull(),
-    code: text(),
-  },
-  (table) => [
-    index("idx_offices_enterprise_id").using(
-      "btree",
-      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("offices_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("offices_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    index("idx_offices_manager").using("btree", table.manager.asc().nullsLast().op("uuid_ops")),
-    foreignKey({
-      columns: [table.manager],
-      foreignColumns: [employees.id],
-      name: "fk_office_manager",
-    }).onDelete("set null"),
   ],
 );
 
@@ -871,59 +683,6 @@ export const usersInAuth = auth.table(
     check(
       "users_email_change_confirm_status_check",
       sql`(email_change_confirm_status >= 0) AND (email_change_confirm_status <= 2)`,
-    ),
-  ],
-);
-
-export const quotes = pgTable(
-  "quotes",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
-    quote_number: text().notNull(),
-    issue_date: date().notNull(),
-    expiry_date: date().notNull(),
-    status: text().default("draft").notNull(),
-    subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
-    tax_rate: numeric({ precision: 5, scale: 2 }).default("0"),
-    notes: jsonb(),
-    client_id: uuid().notNull(),
-    user_id: uuid().notNull(),
-    tax_amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
-CASE
-    WHEN (tax_rate IS NULL) THEN (0)::numeric
-    ELSE round((subtotal * tax_rate), 2)
-END`),
-    total: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
-CASE
-    WHEN (tax_rate IS NULL) THEN subtotal
-    ELSE round((subtotal * ((1)::numeric + tax_rate)), 2)
-END`),
-    enterprise_id: uuid().notNull(),
-    created_by: uuid(),
-  },
-  (table) => [
-    index("quotes_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
-    index("quotes_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
-    index("quotes_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    foreignKey({
-      columns: [table.client_id],
-      foreignColumns: [clients.id],
-      name: "quotes_client_id_fkey",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [table.created_by],
-      foreignColumns: [profiles.id],
-      name: "quotes_created_by_fkey",
-    }),
-    check(
-      "quotes_status_check",
-      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'accepted'::text, 'rejected'::text, 'expired'::text])`,
     ),
   ],
 );
@@ -1278,174 +1037,37 @@ export const user_enterprise_roles = pgTable(
   ],
 );
 
-export const employee_requests = pgTable(
-  "employee_requests",
+export const jobs = pgTable(
+  "jobs",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
-    employee_id: uuid().notNull(),
-    type: text().notNull(),
-    status: text().default("pending").notNull(),
-    title: text().notNull(),
+    title: varchar({ length: 255 }).notNull(),
     description: text(),
+    requirements: text(),
+    location: varchar({ length: 255 }),
+    department: varchar({ length: 255 }),
+    type: varchar({ length: 50 }).notNull(),
+    salary: numeric({ precision: 10, scale: 2 }),
+    status: common_status().default("active"),
     start_date: date(),
     end_date: date(),
-    amount: numeric({ precision: 10, scale: 2 }),
-    attachments: jsonb().default([]),
-    notes: jsonb(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
+    responsibilities: text(),
+    benefits: text(),
+    total_positions: numeric().default("0").notNull(),
+    occupied_positions: numeric().default("0").notNull(),
   },
   (table) => [
-    index("employee_requests_created_at_idx").using(
-      "btree",
-      table.created_at.asc().nullsLast().op("timestamptz_ops"),
-    ),
-    index("employee_requests_employee_id_idx").using(
-      "btree",
-      table.employee_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("employee_requests_status_idx").using(
-      "btree",
-      table.status.asc().nullsLast().op("text_ops"),
-    ),
-    index("employee_requests_type_idx").using("btree", table.type.asc().nullsLast().op("text_ops")),
-    index("employee_requests_user_id_idx").using(
-      "btree",
-      table.user_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    foreignKey({
-      columns: [table.employee_id],
-      foreignColumns: [employees.id],
-      name: "employee_requests_employee_id_employees_id_fk",
-    }),
-    pgPolicy("Allow enterprise members to update requests", {
-      as: "permissive",
-      for: "update",
-      to: ["public"],
-      using: sql`is_member_of_enterprise(enterprise_id)`,
-      withCheck: sql`is_member_of_enterprise(enterprise_id)`,
-    }),
-    pgPolicy("Allow members to view own enterprise requests", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-    }),
-    pgPolicy("Allow members to insert for own enterprise", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-    }),
-    pgPolicy("Allow creator to delete own requests", {
-      as: "permissive",
-      for: "delete",
-      to: ["public"],
-    }),
-  ],
-);
-
-export const expenses = pgTable(
-  "expenses",
-  {
-    id: uuid().defaultRandom().primaryKey().notNull(),
-    enterprise_id: uuid().notNull(),
-    description: text(),
-    amount: numeric({ precision: 10, scale: 2 }).notNull(),
-    incurred_at: date().default(sql`CURRENT_DATE`),
-    created_by: uuid(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
-    category: text().notNull(),
-    due_date: date(),
-    issue_date: date().default(sql`CURRENT_DATE`),
-    notes: jsonb(),
-    expense_number: text().notNull(),
-    status: text().default("pending").notNull(),
-    user_id: uuid().notNull(),
-  },
-  (table) => [
-    foreignKey({
-      columns: [table.created_by],
-      foreignColumns: [profiles.id],
-      name: "expenses_created_by_fkey",
-    }),
-    foreignKey({
-      columns: [table.enterprise_id],
-      foreignColumns: [enterprises.id],
-      name: "expenses_enterprise_id_fkey",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const purchases = pgTable(
-  "purchases",
-  {
-    id: uuid().defaultRandom().primaryKey().notNull(),
-    enterprise_id: uuid().notNull(),
-    description: text(),
-    amount: numeric({ precision: 10, scale: 2 }).notNull(),
-    incurred_at: date().default(sql`CURRENT_DATE`),
-    created_by: uuid(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
-    category: text().notNull(),
-    due_date: date(),
-    issue_date: date().default(sql`CURRENT_DATE`),
-    notes: jsonb(),
-    purchase_number: text().notNull(),
-    status: text().default("pending").notNull(),
-    user_id: uuid().notNull(),
-  },
-  (table) => [
-    foreignKey({
-      columns: [table.created_by],
-      foreignColumns: [profiles.id],
-      name: "purchases_created_by_fkey",
-    }),
-    foreignKey({
-      columns: [table.enterprise_id],
-      foreignColumns: [enterprises.id],
-      name: "purchases_enterprise_id_fkey",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const vendors = pgTable(
-  "vendors",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
-    name: text().notNull(),
-    email: text().notNull(),
-    phone: text().notNull(),
-    company: text(),
-    short_address: text(),
-    additional_number: text(),
-    building_number: text(),
-    street_name: text(),
-    city: text(),
-    region: text(),
-    country: text(),
-    zip_code: text(),
-    notes: jsonb(),
-    user_id: uuid().notNull(),
-    updated_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
-    enterprise_id: uuid().notNull(),
-  },
-  (table) => [
-    index("idx_vendors_enterprise_id").using(
+    index("idx_jobs_enterprise_id").using(
       "btree",
       table.enterprise_id.asc().nullsLast().op("uuid_ops"),
     ),
-    index("vendors_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-    index("vendors_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("vendors_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("jobs_department_idx").using("btree", table.department.asc().nullsLast().op("text_ops")),
+    index("jobs_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
+    index("jobs_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
   ],
 );
 
@@ -1545,6 +1167,119 @@ export const job_listing_jobs = pgTable(
   ],
 );
 
+export const employee_requests = pgTable(
+  "employee_requests",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    employee_id: uuid().notNull(),
+    type: text().notNull(),
+    status: text().default("pending").notNull(),
+    title: text().notNull(),
+    description: text(),
+    start_date: date(),
+    end_date: date(),
+    amount: numeric({ precision: 10, scale: 2 }),
+    attachments: jsonb().default([]),
+    notes: jsonb(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+  },
+  (table) => [
+    index("employee_requests_created_at_idx").using(
+      "btree",
+      table.created_at.asc().nullsLast().op("timestamptz_ops"),
+    ),
+    index("employee_requests_employee_id_idx").using(
+      "btree",
+      table.employee_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("employee_requests_status_idx").using(
+      "btree",
+      table.status.asc().nullsLast().op("text_ops"),
+    ),
+    index("employee_requests_type_idx").using("btree", table.type.asc().nullsLast().op("text_ops")),
+    index("employee_requests_user_id_idx").using(
+      "btree",
+      table.user_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    foreignKey({
+      columns: [table.employee_id],
+      foreignColumns: [employees.id],
+      name: "employee_requests_employee_id_employees_id_fk",
+    }),
+    pgPolicy("Allow enterprise members to update requests", {
+      as: "permissive",
+      for: "update",
+      to: ["public"],
+      using: sql`is_member_of_enterprise(enterprise_id)`,
+      withCheck: sql`is_member_of_enterprise(enterprise_id)`,
+    }),
+    pgPolicy("Allow members to view own enterprise requests", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+    }),
+    pgPolicy("Allow members to insert for own enterprise", {
+      as: "permissive",
+      for: "insert",
+      to: ["public"],
+    }),
+    pgPolicy("Allow creator to delete own requests", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
+    }),
+  ],
+);
+
+export const profiles = pgTable(
+  "profiles",
+  {
+    id: uuid().primaryKey().notNull(),
+    email: text(),
+    full_name: text(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
+    user_settings: jsonb(),
+    role: text().default("user").notNull(),
+    username: text(),
+    enterprise_id: uuid(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }).default(
+      sql`timezone('utc'::text, now())`,
+    ),
+    stripe_customer_id: text(),
+    subscribed_to: text(),
+    price_id: text(),
+    cancel_at_period_end: boolean().default(false),
+    // You can use { mode: "bigint" } if numbers are exceeding js number limitations
+    cancel_at: bigint({ mode: "number" }),
+  },
+  (table) => [
+    index("profiles_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+    index("profiles_enterprise_id_idx").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("profiles_user_id_idx").using("btree", table.id.asc().nullsLast().op("uuid_ops")),
+    index("profiles_username_idx").using("btree", table.username.asc().nullsLast().op("text_ops")),
+    foreignKey({
+      columns: [table.id],
+      foreignColumns: [usersInAuth.id],
+      name: "profiles_id_fkey",
+    }).onDelete("cascade"),
+    unique("profiles_email_key").on(table.email),
+    pgPolicy("Users can view own profile", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+      using: sql`(auth.uid() = id)`,
+    }),
+    pgPolicy("Users can insert own profile", { as: "permissive", for: "insert", to: ["public"] }),
+    pgPolicy("Users can update own profile", { as: "permissive", for: "update", to: ["public"] }),
+  ],
+);
+
 export const quote_items = pgTable(
   "quote_items",
   {
@@ -1580,42 +1315,6 @@ export const quote_items = pgTable(
   ],
 );
 
-export const salaries = pgTable(
-  "salaries",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
-    notes: jsonb(),
-    user_id: uuid().notNull(),
-    enterprise_id: uuid().notNull(),
-    employee_id: uuid().notNull(),
-    amount: numeric({ precision: 10, scale: 2 }).notNull(),
-    currency: text().default("USD").notNull(),
-    payment_frequency: text().default("monthly").notNull(),
-    deductions: jsonb().default([]),
-    start_date: date().notNull(),
-    payment_date: date(),
-    end_date: date(),
-  },
-  (table) => [
-    index("salaries_employee_id_idx").using(
-      "btree",
-      table.employee_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("salaries_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    foreignKey({
-      columns: [table.employee_id],
-      foreignColumns: [employees.id],
-      name: "salaries_employee_id_fkey",
-    }).onDelete("cascade"),
-  ],
-);
-
 export const templates = pgTable(
   "templates",
   {
@@ -1638,129 +1337,6 @@ export const templates = pgTable(
     index("templates_type_idx").using("btree", table.type.asc().nullsLast().op("text_ops")),
     index("templates_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     check("templates_type_check", sql`type = ANY (ARRAY['invoice'::text, 'quote'::text])`),
-  ],
-);
-
-export const jobs = pgTable(
-  "jobs",
-  {
-    id: uuid().defaultRandom().primaryKey().notNull(),
-    title: varchar({ length: 255 }).notNull(),
-    description: text(),
-    requirements: text(),
-    location: varchar({ length: 255 }),
-    department: varchar({ length: 255 }),
-    type: varchar({ length: 50 }).notNull(),
-    salary: numeric({ precision: 10, scale: 2 }),
-    status: common_status().default("active"),
-    start_date: date(),
-    end_date: date(),
-    total_positions: numeric().notNull().default("1"),
-    occupied_positions: numeric().notNull().default("0"),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
-    updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
-    user_id: uuid().notNull(),
-    enterprise_id: uuid().notNull(),
-    responsibilities: text(),
-    benefits: text(),
-  },
-  (table) => [
-    index("idx_jobs_enterprise_id").using(
-      "btree",
-      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("jobs_department_idx").using("btree", table.department.asc().nullsLast().op("text_ops")),
-    index("jobs_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
-    index("jobs_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-  ],
-);
-
-export const warehouses = pgTable(
-  "warehouses",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
-    name: text().notNull(),
-    code: text(),
-    short_address: text(),
-    additional_number: text(),
-    building_number: text(),
-    street_name: text(),
-    manager: uuid(),
-    city: text(),
-    region: text(),
-    country: text(),
-    zip_code: text(),
-    capacity: numeric({ precision: 10, scale: 2 }),
-    status: common_status().default("active"),
-    notes: jsonb(),
-    user_id: uuid().notNull(),
-    enterprise_id: uuid().notNull(),
-    phone: text(),
-  },
-  (table) => [
-    index("idx_warehouses_enterprise_id").using(
-      "btree",
-      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("warehouses_code_idx").using("btree", table.code.asc().nullsLast().op("text_ops")),
-    index("warehouses_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("warehouses_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    unique("warehouses_code_key").on(table.code),
-    index("idx_warehouses_manager").using("btree", table.manager.asc().nullsLast().op("uuid_ops")),
-    foreignKey({
-      columns: [table.manager],
-      foreignColumns: [employees.id],
-      name: "fk_warehouse_manager",
-    }).onDelete("set null"),
-  ],
-);
-
-export const profiles = pgTable(
-  "profiles",
-  {
-    id: uuid().primaryKey().notNull(),
-    email: text(),
-    full_name: text(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
-    user_settings: jsonb(),
-    role: text().default("user").notNull(),
-    username: text(),
-    enterprise_id: uuid(),
-    updated_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
-    stripe_customer_id: text(),
-    subscribed_to: text(),
-    price_id: text(),
-  },
-  (table) => [
-    index("profiles_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-    index("profiles_enterprise_id_idx").using(
-      "btree",
-      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("profiles_user_id_idx").using("btree", table.id.asc().nullsLast().op("uuid_ops")),
-    index("profiles_username_idx").using("btree", table.username.asc().nullsLast().op("text_ops")),
-    foreignKey({
-      columns: [table.id],
-      foreignColumns: [usersInAuth.id],
-      name: "profiles_id_fkey",
-    }).onDelete("cascade"),
-    unique("profiles_email_key").on(table.email),
-    pgPolicy("Users can view own profile", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-      using: sql`(auth.uid() = id)`,
-    }),
-    pgPolicy("Users can insert own profile", { as: "permissive", for: "insert", to: ["public"] }),
-    pgPolicy("Users can update own profile", { as: "permissive", for: "update", to: ["public"] }),
   ],
 );
 
@@ -1848,223 +1424,84 @@ export const permissions = pgTable(
   ],
 );
 
-export const job_listings = pgTable(
-  "job_listings",
+export const expenses = pgTable(
+  "expenses",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
-    title: varchar({ length: 255 }).notNull(),
+    enterprise_id: uuid().notNull(),
     description: text(),
-    status: common_status().default("active"),
-    slug: varchar({ length: 255 }).notNull(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
-    updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    amount: numeric({ precision: 10, scale: 2 }).notNull(),
+    incurred_at: date().default(sql`CURRENT_DATE`),
+    created_by: uuid(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
+    category: text().notNull(),
+    due_date: date(),
+    issue_date: date().default(sql`CURRENT_DATE`),
+    notes: jsonb(),
+    expense_number: text().notNull(),
+    status: text().default("pending").notNull(),
     user_id: uuid().notNull(),
-    enterprise_id: uuid().notNull(),
-    is_public: boolean().default(false).notNull(),
-    currency: text(),
-    locations: jsonb().default([]),
-    departments: jsonb().default([]),
-    enable_search_filtering: boolean().default(true),
   },
   (table) => [
-    index("job_listings_slug_idx").using("btree", table.slug.asc().nullsLast().op("text_ops")),
-    index("job_listings_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
-    index("job_listings_user_id_idx").using(
-      "btree",
-      table.user_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    unique("job_listings_slug_unique").on(table.slug),
+    foreignKey({
+      columns: [table.created_by],
+      foreignColumns: [profiles.id],
+      name: "expenses_created_by_fkey",
+    }),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "expenses_enterprise_id_fkey",
+    }).onDelete("cascade"),
   ],
 );
 
-export const domains = pgTable(
-  "domains",
+export const employees = pgTable(
+  "employees",
   {
     id: uuid()
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    domain_name: text().notNull(),
-    registrar: text(),
-    monthly_cost: numeric({ precision: 10, scale: 2 }),
-    annual_cost: numeric({ precision: 10, scale: 2 }),
-    payment_cycle: payment_cycle(),
-    status: common_status().default("active"),
-    created_at: timestamp({ withTimezone: true, mode: "string" })
-      .default(sql`timezone('utc'::text, now())`)
-      .notNull(),
-    updated_at: timestamp({ withTimezone: true, mode: "string" })
-      .default(sql`timezone('utc'::text, now())`)
-      .notNull(),
+    first_name: text().notNull(),
+    last_name: text().notNull(),
+    email: text().notNull(),
+    phone: text(),
+    hire_date: date(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
+      sql`timezone('utc'::text, now())`,
+    ),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
+    short_address: text(),
+    additional_number: text(),
+    building_number: text(),
+    street_name: text(),
+    city: text(),
+    region: text(),
+    country: text(),
+    zip_code: text(),
+    termination_date: date(),
+    job_id: uuid(),
+    salary: jsonb().default([]),
     notes: jsonb(),
+    status: employee_status().default("active"),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }),
+    nationality: text(),
   },
   (table) => [
-    index("domains_domain_name_idx").using(
-      "btree",
-      table.domain_name.asc().nullsLast().op("text_ops"),
-    ),
-    index("domains_enterprise_id_idx").using(
+    index("employees_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+    index("employees_job_id_idx").using("btree", table.job_id.asc().nullsLast().op("uuid_ops")),
+    index("employees_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("idx_employees_enterprise_id").using(
       "btree",
       table.enterprise_id.asc().nullsLast().op("uuid_ops"),
     ),
-    index("domains_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     foreignKey({
-      columns: [table.enterprise_id],
-      foreignColumns: [enterprises.id],
-      name: "domains_enterprise_id_enterprises_id_fk",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [table.user_id],
-      foreignColumns: [usersInAuth.id],
-      name: "domains_user_id_users_id_fk",
-    }),
-    unique("domains_enterprise_id_domain_name_unique").on(table.domain_name, table.enterprise_id),
-  ],
-);
-export const websites = pgTable(
-  "websites",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    domain_name: text().notNull(),
-    created_at: timestamp({ withTimezone: true, mode: "string" })
-      .default(sql`timezone('utc'::text, now())`)
-      .notNull(),
-    updated_at: timestamp({ withTimezone: true, mode: "string" })
-      .default(sql`timezone('utc'::text, now())`)
-      .notNull(),
-    status: common_status().default("active"),
-    user_id: uuid().notNull(),
-    enterprise_id: uuid().notNull(),
-    notes: jsonb(),
-  },
-  (table) => [
-    index("websites_domain_name_idx").using(
-      "btree",
-      table.domain_name.asc().nullsLast().op("text_ops"),
-    ),
-    index("websites_enterprise_id_idx").using(
-      "btree",
-      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("websites_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    foreignKey({
-      columns: [table.enterprise_id],
-      foreignColumns: [enterprises.id],
-      name: "websites_enterprise_id_enterprises_id_fk",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [table.user_id],
-      foreignColumns: [usersInAuth.id],
-      name: "websites_user_id_users_id_fk",
-    }),
-    unique("websites_enterprise_id_domain_name_unique").on(table.domain_name, table.enterprise_id),
-  ],
-);
-
-export const online_stores = pgTable(
-  "online_stores",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    domain_name: text().notNull(),
-    platform: text(),
-    created_at: timestamp({ withTimezone: true, mode: "string" })
-      .default(sql`timezone('utc'::text, now())`)
-      .notNull(),
-    updated_at: timestamp({ withTimezone: true, mode: "string" })
-      .default(sql`timezone('utc'::text, now())`)
-      .notNull(),
-    status: common_status().default("active"),
-    user_id: uuid().notNull(),
-    enterprise_id: uuid().notNull(),
-    notes: jsonb(),
-  },
-  (table) => [
-    index("online_stores_domain_name_idx").using(
-      "btree",
-      table.domain_name.asc().nullsLast().op("text_ops"),
-    ),
-    index("online_stores_enterprise_id_idx").using(
-      "btree",
-      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("online_stores_user_id_idx").using(
-      "btree",
-      table.user_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    foreignKey({
-      columns: [table.enterprise_id],
-      foreignColumns: [enterprises.id],
-      name: "online_stores_enterprise_id_enterprises_id_fk",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [table.user_id],
-      foreignColumns: [usersInAuth.id],
-      name: "online_stores_user_id_users_id_fk",
-    }),
-    unique("online_stores_enterprise_id_domain_name_unique").on(
-      table.domain_name,
-      table.enterprise_id,
-    ),
-  ],
-);
-
-export const servers = pgTable(
-  "servers",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    name: text().notNull(),
-    ip_address: inet(),
-    location: text(),
-    provider: text(),
-    os: text(),
-    status: common_status().default("active"),
-    tags: jsonb().default([]),
-    monthly_cost: numeric({ precision: 10, scale: 2 }),
-    annual_cost: numeric({ precision: 10, scale: 2 }),
-    payment_cycle: payment_cycle(),
-    notes: jsonb(),
-    created_at: timestamp({ withTimezone: true, mode: "string" })
-      .default(sql`timezone('utc'::text, now())`)
-      .notNull(),
-    updated_at: timestamp({ withTimezone: true, mode: "string" })
-      .default(sql`timezone('utc'::text, now())`)
-      .notNull(),
-    user_id: uuid().notNull(),
-    enterprise_id: uuid().notNull(),
-  },
-  (table) => [
-    index("servers_enterprise_id_idx").using(
-      "btree",
-      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("servers_ip_address_idx").using(
-      "btree",
-      table.ip_address.asc().nullsLast().op("inet_ops"),
-    ),
-    index("servers_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("servers_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
-    index("servers_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    foreignKey({
-      columns: [table.enterprise_id],
-      foreignColumns: [enterprises.id],
-      name: "servers_enterprise_id_enterprises_id_fk",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [table.user_id],
-      foreignColumns: [usersInAuth.id],
-      name: "servers_user_id_users_id_fk",
-    }),
+      columns: [table.job_id],
+      foreignColumns: [jobs.id],
+      name: "employees_job_id_jobs_id_fk",
+    }).onDelete("set null"),
   ],
 );
 
@@ -2111,6 +1548,445 @@ export const cars = pgTable(
   ],
 );
 
+export const domains = pgTable(
+  "domains",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    domain_name: text().notNull(),
+    registrar: text(),
+    monthly_cost: numeric({ precision: 10, scale: 2 }),
+    annual_cost: numeric({ precision: 10, scale: 2 }),
+    payment_cycle: payment_cycle(),
+    created_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    notes: jsonb(),
+    status: common_status().default("active"),
+  },
+  (table) => [
+    index("domains_domain_name_idx").using(
+      "btree",
+      table.domain_name.asc().nullsLast().op("text_ops"),
+    ),
+    index("domains_enterprise_id_idx").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("domains_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "domains_enterprise_id_enterprises_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.user_id],
+      foreignColumns: [usersInAuth.id],
+      name: "domains_user_id_users_id_fk",
+    }),
+    unique("domains_enterprise_id_domain_name_unique").on(table.domain_name, table.enterprise_id),
+  ],
+);
+
+export const invoices = pgTable(
+  "invoices",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    enterprise_id: uuid(),
+    invoice_number: text().notNull(),
+    issue_date: date().default(sql`CURRENT_DATE`),
+    due_date: date(),
+    status: text().default("draft").notNull(),
+    subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
+    tax_rate: numeric({ precision: 5, scale: 2 }).default("0"),
+    tax_amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
+CASE
+    WHEN (tax_rate IS NULL) THEN (0)::numeric
+    ELSE round((subtotal * tax_rate), 2)
+END`),
+    total: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
+CASE
+    WHEN (tax_rate IS NULL) THEN subtotal
+    ELSE round((subtotal * ((1)::numeric + tax_rate)), 2)
+END`),
+    notes: jsonb(),
+    client_id: uuid().notNull(),
+    created_by: uuid(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
+    user_id: uuid(),
+  },
+  (table) => [
+    index("idx_invoices_enterprise_id").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("invoices_client_id_idx").using(
+      "btree",
+      table.client_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("invoices_invoice_number_idx").using(
+      "btree",
+      table.invoice_number.asc().nullsLast().op("text_ops"),
+    ),
+    index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
+    foreignKey({
+      columns: [table.client_id],
+      foreignColumns: [clients.id],
+      name: "invoices_client_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.created_by],
+      foreignColumns: [profiles.id],
+      name: "invoices_created_by_fkey",
+    }),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "invoices_enterprise_id_fkey",
+    }).onDelete("cascade"),
+    check(
+      "invoices_status_check",
+      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'partially_paid'::text, 'overdue'::text, 'void'::text])`,
+    ),
+  ],
+);
+
+export const offices = pgTable(
+  "offices",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
+      sql`timezone('utc'::text, now())`,
+    ),
+    name: text().notNull(),
+    short_address: text(),
+    additional_number: text(),
+    building_number: text(),
+    street_name: text(),
+    city: text(),
+    region: text(),
+    country: text(),
+    zip_code: text(),
+    phone: text(),
+    email: text(),
+    status: common_status().default("active"),
+    user_id: uuid().notNull(),
+    notes: jsonb(),
+    enterprise_id: uuid().notNull(),
+    code: text(),
+    manager: uuid(),
+  },
+  (table) => [
+    index("idx_offices_enterprise_id").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("idx_offices_manager").using("btree", table.manager.asc().nullsLast().op("uuid_ops")),
+    index("offices_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("offices_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.manager],
+      foreignColumns: [employees.id],
+      name: "fk_office_manager",
+    }).onDelete("set null"),
+  ],
+);
+
+export const online_stores = pgTable(
+  "online_stores",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    domain_name: text().notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    status: common_status().default("active"),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    notes: jsonb(),
+    platform: text(),
+  },
+  (table) => [
+    index("online_stores_domain_name_idx").using(
+      "btree",
+      table.domain_name.asc().nullsLast().op("text_ops"),
+    ),
+    index("online_stores_enterprise_id_idx").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("online_stores_user_id_idx").using(
+      "btree",
+      table.user_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "online_stores_enterprise_id_enterprises_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.user_id],
+      foreignColumns: [usersInAuth.id],
+      name: "online_stores_user_id_users_id_fk",
+    }),
+    unique("online_stores_enterprise_id_domain_name_unique").on(
+      table.domain_name,
+      table.enterprise_id,
+    ),
+  ],
+);
+
+export const job_listings = pgTable(
+  "job_listings",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    title: varchar({ length: 255 }).notNull(),
+    description: text(),
+    status: common_status().default("active"),
+    slug: varchar({ length: 255 }).notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    is_public: boolean().default(false).notNull(),
+    currency: text(),
+    locations: jsonb().default([]),
+    departments: jsonb().default([]),
+    enable_search_filtering: boolean().default(true),
+  },
+  (table) => [
+    index("job_listings_slug_idx").using("btree", table.slug.asc().nullsLast().op("text_ops")),
+    index("job_listings_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
+    index("job_listings_user_id_idx").using(
+      "btree",
+      table.user_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    unique("job_listings_slug_unique").on(table.slug),
+  ],
+);
+
+export const products = pgTable(
+  "products",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    name: text().notNull(),
+    description: text(),
+    price: numeric({ precision: 10, scale: 2 }).notNull(),
+    sku: text(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
+      sql`timezone('utc'::text, now())`,
+    ),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    cost: numeric({ precision: 10, scale: 2 }),
+    stock_quantity: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
+    unit: text(),
+    status: common_status().default("active"),
+    notes: jsonb(),
+  },
+  (table) => [
+    index("idx_products_enterprise_id").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("products_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("products_sku_idx").using("btree", table.sku.asc().nullsLast().op("text_ops")),
+    index("products_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+  ],
+);
+
+export const quotes = pgTable(
+  "quotes",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
+      sql`timezone('utc'::text, now())`,
+    ),
+    quote_number: text().notNull(),
+    issue_date: date().notNull(),
+    expiry_date: date().notNull(),
+    status: text().default("draft").notNull(),
+    subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
+    tax_rate: numeric({ precision: 5, scale: 2 }).default("0"),
+    notes: jsonb(),
+    client_id: uuid().notNull(),
+    user_id: uuid().notNull(),
+    tax_amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
+CASE
+    WHEN (tax_rate IS NULL) THEN (0)::numeric
+    ELSE round((subtotal * tax_rate), 2)
+END`),
+    total: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
+CASE
+    WHEN (tax_rate IS NULL) THEN subtotal
+    ELSE round((subtotal * ((1)::numeric + tax_rate)), 2)
+END`),
+    enterprise_id: uuid().notNull(),
+    created_by: uuid(),
+  },
+  (table) => [
+    index("quotes_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
+    index("quotes_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
+    index("quotes_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.client_id],
+      foreignColumns: [clients.id],
+      name: "quotes_client_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.created_by],
+      foreignColumns: [profiles.id],
+      name: "quotes_created_by_fkey",
+    }),
+    check(
+      "quotes_status_check",
+      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'accepted'::text, 'rejected'::text, 'expired'::text])`,
+    ),
+  ],
+);
+
+export const purchases = pgTable(
+  "purchases",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    enterprise_id: uuid().notNull(),
+    description: text(),
+    amount: numeric({ precision: 10, scale: 2 }).notNull(),
+    incurred_at: date().default(sql`CURRENT_DATE`),
+    created_by: uuid(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
+    category: text().notNull(),
+    due_date: date(),
+    issue_date: date().default(sql`CURRENT_DATE`),
+    notes: jsonb(),
+    purchase_number: text().notNull(),
+    status: text().default("pending").notNull(),
+    user_id: uuid().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.created_by],
+      foreignColumns: [profiles.id],
+      name: "purchases_created_by_fkey",
+    }),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "purchases_enterprise_id_fkey",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const salaries = pgTable(
+  "salaries",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
+      sql`timezone('utc'::text, now())`,
+    ),
+    notes: jsonb(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    employee_id: uuid().notNull(),
+    amount: numeric({ precision: 10, scale: 2 }).notNull(),
+    currency: text().default("USD").notNull(),
+    payment_frequency: text().default("monthly").notNull(),
+    start_date: date().notNull(),
+    end_date: date(),
+    deductions: jsonb().default([]),
+    payment_date: date(),
+  },
+  (table) => [
+    index("salaries_employee_id_idx").using(
+      "btree",
+      table.employee_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("salaries_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.employee_id],
+      foreignColumns: [employees.id],
+      name: "salaries_employee_id_fkey",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const servers = pgTable(
+  "servers",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    name: text().notNull(),
+    ip_address: inet(),
+    location: text(),
+    provider: text(),
+    os: text(),
+    status: common_status().default("active"),
+    tags: jsonb().default([]),
+    notes: jsonb(),
+    created_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    monthly_cost: numeric({ precision: 10, scale: 2 }),
+    annual_cost: numeric({ precision: 10, scale: 2 }),
+    payment_cycle: payment_cycle(),
+  },
+  (table) => [
+    index("servers_enterprise_id_idx").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("servers_ip_address_idx").using(
+      "btree",
+      table.ip_address.asc().nullsLast().op("inet_ops"),
+    ),
+    index("servers_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("servers_status_idx").using("btree", table.status.asc().nullsLast().op("enum_ops")),
+    index("servers_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "servers_enterprise_id_enterprises_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.user_id],
+      foreignColumns: [usersInAuth.id],
+      name: "servers_user_id_users_id_fk",
+    }),
+  ],
+);
+
 export const trucks = pgTable(
   "trucks",
   {
@@ -2150,6 +2026,179 @@ export const trucks = pgTable(
       columns: [table.user_id],
       foreignColumns: [usersInAuth.id],
       name: "trucks_user_id_users_id_fk",
+    }),
+  ],
+);
+
+export const vendors = pgTable(
+  "vendors",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
+      sql`timezone('utc'::text, now())`,
+    ),
+    name: text().notNull(),
+    email: text().notNull(),
+    phone: text().notNull(),
+    company: text(),
+    short_address: text(),
+    additional_number: text(),
+    building_number: text(),
+    street_name: text(),
+    city: text(),
+    region: text(),
+    country: text(),
+    zip_code: text(),
+    notes: jsonb(),
+    user_id: uuid().notNull(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }).default(
+      sql`timezone('utc'::text, now())`,
+    ),
+    enterprise_id: uuid().notNull(),
+  },
+  (table) => [
+    index("idx_vendors_enterprise_id").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("vendors_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+    index("vendors_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("vendors_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+  ],
+);
+
+export const warehouses = pgTable(
+  "warehouses",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
+      sql`timezone('utc'::text, now())`,
+    ),
+    name: text().notNull(),
+    code: text(),
+    short_address: text(),
+    additional_number: text(),
+    building_number: text(),
+    street_name: text(),
+    city: text(),
+    region: text(),
+    country: text(),
+    zip_code: text(),
+    capacity: numeric({ precision: 10, scale: 2 }),
+    status: common_status().default("active"),
+    notes: jsonb(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    phone: text(),
+    manager: uuid(),
+  },
+  (table) => [
+    index("idx_warehouses_enterprise_id").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("idx_warehouses_manager").using("btree", table.manager.asc().nullsLast().op("uuid_ops")),
+    index("warehouses_code_idx").using("btree", table.code.asc().nullsLast().op("text_ops")),
+    index("warehouses_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("warehouses_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.manager],
+      foreignColumns: [employees.id],
+      name: "fk_warehouse_manager",
+    }).onDelete("set null"),
+    unique("warehouses_code_key").on(table.code),
+  ],
+);
+
+export const websites = pgTable(
+  "websites",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    domain_name: text().notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    notes: jsonb(),
+    status: common_status().default("active"),
+  },
+  (table) => [
+    index("websites_domain_name_idx").using(
+      "btree",
+      table.domain_name.asc().nullsLast().op("text_ops"),
+    ),
+    index("websites_enterprise_id_idx").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("websites_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "websites_enterprise_id_enterprises_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.user_id],
+      foreignColumns: [usersInAuth.id],
+      name: "websites_user_id_users_id_fk",
+    }),
+    unique("websites_enterprise_id_domain_name_unique").on(table.domain_name, table.enterprise_id),
+  ],
+);
+
+export const subscription_reactivations = pgTable(
+  "subscription_reactivations",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    user_id: uuid().notNull(),
+    subscription_id: text().notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.user_id],
+      foreignColumns: [usersInAuth.id],
+      name: "subscription_reactivations_user_id_fkey",
+    }).onDelete("cascade"),
+    unique("user_subscription_unique").on(table.user_id, table.subscription_id, table.created_at),
+    pgPolicy("Users can view their own reactivation history", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can add their own reactivation records", {
+      as: "permissive",
+      for: "insert",
+      to: ["public"],
+    }),
+    pgPolicy("No one can update reactivation history", {
+      as: "permissive",
+      for: "update",
+      to: ["public"],
+    }),
+    pgPolicy("No one can delete reactivation history", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
+    }),
+    pgPolicy("Service role can manage all reactivation records", {
+      as: "permissive",
+      for: "all",
+      to: ["public"],
     }),
   ],
 );
@@ -2199,16 +2248,124 @@ export const activity_logs = pgTable(
       .notNull(),
   },
   (table) => [
+    index("activity_logs_branch_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'BRANCH'::activity_target_type)`),
+    index("activity_logs_branch_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'BRANCH'::activity_target_type)`),
+    index("activity_logs_cars_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'CAR'::activity_target_type)`),
+    index("activity_logs_cars_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'CAR'::activity_target_type)`),
+    index("activity_logs_client_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'CLIENT'::activity_target_type)`),
+    index("activity_logs_client_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'CLIENT'::activity_target_type)`),
+    index("activity_logs_domain_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'DOMAIN'::activity_target_type)`),
+    index("activity_logs_domain_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'DOMAIN'::activity_target_type)`),
+    index("activity_logs_employee_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'EMPLOYEE'::activity_target_type)`),
+    index("activity_logs_employee_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'EMPLOYEE'::activity_target_type)`),
+    index("activity_logs_employee_request_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'EMPLOYEE_REQUEST'::activity_target_type)`),
+    index("activity_logs_employee_request_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'EMPLOYEE_REQUEST'::activity_target_type)`),
     index("activity_logs_enterprise_idx").using(
       "btree",
       table.enterprise_id.asc().nullsLast().op("uuid_ops"),
     ),
+    index("activity_logs_expense_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'EXPENSE'::activity_target_type)`),
+    index("activity_logs_expense_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'EXPENSE'::activity_target_type)`),
+    index("activity_logs_invoice_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'INVOICE'::activity_target_type)`),
+    index("activity_logs_invoice_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'INVOICE'::activity_target_type)`),
+    index("activity_logs_job_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'JOB'::activity_target_type)`),
+    index("activity_logs_job_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'JOB'::activity_target_type)`),
+    index("activity_logs_job_listing_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'JOB_LISTING'::activity_target_type)`),
+    index("activity_logs_job_listing_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'JOB_LISTING'::activity_target_type)`),
+    index("activity_logs_office_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'OFFICE'::activity_target_type)`),
+    index("activity_logs_office_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'OFFICE'::activity_target_type)`),
+    index("activity_logs_online_stores_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'ONLINE_STORE'::activity_target_type)`),
+    index("activity_logs_online_stores_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'ONLINE_STORE'::activity_target_type)`),
+    index("activity_logs_product_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'PRODUCT'::activity_target_type)`),
+    index("activity_logs_product_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'PRODUCT'::activity_target_type)`),
+    index("activity_logs_purchases_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'PURCHASE'::activity_target_type)`),
+    index("activity_logs_purchases_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'PURCHASE'::activity_target_type)`),
+    index("activity_logs_server_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'SERVER'::activity_target_type)`),
+    index("activity_logs_server_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'SERVER'::activity_target_type)`),
     index("activity_logs_target_idx").using(
       "btree",
       table.target_type.asc().nullsLast().op("enum_ops"),
       table.target_id.asc().nullsLast().op("enum_ops"),
     ),
     index("activity_logs_user_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("activity_logs_warehouse_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'WAREHOUSE'::activity_target_type)`),
+    index("activity_logs_warehouse_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'WAREHOUSE'::activity_target_type)`),
+    index("activity_logs_website_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'WEBSITE'::activity_target_type)`),
+    index("activity_logs_website_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'WEBSITE'::activity_target_type)`),
+    index("activity_logs_websites_action_idx")
+      .using("btree", table.action_type.asc().nullsLast().op("enum_ops"))
+      .where(sql`(target_type = 'WEBSITE'::activity_target_type)`),
+    index("activity_logs_websites_created_at_idx")
+      .using("btree", table.created_at.asc().nullsLast().op("timestamptz_ops"))
+      .where(sql`(target_type = 'WEBSITE'::activity_target_type)`),
     foreignKey({
       columns: [table.enterprise_id],
       foreignColumns: [enterprises.id],

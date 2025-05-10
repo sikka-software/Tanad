@@ -162,9 +162,11 @@ export function AddressFormSection({
                   disabled={isLoading}
                   dir={dir}
                   ariaInvalid={false}
-                  placeholder={t("Forms.country.placeholder")}
-                  searchPlaceholder={t("Forms.country.search_placeholder")}
-                  noItems={t("Forms.country.no_items")}
+                  texts={{
+                    placeholder: t("Forms.country.placeholder"),
+                    searchPlaceholder: t("Forms.country.search_placeholder"),
+                    noItems: t("Forms.country.no_items"),
+                  }}
                 />
               </FormControl>
               <FormMessage />
