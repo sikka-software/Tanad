@@ -49,9 +49,6 @@ export function useCreateCar() {
     onSuccess: () => {
       // Invalidate the list query to refetch
       queryClient.invalidateQueries({ queryKey: carKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Cars.success.create"),
-      });
     },
   });
 }
@@ -66,9 +63,6 @@ export function useUpdateCar() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: carKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: carKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Cars.success.update"),
-      });
     },
   });
 }

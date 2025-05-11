@@ -2,7 +2,7 @@ import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -78,9 +78,20 @@ export default function CarsPage() {
     },
   });
 
+  // Get the store's data for instant updates
+  const storeData = useCarStore((state) => state.data) || [];
+  const setData = useCarStore((state) => state.setData);
+
+  // When offices data changes (from server), update the store
+  useEffect(() => {
+    if (cars && setData) {
+      setData(cars);
+    }
+  }, [cars, setData]);
+
   const filteredCars = useMemo(() => {
-    return getFilteredCars(cars || []);
-  }, [cars, getFilteredCars, searchQuery, filterConditions, filterCaseSensitive]);
+    return getFilteredCars(storeData);
+  }, [storeData, getFilteredCars, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedCars = useMemo(() => {
     return getSortedCars(filteredCars);

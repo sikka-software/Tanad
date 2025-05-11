@@ -138,8 +138,11 @@ export type Database = {
           license_plate: string | null
           make: string
           model: string
+          monthly_payment: number | null
           name: string
           notes: Json | null
+          ownership_status: string | null
+          status: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at: string
           user_id: string
           vin: string | null
@@ -155,8 +158,11 @@ export type Database = {
           license_plate?: string | null
           make: string
           model: string
+          monthly_payment?: number | null
           name: string
           notes?: Json | null
+          ownership_status?: string | null
+          status?: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at?: string
           user_id: string
           vin?: string | null
@@ -172,8 +178,11 @@ export type Database = {
           license_plate?: string | null
           make?: string
           model?: string
+          monthly_payment?: number | null
           name?: string
           notes?: Json | null
+          ownership_status?: string | null
+          status?: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at?: string
           user_id?: string
           vin?: string | null
@@ -1755,8 +1764,11 @@ export type Database = {
           license_plate: string | null
           make: string
           model: string
+          monthly_payment: number | null
           name: string
           notes: Json | null
+          ownership_status: string | null
+          status: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at: string
           user_id: string
           vin: string | null
@@ -1772,8 +1784,11 @@ export type Database = {
           license_plate?: string | null
           make: string
           model: string
+          monthly_payment?: number | null
           name: string
           notes?: Json | null
+          ownership_status?: string | null
+          status?: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at?: string
           user_id: string
           vin?: string | null
@@ -1789,8 +1804,11 @@ export type Database = {
           license_plate?: string | null
           make?: string
           model?: string
+          monthly_payment?: number | null
           name?: string
           notes?: Json | null
+          ownership_status?: string | null
+          status?: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at?: string
           user_id?: string
           vin?: string | null
@@ -2546,6 +2564,14 @@ export type Database = {
         | "on_leave"
         | "resigned"
       payment_cycle: "monthly" | "annual"
+      vehicle_status:
+        | "active"
+        | "maintenance"
+        | "sold"
+        | "totaled"
+        | "retired"
+        | "stored"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2880,6 +2906,15 @@ export const Constants = {
         "resigned",
       ],
       payment_cycle: ["monthly", "annual"],
+      vehicle_status: [
+        "active",
+        "maintenance",
+        "sold",
+        "totaled",
+        "retired",
+        "stored",
+        "other",
+      ],
     },
   },
 } as const

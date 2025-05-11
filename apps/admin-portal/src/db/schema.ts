@@ -250,6 +250,15 @@ export const app_permission = pgEnum("app_permission", [
 ]);
 export const app_role = pgEnum("app_role", ["superadmin", "admin", "accounting", "hr"]);
 export const common_status = pgEnum("common_status", ["active", "inactive", "draft", "archived"]);
+export const vehicle_status = pgEnum("vehicle_status", [
+  "active",
+  "maintenance",
+  "sold",
+  "totaled",
+  "retired",
+  "stored",
+  "other",
+]);
 export const employee_status = pgEnum("employee_status", [
   "active",
   "inactive",
@@ -1520,6 +1529,9 @@ export const cars = pgTable(
     code: text(),
     license_country: text(),
     license_plate: text(),
+    ownership_status: text(),
+    status: vehicle_status().default("active"),
+    monthly_payment: numeric({ precision: 10, scale: 2 }),
     created_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
       .notNull(),
@@ -2000,6 +2012,9 @@ export const trucks = pgTable(
     color: text(),
     vin: text(),
     code: text(),
+    ownership_status: text(),
+    status: vehicle_status().default("active"),
+    monthly_payment: numeric({ precision: 10, scale: 2 }),
     license_country: text(),
     license_plate: text(),
     created_at: timestamp({ withTimezone: true, mode: "string" })

@@ -1,5 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import CountryInput from "@root/src/components/ui/country-input";
+import { CurrencyInput } from "@root/src/components/ui/currency-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@root/src/components/ui/select";
 import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
@@ -11,9 +19,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 
 import { ModuleFormProps } from "@/types/common.type";
+import { VehicleStatus } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import { VEHICLE_OWNERSHIP_STATUSES } from "../employee/employee.options";
 import { useCreateCar, useUpdateCar } from "./car.hooks";
 import useCarStore from "./car.store";
 import { CarUpdateData, CarCreateData } from "./car.type";
@@ -29,6 +39,9 @@ export const createCarSchema = (t: (key: string) => string) => {
     code: z.string().optional().or(z.literal("")),
     license_country: z.string().optional().or(z.literal("")),
     license_plate: z.string().optional().or(z.literal("")),
+    ownership_status: z.string().optional().or(z.literal("")),
+    monthly_payment: z.string().optional().or(z.literal("")),
+    status: z.enum(VehicleStatus).optional().or(z.literal("")),
     notes: z.any().optional().nullable(),
   });
 
@@ -74,6 +87,9 @@ export function CarForm({
       code: defaultValues?.code || "",
       license_country: defaultValues?.license_country || "",
       license_plate: defaultValues?.license_plate || "",
+      ownership_status: defaultValues?.ownership_status || "",
+      monthly_payment: defaultValues?.monthly_payment?.toString() || "",
+      status: defaultValues?.status || "",
       notes: getNotesValue(defaultValues),
     },
   });
@@ -103,6 +119,9 @@ export function CarForm({
               notes: data.notes || "",
               license_country: data.license_country?.trim() || "",
               license_plate: data.license_plate?.trim() || "",
+              status: data.status,
+              ownership_status: data.ownership_status?.trim() || "",
+              monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
             },
           },
           {
@@ -125,6 +144,9 @@ export function CarForm({
             code: data.code?.trim() || "",
             license_country: data.license_country?.trim() || "",
             license_plate: data.license_plate?.trim() || "",
+            ownership_status: data.ownership_status?.trim() || "",
+            monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
+            status: data.status,
             notes: data.notes || "",
             user_id: user?.id || "",
             enterprise_id: enterprise?.id || "",
@@ -156,8 +178,8 @@ export function CarForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="form-container">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="code"
@@ -194,7 +216,7 @@ export function CarForm({
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="make"
@@ -230,7 +252,7 @@ export function CarForm({
               )}
             />
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="year"
@@ -279,7 +301,7 @@ export function CarForm({
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="license_country"
@@ -304,6 +326,7 @@ export function CarForm({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="license_plate"
@@ -321,7 +344,96 @@ export function CarForm({
                 </FormItem>
               )}
             />
-            {/* Add a similar FormField here if there's another field, or leave as is for full width on smaller screens */}
+          </div>
+          <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="ownership_status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Cars.form.ownership_status.label")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isLoading}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Cars.form.ownership_status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {VEHICLE_OWNERSHIP_STATUSES.map((typeOpt) => (
+                          <SelectItem key={typeOpt.value} value={typeOpt.value}>
+                            {t(`Cars.form.ownership_status.${typeOpt.value}`, {
+                              defaultValue: typeOpt.label,
+                            })}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {form.watch("ownership_status") === "financed" && (
+              <FormField
+                control={form.control}
+                name="monthly_payment"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Cars.form.monthly_payment.label")}</FormLabel>
+                    <FormControl>
+                      <CurrencyInput
+                        placeholder={t("Cars.form.monthly_payment.placeholder")}
+                        disabled={isLoading}
+                        {...field}
+                        showCommas={true}
+                        value={field.value ? parseFloat(String(field.value)) : undefined}
+                        onChange={(value) => field.onChange(value?.toString() || "")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Cars.form.status.label")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isLoading}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Cars.form.status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(VehicleStatus).map((typeOpt) => (
+                          <SelectItem key={typeOpt} value={typeOpt}>
+                            {t(`Cars.form.status.${typeOpt}`, {
+                              defaultValue: typeOpt,
+                            })}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
         </div>
       </form>

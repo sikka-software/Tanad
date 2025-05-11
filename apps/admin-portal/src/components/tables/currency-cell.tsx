@@ -13,7 +13,7 @@ import { MoneyFormatter } from "../ui/currency-input";
  */
 const CurrencyCell = ({
   value,
-  currency,
+  currency = "sar",
   hideSymbol = false,
   fallback = "-",
 }: {

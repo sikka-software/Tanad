@@ -4895,8 +4895,17 @@
         "label": "رقم لوحة الترخيص",
         "placeholder": "أدخل رقم لوحة الترخيص"
       },
-      "create_button": "إنشاء السيارة",
-      "update_button": "تحديث السيارة"
+      "ownership_status": {
+        "label": "حالة الملكية",
+        "placeholder": "اختر حالة الملكية",
+        "owned": "مملوكة",
+        "rented": "إيجار",
+        "financed": "إيجار منتهي بالتمليك"
+      },
+      "monthly_payment": {
+        "label": "الدفعات الشهرية",
+        "placeholder": "أدخل الدفعات الشهرية"
+      }
     },
     "success": {
       "create": "تم إنشاء السيارة بنجاح.",

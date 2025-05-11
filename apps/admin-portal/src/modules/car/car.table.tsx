@@ -23,6 +23,8 @@ const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps
   const selectedRows = useCarStore((state) => state.selectedRows);
   const setSelectedRows = useCarStore((state) => state.setSelectedRows);
 
+  const setData = useCarStore((state) => state.setData);
+
   const canEditCar = useUserStore((state) => state.hasPermission("cars.update"));
   const canDuplicateCar = useUserStore((state) => state.hasPermission("cars.duplicate"));
   const canViewCar = useUserStore((state) => state.hasPermission("cars.view"));
@@ -78,10 +80,28 @@ const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps
       header: t("Cars.form.license_plate.label"),
       validationSchema: z.string().min(1, "Required"),
     },
+    {
+      accessorKey: "ownership_status",
+      header: t("Cars.form.ownership_status.label"),
+      validationSchema: z.string().min(1, "Required"),
+      cellType: "select",
+      options: [
+        { label: t("Cars.form.ownership_status.financed"), value: "financed" },
+        { label: t("Cars.form.ownership_status.owned"), value: "owned" },
+        { label: t("Cars.form.ownership_status.rented"), value: "rented" },
+      ],
+    },
+    {
+      accessorKey: "monthly_payment",
+      header: t("Cars.form.monthly_payment.label"),
+      validationSchema: z.number().min(0, "Required"),
+      cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
+    },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
     await updateCar({ id: rowId, data: { [columnId]: value } });
   };
 
