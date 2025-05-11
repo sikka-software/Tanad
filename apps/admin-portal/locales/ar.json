@@ -3720,6 +3720,7 @@
     "placeholder": "أدخل الملاحظات"
   },
   "Forms": {
+    "must_be_number": "يرجى ادخال رقم",
     "description": {
       "label": "الوصف",
       "placeholder": "أدخل الوصف"

@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import CountryInput from "@root/src/components/ui/country-input";
 import { CurrencyInput } from "@root/src/components/ui/currency-input";
+import NumberInput from "@root/src/components/ui/number-input";
 import {
   Select,
   SelectContent,
@@ -33,7 +34,10 @@ export const createCarSchema = (t: (key: string) => string) => {
     name: z.string().min(1, t("Cars.form.name.required")),
     make: z.string().optional().or(z.literal("")),
     model: z.string().optional().or(z.literal("")),
-    year: z.string().optional().or(z.literal("")),
+    year: z
+      .number({ invalid_type_error: t("Forms.must_be_number") })
+      .optional()
+      .or(z.literal("")),
     color: z.string().optional().or(z.literal("")),
     vin: z.string().optional().or(z.literal("")),
     code: z.string().optional().or(z.literal("")),
@@ -81,7 +85,7 @@ export function CarForm({
       name: defaultValues?.name || "",
       make: defaultValues?.make || "",
       model: defaultValues?.model || "",
-      year: defaultValues?.year || "",
+      year: defaultValues?.year,
       color: defaultValues?.color || "",
       vin: defaultValues?.vin || "",
       code: defaultValues?.code || "",
@@ -112,7 +116,7 @@ export function CarForm({
               name: data.name.trim(),
               make: data.make?.trim() || "",
               model: data.model?.trim() || "",
-              year: data.year?.trim() || "",
+              year: data.year as number,
               color: data.color?.trim() || "",
               vin: data.vin?.trim() || "",
               code: data.code?.trim() || "",
@@ -138,7 +142,7 @@ export function CarForm({
             name: data.name.trim(),
             make: data.make?.trim() || "",
             model: data.model?.trim() || "",
-            year: data.year?.trim() || "",
+            year: data.year as number,
             color: data.color?.trim() || "",
             vin: data.vin?.trim() || "",
             code: data.code?.trim() || "",
@@ -260,10 +264,19 @@ export function CarForm({
                 <FormItem>
                   <FormLabel>{t("Cars.form.year.label")}</FormLabel>
                   <FormControl>
-                    <Input
+                    <NumberInput
                       placeholder={t("Cars.form.year.placeholder")}
                       disabled={isLoading}
                       {...field}
+                      // onChange={(e) => {
+                      //   const value = e.target.value;
+                      //   const numberRegex = /^\d*$/;
+                      //   const isNumber
+                      //   if (numberRegex.test(value)) {
+                      //     field.onChange(value === "" ? undefined : Number(value));
+                      //   }
+                      // }}
+                      maxLength={4}
                     />
                   </FormControl>
                   <FormMessage />

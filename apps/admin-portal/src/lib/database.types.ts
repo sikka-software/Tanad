@@ -146,7 +146,7 @@ export type Database = {
           updated_at: string
           user_id: string
           vin: string | null
-          year: string
+          year: number
         }
         Insert: {
           code?: string | null
@@ -166,7 +166,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           vin?: string | null
-          year: string
+          year: number
         }
         Update: {
           code?: string | null
@@ -186,7 +186,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           vin?: string | null
-          year?: string
+          year?: number
         }
         Relationships: [
           {
@@ -1772,7 +1772,7 @@ export type Database = {
           updated_at: string
           user_id: string
           vin: string | null
-          year: string
+          year: number
         }
         Insert: {
           code?: string | null
@@ -1792,7 +1792,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           vin?: string | null
-          year: string
+          year: number
         }
         Update: {
           code?: string | null
@@ -1812,7 +1812,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           vin?: string | null
-          year?: string
+          year?: number
         }
         Relationships: [
           {
