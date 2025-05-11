@@ -1212,6 +1212,7 @@
   },
   "Auth": {
     "user_already_exists": "المستخدم موجود بالفعل",
+    "logged_in_successfully": "تم تسجيل الدخول بنجاح",
     "forgot_password": "هل نسيت كلمة المرور؟",
     "password_reset_email_sent": "تم إرسال بريد إلكتروني لإعادة تعيين كلمة المرور",
     "password_reset_successfully": "تم إعادة تعيين كلمة المرور بنجاح",

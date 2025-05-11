@@ -30,6 +30,8 @@ import { useCompanies } from "@/company/company.hooks";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useCompanyStore from "../company/company.store";
+
 export const createClientSchema = (t: (key: string) => string) => {
   const baseClientSchema = z.object({
     name: z.string().min(1, t("Clients.form.validation.name_required")),
@@ -39,7 +41,9 @@ export const createClientSchema = (t: (key: string) => string) => {
       .email(t("Clients.form.validation.email_invalid")),
     phone: z.string().min(1, t("Clients.form.validation.phone_required")),
     company: z.string().nullish(),
-    status: z.enum(CommonStatus),
+    status: z.enum(CommonStatus, {
+      invalid_type_error: t("Clients.form.status.required"),
+    }),
     notes: z.any().optional().nullable(),
   });
 
@@ -59,14 +63,18 @@ export function ClientForm({
 }: ModuleFormProps<ClientCreateData | ClientUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
+
   const { user, membership } = useUserStore();
-  const { data: companies, isLoading: companiesLoading } = useCompanies();
-  const { mutateAsync: createClient, isPending: isCreating } = useCreateClient();
-  const { mutateAsync: updateClient, isPending: isUpdating } = useUpdateClient();
-  const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
+  const { mutateAsync: createClient } = useCreateClient();
+  const { mutateAsync: updateClient } = useUpdateClient();
 
   const isLoading = useClientStore((state) => state.isLoading);
   const setIsLoading = useClientStore((state) => state.setIsLoading);
+
+  const { data: companies, isLoading: companiesLoading } = useCompanies();
+  const setIsCompanySaving = useCompanyStore((state) => state.setIsLoading);
+  const isCompanySaving = useCompanyStore((state) => state.isLoading);
+  const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(createClientSchema(t)),
@@ -89,16 +97,7 @@ export function ClientForm({
     },
   });
 
-  // Expose form methods for external use (like dummy data)
-  if (typeof window !== "undefined") {
-    (window as any).clientForm = form;
-  }
-
-  const companyOptions =
-    companies?.map((company) => ({
-      label: company.name,
-      value: company.id,
-    })) || [];
+  console.log("default values are ", defaultValues);
 
   const handleSubmit = async (data: ClientFormValues) => {
     setIsLoading(true);
@@ -179,6 +178,16 @@ export function ClientForm({
       });
     }
   };
+
+  const companyOptions =
+    companies?.map((company) => ({
+      label: company.name,
+      value: company.id,
+    })) || [];
+
+  if (typeof window !== "undefined") {
+    (window as any).clientForm = form;
+  }
 
   return (
     <>
@@ -325,11 +334,15 @@ export function ClientForm({
         onOpenChange={setIsCompanyDialogOpen}
         title={t("Pages.Companies.add")}
         formId="company-form"
+        loadingSave={isCompanySaving}
       >
         <CompanyForm
           nestedForm
           formHtmlId="company-form"
-          onSuccess={() => setIsCompanyDialogOpen(false)}
+          onSuccess={() => {
+            setIsCompanyDialogOpen(false);
+            setIsCompanySaving(false);
+          }}
         />
       </FormDialog>
     </>

@@ -39,7 +39,41 @@ const modelMap: Record<string, ModelConfig> = {
   branches: { tableName: "branches" },
   companies: { tableName: "companies" },
   jobs: { tableName: "jobs" },
-  clients: { tableName: "clients" },
+  clients: {
+    tableName: "clients",
+    customHandlers: {
+      GET: async (supabase: SupabaseClient<Database>, user_id: string, req: NextApiRequest) => {
+        // 1. Get the user's enterprise_id
+        const { data: membership, error: enterpriseError } = await supabase
+          .from("memberships")
+          .select("enterprise_id")
+          .eq("profile_id", user_id)
+          .maybeSingle();
+
+        if (enterpriseError) {
+          console.error("Error fetching enterprise ID for clients GET:", enterpriseError);
+          throw new Error("Failed to retrieve enterprise association");
+        }
+        if (!membership?.enterprise_id) {
+          throw new Error("User is not associated with an enterprise.");
+        }
+        const enterprise_id = membership.enterprise_id;
+
+        // 2. Fetch clients with joined company name
+        const { data, error } = await supabase
+          .from("clients")
+          .select("*, company:companies(name)")
+          .eq("enterprise_id", enterprise_id)
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching clients with company name:", error);
+          throw error;
+        }
+        return data;
+      },
+    },
+  },
   expenses: { tableName: "expenses" },
   departments: { tableName: "departments" },
   salaries: { tableName: "salaries" },

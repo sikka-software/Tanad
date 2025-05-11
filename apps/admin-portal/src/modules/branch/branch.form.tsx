@@ -78,13 +78,13 @@ export function BranchForm({
   const { mutate: updateBranch } = useUpdateBranch();
   const { data: branches } = useBranches();
 
-  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const isLoading = useBranchStore((state) => state.isLoading);
+  const setIsLoading = useBranchStore((state) => state.setIsLoading);
+
+  const { data: employees, isLoading: employeesLoading } = useEmployees();
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
-
-  const isLoading = useBranchStore((state) => state.isLoading);
-  const setIsLoading = useBranchStore((state) => state.setIsLoading);
 
   const form = useForm<BranchFormValues>({
     resolver: zodResolver(createBranchSchema(t)),
@@ -187,10 +187,11 @@ export function BranchForm({
     }
   };
 
-  const employeeOptions = employees.map((emp) => ({
-    label: `${emp.first_name} ${emp.last_name}`,
-    value: emp.id,
-  }));
+  const employeeOptions =
+    employees?.map((emp) => ({
+      label: `${emp.first_name} ${emp.last_name}`,
+      value: emp.id,
+    })) || [];
 
   if (typeof window !== "undefined") {
     (window as any).branchForm = form;
