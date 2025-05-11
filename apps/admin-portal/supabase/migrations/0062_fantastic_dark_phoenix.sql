@@ -1,0 +1,1 @@
+ALTER TABLE "companies" ADD COLUMN "vat_number" text;

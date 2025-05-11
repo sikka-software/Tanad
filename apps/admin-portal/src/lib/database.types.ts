@@ -280,6 +280,7 @@ export type Database = {
           status: Database["public"]["Enums"]["common_status"] | null
           street_name: string | null
           user_id: string
+          vat_number: string | null
           website: string | null
           zip_code: string | null
         }
@@ -302,6 +303,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["common_status"] | null
           street_name?: string | null
           user_id: string
+          vat_number?: string | null
           website?: string | null
           zip_code?: string | null
         }
@@ -324,6 +326,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["common_status"] | null
           street_name?: string | null
           user_id?: string
+          vat_number?: string | null
           website?: string | null
           zip_code?: string | null
         }

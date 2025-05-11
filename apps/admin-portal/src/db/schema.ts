@@ -415,6 +415,7 @@ export const companies = pgTable(
     country: text(),
     zip_code: text(),
     industry: text(),
+    vat_number: text(),
     size: text(),
     notes: jsonb(),
     status: common_status().default("active"),
