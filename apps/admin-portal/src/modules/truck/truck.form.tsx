@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import CountryInput from "@root/src/components/ui/country-input";
+import { CurrencyInput } from "@root/src/components/ui/currency-input";
 import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
@@ -9,11 +10,13 @@ import * as z from "zod";
 import DigitsInput from "@/ui/digits-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
+import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/ui/select";
 
-import { ModuleFormProps } from "@/types/common.type";
+import { ModuleFormProps, VehicleStatus } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import { VEHICLE_OWNERSHIP_STATUSES } from "../employee/employee.options";
 import { useCreateTruck, useUpdateTruck } from "./truck.hooks";
 import useTruckStore from "./truck.store";
 import { TruckUpdateData, TruckCreateData } from "./truck.type";
@@ -29,6 +32,10 @@ export const createTruckSchema = (t: (key: string) => string) => {
     code: z.string().optional().or(z.literal("")),
     license_country: z.string().optional().or(z.literal("")),
     license_plate: z.string().optional().or(z.literal("")),
+    ownership_status: z.string().optional().or(z.literal("")),
+    monthly_payment: z.string().optional().or(z.literal("")),
+
+    status: z.enum(VehicleStatus).optional().or(z.literal("")),
     notes: z.any().optional().nullable(),
   });
 
@@ -74,6 +81,9 @@ export function TruckForm({
       code: defaultValues?.code || "",
       license_country: defaultValues?.license_country || "",
       license_plate: defaultValues?.license_plate || "",
+      ownership_status: defaultValues?.ownership_status || "",
+      monthly_payment: defaultValues?.monthly_payment?.toString() || "",
+      status: defaultValues?.status || "",
       notes: getNotesValue(defaultValues),
     },
   });
@@ -100,9 +110,12 @@ export function TruckForm({
               color: data.color?.trim() || "",
               vin: data.vin?.trim() || "",
               code: data.code?.trim() || "",
+              status: data.status === "" ? null : data.status,
               notes: data.notes || "",
               license_country: data.license_country?.trim() || "",
               license_plate: data.license_plate?.trim() || "",
+              ownership_status: data.ownership_status?.trim() || "",
+              monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
             },
           },
           {
@@ -125,6 +138,9 @@ export function TruckForm({
             code: data.code?.trim() || "",
             license_country: data.license_country?.trim() || "",
             license_plate: data.license_plate?.trim() || "",
+            ownership_status: data.ownership_status?.trim() || "",
+            monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
+            status: data.status === "" ? null : data.status,
             notes: data.notes || "",
             user_id: user?.id || "",
             enterprise_id: enterprise?.id || "",
@@ -323,6 +339,96 @@ export function TruckForm({
               )}
             />
           </div>
+          <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="ownership_status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Cars.form.ownership_status.label")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isLoading}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Cars.form.ownership_status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {VEHICLE_OWNERSHIP_STATUSES.map((typeOpt) => (
+                          <SelectItem key={typeOpt.value} value={typeOpt.value}>
+                            {t(`Cars.form.ownership_status.${typeOpt.value}`, {
+                              defaultValue: typeOpt.label,
+                            })}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {form.watch("ownership_status") === "financed" && (
+              <FormField
+                control={form.control}
+                name="monthly_payment"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Cars.form.monthly_payment.label")}</FormLabel>
+                    <FormControl>
+                      <CurrencyInput
+                        placeholder={t("Cars.form.monthly_payment.placeholder")}
+                        disabled={isLoading}
+                        {...field}
+                        showCommas={true}
+                        value={field.value ? parseFloat(String(field.value)) : undefined}
+                        onChange={(value) => field.onChange(value?.toString() || "")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+          </div>
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Trucks.form.status.label")}</FormLabel>
+                <FormControl>
+                  <Select
+                    dir={lang === "ar" ? "rtl" : "ltr"}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={isLoading}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("Trucks.form.status.placeholder")} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.values(VehicleStatus).map((typeOpt) => (
+                        <SelectItem key={typeOpt} value={typeOpt}>
+                          {t(`Trucks.form.status.${typeOpt}`, {
+                            defaultValue: typeOpt,
+                          })}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
       </form>
     </Form>

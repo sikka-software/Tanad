@@ -4905,6 +4905,17 @@
       "monthly_payment": {
         "label": "الدفعات الشهرية",
         "placeholder": "أدخل الدفعات الشهرية"
+      },
+      "status": {
+        "label": "الحالة",
+        "placeholder": "اختر الحالة",
+        "active": "نشط",
+        "maintenance": "صيانة",
+        "sold": "مباع",
+        "totaled": "تشليح",
+        "retired": "معطل",
+        "stored": "مخزن",
+        "other": "أخرى"
       }
     },
     "success": {
