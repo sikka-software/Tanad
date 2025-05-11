@@ -39,6 +39,22 @@ const modelMap: Record<string, ModelConfig> = {
   branches: { tableName: "branches" },
   companies: { tableName: "companies" },
   jobs: { tableName: "jobs" },
+  expenses: { tableName: "expenses" },
+  departments: { tableName: "departments" },
+  salaries: { tableName: "salaries" },
+  domains: { tableName: "domains" },
+  servers: { tableName: "servers" },
+  purchases: { tableName: "purchases" },
+  websites: { tableName: "websites" },
+  online_stores: { tableName: "online_stores" },
+  offices: { tableName: "offices" },
+  warehouses: { tableName: "warehouses" },
+  products: { tableName: "products" },
+  cars: { tableName: "cars" },
+  trucks: { tableName: "trucks" },
+  vendors: { tableName: "vendors" },
+  employee_requests: { tableName: "employee_requests" },
+  bank_accounts: { tableName: "bank_accounts" },
   clients: {
     tableName: "clients",
     customHandlers: {
@@ -74,14 +90,6 @@ const modelMap: Record<string, ModelConfig> = {
       },
     },
   },
-  expenses: { tableName: "expenses" },
-  departments: { tableName: "departments" },
-  salaries: { tableName: "salaries" },
-  domains: { tableName: "domains" },
-  servers: { tableName: "servers" },
-  purchases: { tableName: "purchases" },
-  websites: { tableName: "websites" },
-  online_stores: { tableName: "online_stores" },
   department_locations: {
     tableName: "department_locations",
     customHandlers: {
@@ -122,8 +130,7 @@ const modelMap: Record<string, ModelConfig> = {
       },
     },
   },
-  offices: { tableName: "offices" },
-  warehouses: { tableName: "warehouses" },
+
   employees: {
     tableName: "employees",
     customHandlers: {
@@ -195,16 +202,13 @@ const modelMap: Record<string, ModelConfig> = {
             .maybeSingle();
           if (newJobFetchError) throw newJobFetchError;
           const newOccupied = (newJob?.occupied_positions || 0) + 1;
-          await supabase
-            .from("jobs")
-            .update({ occupied_positions: newOccupied })
-            .eq("id", job_id);
+          await supabase.from("jobs").update({ occupied_positions: newOccupied }).eq("id", job_id);
         }
         return updatedEmployee;
       },
     },
   },
-  products: { tableName: "products" },
+
   invoices: {
     tableName: "invoices",
     customHandlers: {
@@ -364,9 +368,7 @@ const modelMap: Record<string, ModelConfig> = {
           unit_price: item.unit_price,
         }));
 
-        const { error: itemsError } = await supabase
-          .from("quote_items")
-          .insert(quoteItemsToInsert);
+        const { error: itemsError } = await supabase.from("quote_items").insert(quoteItemsToInsert);
 
         if (itemsError) {
           console.error("Error inserting quote items:", itemsError);
@@ -378,8 +380,6 @@ const modelMap: Record<string, ModelConfig> = {
       },
     },
   },
-  vendors: { tableName: "vendors" },
-  employee_requests: { tableName: "employee_requests" },
   job_listings: {
     tableName: "job_listings",
     customHandlers: {
@@ -457,8 +457,6 @@ const modelMap: Record<string, ModelConfig> = {
       },
     },
   },
-  cars: { tableName: "cars" },
-  trucks: { tableName: "trucks" },
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

@@ -1,7 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import CountryInput from "@root/src/components/ui/country-input";
-import { CurrencyInput } from "@root/src/components/ui/currency-input";
-import NumberInput from "@root/src/components/ui/number-input";
 import {
   Select,
   SelectContent,
@@ -15,90 +12,87 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import DigitsInput from "@/ui/digits-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 
 import { ModuleFormProps } from "@/types/common.type";
-import { VehicleStatus } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { VEHICLE_OWNERSHIP_STATUSES } from "../employee/employee.options";
-import { useCreateCar, useUpdateCar } from "./car.hooks";
-import useCarStore from "./car.store";
-import { CarUpdateData, CarCreateData } from "./car.type";
+import { useCreateBankAccount, useUpdateBankAccount } from "./bank_account.hooks";
+import useBankAccountStore from "./bank_account.store";
+import { BankAccountCreateData, BankAccountUpdateData } from "./bank_account.type";
 
-export const createCarSchema = (t: (key: string) => string) => {
-  const baseCarSchema = z.object({
-    name: z.string().min(1, t("Cars.form.name.required")),
-    make: z.string().optional().or(z.literal("")),
-    model: z.string().optional().or(z.literal("")),
-    year: z.number({
-      invalid_type_error: t("Forms.must_be_number"),
-      message: t("Forms.must_be_number"),
-    }),
-    color: z.string().optional().or(z.literal("")),
-    vin: z.string().optional().or(z.literal("")),
-    code: z.string().optional().or(z.literal("")),
-    license_country: z.string().optional().or(z.literal("")),
-    license_plate: z.string().optional().or(z.literal("")),
-    ownership_status: z.string().optional().or(z.literal("")),
-    monthly_payment: z.string().optional().or(z.literal("")),
-    status: z.enum(VehicleStatus).optional().or(z.literal("")),
+// Status and account type options (define here if not in options file)
+const BANK_ACCOUNT_STATUS_OPTIONS = [
+  { value: "active", label: "Active" },
+  { value: "inactive", label: "Inactive" },
+  { value: "pending", label: "Pending" },
+];
+const BANK_ACCOUNT_TYPE_OPTIONS = [
+  { value: "checking", label: "Checking" },
+  { value: "savings", label: "Savings" },
+  { value: "business", label: "Business" },
+  { value: "other", label: "Other" },
+];
+
+export const createBankAccountSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("BankAccounts.form.name.required")),
+    account_number: z.string().optional().or(z.literal("")),
+    account_type: z.string().optional().or(z.literal("")),
+    routing_number: z.string().optional().or(z.literal("")),
+    iban: z.string().min(1, t("BankAccounts.form.iban.required")),
+    swift_bic: z.string().optional().or(z.literal("")),
+    bank_name: z.string().min(1, t("BankAccounts.form.bank_name.required")),
+    status: z.string().min(1, t("BankAccounts.form.status.required")),
     notes: z.any().optional().nullable(),
   });
 
-  return baseCarSchema;
-};
+export type BankAccountFormValues = z.input<ReturnType<typeof createBankAccountSchema>>;
 
-export type CarFormValues = z.input<ReturnType<typeof createCarSchema>>;
-
-export interface CarFormProps {
+export interface BankAccountFormProps {
   id?: string;
   onSuccess?: () => void;
-  defaultValues?: CarUpdateData | null;
+  defaultValues?: BankAccountUpdateData | null;
   editMode?: boolean;
 }
 
-export function CarForm({
+export function BankAccountForm({
   formHtmlId,
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<CarUpdateData | CarCreateData>) {
+  onError,
+}: ModuleFormProps<BankAccountUpdateData | BankAccountCreateData>) {
   const t = useTranslations();
   const lang = useLocale();
 
   const user = useUserStore((state) => state.user);
   const enterprise = useUserStore((state) => state.enterprise);
 
-  const { mutate: createCar } = useCreateCar();
-  const { mutate: updateCar } = useUpdateCar();
+  const { mutate: createBankAccount } = useCreateBankAccount();
+  const { mutate: updateBankAccount } = useUpdateBankAccount();
 
-  const isLoading = useCarStore((state) => state.isLoading);
-  const setIsLoading = useCarStore((state) => state.setIsLoading);
+  const isLoading = useBankAccountStore((state) => state.isLoading);
+  const setIsLoading = useBankAccountStore((state) => state.setIsLoading);
 
-  const form = useForm<CarFormValues>({
-    resolver: zodResolver(createCarSchema(t)),
+  const form = useForm<BankAccountFormValues>({
+    resolver: zodResolver(createBankAccountSchema(t)),
     defaultValues: {
       name: defaultValues?.name || "",
-      make: defaultValues?.make || "",
-      model: defaultValues?.model || "",
-      year: defaultValues?.year,
-      color: defaultValues?.color || "",
-      vin: defaultValues?.vin || "",
-      code: defaultValues?.code || "",
-      license_country: defaultValues?.license_country || "",
-      license_plate: defaultValues?.license_plate || "",
-      ownership_status: defaultValues?.ownership_status || "",
-      monthly_payment: defaultValues?.monthly_payment?.toString() || "",
+      account_number: defaultValues?.account_number || "",
+      account_type: defaultValues?.account_type || "",
+      routing_number: defaultValues?.routing_number || "",
+      iban: defaultValues?.iban || "",
+      swift_bic: defaultValues?.swift_bic || "",
+      bank_name: defaultValues?.bank_name || "",
       status: defaultValues?.status || "",
       notes: getNotesValue(defaultValues),
     },
   });
 
-  const handleSubmit = async (data: CarFormValues) => {
+  const handleSubmit = async (data: BankAccountFormValues) => {
     setIsLoading(true);
     if (!user?.id) {
       toast.error(t("General.unauthorized"), {
@@ -106,77 +100,69 @@ export function CarForm({
       });
       return;
     }
-
     try {
       if (editMode) {
-        await updateCar(
+        await updateBankAccount(
           {
             id: defaultValues?.id || "",
             data: {
               name: data.name.trim(),
-              make: data.make?.trim() || "",
-              model: data.model?.trim() || "",
-              year: data.year,
-              color: data.color?.trim() || "",
-              vin: data.vin?.trim() || "",
-              code: data.code?.trim() || "",
+              account_number: data.account_number?.trim() || "",
+              account_type: data.account_type?.trim() || "",
+              routing_number: data.routing_number?.trim() || "",
+              iban: data.iban.trim(),
+              swift_bic: data.swift_bic?.trim() || "",
+              bank_name: data.bank_name.trim(),
+              status: data.status.trim(),
               notes: data.notes || "",
-              license_country: data.license_country?.trim() || "",
-              license_plate: data.license_plate?.trim() || "",
-              status: data.status === "" ? null : data.status,
-              ownership_status: data.ownership_status?.trim() || "",
-              monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
             },
           },
           {
-            onSuccess: async (response) => {
-              if (onSuccess) {
-                onSuccess();
-              }
+            onSuccess: async () => {
+              if (onSuccess) onSuccess();
+            },
+            onError: () => {
+              if (onError) onError();
             },
           },
         );
       } else {
-        await createCar(
+        await createBankAccount(
           {
             name: data.name.trim(),
-            make: data.make?.trim() || "",
-            model: data.model?.trim() || "",
-            year: data.year,
-            color: data.color?.trim() || "",
-            vin: data.vin?.trim() || "",
-            code: data.code?.trim() || "",
-            license_country: data.license_country?.trim() || "",
-            license_plate: data.license_plate?.trim() || "",
-            ownership_status: data.ownership_status?.trim() || "",
-            monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
-            status: data.status === "" ? null : data.status,
+            account_number: data.account_number?.trim() || "",
+            account_type: data.account_type?.trim() || "",
+            routing_number: data.routing_number?.trim() || "",
+            iban: data.iban.trim(),
+            swift_bic: data.swift_bic?.trim() || "",
+            bank_name: data.bank_name.trim(),
+            status: data.status.trim(),
             notes: data.notes || "",
             user_id: user?.id || "",
             enterprise_id: enterprise?.id || "",
           },
-
           {
-            onSuccess: async (response) => {
-              if (onSuccess) {
-                onSuccess();
-              }
+            onSuccess: async () => {
+              if (onSuccess) onSuccess();
+            },
+            onError: () => {
+              if (onError) onError();
             },
           },
         );
       }
     } catch (error) {
       setIsLoading(false);
-      console.error("Failed to save car:", error);
+      console.error("Failed to save bank account:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Cars.error.create"),
+        description: t("BankAccounts.error.create"),
       });
     }
   };
 
   // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
-    (window as any).carForm = form;
+    (window as any).bankAccountForm = form;
   }
 
   return (
@@ -186,50 +172,13 @@ export function CarForm({
           <div className="form-fields-cols-2">
             <FormField
               control={form.control}
-              name="code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Cars.form.code.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Cars.form.code.placeholder")}
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Cars.form.name.label")} *</FormLabel>
+                  <FormLabel>{t("BankAccounts.form.name.label")} *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("Cars.form.name.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="form-fields-cols-2">
-            <FormField
-              control={form.control}
-              name="make"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.make.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Vehicles.form.make.placeholder")}
+                      placeholder={t("BankAccounts.form.name.placeholder")}
                       {...field}
                       disabled={isLoading}
                     />
@@ -240,15 +189,15 @@ export function CarForm({
             />
             <FormField
               control={form.control}
-              name="model"
+              name="bank_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Vehicles.form.model.label")}</FormLabel>
+                  <FormLabel>{t("BankAccounts.form.bank_name.label")} *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("Vehicles.form.model.placeholder")}
-                      disabled={isLoading}
+                      placeholder={t("BankAccounts.form.bank_name.placeholder")}
                       {...field}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -259,108 +208,27 @@ export function CarForm({
           <div className="form-fields-cols-2">
             <FormField
               control={form.control}
-              name="year"
+              name="account_number"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Vehicles.form.year.label")}</FormLabel>
-                  <FormControl>
-                    <NumberInput
-                      placeholder={t("Vehicles.form.year.placeholder")}
-                      disabled={isLoading}
-                      maxLength={4}
-                      value={field.value === undefined || field.value === null ? "" : field.value}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        field.onChange(val === "" ? undefined : Number(val));
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="color"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.color.label")}</FormLabel>
+                  <FormLabel>{t("BankAccounts.form.account_number.label")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("Vehicles.form.color.placeholder")}
-                      disabled={isLoading}
+                      placeholder={t("BankAccounts.form.account_number.placeholder")}
                       {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <FormField
-            control={form.control}
-            name="vin"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Vehicles.form.vin.label")}</FormLabel>
-                <FormControl>
-                  <DigitsInput disabled={isLoading} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="form-fields-cols-2">
-            <FormField
-              control={form.control}
-              name="license_country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.license_country.label")}</FormLabel>
-                  <FormControl>
-                    <CountryInput
-                      value={field.value ?? ""}
-                      onChange={field.onChange}
                       disabled={isLoading}
-                      dir={lang === "ar" ? "rtl" : "ltr"}
-                      ariaInvalid={false}
-                      texts={{
-                        placeholder: t("Forms.country.placeholder"),
-                        searchPlaceholder: t("Forms.country.search_placeholder"),
-                        noItems: t("Forms.country.no_items"),
-                      }}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
-              name="license_plate"
+              name="account_type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Vehicles.form.license_plate.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Vehicles.form.license_plate.placeholder")}
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="form-fields-cols-2">
-            <FormField
-              control={form.control}
-              name="ownership_status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.ownership_status.label")}</FormLabel>
+                  <FormLabel>{t("BankAccounts.form.account_type.label")}</FormLabel>
                   <FormControl>
                     <Select
                       dir={lang === "ar" ? "rtl" : "ltr"}
@@ -371,14 +239,14 @@ export function CarForm({
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue
-                            placeholder={t("Vehicles.form.ownership_status.placeholder")}
+                            placeholder={t("BankAccounts.form.account_type.placeholder")}
                           />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {VEHICLE_OWNERSHIP_STATUSES.map((typeOpt) => (
+                        {BANK_ACCOUNT_TYPE_OPTIONS.map((typeOpt) => (
                           <SelectItem key={typeOpt.value} value={typeOpt.value}>
-                            {t(`Vehicles.form.ownership_status.${typeOpt.value}`, {
+                            {t(`BankAccounts.form.account_type.${typeOpt.value}`, {
                               defaultValue: typeOpt.label,
                             })}
                           </SelectItem>
@@ -390,34 +258,67 @@ export function CarForm({
                 </FormItem>
               )}
             />
-            {form.watch("ownership_status") === "financed" && (
-              <FormField
-                control={form.control}
-                name="monthly_payment"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Cars.form.monthly_payment.label")}</FormLabel>
-                    <FormControl>
-                      <CurrencyInput
-                        placeholder={t("Cars.form.monthly_payment.placeholder")}
-                        disabled={isLoading}
-                        {...field}
-                        showCommas={true}
-                        value={field.value ? parseFloat(String(field.value)) : undefined}
-                        onChange={(value) => field.onChange(value?.toString() || "")}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+          </div>
+          <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="iban"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("BankAccounts.form.iban.label")} *</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("BankAccounts.form.iban.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="swift_bic"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("BankAccounts.form.swift_bic.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("BankAccounts.form.swift_bic.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="routing_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("BankAccounts.form.routing_number.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("BankAccounts.form.routing_number.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Vehicles.form.status.label")}</FormLabel>
+                  <FormLabel>{t("BankAccounts.form.status.label")} *</FormLabel>
                   <FormControl>
                     <Select
                       dir={lang === "ar" ? "rtl" : "ltr"}
@@ -427,14 +328,14 @@ export function CarForm({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder={t("Vehicles.form.status.placeholder")} />
+                          <SelectValue placeholder={t("BankAccounts.form.status.placeholder")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {Object.values(VehicleStatus).map((typeOpt) => (
-                          <SelectItem key={typeOpt} value={typeOpt}>
-                            {t(`Vehicles.form.status.${typeOpt}`, {
-                              defaultValue: typeOpt,
+                        {BANK_ACCOUNT_STATUS_OPTIONS.map((statusOpt) => (
+                          <SelectItem key={statusOpt.value} value={statusOpt.value}>
+                            {t(`BankAccounts.form.status.${statusOpt.value}`, {
+                              defaultValue: statusOpt.label,
                             })}
                           </SelectItem>
                         ))}
@@ -446,6 +347,23 @@ export function CarForm({
               )}
             />
           </div>
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("BankAccounts.form.notes.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t("BankAccounts.form.notes.placeholder")}
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
       </form>
     </Form>

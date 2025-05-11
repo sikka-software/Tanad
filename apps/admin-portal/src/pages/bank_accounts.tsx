@@ -29,6 +29,9 @@ export default function BankAccountsPage() {
 
   const isDeleteDialogOpen = useBankAccountStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useBankAccountStore((state) => state.setIsDeleteDialogOpen);
+  const actionableBankAccount = useBankAccountStore((state) => state.actionableItem);
+  const loadingSaveBankAccount = useBankAccountStore((state) => state.isLoading);
+  const setIsLoadingSavingBankAccount = useBankAccountStore((state) => state.setIsLoading);
 
   const { data: bankAccounts, isLoading: loadingFetchBankAccounts, error } = useBankAccounts();
   const { mutateAsync: deleteBankAccounts, isPending: isDeleting } = useDeleteBankAccount();
@@ -56,12 +59,11 @@ export default function BankAccountsPage() {
           }
         />
 
-        <div>
-          {/* <BankAccountsTable
+        <div className="p-4">
+          <BankAccountsTable
             data={bankAccounts as BankAccount[]}
             isLoading={loadingFetchBankAccounts}
-            error={error as Error | null}
-          /> */}
+          />
         </div>
 
         <FormDialog
@@ -76,19 +78,22 @@ export default function BankAccountsPage() {
             onSuccess={() => {
               setIsFormDialogOpen(false);
             }}
+            onError={() => {
+              setIsLoadingSavingBankAccount(false);
+            }}
             defaultValues={actionableBankAccount}
             editMode={true}
           />
         </FormDialog>
 
-        <ConfirmDelete
+        {/* <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+        //   handleConfirmDelete={() => handleConfirmDelete()}
           title={t("BankAccounts.confirm_delete")}
-          description={t("BankAccounts.delete_description", { count: selectedRows.length })}
-        />
+          description={t("BankAccounts.delete_description", { count: 1 })}
+        /> */}
       </DataPageLayout>
     </div>
   );

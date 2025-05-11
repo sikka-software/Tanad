@@ -53,6 +53,7 @@ export interface ModuleTableProps<T> {
 export interface ModuleFormProps<T> {
   formHtmlId?: string;
   onSuccess?: () => void;
+  onError?: () => void;
   defaultValues?: T | null;
   editMode?: boolean;
   nestedForm?: boolean;

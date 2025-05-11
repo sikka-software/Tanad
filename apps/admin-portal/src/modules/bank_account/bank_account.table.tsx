@@ -1,7 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -13,35 +11,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-type BankAccount = {
-  id: string;
-  name: string;
-  account_number: string | null;
-  account_type: string | null;
-  bank_name: string;
-  status: string;
-  created_at: string;
-};
+import { BankAccount } from "./bank_account.type";
 
-export function BankAccountsTable() {
-  const [accounts, setAccounts] = useState<BankAccount[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        // const data = await getBankAccounts();
-        setAccounts([]);
-      } catch (error) {
-        console.error("Failed to fetch bank accounts:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAccounts();
-  }, []);
-
+export function BankAccountsTable({
+  data,
+  isLoading,
+}: {
+  data: BankAccount[];
+  isLoading: boolean;
+}) {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "active":
@@ -55,7 +33,7 @@ export function BankAccountsTable() {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return <TableSkeleton />;
   }
 
@@ -72,14 +50,14 @@ export function BankAccountsTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {accounts.length === 0 ? (
+          {data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} className="h-24 text-center">
                 No bank accounts found. Add your first account.
               </TableCell>
             </TableRow>
           ) : (
-            accounts.map((account) => (
+            data.map((account) => (
               <TableRow key={account.id}>
                 <TableCell className="font-medium">{account.name}</TableCell>
                 <TableCell>{account.account_number || "—"}</TableCell>

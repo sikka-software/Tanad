@@ -40,6 +40,7 @@ const modelMap: Record<string, ModelConfig> = {
   invoices: { table: schema.invoices, query: db.query.invoices, idField: "id" },
   quotes: { table: schema.quotes, query: db.query.quotes, idField: "id" },
   vendors: { table: schema.vendors, query: db.query.vendors, idField: "id" },
+  bank_accounts: { table: schema.bank_accounts, query: db.query.bank_accounts, idField: "id" },
   employee_requests: {
     table: schema.employee_requests,
     query: db.query.employee_requests,
