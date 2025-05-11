@@ -49,6 +49,7 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       validationSchema: z.string().min(1, t("Offices.form.name.required")),
     },
     {
+      cellType: "code",
       accessorKey: "code",
       header: t("Offices.form.code.label"),
       validationSchema: z.string().min(1, t("Offices.form.code.required")),

@@ -1,3 +1,4 @@
+import { cn } from "@root/src/lib/utils";
 import { DiamondPlus, Hash, Shuffle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -13,9 +14,10 @@ type CodeInputProps = {
   children: React.ReactNode;
   onSerial: () => void;
   onRandom: () => void;
+  inCell?: boolean;
 };
 
-const CodeInput = ({ children, onSerial, onRandom }: CodeInputProps) => {
+const CodeInput = ({ children, onSerial, onRandom, inCell }: CodeInputProps) => {
   const t = useTranslations();
   const locale = useLocale();
 
@@ -24,7 +26,15 @@ const CodeInput = ({ children, onSerial, onRandom }: CodeInputProps) => {
       {children}
       <DropdownMenu dir={locale === "ar" ? "rtl" : "ltr"}>
         <DropdownMenuTrigger asChild>
-          <Button size="icon_sm" type="button" variant="ghost" className="absolute end-0.5 top-0.5">
+          <Button
+            size="icon_sm"
+            type="button"
+            variant="ghost"
+            className={cn(
+              "absolute end-0.5 top-0.5 cursor-pointer",
+              inCell && "top-1 opacity-50 transition-opacity hover:opacity-100",
+            )}
+          >
             <Hash className="size-6" />
           </Button>
         </DropdownMenuTrigger>

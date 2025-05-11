@@ -43,7 +43,9 @@ import {
 // ** import lib
 import { cn } from "@/lib/utils";
 
+import CodeInput from "./code-input";
 import { CommandSelect } from "./command-select";
+import { Input } from "./input";
 import RowActionsPopover from "./row-actions-popover";
 
 export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
@@ -52,7 +54,7 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
 > & {
   id?: string;
   accessorKey?: string;
-  cellType?: "text" | "select" | "status";
+  cellType?: "text" | "select" | "status" | "code";
   options?: Array<{ label: string; value: string | number | boolean }>;
   validationSchema?: ZodType<any, ZodTypeDef, any>;
   className?: string | ((row: TData) => string); // Allows static or dynamic class names
@@ -881,6 +883,65 @@ function SheetTable<
                     }}
                     ariaInvalid={false}
                   />
+                </TableCell>
+              );
+            }
+            // if cell type is code, show a code input element
+            if (colDef.cellType === "code") {
+              const cellValue = cell.getValue() as string | undefined;
+              return (
+                <TableCell
+                  key={cell.id}
+                  className={cn(
+                    "relative overflow-hidden border p-0",
+                    {
+                      "bg-muted": isDisabled,
+                      "bg-destructive/25": errorMsg,
+                    },
+                    typeof colDef.className === "function"
+                      ? colDef.className(rowData)
+                      : colDef.className,
+                  )}
+                  style={{ ...style, overflow: "hidden", minWidth: 0 }}
+                >
+                  <CodeInput
+                    inCell
+                    onSerial={() => {
+                      if (onEdit) {
+                        // Example: increment last value or provide a serial logic
+                        const next = (parseInt(cellValue || "0", 10) + 1).toString();
+                        onEdit(rowId, colKey as keyof T, next as T[keyof T]);
+                      }
+                    }}
+                    onRandom={() => {
+                      if (onEdit) {
+                        // Example: random 6-digit code
+                        const random = Math.floor(100000 + Math.random() * 900000).toString();
+                        onEdit(rowId, colKey as keyof T, random as T[keyof T]);
+                      }
+                    }}
+                  >
+                    <Input
+                      inCell
+                      contentEditable={colDef.enableEditing !== false ? !isDisabled : false}
+                      suppressContentEditableWarning
+                      value={cellValue || ""}
+                      style={{ minHeight: 36 }}
+                      onFocus={(e) => handleCellFocus(e, groupKey, rowData, colDef)}
+                      onKeyDown={(e) => {
+                        if (
+                          (e.ctrlKey || e.metaKey) &&
+                          ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
+                        ) {
+                          return;
+                        }
+                        handleKeyDown(e, colDef);
+                      }}
+                      onPaste={(e) => handlePaste(e, colDef)}
+                      onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
+                      onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
+                    />
+                  </CodeInput>
                 </TableCell>
               );
             }
