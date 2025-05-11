@@ -122,6 +122,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       {} as Record<string, any>,
     );
 
+    // Special handling for job_listings: generate a new unique slug
+    if (model === "job_listings") {
+      const originalSlug = record.slug || "";
+      const randomStr = Math.random().toString(36).substring(2, 8); // 6 chars
+      dataToDuplicate.slug = `${originalSlug}-copy-${randomStr}`;
+    }
+
     const [duplicated] = (await db
       .insert(table)
       .values({ ...dataToDuplicate, user_id: user.id })
