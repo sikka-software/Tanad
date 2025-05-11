@@ -10,14 +10,14 @@ import * as z from "zod";
 import { DocumentFile } from "@/ui/documents-uploader";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
+import PhoneInput from "@/ui/phone-input";
 
-import { AddressFormSection } from "@/components/forms/address-form-section";
-import { createAddressSchema } from "@/components/forms/address-schema";
-import PhoneInput from "@/components/ui/phone-input";
+import { AddressFormSection } from "@/forms/address-form-section";
+import { createAddressSchema } from "@/forms/address-schema";
 
 import { uploadDocument } from "@/services/documents";
 
-import { ModuleFormProps } from "@/types/common.type";
+import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
 import { useCreateCompany, useUpdateCompany } from "@/company/company.hooks";
 import useCompanyStore from "@/company/company.store";
@@ -36,7 +36,9 @@ export const createCompanySchema = (t: (key: string) => string) => {
     website: z.string().optional(),
     industry: z.string().optional(),
     size: z.string().optional(),
-    status: z.string().default("active"),
+    status: z.enum(CommonStatus, {
+      invalid_type_error: t("Companies.form.status.required"),
+    }),
     notes: z.any().optional().nullable(),
   });
 
@@ -57,8 +59,8 @@ export function CompanyForm({
   const t = useTranslations();
   const locale = useLocale();
   const { profile, membership } = useUserStore();
-  const { mutateAsync: createCompany, isPending: isCreating } = useCreateCompany();
-  const { mutateAsync: updateCompany, isPending: isUpdating } = useUpdateCompany();
+  const { mutateAsync: createCompany } = useCreateCompany();
+  const { mutateAsync: updateCompany } = useUpdateCompany();
   const [pendingDocuments, setPendingDocuments] = useState<DocumentFile[]>([]);
 
   const isLoading = useCompanyStore((state) => state.isLoading);

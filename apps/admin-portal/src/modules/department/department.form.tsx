@@ -37,12 +37,6 @@ type LocationOption = MultiSelectOption<LocationValue> & {
   metadata: { type: LocationValue["type"] };
 };
 
-type FormLocationData = {
-  location_id: string;
-  location_type: "office" | "branch" | "warehouse";
-  user_id: string;
-};
-
 export const createDepartmentSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Departments.form.validation.name_required")),
@@ -63,7 +57,8 @@ export default function DepartmentForm({
   formHtmlId,
   onSuccess,
   defaultValues,
-  editMode = false,
+  editMode,
+  nestedForm,
 }: ModuleFormProps<DepartmentUpdateData | DepartmentCreateData>) {
   const t = useTranslations();
   const user = useUserStore((state) => state.user);
@@ -310,7 +305,7 @@ export default function DepartmentForm({
         </div>
 
         <NotesSection
-          inDialog={editMode}
+          inDialog={editMode || nestedForm}
           control={form.control}
           title={t("Departments.form.notes.label")}
         />

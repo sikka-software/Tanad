@@ -62,7 +62,7 @@ const modelMap: Record<string, ModelConfig> = {
         // 2. Fetch clients with joined company name
         const { data, error } = await supabase
           .from("clients")
-          .select("*, company:companies(name)")
+          .select("*, company:companies(id, name)")
           .eq("enterprise_id", enterprise_id)
           .order("created_at", { ascending: false });
 

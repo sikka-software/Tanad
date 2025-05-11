@@ -14,7 +14,7 @@ const DebugTools = () => {
   const permissions = useUserStore((state) => state.permissions);
 
   // console.table(user, ["id", "email", "created_at", "updated_at"]);
-  console.table(profile, ["id", "email", "created_at", "updated_at"]);
+  // console.table(profile, ["id", "email", "created_at", "updated_at"]);
   // console.table(membership, ["id", "email", "created_at", "updated_at"]);
   // console.table(enterprise, ["id", "email", "created_at", "updated_at"]);
   return (

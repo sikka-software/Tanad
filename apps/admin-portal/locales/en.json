@@ -3779,10 +3779,7 @@
       "duplicate": "Error duplicating role"
     }
   },
-  "OnlineShops": {
-    "title": "Online Shops",
-    "singular": "Online Shop"
-  },
+
   "ActivityLogs": {
     "title": "Activity Logs",
     "description": "Activity logs for the organization during a specific period",

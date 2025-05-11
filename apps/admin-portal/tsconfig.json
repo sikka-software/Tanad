@@ -46,7 +46,9 @@
       "@/setting/*": ["./src/modules/setting/*"],
       "@/user/*": ["./src/modules/user/*"],
       "@/vendor/*": ["./src/modules/vendor/*"],
-      "@/warehouse/*": ["./src/modules/warehouse/*"]
+      "@/warehouse/*": ["./src/modules/warehouse/*"],
+      "@/domain/*": ["./src/modules/domain/*"],
+      "@/website/*": ["./src/modules/website/*"]
     },
     "plugins": [
       {

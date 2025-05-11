@@ -3,7 +3,6 @@ import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -148,14 +147,11 @@ export default function OfficesPage() {
           loadingSave={loadingSaveOffice}
         >
           <OfficeForm
-            formHtmlId={"office-form"}
+            formHtmlId="office-form"
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableOffice(null);
               setLoadingSaveOffice(false);
-              toast.success(t("General.successful_operation"), {
-                description: t("Offices.success.update"),
-              });
             }}
             defaultValues={actionableOffice}
             editMode={true}

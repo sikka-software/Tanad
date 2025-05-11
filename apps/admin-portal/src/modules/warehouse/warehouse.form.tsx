@@ -44,6 +44,7 @@ export function WarehouseForm({
   onSuccess,
   defaultValues,
   editMode,
+  nestedForm,
 }: ModuleFormProps<WarehouseUpdateData | WarehouseCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
@@ -262,14 +263,14 @@ export function WarehouseForm({
         </div>
         <AddressFormSection
           dir={locale === "ar" ? "rtl" : "ltr"}
-          inDialog={editMode}
+          inDialog={editMode || nestedForm}
           title={t("Warehouses.form.address.label")}
           control={form.control}
           isLoading={isLoading}
         />
 
         <NotesSection
-          inDialog={editMode}
+          inDialog={editMode || nestedForm}
           control={form.control}
           title={t("Warehouses.form.notes.label")}
         />

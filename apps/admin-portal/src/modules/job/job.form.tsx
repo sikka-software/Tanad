@@ -9,8 +9,13 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { Badge } from "@/ui/badge";
+import { Card, CardHeader, CardTitle } from "@/ui/card";
 import { ComboboxAdd } from "@/ui/combobox-add";
+import { CurrencyInput } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
+import { Dialog } from "@/ui/dialog";
+import { DialogContent } from "@/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
@@ -18,27 +23,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/ui/switch";
 import { Textarea } from "@/ui/textarea";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { CurrencyInput } from "@/components/ui/currency-input";
-import { Dialog } from "@/components/ui/dialog";
-import { DialogContent } from "@/components/ui/dialog";
+import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
-import { ModuleFormProps } from "@/types/common.type";
+import { OfficeForm } from "@/office/office.form";
 
 import { useCreateJob, useUpdateJob } from "@/job/job.hooks";
 import useJobStore from "@/job/job.store";
 import { JobUpdateData, JobCreateData } from "@/job/job.type";
 
+import { BranchForm } from "@/branch/branch.form";
+
 import DepartmentForm from "@/department/department.form";
 import { useDepartments } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";
 
+import { WarehouseForm } from "@/warehouse/warehouse.form";
+
 import useUserStore from "@/stores/use-user-store";
 
-import { BranchForm } from "../branch/branch.form";
-import { OfficeForm } from "../office/office.form";
-import { WarehouseForm } from "../warehouse/warehouse.form";
+import { OnlineStoreForm } from "../online-store/online-store.form";
 
 const createJobFormSchema = (t: (key: string) => string) =>
   z.object({
@@ -59,7 +62,9 @@ const createJobFormSchema = (t: (key: string) => string) =>
       ),
     start_date: z.date().optional(),
     end_date: z.date().optional(),
-    status: z.string().default("active"),
+    status: z.enum(CommonStatus, {
+      invalid_type_error: t("Jobs.form.status.required"),
+    }),
     total_positions: z.string().optional(),
   });
 
@@ -83,7 +88,7 @@ export function JobForm({
 
   const [isChooseLocationDialogOpen, setIsChooseLocationDialogOpen] = useState(false);
   const [chosenForm, setChosenForm] = useState<
-    "Warehouses" | "Offices" | "Branches" | "OnlineShops" | "Departments"
+    "Warehouses" | "Offices" | "Branches" | "OnlineStores" | "Departments"
   >();
 
   const { mutate: createJob } = useCreateJob();
@@ -92,6 +97,7 @@ export function JobForm({
   const isLoading = useJobStore((state) => state.isLoading);
   const setIsLoading = useJobStore((state) => state.setIsLoading);
 
+  console.log("defaut values are", defaultValues);
   const form = useForm<JobFormValues>({
     resolver: zodResolver(createJobFormSchema(t)),
     defaultValues: {
@@ -503,7 +509,7 @@ export function JobForm({
             >
               <Warehouse className="h-10 w-10" />
               <CardHeader>
-                <CardTitle>{t("Warehouses.singular")}</CardTitle>
+                <CardTitle>{t("Pages.Warehouses.singular")}</CardTitle>
               </CardHeader>
             </Card>
             <Card
@@ -515,7 +521,7 @@ export function JobForm({
             >
               <Building2 className="h-10 w-10" />
               <CardHeader>
-                <CardTitle>{t("Offices.singular")}</CardTitle>
+                <CardTitle>{t("Pages.Offices.singular")}</CardTitle>
               </CardHeader>
             </Card>
             <Card
@@ -527,18 +533,19 @@ export function JobForm({
             >
               <Store className="h-10 w-10" />
               <CardHeader>
-                <CardTitle>{t("Branches.singular")}</CardTitle>
+                <CardTitle>{t("Pages.Branches.singular")}</CardTitle>
               </CardHeader>
             </Card>
-            <Card className="relative flex cursor-not-allowed flex-col items-center justify-center overflow-clip pt-6">
-              <Badge className="absolute -end-0 -top-0 rounded-sm rounded-e-none !rounded-t-none bg-blue-200 p-1 px-2 text-[10px] text-black dark:bg-blue-800 dark:text-white">
-                {t("General.soon")}
-              </Badge>
-              <ShoppingCart className="text-muted-foreground/50 h-10 w-10" />
+            <Card
+              onClick={() => {
+                setChosenForm("OnlineStores");
+                setIsDepartmentDialogOpen(true);
+              }}
+              className="flex cursor-pointer flex-col items-center justify-center pt-6 transition-all duration-300 hover:shadow-xl"
+            >
+              <ShoppingCart className="h-10 w-10" />
               <CardHeader>
-                <CardTitle className="text-muted-foreground/50">
-                  {t("OnlineShops.singular")}
-                </CardTitle>
+                <CardTitle>{t("Pages.OnlineStores.singular")}</CardTitle>
               </CardHeader>
             </Card>
           </div>
@@ -568,8 +575,8 @@ export function JobForm({
             nestedForm
             formHtmlId="office-form"
             onSuccess={() => {
-              setIsDepartmentSaving(false);
-              setIsDepartmentDialogOpen(false);
+              // setIsDepartmentSaving(false);
+              // setIsDepartmentDialogOpen(false);
             }}
           />
         )}
@@ -587,6 +594,17 @@ export function JobForm({
           <DepartmentForm
             nestedForm
             formHtmlId="department-form"
+            onSuccess={() => {
+              setIsDepartmentSaving(false);
+              setIsDepartmentDialogOpen(false);
+              queryClient.invalidateQueries({ queryKey: ["departments"] });
+            }}
+          />
+        )}
+        {chosenForm === "OnlineStores" && (
+          <OnlineStoreForm
+            nestedForm
+            formHtmlId="online-store-form"
             onSuccess={() => {
               setIsDepartmentSaving(false);
               setIsDepartmentDialogOpen(false);

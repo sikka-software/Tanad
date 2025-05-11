@@ -17,8 +17,6 @@ import { createAddressSchema } from "@/components/forms/address-schema";
 import NotesSection from "@/components/forms/notes-section";
 import PhoneInput from "@/components/ui/phone-input";
 
-import { Constants } from "@/lib/database.types";
-
 import { ModuleFormProps, CommonStatus } from "@/types/common.type";
 
 import { useCreateClient, useUpdateClient } from "@/client/client.hooks";
@@ -82,7 +80,10 @@ export function ClientForm({
       name: defaultValues?.name || "",
       email: defaultValues?.email || "",
       phone: defaultValues?.phone || "",
-      company: defaultValues?.company || undefined,
+      company:
+        typeof defaultValues?.company === "object"
+          ? (defaultValues.company as any)?.id || null
+          : defaultValues?.company || null,
       short_address:
         typeof defaultValues?.short_address === "string" ? defaultValues.short_address : "",
       building_number:
@@ -96,8 +97,6 @@ export function ClientForm({
       status: defaultValues?.status || "active",
     },
   });
-
-  console.log("default values are ", defaultValues);
 
   const handleSubmit = async (data: ClientFormValues) => {
     setIsLoading(true);

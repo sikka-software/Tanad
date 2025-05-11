@@ -70,8 +70,18 @@ export default function AddJobPage() {
   );
 }
 
-AddJobPage.messages = ["Notes", "Pages", "Jobs", "General"];
-
+AddJobPage.messages = [
+  "Notes",
+  "Pages",
+  "Jobs",
+  "Branches",
+  "Warehouses",
+  "Forms",
+  "OnlineStores",
+  "Offices",
+  "Departments",
+  "General",
+];
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {

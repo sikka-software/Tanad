@@ -10,15 +10,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
-import NotesSection from "@/components/forms/notes-section";
+import NotesSection from "@/forms/notes-section";
 
-import { ModuleFormProps } from "@/types/common.type";
+import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
+import { useCreateDomain, useUpdateDomain } from "@/domain/domain.hooks";
+import useDomainStore from "@/domain/domain.store";
+import { DomainUpdateData, DomainCreateData } from "@/domain/domain.type";
 import useUserStore from "@/stores/use-user-store";
-
-import { useCreateDomain, useUpdateDomain } from "./domain.hooks";
-import useDomainStore from "./domain.store";
-import { DomainUpdateData, DomainCreateData } from "./domain.type";
 
 export const createDomainSchema = (t: (key: string) => string) => {
   const baseDomainSchema = z.object({
@@ -27,7 +26,9 @@ export const createDomainSchema = (t: (key: string) => string) => {
     monthly_cost: z.number().optional().or(z.literal("")),
     annual_cost: z.number().optional().or(z.literal("")),
     payment_cycle: z.string().min(1, t("Domains.form.payment_cycle.required")),
-    status: z.string().min(1, t("Domains.form.status.required")),
+    status: z.enum(CommonStatus, {
+      invalid_type_error: t("Domains.form.status.required"),
+    }),
     notes: z.any().optional().nullable(),
   });
 

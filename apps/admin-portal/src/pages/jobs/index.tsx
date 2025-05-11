@@ -133,7 +133,7 @@ export default function JobsPage() {
                 data={sortedJobs}
                 isLoading={loadingFetchJobs}
                 error={error}
-                emptyMessage={t("Jobs.no_jobs_found")}
+                emptyMessage={t("Pages.Jobs.no_jobs_found")}
                 renderItem={(job) => <JobCard job={job} />}
                 gridCols="3"
               />
@@ -149,7 +149,7 @@ export default function JobsPage() {
           loadingSave={isLoading}
         >
           <JobForm
-            formHtmlId={"job-form"}
+            formHtmlId="job-form"
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableItem(null);
@@ -176,7 +176,17 @@ export default function JobsPage() {
   );
 }
 
-JobsPage.messages = ["Notes", "Pages", "Jobs", "General"];
+JobsPage.messages = [
+  "Notes",
+  "Pages",
+  "Jobs",
+  "Branches",
+  "Warehouses",
+  "OnlineStores",
+  "Offices",
+  "Departments",
+  "General",
+];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

@@ -1,36 +1,33 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { NotesEditor } from "@root/src/components/blocks/editor-x/notes-editor";
-import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import NotesSection from "@root/src/components/forms/notes-section";
 import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
 import { CommandSelect } from "@root/src/components/ui/command-select";
 import { FormDialog } from "@root/src/components/ui/form-dialog";
-import { SerializedEditorState } from "lexical";
 import { useTranslations, useLocale } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import CodeInput from "@/ui/code-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
-import { Textarea } from "@/ui/textarea";
+import PhoneInput from "@/ui/phone-input";
 
-import { AddressFormSection } from "@/components/forms/address-form-section";
-import { createAddressSchema } from "@/components/forms/address-schema";
-import CodeInput from "@/components/ui/code-input";
-import PhoneInput from "@/components/ui/phone-input";
+import { AddressFormSection } from "@/forms/address-form-section";
+import { createAddressSchema } from "@/forms/address-schema";
 
-import { ModuleFormProps } from "@/types/common.type";
+import { CommonStatus, ModuleFormProps } from "@/types/common.type";
+
+import { useBranches, useCreateBranch, useUpdateBranch } from "@/branch/branch.hooks";
+import useBranchStore from "@/branch/branch.store";
+import { BranchUpdateData, BranchCreateData } from "@/branch/branch.type";
+
+import { EmployeeForm } from "@/employee/employee.form";
+import { useEmployees } from "@/employee/employee.hooks";
+import useEmployeeStore from "@/employee/employee.store";
 
 import useUserStore from "@/stores/use-user-store";
-
-import { EmployeeForm } from "../employee/employee.form";
-import { useEmployees } from "../employee/employee.hooks";
-import useEmployeeStore from "../employee/employee.store";
-import { useBranches, useCreateBranch, useUpdateBranch } from "./branch.hooks";
-import useBranchStore from "./branch.store";
-import { BranchUpdateData, BranchCreateData, Branch } from "./branch.type";
 
 export const createBranchSchema = (t: (key: string) => string) => {
   const baseBranchSchema = z.object({
@@ -43,9 +40,10 @@ export const createBranchSchema = (t: (key: string) => string) => {
       .uuid({ message: t("Branches.form.manager.invalid_uuid") })
       .optional()
       .nullable(),
-    status: z.enum(["active", "inactive"], {
-      message: t("Branches.form.status.required"),
+    status: z.enum(CommonStatus, {
+      invalid_type_error: t("Branches.form.status.required"),
     }),
+
     notes: z.any().optional().nullable(),
   });
 
@@ -101,7 +99,7 @@ export function BranchForm({
       phone: defaultValues?.phone || "",
       email: defaultValues?.email || "",
       manager: defaultValues?.manager || null,
-      status: (defaultValues?.status as "active" | "inactive") || "active",
+      status: defaultValues?.status || "active",
       notes:
         defaultValues?.notes &&
         typeof defaultValues.notes === "object" &&
