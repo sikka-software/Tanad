@@ -167,7 +167,7 @@ export default function TrucksPage() {
   );
 }
 
-TrucksPage.messages = ["Pages", "Trucks", "Notes", "General"];
+TrucksPage.messages = ["Pages", "Trucks", "Notes", "Forms", "General"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

@@ -63,7 +63,7 @@ export default function AddTruckPage() {
   );
 }
 
-AddTruckPage.messages = ["Pages", "Trucks", "Notes", "General"];
+AddTruckPage.messages = ["Pages", "Trucks", "Notes", "Forms", "General"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

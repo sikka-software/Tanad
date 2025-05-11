@@ -4859,21 +4859,21 @@
     "code": "الرمز",
     "form": {
       "name": {
-        "label": "اسم السيارة",
-        "placeholder": "مثال: سيارتي، تويوتا كامري",
-        "required": "اسم السيارة مطلوب"
+        "label": "إسم السيارة",
+        "placeholder": "مثال: Camry, Corolla",
+        "required": "إسم السيارة مطلوب"
       },
       "make": {
         "label": "الشركة المصنعة",
-        "placeholder": "مثال: تويوتا، فورد"
+        "placeholder": "مثال: Toyota, Ford"
       },
       "model": {
         "label": "الموديل",
-        "placeholder": "مثال: كامري، موستانج"
+        "placeholder": "مثال: Camry, Mustang"
       },
       "year": {
         "label": "سنة الصنع",
-        "placeholder": "مثال: ٢٠٢٣"
+        "placeholder": "مثال: 2023"
       },
       "color": {
         "label": "اللون",
@@ -4925,9 +4925,9 @@
     "delete_description": "هل أنت متأكد أنك تريد حذف {count} شاحنة (شاحنات)؟",
     "form": {
       "name": {
-        "label": "الاسم",
+        "label": "إسم الشاحنة",
         "placeholder": "مثال: شاحنة فولفو FH16",
-        "required": "الاسم مطلوب"
+        "required": "إسم الشاحنة مطلوب"
       },
       "make": {
         "label": "الشركة المصنعة",

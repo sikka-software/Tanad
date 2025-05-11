@@ -160,6 +160,23 @@ export function CarForm({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Cars.form.code.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Cars.form.code.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
@@ -175,7 +192,9 @@ export function CarForm({
                 </FormItem>
               )}
             />
+          </div>
 
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="make"
@@ -193,9 +212,6 @@ export function CarForm({
                 </FormItem>
               )}
             />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="model"
@@ -213,7 +229,8 @@ export function CarForm({
                 </FormItem>
               )}
             />
-
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="year"
@@ -231,8 +248,6 @@ export function CarForm({
                 </FormItem>
               )}
             />
-          </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="color"
@@ -250,23 +265,6 @@ export function CarForm({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Cars.form.code.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Cars.form.code.placeholder")}
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
           <FormField
             control={form.control}
@@ -276,11 +274,6 @@ export function CarForm({
                 <FormLabel>{t("Cars.form.vin.label")}</FormLabel>
                 <FormControl>
                   <DigitsInput disabled={isLoading} {...field} />
-                  {/* <Input
-                      placeholder={t("Cars.form.vin.placeholder")}
-                      disabled={isLoading}
-                      {...field}
-                    /> */}
                 </FormControl>
                 <FormMessage />
               </FormItem>

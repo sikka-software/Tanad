@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import CountryInput from "@root/src/components/ui/country-input";
 import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
@@ -232,13 +233,13 @@ export function TruckForm({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
-              name="color"
+              name="year"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Trucks.form.color.label")}</FormLabel>
+                  <FormLabel>{t("Trucks.form.year.label")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("Trucks.form.color.placeholder")}
+                      placeholder={t("Trucks.form.year.placeholder")}
                       disabled={isLoading}
                       {...field}
                     />
@@ -249,13 +250,13 @@ export function TruckForm({
             />
             <FormField
               control={form.control}
-              name="year"
+              name="color"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Trucks.form.year.label")}</FormLabel>
+                  <FormLabel>{t("Trucks.form.color.label")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("Trucks.form.year.placeholder")}
+                      placeholder={t("Trucks.form.color.placeholder")}
                       disabled={isLoading}
                       {...field}
                     />
@@ -286,10 +287,17 @@ export function TruckForm({
                 <FormItem>
                   <FormLabel>{t("Trucks.form.license_country.label")}</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder={t("Trucks.form.license_country.placeholder")}
+                    <CountryInput
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
                       disabled={isLoading}
-                      {...field}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      ariaInvalid={false}
+                      texts={{
+                        placeholder: t("Forms.country.placeholder"),
+                        searchPlaceholder: t("Forms.country.search_placeholder"),
+                        noItems: t("Forms.country.no_items"),
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
