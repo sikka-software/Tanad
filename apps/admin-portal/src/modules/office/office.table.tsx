@@ -27,6 +27,7 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
 
   const selectedRows = useOfficeStore((state) => state.selectedRows);
   const setSelectedRows = useOfficeStore((state) => state.setSelectedRows);
+  const setData = useOfficeStore((state) => state.setData);
 
   const canEditOffice = useUserStore((state) => state.hasPermission("offices.update"));
   const canDuplicateOffice = useUserStore((state) => state.hasPermission("offices.duplicate"));
@@ -144,9 +145,12 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
     },
   ];
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+  const handleEdit = (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "office_id") return;
-    await updateOffice({ id: rowId, office: { [columnId]: value } });
+    // Optimistically update the store's data
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    // Then call the API (fire and forget)
+    updateOffice({ id: rowId, office: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(

@@ -81,9 +81,21 @@ export default function OfficesPage() {
     },
   });
 
+  // Get the store's data for instant updates
+  const storeData = useOfficeStore((state) => state.data) || [];
+  const setData = useOfficeStore((state) => state.setData);
+
+  // When offices data changes (from server), update the store
+  useEffect(() => {
+    if (offices && setData) {
+      setData(offices);
+    }
+  }, [offices, setData]);
+
+  // Apply filtering and sorting to the store's data
   const filteredOffices = useMemo(() => {
-    return getFilteredOffices(offices || []);
-  }, [offices, getFilteredOffices, searchQuery, filterConditions, filterCaseSensitive]);
+    return getFilteredOffices(storeData);
+  }, [storeData, getFilteredOffices, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedOffices = useMemo(() => {
     return getSortedOffices(filteredOffices);
@@ -92,12 +104,6 @@ export default function OfficesPage() {
   if (!canReadOffices) {
     return <NoPermission />;
   }
-
-  useEffect(() => {
-    if (setDataLength) {
-      setDataLength(offices?.length || 0);
-    }
-  }, [offices]);
 
   return (
     <div>

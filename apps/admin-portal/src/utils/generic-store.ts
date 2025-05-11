@@ -24,6 +24,7 @@ export function createGenericStore<T extends { id: string }>(
   const actualSearchFilter = searchFilterFn || defaultSearchFilter;
 
   return create<BaseStates<T> & BaseActions<T>>((set, get) => ({
+    data: [],
     dataLength: 0,
     isLoading: false,
     error: null,
@@ -104,5 +105,7 @@ export function createGenericStore<T extends { id: string }>(
         return { ...state, selectedRows: [] };
       });
     },
+
+    setData: (data: T[]) => set({ data }),
   }));
 }
