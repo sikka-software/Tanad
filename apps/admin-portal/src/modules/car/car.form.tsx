@@ -267,8 +267,12 @@ export function CarForm({
                     <NumberInput
                       placeholder={t("Cars.form.year.placeholder")}
                       disabled={isLoading}
-                      {...field}
                       maxLength={4}
+                      value={field.value === undefined || field.value === null ? '' : field.value}
+                      onChange={e => {
+                        const val = e.target.value;
+                        field.onChange(val === '' ? undefined : Number(val));
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
