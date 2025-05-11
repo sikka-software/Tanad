@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
 import {
   createTruck,
@@ -47,9 +46,6 @@ export function useCreateTruck() {
     onSuccess: () => {
       // Invalidate the list query to refetch
       queryClient.invalidateQueries({ queryKey: truckKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Trucks.success.create"),
-      });
     },
   });
 }
@@ -64,9 +60,6 @@ export function useUpdateTruck() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: truckKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: truckKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Trucks.success.update"),
-      });
     },
   });
 }

@@ -4014,6 +4014,57 @@
       "zimbabwe": "زيمبابوي"
     }
   },
+  "Vehicles": {
+    "form": {
+      "make": {
+        "label": "الشركة المصنعة",
+        "placeholder": "مثال: Toyota, Ford"
+      },
+      "model": {
+        "label": "الموديل",
+        "placeholder": "مثال: Camry, Mustang"
+      },
+      "year": {
+        "label": "سنة الصنع",
+        "placeholder": "مثال: 2023"
+      },
+      "color": {
+        "label": "اللون",
+        "placeholder": "مثال: أحمر، أزرق"
+      },
+      "vin": {
+        "label": "رقم الهيكل (VIN)",
+        "placeholder": "أدخل رقم الهيكل"
+      },
+      "license_country": {
+        "label": "بلد الترخيص",
+        "placeholder": "مثال: المملكة العربية السعودية"
+      },
+      "license_plate": {
+        "label": "رقم لوحة الترخيص",
+        "placeholder": "أدخل رقم لوحة الترخيص"
+      },
+
+      "ownership_status": {
+        "label": "حالة الملكية",
+        "placeholder": "اختر حالة الملكية",
+        "owned": "مملوكة",
+        "rented": "إيجار",
+        "financed": "إيجار منتهي بالتمليك"
+      },
+      "status": {
+        "label": "الحالة",
+        "placeholder": "اختر الحالة",
+        "active": "نشط",
+        "maintenance": "صيانة",
+        "sold": "مباع",
+        "totaled": "تشليح",
+        "retired": "معطل",
+        "stored": "مخزن",
+        "other": "أخرى"
+      }
+    }
+  },
   "Companies": {
     "title": "الشركات",
     "update_company": "تحديث الشركة",
@@ -4864,59 +4915,14 @@
         "placeholder": "مثال: Camry, Corolla",
         "required": "إسم السيارة مطلوب"
       },
-      "make": {
-        "label": "الشركة المصنعة",
-        "placeholder": "مثال: Toyota, Ford"
-      },
-      "model": {
-        "label": "الموديل",
-        "placeholder": "مثال: Camry, Mustang"
-      },
-      "year": {
-        "label": "سنة الصنع",
-        "placeholder": "مثال: 2023"
-      },
-      "color": {
-        "label": "اللون",
-        "placeholder": "مثال: أحمر، أزرق"
-      },
-      "vin": {
-        "label": "رقم الهيكل (VIN)",
-        "placeholder": "أدخل رقم الهيكل"
-      },
       "code": {
         "label": "الرمز التعريفي",
         "placeholder": "أدخل الرمز التعريفي للسيارة"
       },
-      "license_country": {
-        "label": "بلد الترخيص",
-        "placeholder": "مثال: المملكة العربية السعودية"
-      },
-      "license_plate": {
-        "label": "رقم لوحة الترخيص",
-        "placeholder": "أدخل رقم لوحة الترخيص"
-      },
-      "ownership_status": {
-        "label": "حالة الملكية",
-        "placeholder": "اختر حالة الملكية",
-        "owned": "مملوكة",
-        "rented": "إيجار",
-        "financed": "إيجار منتهي بالتمليك"
-      },
+
       "monthly_payment": {
         "label": "الدفعات الشهرية",
         "placeholder": "أدخل الدفعات الشهرية"
-      },
-      "status": {
-        "label": "الحالة",
-        "placeholder": "اختر الحالة",
-        "active": "نشط",
-        "maintenance": "صيانة",
-        "sold": "مباع",
-        "totaled": "تشليح",
-        "retired": "معطل",
-        "stored": "مخزن",
-        "other": "أخرى"
       }
     },
     "success": {
@@ -4950,40 +4956,10 @@
         "placeholder": "مثال: شاحنة فولفو FH16",
         "required": "إسم الشاحنة مطلوب"
       },
-      "make": {
-        "label": "الشركة المصنعة",
-        "placeholder": "مثال: فولفو، سكانيا"
-      },
-      "model": {
-        "label": "الموديل",
-        "placeholder": "مثال: FH, Actros"
-      },
-      "year": {
-        "label": "سنة الصنع",
-        "placeholder": "مثال: ٢٠٢٣"
-      },
-      "color": {
-        "label": "اللون",
-        "placeholder": "مثال: أحمر، أزرق"
-      },
-      "vin": {
-        "label": "رقم الهيكل (VIN)",
-        "placeholder": "أدخل رقم الهيكل"
-      },
       "code": {
         "label": "الرمز التعريفي",
         "placeholder": "أدخل الرمز التعريفي للشاحنة"
-      },
-      "license_country": {
-        "label": "بلد الترخيص",
-        "placeholder": "مثال: المملكة العربية السعودية"
-      },
-      "license_plate": {
-        "label": "رقم لوحة الترخيص",
-        "placeholder": "أدخل رقم لوحة الترخيص"
-      },
-      "create_button": "إنشاء شاحنة",
-      "update_button": "تحديث شاحنة"
+      }
     },
     "success": {
       "create": "تم إنشاء الشاحنة بنجاح.",

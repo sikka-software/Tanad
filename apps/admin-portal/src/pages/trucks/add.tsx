@@ -26,12 +26,12 @@ export default function AddTruckPage() {
       form.setValue("name", dummyData.first_name);
       form.setValue("make", dummyData.last_name);
       form.setValue("model", dummyData.email);
-      form.setValue("year", dummyData.randomNumber);
+      form.setValue("year", dummyData.randomNumber(4));
       form.setValue("color", dummyData.randomString);
-      form.setValue("vin", dummyData.randomNumber);
-      form.setValue("code", dummyData.randomNumber);
-      form.setValue("license_country", dummyData.randomNumber);
-      form.setValue("license_plate", dummyData.randomNumber);
+      form.setValue("vin", dummyData.randomString);
+      form.setValue("code", dummyData.randomString);
+      form.setValue("license_country", dummyData.randomString);
+      form.setValue("license_plate", dummyData.randomString);
       form.setValue("notes", dummyData.state);
     }
   };
@@ -63,7 +63,7 @@ export default function AddTruckPage() {
   );
 }
 
-AddTruckPage.messages = ["Pages", "Trucks", "Notes", "Forms", "General"];
+AddTruckPage.messages = ["Pages", "Trucks", "Vehicles", "Notes", "Forms", "General"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

@@ -45,37 +45,37 @@ const TrucksTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
     },
     {
       accessorKey: "make",
-      header: t("Trucks.form.make.label"),
+      header: t("Vehicles.form.make.label"),
       validationSchema: z.string().min(1, "Required"),
     },
     {
       accessorKey: "model",
-      header: t("Trucks.form.model.label"),
+      header: t("Vehicles.form.model.label"),
       validationSchema: z.string().min(1, "Required"),
     },
     {
       accessorKey: "year",
-      header: t("Trucks.form.year.label"),
+      header: t("Vehicles.form.year.label"),
       validationSchema: z.number().min(0, "Required"),
     },
     {
       accessorKey: "color",
-      header: t("Trucks.form.color.label"),
+      header: t("Vehicles.form.color.label"),
       validationSchema: z.string().min(1, "Required"),
     },
     {
       accessorKey: "vin",
-      header: t("Trucks.form.vin.label"),
+      header: t("Vehicles.form.vin.label"),
       validationSchema: z.string().min(1, "Required"),
     },
     {
       accessorKey: "license_country",
-      header: t("Trucks.form.license_country.label"),
+      header: t("Vehicles.form.license_country.label"),
       validationSchema: z.string().min(1, "Required"),
     },
     {
       accessorKey: "license_plate",
-      header: t("Trucks.form.license_plate.label"),
+      header: t("Vehicles.form.license_plate.label"),
       validationSchema: z.string().min(1, "Required"),
     },
   ];

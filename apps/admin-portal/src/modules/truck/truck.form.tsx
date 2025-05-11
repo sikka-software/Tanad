@@ -10,6 +10,7 @@ import * as z from "zod";
 import DigitsInput from "@/ui/digits-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
+import NumberInput from "@/ui/number-input";
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/ui/select";
 
 import { ModuleFormProps, VehicleStatus } from "@/types/common.type";
@@ -26,7 +27,10 @@ export const createTruckSchema = (t: (key: string) => string) => {
     name: z.string().min(1, t("Trucks.form.name.required")),
     make: z.string().optional().or(z.literal("")),
     model: z.string().optional().or(z.literal("")),
-    year: z.string().optional().or(z.literal("")),
+    year: z.number({
+      invalid_type_error: t("Forms.must_be_number"),
+      message: t("Forms.must_be_number"),
+    }),
     color: z.string().optional().or(z.literal("")),
     vin: z.string().optional().or(z.literal("")),
     code: z.string().optional().or(z.literal("")),
@@ -75,7 +79,7 @@ export function TruckForm({
       name: defaultValues?.name || "",
       make: defaultValues?.make || "",
       model: defaultValues?.model || "",
-      year: defaultValues?.year || "",
+      year: defaultValues?.year,
       color: defaultValues?.color || "",
       vin: defaultValues?.vin || "",
       code: defaultValues?.code || "",
@@ -106,7 +110,7 @@ export function TruckForm({
               name: data.name.trim(),
               make: data.make?.trim() || "",
               model: data.model?.trim() || "",
-              year: data.year?.trim() || "",
+              year: data.year,
               color: data.color?.trim() || "",
               vin: data.vin?.trim() || "",
               code: data.code?.trim() || "",
@@ -132,7 +136,7 @@ export function TruckForm({
             name: data.name.trim(),
             make: data.make?.trim() || "",
             model: data.model?.trim() || "",
-            year: data.year?.trim() || "",
+            year: data.year,
             color: data.color?.trim() || "",
             vin: data.vin?.trim() || "",
             code: data.code?.trim() || "",
@@ -216,10 +220,10 @@ export function TruckForm({
               name="make"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Trucks.form.make.label")}</FormLabel>
+                  <FormLabel>{t("Vehicles.form.make.label")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("Trucks.form.make.placeholder")}
+                      placeholder={t("Vehicles.form.make.placeholder")}
                       {...field}
                       disabled={isLoading}
                     />
@@ -233,10 +237,10 @@ export function TruckForm({
               name="model"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Trucks.form.model.label")}</FormLabel>
+                  <FormLabel>{t("Vehicles.form.model.label")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("Trucks.form.model.placeholder")}
+                      placeholder={t("Vehicles.form.model.placeholder")}
                       disabled={isLoading}
                       {...field}
                     />
@@ -252,12 +256,17 @@ export function TruckForm({
               name="year"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Trucks.form.year.label")}</FormLabel>
+                  <FormLabel>{t("Vehicles.form.year.label")}</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder={t("Trucks.form.year.placeholder")}
+                    <NumberInput
+                      placeholder={t("Vehicles.form.year.placeholder")}
                       disabled={isLoading}
-                      {...field}
+                      maxLength={4}
+                      value={field.value === undefined || field.value === null ? "" : field.value}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        field.onChange(val === "" ? undefined : Number(val));
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -269,10 +278,10 @@ export function TruckForm({
               name="color"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Trucks.form.color.label")}</FormLabel>
+                  <FormLabel>{t("Vehicles.form.color.label")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("Trucks.form.color.placeholder")}
+                      placeholder={t("Vehicles.form.color.placeholder")}
                       disabled={isLoading}
                       {...field}
                     />
@@ -287,7 +296,7 @@ export function TruckForm({
             name="vin"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Trucks.form.vin.label")}</FormLabel>
+                <FormLabel>{t("Vehicles.form.vin.label")}</FormLabel>
                 <FormControl>
                   <DigitsInput disabled={isLoading} {...field} />
                 </FormControl>
@@ -301,7 +310,7 @@ export function TruckForm({
               name="license_country"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Trucks.form.license_country.label")}</FormLabel>
+                  <FormLabel>{t("Vehicles.form.license_country.label")}</FormLabel>
                   <FormControl>
                     <CountryInput
                       value={field.value ?? ""}
@@ -326,10 +335,10 @@ export function TruckForm({
               name="license_plate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Trucks.form.license_plate.label")}</FormLabel>
+                  <FormLabel>{t("Vehicles.form.license_plate.label")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("Trucks.form.license_plate.placeholder")}
+                      placeholder={t("Vehicles.form.license_plate.placeholder")}
                       disabled={isLoading}
                       {...field}
                     />
@@ -345,7 +354,7 @@ export function TruckForm({
               name="ownership_status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Cars.form.ownership_status.label")}</FormLabel>
+                  <FormLabel>{t("Vehicles.form.ownership_status.label")}</FormLabel>
                   <FormControl>
                     <Select
                       dir={lang === "ar" ? "rtl" : "ltr"}
@@ -355,13 +364,15 @@ export function TruckForm({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder={t("Cars.form.ownership_status.placeholder")} />
+                          <SelectValue
+                            placeholder={t("Vehicles.form.ownership_status.placeholder")}
+                          />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         {VEHICLE_OWNERSHIP_STATUSES.map((typeOpt) => (
                           <SelectItem key={typeOpt.value} value={typeOpt.value}>
-                            {t(`Cars.form.ownership_status.${typeOpt.value}`, {
+                            {t(`Vehicles.form.ownership_status.${typeOpt.value}`, {
                               defaultValue: typeOpt.label,
                             })}
                           </SelectItem>
@@ -395,40 +406,40 @@ export function TruckForm({
                 )}
               />
             )}
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.status.label")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isLoading}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Vehicles.form.status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(VehicleStatus).map((typeOpt) => (
+                          <SelectItem key={typeOpt} value={typeOpt}>
+                            {t(`Vehicles.form.status.${typeOpt}`, {
+                              defaultValue: typeOpt,
+                            })}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Trucks.form.status.label")}</FormLabel>
-                <FormControl>
-                  <Select
-                    dir={lang === "ar" ? "rtl" : "ltr"}
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={isLoading}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("Trucks.form.status.placeholder")} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {Object.values(VehicleStatus).map((typeOpt) => (
-                        <SelectItem key={typeOpt} value={typeOpt}>
-                          {t(`Trucks.form.status.${typeOpt}`, {
-                            defaultValue: typeOpt,
-                          })}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
       </form>
     </Form>

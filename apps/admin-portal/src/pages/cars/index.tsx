@@ -178,7 +178,7 @@ export default function CarsPage() {
   );
 }
 
-CarsPage.messages = ["Pages", "Cars", "Notes", "Forms", "General"];
+CarsPage.messages = ["Pages", "Cars", "Vehicles", "Notes", "Forms", "General"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

@@ -264,7 +264,7 @@ export const generateDummyData = () => {
       fakeExpenseCategories[Math.floor(Math.random() * fakeExpenseCategories.length)],
     randomString: Math.random().toString(36).substring(2, 15),
 
-    randomNumber: Math.floor(Math.random() * 1000000),
+    randomNumber: (length: number) => Math.floor(Math.random() * 10 ** length),
     randomDate: generateRandomDate(),
     employee_status: fakeEmployeeStatus[Math.floor(Math.random() * fakeEmployeeStatus.length)],
     employee_department:
