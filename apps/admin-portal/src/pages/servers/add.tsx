@@ -61,7 +61,7 @@ export default function AddServerPage() {
   );
 }
 
-AddServerPage.messages = ["Notes", "Pages", "Servers", "General"];
+AddServerPage.messages = ["Notes", "Forms", "Pages", "Servers", "General"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

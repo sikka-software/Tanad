@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
 import { Combobox } from "@root/src/components/ui/combobox";
+import CountryInput from "@root/src/components/ui/country-input";
 import { countries } from "@root/src/lib/constants/countries";
 import { getNotesValue } from "@root/src/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
@@ -208,29 +209,17 @@ export function ServerForm({
                 <FormItem>
                   <FormLabel>{t("Servers.form.location.label")}</FormLabel>
                   <FormControl>
-                    <Combobox
-                      dir={lang === "ar" ? "rtl" : "ltr"}
-                      data={countries || []}
-                      labelKey="label"
-                      inputProps={{ disabled: isLoading }}
-                      valueKey="value"
-                      value={field.value}
-                      texts={{
-                        placeholder: t("Servers.form.location.placeholder"),
-                        searchPlaceholder: t("Servers.form.location.search_placeholder"),
-                        noItems: t("Servers.form.location.no_items"),
-                      }}
-                      renderOption={(item) => (
-                        <div>
-                          {t(`Forms.Country.${item.label.toLowerCase().split(" ").join("_")}`)}
-                        </div>
-                      )}
-                      renderSelected={(item) => (
-                        <div>
-                          {t(`Forms.Country.${item.label.toLowerCase().split(" ").join("_")}`)}
-                        </div>
-                      )}
+                    <CountryInput
+                      value={field.value ?? ""}
                       onChange={field.onChange}
+                      disabled={isLoading}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      ariaInvalid={false}
+                      texts={{
+                        placeholder: t("Forms.country.placeholder"),
+                        searchPlaceholder: t("Forms.country.search_placeholder"),
+                        noItems: t("Forms.country.no_items"),
+                      }}
                     />
                   </FormControl>
                   <FormMessage />

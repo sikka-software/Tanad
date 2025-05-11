@@ -133,7 +133,7 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
                   {selectedItem
                     ? renderSelected
                       ? renderSelected(selectedItem)
-                      : getProperty(selectedItem, labelKey)
+                      : getProperty(selectedItem, dir === "rtl" ? "arabic_label" : "label")
                     : props.texts?.placeholder || ". . ."}
 
                   <svg
@@ -175,7 +175,9 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
                       if (!item) return 0;
                       const searchNorm = (search || "").trim().toLowerCase();
                       const label = getProperty(item, "label")?.toString().toLowerCase();
-                      const arabicLabel = getProperty(item, "arabic_label")?.toString().toLowerCase();
+                      const arabicLabel = getProperty(item, "arabic_label")
+                        ?.toString()
+                        .toLowerCase();
                       if (
                         (label && label.includes(searchNorm)) ||
                         (arabicLabel && arabicLabel.includes(searchNorm))
@@ -231,7 +233,9 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
                       >
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      {renderOption ? renderOption(item) : getProperty(item, labelKey)}
+                      {renderOption
+                        ? renderOption(item)
+                        : getProperty(item, dir === "rtl" ? "arabic_label" : "label")}
                     </CommandItem>
                   ))}
                 </CommandGroup>
