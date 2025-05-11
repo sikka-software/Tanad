@@ -53,6 +53,65 @@ export type Database = {
           },
         ]
       }
+      bank_accounts: {
+        Row: {
+          account_number: string | null
+          account_type: string | null
+          bank_name: string
+          created_at: string | null
+          enterprise_id: string
+          iban: string
+          id: string
+          name: string
+          notes: Json | null
+          routing_number: string | null
+          status: string
+          swift_bic: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          account_number?: string | null
+          account_type?: string | null
+          bank_name: string
+          created_at?: string | null
+          enterprise_id: string
+          iban: string
+          id?: string
+          name: string
+          notes?: Json | null
+          routing_number?: string | null
+          status: string
+          swift_bic?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          account_number?: string | null
+          account_type?: string | null
+          bank_name?: string
+          created_at?: string | null
+          enterprise_id?: string
+          iban?: string
+          id?: string
+          name?: string
+          notes?: Json | null
+          routing_number?: string | null
+          status?: string
+          swift_bic?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_accounts_enterprise_id_enterprises_id_fk"
+            columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "enterprises"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       branches: {
         Row: {
           additional_number: string | null

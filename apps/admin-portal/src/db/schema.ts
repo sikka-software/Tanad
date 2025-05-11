@@ -1562,6 +1562,50 @@ export const cars = pgTable(
   ],
 );
 
+export const bank_accounts = pgTable(
+  "bank_accounts",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    name: text().notNull(),
+    account_number: text(),
+    account_type: text(),
+    routing_number: text(),
+    iban: text().notNull(),
+    swift_bic: text(),
+    bank_name: text().notNull(),
+    status: text().notNull(),
+    notes: jsonb(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+  },
+  (table) => [
+    index("bank_accounts_enterprise_id_idx").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("bank_accounts_user_id_idx").using(
+      "btree",
+      table.user_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "bank_accounts_enterprise_id_enterprises_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.user_id],
+      foreignColumns: [usersInAuth.id],
+      name: "bank_accounts_user_id_users_id_fk",
+    }),
+    unique("bank_accounts_enterprise_id_name_unique").on(table.name, table.enterprise_id),
+  ],
+);
+
 export const domains = pgTable(
   "domains",
   {
