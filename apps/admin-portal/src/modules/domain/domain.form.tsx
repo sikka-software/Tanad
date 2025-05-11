@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import BooleanTabs from "@root/src/components/ui/boolean-tabs";
 import { CurrencyInput } from "@root/src/components/ui/currency-input";
 import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
@@ -262,17 +263,15 @@ export function DomainForm({
                 <FormItem>
                   <FormLabel>{t("Domains.form.status.label")}</FormLabel>
                   <FormControl>
-                    <Select dir={lang === "ar" ? "rtl" : "ltr"} {...field} disabled={isLoading}>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("Domains.form.status.placeholder")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="active">{t("Domains.form.status.active")}</SelectItem>
-                        <SelectItem value="inactive">
-                          {t("Domains.form.status.inactive")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <BooleanTabs
+                      trueText={t("Domains.form.status.active")}
+                      falseText={t("Domains.form.status.inactive")}
+                      value={field.value === "active"}
+                      onValueChange={(newValue) => {
+                        field.onChange(newValue ? "active" : "inactive");
+                      }}
+                      listClassName="w-full"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

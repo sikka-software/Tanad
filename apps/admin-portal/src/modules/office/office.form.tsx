@@ -337,25 +337,6 @@ export function OfficeForm({
                         }}
                         listClassName="w-full"
                       />
-                      {/* <CommandSelect
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={[
-                          { label: t("Offices.form.status.active"), value: "active" },
-                          { label: t("Offices.form.status.inactive"), value: "inactive" },
-                        ]}
-                        isLoading={false}
-                        defaultValue={field.value || ""}
-                        onChange={(value) => {
-                          field.onChange(value || null);
-                        }}
-                        texts={{
-                          placeholder: t("Offices.form.status.placeholder"),
-                        }}
-                        renderOption={(item) => {
-                          return <div>{item.label}</div>;
-                        }}
-                        ariaInvalid={!!form.formState.errors.status}
-                      /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import BooleanTabs from "@root/src/components/ui/boolean-tabs";
 import NumberInputWithButtons from "@root/src/components/ui/number-input-buttons";
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2, ShoppingCart, Store, Warehouse } from "lucide-react";
@@ -388,26 +389,47 @@ export function JobForm({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="salary"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Jobs.form.salary.label")}</FormLabel>
-                <FormControl>
-                  <CurrencyInput
-                    showCommas={true}
-                    value={field.value ? parseFloat(field.value) : undefined}
-                    onChange={(value) => field.onChange(value?.toString() || "")}
-                    placeholder={t("Jobs.form.salary.placeholder")}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="salary"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Jobs.form.salary.label")}</FormLabel>
+                  <FormControl>
+                    <CurrencyInput
+                      showCommas={true}
+                      value={field.value ? parseFloat(field.value) : undefined}
+                      onChange={(value) => field.onChange(value?.toString() || "")}
+                      placeholder={t("Jobs.form.salary.placeholder")}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Jobs.form.status.label")} *</FormLabel>
+                  <BooleanTabs
+                    trueText={t("Jobs.form.status.active")}
+                    falseText={t("Jobs.form.status.inactive")}
+                    value={field.value === "active"}
+                    onValueChange={(newValue) => {
+                      field.onChange(newValue ? "active" : "inactive");
+                    }}
+                    listClassName="w-full"
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
             name="description"
@@ -476,21 +498,6 @@ export function JobForm({
                   />
                 </FormControl>
                 <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">{t("Jobs.form.status.label")}</FormLabel>
-                </div>
-                <FormControl>
-                  <Switch checked={field.value === "active"} onCheckedChange={field.onChange} />
-                </FormControl>
               </FormItem>
             )}
           />

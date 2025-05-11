@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
+import BooleanTabs from "@root/src/components/ui/boolean-tabs";
 import { Combobox } from "@root/src/components/ui/combobox";
 import { E_COMMERCE_PLATFORMS } from "@root/src/lib/constants";
 import { getNotesValue } from "@root/src/lib/utils";
@@ -189,22 +190,15 @@ export function OnlineStoreForm({
               <FormItem>
                 <FormLabel>{t("OnlineStores.form.status.label")}</FormLabel>
                 <FormControl>
-                  <Select
-                    dir={lang === "ar" ? "rtl" : "ltr"}
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={isLoading}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("OnlineStores.form.status.placeholder")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">{t("OnlineStores.form.status.active")}</SelectItem>
-                      <SelectItem value="inactive">
-                        {t("OnlineStores.form.status.inactive")}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <BooleanTabs
+                    trueText={t("OnlineStores.form.status.active")}
+                    falseText={t("OnlineStores.form.status.inactive")}
+                    value={field.value === "active"}
+                    onValueChange={(newValue) => {
+                      field.onChange(newValue ? "active" : "inactive");
+                    }}
+                    listClassName="w-full"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

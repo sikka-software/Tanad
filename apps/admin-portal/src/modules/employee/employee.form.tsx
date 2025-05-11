@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import NotesSection from "@root/src/components/forms/notes-section";
+import BooleanTabs from "@root/src/components/ui/boolean-tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@root/src/components/ui/tooltip";
 import { getNotesValue } from "@root/src/lib/utils";
 import { PlusCircle, Trash2Icon } from "lucide-react";
@@ -443,27 +444,15 @@ export function EmployeeForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("Employees.form.status.label")} *</FormLabel>
-                    <Select
-                      dir={locale === "ar" ? "rtl" : "ltr"}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={isEmployeeSaving}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t("Employees.form.status.placeholder")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="active">{t("Employees.form.status.active")}</SelectItem>
-                        <SelectItem value="inactive">
-                          {t("Employees.form.status.inactive")}
-                        </SelectItem>
-                        <SelectItem value="on_leave">
-                          {t("Employees.form.status.on_leave")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <BooleanTabs
+                      trueText={t("Employees.form.status.active")}
+                      falseText={t("Employees.form.status.inactive")}
+                      value={field.value === "active"}
+                      onValueChange={(newValue) => {
+                        field.onChange(newValue ? "active" : "inactive");
+                      }}
+                      listClassName="w-full"
+                    />
                     <FormMessage />
                   </FormItem>
                 )}

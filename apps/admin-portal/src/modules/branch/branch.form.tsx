@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
+import BooleanTabs from "@root/src/components/ui/boolean-tabs";
 import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
 import { CommandSelect } from "@root/src/components/ui/command-select";
 import { FormDialog } from "@root/src/components/ui/form-dialog";
@@ -332,24 +333,14 @@ export function BranchForm({
                   <FormItem>
                     <FormLabel>{t("Branches.form.status.label")}</FormLabel>
                     <FormControl>
-                      <CommandSelect
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={[
-                          { label: t("Branches.form.status.active"), value: "active" },
-                          { label: t("Branches.form.status.inactive"), value: "inactive" },
-                        ]}
-                        isLoading={false}
-                        defaultValue={field.value || ""}
-                        onChange={(value) => {
-                          field.onChange(value || null);
+                      <BooleanTabs
+                        trueText={t("Branches.form.status.active")}
+                        falseText={t("Branches.form.status.inactive")}
+                        value={field.value === "active"}
+                        onValueChange={(newValue) => {
+                          field.onChange(newValue ? "active" : "inactive");
                         }}
-                        texts={{
-                          placeholder: t("Branches.form.status.placeholder"),
-                        }}
-                        renderOption={(item) => {
-                          return <div>{item.label}</div>;
-                        }}
-                        ariaInvalid={!!form.formState.errors.manager}
+                        listClassName="w-full"
                       />
                     </FormControl>
                     <FormMessage />

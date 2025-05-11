@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
+import BooleanTabs from "@root/src/components/ui/boolean-tabs";
 import { useTranslations, useLocale } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -164,23 +165,18 @@ export function WebsiteForm({
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Websites.form.status.label")} *</FormLabel>
-                  <Select
-                    disabled={isLoading}
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("Websites.form.status.placeholder")} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="active">{t("Websites.form.status.active")}</SelectItem>
-                      <SelectItem value="inactive">{t("Websites.form.status.inactive")}</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>{t("Websites.form.status.label")}</FormLabel>
+                  <FormControl>
+                    <BooleanTabs
+                      trueText={t("Websites.form.status.active")}
+                      falseText={t("Websites.form.status.inactive")}
+                      value={field.value === "active"}
+                      onValueChange={(newValue) => {
+                        field.onChange(newValue ? "active" : "inactive");
+                      }}
+                      listClassName="w-full"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

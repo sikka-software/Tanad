@@ -1,12 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CommandSelect } from "@root/src/components/ui/command-select";
-import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import BooleanTabs from "@/ui/boolean-tabs";
 import { ComboboxAdd } from "@/ui/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
@@ -16,6 +15,8 @@ import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
 import NotesSection from "@/components/forms/notes-section";
 import PhoneInput from "@/components/ui/phone-input";
+
+import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps, CommonStatus } from "@/types/common.type";
 
@@ -286,24 +287,14 @@ export function ClientForm({
                   <FormItem>
                     <FormLabel>{t("Clients.form.status.label")}</FormLabel>
                     <FormControl>
-                      <CommandSelect
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={[
-                          { label: t("Clients.form.status.active"), value: "active" },
-                          { label: t("Clients.form.status.inactive"), value: "inactive" },
-                        ]}
-                        isLoading={false}
-                        defaultValue={field.value || ""}
-                        onChange={(value) => {
-                          field.onChange(value || null);
+                      <BooleanTabs
+                        trueText={t("Clients.form.status.active")}
+                        falseText={t("Clients.form.status.inactive")}
+                        value={field.value === "active"}
+                        onValueChange={(newValue) => {
+                          field.onChange(newValue ? "active" : "inactive");
                         }}
-                        texts={{
-                          placeholder: t("Clients.form.status.placeholder"),
-                        }}
-                        renderOption={(item) => {
-                          return <div>{item.label}</div>;
-                        }}
-                        // ariaInvalid={!!form.formState.errors.manager}
+                        listClassName="w-full"
                       />
                     </FormControl>
                     <FormMessage />
