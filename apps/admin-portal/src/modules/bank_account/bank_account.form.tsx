@@ -1,262 +1,452 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-import type React from "react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import * as z from "zod";
-
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import CountryInput from "@root/src/components/ui/country-input";
+import { CurrencyInput } from "@root/src/components/ui/currency-input";
+import NumberInput from "@root/src/components/ui/number-input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+} from "@root/src/components/ui/select";
+import { getNotesValue } from "@root/src/lib/utils";
+import { useLocale, useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Account name must be at least 2 characters.",
-  }),
-  account_number: z.string().optional(),
-  account_type: z.string().optional(),
-  routing_number: z.string().optional(),
-  iban: z.string().min(1, {
-    message: "IBAN is required.",
-  }),
-  swift_bic: z.string().optional(),
-  bank_name: z.string().min(1, {
-    message: "Bank name is required.",
-  }),
-  status: z.string({
-    required_error: "Please select a status.",
-  }),
-  notes: z.string().optional(),
-});
+import DigitsInput from "@/ui/digits-input";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { Input } from "@/ui/input";
 
-type FormValues = z.infer<typeof formSchema>;
+import { ModuleFormProps } from "@/types/common.type";
+import { VehicleStatus } from "@/types/common.type";
 
-export function AddBankAccountDialog({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+import useUserStore from "@/stores/use-user-store";
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+import { VEHICLE_OWNERSHIP_STATUSES } from "../employee/employee.options";
+import { useCreateCar, useUpdateCar } from "./car.hooks";
+import useCarStore from "./car.store";
+import { CarUpdateData, CarCreateData } from "./car.type";
+
+export const createCarSchema = (t: (key: string) => string) => {
+  const baseCarSchema = z.object({
+    name: z.string().min(1, t("Cars.form.name.required")),
+    make: z.string().optional().or(z.literal("")),
+    model: z.string().optional().or(z.literal("")),
+    year: z.number({
+      invalid_type_error: t("Forms.must_be_number"),
+      message: t("Forms.must_be_number"),
+    }),
+    color: z.string().optional().or(z.literal("")),
+    vin: z.string().optional().or(z.literal("")),
+    code: z.string().optional().or(z.literal("")),
+    license_country: z.string().optional().or(z.literal("")),
+    license_plate: z.string().optional().or(z.literal("")),
+    ownership_status: z.string().optional().or(z.literal("")),
+    monthly_payment: z.string().optional().or(z.literal("")),
+    status: z.enum(VehicleStatus).optional().or(z.literal("")),
+    notes: z.any().optional().nullable(),
+  });
+
+  return baseCarSchema;
+};
+
+export type CarFormValues = z.input<ReturnType<typeof createCarSchema>>;
+
+export interface CarFormProps {
+  id?: string;
+  onSuccess?: () => void;
+  defaultValues?: CarUpdateData | null;
+  editMode?: boolean;
+}
+
+export function CarForm({
+  formHtmlId,
+  onSuccess,
+  defaultValues,
+  editMode,
+}: ModuleFormProps<CarUpdateData | CarCreateData>) {
+  const t = useTranslations();
+  const lang = useLocale();
+
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+
+  const { mutate: createCar } = useCreateCar();
+  const { mutate: updateCar } = useUpdateCar();
+
+  const isLoading = useCarStore((state) => state.isLoading);
+  const setIsLoading = useCarStore((state) => state.setIsLoading);
+
+  const form = useForm<CarFormValues>({
+    resolver: zodResolver(createCarSchema(t)),
     defaultValues: {
-      name: "",
-      account_number: "",
-      account_type: "",
-      routing_number: "",
-      iban: "",
-      swift_bic: "",
-      bank_name: "",
-      status: "active",
-      notes: "",
+      name: defaultValues?.name || "",
+      make: defaultValues?.make || "",
+      model: defaultValues?.model || "",
+      year: defaultValues?.year,
+      color: defaultValues?.color || "",
+      vin: defaultValues?.vin || "",
+      code: defaultValues?.code || "",
+      license_country: defaultValues?.license_country || "",
+      license_plate: defaultValues?.license_plate || "",
+      ownership_status: defaultValues?.ownership_status || "",
+      monthly_payment: defaultValues?.monthly_payment?.toString() || "",
+      status: defaultValues?.status || "",
+      notes: getNotesValue(defaultValues),
     },
   });
 
-  async function onSubmit(values: FormValues) {
-    setIsSubmitting(true);
-    try {
-      // In a real app, you would pass user_id and enterprise_id from auth context
-      // await createBankAccount({
-      //   ...values,
-      //   user_id: "00000000-0000-0000-0000-000000000000", // Replace with actual user_id
-      //   enterprise_id: "00000000-0000-0000-0000-000000000000", // Replace with actual enterprise_id
-      //   notes: values.notes ? JSON.parse(`{"content": "${values.notes}"}`) : null,
-      // });
-
-      // toast({
-      //   title: "Account created",
-      //   description: "Your bank account has been successfully added.",
-      // });
-
-      form.reset();
-      setOpen(false);
-    } catch (error) {
-      console.error("Error creating bank account:", error);
-      // toast({
-      //   title: "Error",
-      //   description: "Failed to create bank account. Please try again.",
-      //   variant: "destructive",
-      // });
-    } finally {
-      setIsSubmitting(false);
+  const handleSubmit = async (data: CarFormValues) => {
+    setIsLoading(true);
+    if (!user?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      return;
     }
+
+    try {
+      if (editMode) {
+        await updateCar(
+          {
+            id: defaultValues?.id || "",
+            data: {
+              name: data.name.trim(),
+              make: data.make?.trim() || "",
+              model: data.model?.trim() || "",
+              year: data.year,
+              color: data.color?.trim() || "",
+              vin: data.vin?.trim() || "",
+              code: data.code?.trim() || "",
+              notes: data.notes || "",
+              license_country: data.license_country?.trim() || "",
+              license_plate: data.license_plate?.trim() || "",
+              status: data.status === "" ? null : data.status,
+              ownership_status: data.ownership_status?.trim() || "",
+              monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
+            },
+          },
+          {
+            onSuccess: async (response) => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      } else {
+        await createCar(
+          {
+            name: data.name.trim(),
+            make: data.make?.trim() || "",
+            model: data.model?.trim() || "",
+            year: data.year,
+            color: data.color?.trim() || "",
+            vin: data.vin?.trim() || "",
+            code: data.code?.trim() || "",
+            license_country: data.license_country?.trim() || "",
+            license_plate: data.license_plate?.trim() || "",
+            ownership_status: data.ownership_status?.trim() || "",
+            monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
+            status: data.status === "" ? null : data.status,
+            notes: data.notes || "",
+            user_id: user?.id || "",
+            enterprise_id: enterprise?.id || "",
+          },
+
+          {
+            onSuccess: async (response) => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Failed to save car:", error);
+      toast.error(t("General.error_operation"), {
+        description: t("Cars.error.create"),
+      });
+    }
+  };
+
+  // Expose form methods for external use (like dummy data)
+  if (typeof window !== "undefined") {
+    (window as any).carForm = form;
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Account Name*</FormLabel>
-                <FormControl>
-                  <Input placeholder="Primary Checking" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="bank_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Bank Name*</FormLabel>
-                <FormControl>
-                  <Input placeholder="Bank of America" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="account_number"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Account Number</FormLabel>
-                <FormControl>
-                  <Input placeholder="123456789" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="account_type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Account Type</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className="form-container">
+          <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Cars.form.code.label")}</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select account type" />
-                    </SelectTrigger>
+                    <Input
+                      placeholder={t("Cars.form.code.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="checking">Checking</SelectItem>
-                    <SelectItem value="savings">Savings</SelectItem>
-                    <SelectItem value="business">Business</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="routing_number"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Routing Number</FormLabel>
-                <FormControl>
-                  <Input placeholder="987654321" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="iban"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>IBAN*</FormLabel>
-                <FormControl>
-                  <Input placeholder="DE89 3704 0044 0532 0130 00" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="swift_bic"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>SWIFT/BIC</FormLabel>
-                <FormControl>
-                  <Input placeholder="DEUTDEFF" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Status*</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Cars.form.name.label")} *</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
+                    <Input
+                      placeholder={t("Cars.form.name.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="make"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.make.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Vehicles.form.make.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="model"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.model.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Vehicles.form.model.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="year"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.year.label")}</FormLabel>
+                  <FormControl>
+                    <NumberInput
+                      placeholder={t("Vehicles.form.year.placeholder")}
+                      disabled={isLoading}
+                      maxLength={4}
+                      value={field.value === undefined || field.value === null ? "" : field.value}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        field.onChange(val === "" ? undefined : Number(val));
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="color"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.color.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Vehicles.form.color.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <FormField
+            control={form.control}
+            name="vin"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Vehicles.form.vin.label")}</FormLabel>
+                <FormControl>
+                  <DigitsInput disabled={isLoading} {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+          <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="license_country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.license_country.label")}</FormLabel>
+                  <FormControl>
+                    <CountryInput
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      disabled={isLoading}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      ariaInvalid={false}
+                      texts={{
+                        placeholder: t("Forms.country.placeholder"),
+                        searchPlaceholder: t("Forms.country.search_placeholder"),
+                        noItems: t("Forms.country.no_items"),
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="license_plate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.license_plate.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Vehicles.form.license_plate.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="ownership_status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.ownership_status.label")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isLoading}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={t("Vehicles.form.ownership_status.placeholder")}
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {VEHICLE_OWNERSHIP_STATUSES.map((typeOpt) => (
+                          <SelectItem key={typeOpt.value} value={typeOpt.value}>
+                            {t(`Vehicles.form.ownership_status.${typeOpt.value}`, {
+                              defaultValue: typeOpt.label,
+                            })}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {form.watch("ownership_status") === "financed" && (
+              <FormField
+                control={form.control}
+                name="monthly_payment"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Cars.form.monthly_payment.label")}</FormLabel>
+                    <FormControl>
+                      <CurrencyInput
+                        placeholder={t("Cars.form.monthly_payment.placeholder")}
+                        disabled={isLoading}
+                        {...field}
+                        showCommas={true}
+                        value={field.value ? parseFloat(String(field.value)) : undefined}
+                        onChange={(value) => field.onChange(value?.toString() || "")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.status.label")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isLoading}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Vehicles.form.status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(VehicleStatus).map((typeOpt) => (
+                          <SelectItem key={typeOpt} value={typeOpt}>
+                            {t(`Vehicles.form.status.${typeOpt}`, {
+                              defaultValue: typeOpt,
+                            })}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Notes</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Additional information about this account" {...field} />
-              </FormControl>
-              <FormDescription>Any additional details about this bank account.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Account"}
-          </Button>
-        </DialogFooter>
       </form>
     </Form>
   );

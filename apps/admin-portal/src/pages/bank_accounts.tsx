@@ -1,41 +1,25 @@
-import { Button } from "@excalidraw/excalidraw/components/Button";
-import DomainCard from "@root/src/modules/domain/domain.card";
-import { DomainForm } from "@root/src/modules/domain/domain.form";
-import {
-  useDomains,
-  useBulkDeleteDomains,
-  useDuplicateDomain,
-} from "@root/src/modules/domain/domain.hooks";
-import useDomainStore from "@root/src/modules/domain/domain.store";
-import DomainsTable from "@root/src/modules/domain/domain.table";
-import { DomainUpdateData } from "@root/src/modules/domain/domain.type";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
-import DataModelList from "@/ui/data-model-list";
 import { FormDialog } from "@/ui/form-dialog";
-import NoPermission from "@/ui/no-permission";
-import PageSearchAndFilter from "@/ui/page-search-and-filter";
-import SelectionMode from "@/ui/selection-mode";
 
-import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import useBankAccountStore from "@/modules/bank_account/bank_account.store";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/domain/domain.options";
-import useUserStore from "@/stores/use-user-store";
 
+import { Button } from "../components/ui/button";
 import PageTitle from "../components/ui/page-title";
+import { BankAccountForm } from "../modules/bank_account/bank_account.form";
 import { useBankAccounts, useDeleteBankAccount } from "../modules/bank_account/bank_account.hooks";
 import { BankAccountsTable } from "../modules/bank_account/bank_account.table";
+import { BankAccount } from "../modules/bank_account/bank_account.type";
 
 export default function BankAccountsPage() {
   const t = useTranslations();
@@ -73,11 +57,11 @@ export default function BankAccountsPage() {
         />
 
         <div>
-          <BankAccountsTable
-            data={bankAccounts}
+          {/* <BankAccountsTable
+            data={bankAccounts as BankAccount[]}
             isLoading={loadingFetchBankAccounts}
             error={error as Error | null}
-          />
+          /> */}
         </div>
 
         <FormDialog
@@ -110,14 +94,14 @@ export default function BankAccountsPage() {
   );
 }
 
-DomainsPage.messages = ["Pages", "Domains", "Notes", "General"];
+BankAccountsPage.messages = ["Pages", "BankAccounts", "Notes", "General"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        DomainsPage.messages,
+        (await import(`../../locales/${locale}.json`)).default,
+        BankAccountsPage.messages,
       ),
     },
   };
