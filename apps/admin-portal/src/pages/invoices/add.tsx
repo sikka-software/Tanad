@@ -2,7 +2,6 @@ import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { toast } from "sonner";
 
 import PageTitle from "@/ui/page-title";
 
@@ -22,9 +21,6 @@ export default function AddInvoicePage() {
   const onAddSuccess = () => {
     setIsLoading(false);
     router.push("/invoices");
-    toast.success(t("General.successful_operation"), {
-      description: t("Invoices.success.create"),
-    });
   };
 
   return (
@@ -47,7 +43,17 @@ export default function AddInvoicePage() {
   );
 }
 
-AddInvoicePage.messages = ["Notes", "Pages", "Invoices", "ProductsFormSection", "General"];
+AddInvoicePage.messages = [
+  "Notes",
+  "Pages",
+  "Invoices",
+  "Clients",
+  "Companies",
+  "Forms",
+  "Products",
+  "ProductsFormSection",
+  "General",
+];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

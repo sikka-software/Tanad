@@ -3,7 +3,6 @@ import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -155,9 +154,6 @@ export default function InvoicesPage() {
               setIsFormDialogOpen(false);
               setActionableInvoice(null);
               setLoadingSaveInvoice(false);
-              toast.success(t("General.successful_operation"), {
-                description: t("Invoices.success.update"),
-              });
             }}
             defaultValues={actionableInvoice}
             editMode={true}
@@ -177,7 +173,17 @@ export default function InvoicesPage() {
   );
 }
 
-InvoicesPage.messages = ["Notes", "Pages", "Invoices", "General", "ProductsFormSection"];
+InvoicesPage.messages = [
+  "Notes",
+  "Pages",
+  "Clients",
+  "Companies",
+  "Invoices",
+  "Forms",
+  "General",
+  "Products",
+  "ProductsFormSection",
+];
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {

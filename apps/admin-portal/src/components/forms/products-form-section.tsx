@@ -46,7 +46,6 @@ interface Product {
   price: number;
   // Add other fields if necessary for handleProductSelection or other logic
 }
-type ItemsFieldArray = FieldArrayWithId<FormValues, "items", "id">[];
 
 // --- Product Row Component ---
 interface ProductRowProps {
@@ -83,7 +82,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
     t,
     canDelete,
   }) => {
-    const currency = useUserStore((state) => state.profile?.user_settings.currency);
+    const currency = useUserStore((state) => state.profile?.user_settings?.currency);
     const quantity = useWatch({ control, name: `items.${index}.quantity` });
     const unitPrice = useWatch({ control, name: `items.${index}.unit_price` });
 

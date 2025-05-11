@@ -121,7 +121,11 @@ export default function Auth() {
           id: data.user.id,
           email: data.user.email,
           full_name: email.split("@")[0], // Placeholder name
-          stripe_customer_id: customerId, // Store customer ID in profile
+          stripe_customer_id: customerId,
+          user_settings: {
+            currency: "sar",
+            calendar: "gregorian",
+          },
         });
 
         if (profileError) {

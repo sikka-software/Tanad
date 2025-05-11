@@ -45,9 +45,9 @@ export function useCreateClient() {
     mutationFn: (newClient: ClientCreateData) => createClient(newClient),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Clients.success.create"),
-      });
+      // toast.success(t("General.successful_operation"), {
+      //   description: t("Clients.success.create"),
+      // });
     },
   });
 }
@@ -61,9 +61,9 @@ export function useUpdateClient() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: clientKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Clients.success.update"),
-      });
+      // toast.success(t("General.successful_operation"), {
+      //   description: t("Clients.success.update"),
+      // });
     },
   });
 }

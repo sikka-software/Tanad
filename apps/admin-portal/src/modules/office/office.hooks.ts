@@ -75,9 +75,9 @@ export function useUpdateOffice() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: officeKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Offices.success.update"),
-      });
+      // toast.success(t("General.successful_operation"), {
+      //   description: t("Offices.success.update"),
+      // });
     },
     onError: (error) => {
       toast.error(t("General.error_operation"), {

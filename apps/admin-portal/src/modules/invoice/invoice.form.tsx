@@ -28,9 +28,13 @@ import { useInvoices } from "@/modules/invoice/invoice.hooks";
 import { InvoiceUpdateData, InvoiceCreateData, InvoiceItem } from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
+import { useClients } from "../client/client.hooks";
+import useClientStore from "../client/client.store";
 import { useCreateInvoice, useUpdateInvoice } from "../invoice/invoice.hooks";
 import useInvoiceStore from "../invoice/invoice.store";
 import { ProductForm } from "../product/product.form";
+import { useProducts } from "../product/product.hooks";
+import useProductStore from "../product/product.store";
 
 const createInvoiceSchema = (t: (key: string) => string) =>
   z.object({
@@ -78,18 +82,21 @@ export function InvoiceForm({
   const t = useTranslations();
   const locale = useLocale();
   const { profile, membership } = useUserStore();
-  const { mutateAsync: createInvoice, isPending: isCreating } = useCreateInvoice();
-  const { mutateAsync: updateInvoice, isPending: isUpdating } = useUpdateInvoice();
+  const { mutateAsync: createInvoice } = useCreateInvoice();
+  const { mutateAsync: updateInvoice } = useUpdateInvoice();
 
-  const supabase = createClient();
-  const router = useRouter();
+  const isProductSaving = useProductStore((state) => state.isLoading);
+  const setIsProductSaving = useProductStore((state) => state.setIsLoading);
+
+  const isClientSaving = useClientStore((state) => state.isLoading);
+  const setIsClientSaving = useClientStore((state) => state.setIsLoading);
+
   const { data: invoices } = useInvoices();
-  const [loading, setLoading] = useState(false);
-  const [clients, setClients] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [clientsLoading, setClientsLoading] = useState(true);
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
+
+  const { data: products, isLoading: productsLoading } = useProducts();
+  const { data: clients, isLoading: clientsLoading } = useClients();
 
   const isLoading = useInvoiceStore((state) => state.isLoading);
   const setIsLoading = useInvoiceStore((state) => state.setIsLoading);
@@ -129,34 +136,6 @@ export function InvoiceForm({
     defaultValues: formDefaultValues,
   });
 
-  useEffect(() => {
-    // Get the current user ID and fetch clients
-    const getClients = async () => {
-      setClientsLoading(true);
-
-      // Fetch clients
-      try {
-        const { data, error } = await supabase
-          .from("clients")
-          .select("id, name, company")
-          .order("name");
-
-        if (error) throw error;
-
-        setClients(data || []);
-      } catch (error) {
-        console.error("Error fetching clients:", error);
-        toast.error(t("General.error_operation"), {
-          description: t("General.error_load_clients"),
-        });
-      } finally {
-        setClientsLoading(false);
-      }
-    };
-
-    getClients();
-  }, [t, supabase]);
-
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "items",
@@ -181,7 +160,7 @@ export function InvoiceForm({
   }, [watchedItems, form]);
 
   const handleProductSelection = (index: number, product_id: string) => {
-    const selectedProduct = products.find((product) => product.id === product_id);
+    const selectedProduct = products?.find((product) => product.id === product_id);
     if (selectedProduct) {
       form.setValue(`items.${index}.unit_price`, selectedProduct.price);
       form.setValue(`items.${index}.description`, selectedProduct.description || "");
@@ -270,7 +249,7 @@ export function InvoiceForm({
   }
 
   // Format clients for ComboboxAdd
-  const clientOptions = clients.map((client) => ({
+  const clientOptions = clients?.map((client) => ({
     label: client.company ? `${client.name} (${client.company})` : client.name,
     value: client.id,
   }));
@@ -289,7 +268,8 @@ export function InvoiceForm({
                     <FormLabel>{t("Invoices.form.client.label")} *</FormLabel>
                     <FormControl>
                       <ComboboxAdd
-                        data={clientOptions}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        data={clientOptions || []}
                         isLoading={clientsLoading}
                         defaultValue={field.value}
                         onChange={(value) => field.onChange(value || null)}
@@ -334,7 +314,7 @@ export function InvoiceForm({
                         <Input
                           placeholder={t("Invoices.form.invoice_number.placeholder")}
                           {...field}
-                          disabled={loading}
+                          disabled={isLoading}
                         />
                       </CodeInput>
                     </FormControl>
@@ -473,7 +453,7 @@ export function InvoiceForm({
             onAddNewProduct={() => setIsNewProductDialogOpen(true)}
             handleProductSelection={handleProductSelection}
             title={t("ProductsFormSection.title")}
-            isLoading={loading}
+            isLoading={isLoading}
             isError={form.formState.errors.items as FieldError}
           />
           <NotesSection
@@ -491,8 +471,16 @@ export function InvoiceForm({
         formId="client-form"
         cancelText={t("cancel")}
         submitText={t("save")}
+        loadingSave={isClientSaving}
       >
-        <ClientForm formHtmlId="client-form" nestedForm />
+        <ClientForm
+          formHtmlId="client-form"
+          nestedForm
+          onSuccess={() => {
+            setIsDialogOpen(false);
+            setIsClientSaving(false);
+          }}
+        />
       </FormDialog>
       <FormDialog
         open={isNewProductDialogOpen}
@@ -501,8 +489,16 @@ export function InvoiceForm({
         formId="product-form"
         cancelText={t("cancel")}
         submitText={t("save")}
+        loadingSave={isProductSaving}
       >
-        <ProductForm formHtmlId="product-form" nestedForm />
+        <ProductForm
+          formHtmlId="product-form"
+          nestedForm
+          onSuccess={() => {
+            setIsNewProductDialogOpen(false);
+            setIsProductSaving(false);
+          }}
+        />
       </FormDialog>
     </>
   );
