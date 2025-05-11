@@ -111,7 +111,7 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
   }, [user, refreshData]);
 
   // Add handler for cancel subscription
-  const handleCancelSubscription = async (cancelAtPeriodEnd: boolean = true) => {
+  const handleCancelSubscription = async () => {
     if (!subscription.id) {
       toast.error(
         t("Billing.no_active_subscription", { fallback: "No active subscription to cancel" }),
@@ -121,18 +121,14 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
 
     setIsCanceling(true);
     try {
-      const response = await subscription.cancelSubscription(cancelAtPeriodEnd);
+      const response = await subscription.cancelSubscription();
 
       if (response.success) {
         toast.success(
-          cancelAtPeriodEnd
-            ? t("Billing.cancel_subscription.cancel_success", {
-                fallback:
-                  "Your subscription has been canceled and will end at the end of your billing period",
-              })
-            : t("Billing.cancel_subscription.immediate_cancel_success", {
-                fallback: "Your subscription has been canceled immediately",
-              }),
+          t("Billing.cancel_subscription.cancel_success", {
+            fallback:
+              "Your subscription has been canceled and will end at the end of your billing period",
+          }),
         );
 
         // Refresh data to update UI
