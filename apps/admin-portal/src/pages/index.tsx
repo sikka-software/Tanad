@@ -50,7 +50,7 @@ export default function LandingPage() {
   );
 }
 
-LandingPage.messages = ["Pages", "General", "Landing"];
+LandingPage.messages = ["Pages", "General", "Landing", "SEO"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
