@@ -148,9 +148,11 @@ function AppContent({ Component, pageProps, router }: AppProps) {
         timeZone="Asia/Riyadh"
         now={new Date()}
       >
-        <AppLayout>
-          <Component {...pageProps} />
-        </AppLayout>
+        <QueryProvider>
+          <AppLayout>
+            <Component {...pageProps} />
+          </AppLayout>
+        </QueryProvider>
       </NextIntlClientProvider>
     </div>
   );
@@ -159,10 +161,8 @@ function AppContent({ Component, pageProps, router }: AppProps) {
 export default function App(props: AppProps) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <QueryProvider>
-        <AppContent {...props} />
-        {process.env.NODE_ENV === "development" && <DebugTools />}
-      </QueryProvider>
+      <AppContent {...props} />
+      {process.env.NODE_ENV === "development" && <DebugTools />}
     </ThemeProvider>
   );
 }
