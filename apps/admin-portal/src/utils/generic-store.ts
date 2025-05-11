@@ -24,6 +24,7 @@ export function createGenericStore<T extends { id: string }>(
   const actualSearchFilter = searchFilterFn || defaultSearchFilter;
 
   return create<BaseStates<T> & BaseActions<T>>((set, get) => ({
+    dataLength: 0,
     isLoading: false,
     error: null,
     selectedRows: [],
@@ -41,7 +42,7 @@ export function createGenericStore<T extends { id: string }>(
 
     setIsLoading: (isLoading) => set({ isLoading }),
     setError: (error) => set({ error }),
-
+    setDataLength: (dataLength) => set({ dataLength }),
     getFilteredData: (data: T[]) => {
       const { searchQuery, filterConditions, filterCaseSensitive } = get();
 

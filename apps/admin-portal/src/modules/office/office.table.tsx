@@ -1,5 +1,7 @@
+import CodeInput from "@root/src/components/ui/code-input";
 import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
 import { CommandSelect } from "@root/src/components/ui/command-select";
+import { Input } from "@root/src/components/ui/input";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 import { z } from "zod";
@@ -22,6 +24,8 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const t = useTranslations();
   const locale = useLocale();
   const { mutate: updateOffice } = useUpdateOffice();
+
+  const dataLength = useOfficeStore((state) => state.dataLength);
 
   const selectedRows = useOfficeStore((state) => state.selectedRows);
   const setSelectedRows = useOfficeStore((state) => state.setSelectedRows);
@@ -50,6 +54,20 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
     },
     {
       cellType: "code",
+
+      onSerial: () => {
+        const nextNumber = (dataLength || 0) + 1;
+        const paddedNumber = String(nextNumber).padStart(4, "0");
+        // now set the cell value to the padded number
+      },
+      onRandom: () => {
+        const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        let randomCode = "";
+        for (let i = 0; i < 5; i++) {
+          randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+        }
+        // now set the cell value to the random code
+      },
       accessorKey: "code",
       header: t("Offices.form.code.label"),
       validationSchema: z.string().min(1, t("Offices.form.code.required")),

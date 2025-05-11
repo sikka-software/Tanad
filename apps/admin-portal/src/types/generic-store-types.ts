@@ -9,7 +9,8 @@ export type SortRule = {
 };
 
 export type BaseStates<T> = {
-  data?: T[]; // Optional since some stores might manage data externally
+  data?: T[];
+  dataLength?: number;
   isLoading: boolean;
   error: string | null;
   selectedRows: string[];
@@ -26,7 +27,8 @@ export type BaseStates<T> = {
 };
 
 export type BaseActions<T> = {
-  setData?: (data: T[]) => void; // Optional setter for data
+  setData?: (data: T[]) => void;
+  setDataLength?: (dataLength: number) => void;
   setIsLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
   setSelectedRows: (ids: string[]) => void;

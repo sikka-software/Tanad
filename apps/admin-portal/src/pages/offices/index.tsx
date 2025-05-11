@@ -2,7 +2,7 @@ import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -30,6 +30,7 @@ import useUserStore from "@/stores/use-user-store";
 export default function OfficesPage() {
   const t = useTranslations();
   const router = useRouter();
+
   const canReadOffices = useUserStore((state) => state.hasPermission("offices.read"));
   const canCreateOffices = useUserStore((state) => state.hasPermission("offices.create"));
 
@@ -53,6 +54,7 @@ export default function OfficesPage() {
   const filterCaseSensitive = useOfficeStore((state) => state.filterCaseSensitive);
   const getFilteredOffices = useOfficeStore((state) => state.getFilteredData);
   const getSortedOffices = useOfficeStore((state) => state.getSortedData);
+  const setDataLength = useOfficeStore((state) => state.setDataLength);
 
   const { data: offices, isLoading, error } = useOffices();
   const { mutateAsync: deleteOffices, isPending: isDeleting } = useBulkDeleteOffices();
@@ -90,6 +92,12 @@ export default function OfficesPage() {
   if (!canReadOffices) {
     return <NoPermission />;
   }
+
+  useEffect(() => {
+    if (setDataLength) {
+      setDataLength(offices?.length || 0);
+    }
+  }, [offices]);
 
   return (
     <div>

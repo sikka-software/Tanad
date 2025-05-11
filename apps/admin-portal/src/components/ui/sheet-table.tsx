@@ -62,6 +62,9 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   enableEditing?: boolean;
   noPadding?: boolean;
   dir?: "ltr" | "rtl";
+  // For code cellType only:
+  onSerial?: (row: TData) => void;
+  onRandom?: (row: TData) => void;
 };
 
 /**
@@ -907,15 +910,17 @@ function SheetTable<
                   <CodeInput
                     inCell
                     onSerial={() => {
-                      if (onEdit) {
-                        // Example: increment last value or provide a serial logic
+                      if (colDef.onSerial) {
+                        colDef.onSerial(rowData);
+                      } else if (onEdit) {
                         const next = (parseInt(cellValue || "0", 10) + 1).toString();
                         onEdit(rowId, colKey as keyof T, next as T[keyof T]);
                       }
                     }}
                     onRandom={() => {
-                      if (onEdit) {
-                        // Example: random 6-digit code
+                      if (colDef.onRandom) {
+                        colDef.onRandom(rowData);
+                      } else if (onEdit) {
                         const random = Math.floor(100000 + Math.random() * 900000).toString();
                         onEdit(rowId, colKey as keyof T, random as T[keyof T]);
                       }
@@ -923,9 +928,8 @@ function SheetTable<
                   >
                     <Input
                       inCell
-                      contentEditable={colDef.enableEditing !== false ? !isDisabled : false}
-                      suppressContentEditableWarning
                       value={cellValue || ""}
+                      disabled={isDisabled}
                       style={{ minHeight: 36 }}
                       onFocus={(e) => handleCellFocus(e, groupKey, rowData, colDef)}
                       onKeyDown={(e) => {
@@ -940,6 +944,11 @@ function SheetTable<
                       onPaste={(e) => handlePaste(e, colDef)}
                       onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
                       onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
+                      onChange={(e) => {
+                        if (onEdit) {
+                          onEdit(rowId, colKey as keyof T, e.target.value as T[keyof T]);
+                        }
+                      }}
                     />
                   </CodeInput>
                 </TableCell>
