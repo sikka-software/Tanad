@@ -11,6 +11,7 @@ import { DocumentFile } from "@/ui/documents-uploader";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import PhoneInput from "@/ui/phone-input";
+import DigitsInput from "@/ui/digits-input";
 
 import { AddressFormSection } from "@/forms/address-form-section";
 import { createAddressSchema } from "@/forms/address-schema";
@@ -40,6 +41,7 @@ export const createCompanySchema = (t: (key: string) => string) => {
       invalid_type_error: t("Companies.form.status.required"),
     }),
     notes: z.any().optional().nullable(),
+    vat_number: z.string().optional(),
   });
 
   const addressSchema = createAddressSchema(t);
@@ -85,6 +87,7 @@ export function CompanyForm({
       country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
       notes: getNotesValue(defaultValues) || "",
+      vat_number: defaultValues?.vat_number || "",
     },
   });
 
@@ -157,6 +160,7 @@ export function CompanyForm({
               country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
               additional_number: data.additional_number?.trim() || undefined,
+              vat_number: data.vat_number?.trim() || undefined,
             },
           },
           {
@@ -188,6 +192,7 @@ export function CompanyForm({
             country: data.country?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
             additional_number: data.additional_number?.trim() || undefined,
+            vat_number: data.vat_number?.trim() || undefined,
           },
           {
             onSuccess: async (response) => {
@@ -326,6 +331,23 @@ export function CompanyForm({
               )}
             />
           </div>
+            <FormField
+              control={form.control}
+              name="vat_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.vat_number.label")}</FormLabel>
+                  <FormControl>
+                    <DigitsInput
+                      disabled={isLoading}
+                      placeholder={t("Companies.form.vat_number.placeholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
         </div>
 
         <AddressFormSection

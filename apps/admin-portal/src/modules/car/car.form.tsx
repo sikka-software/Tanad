@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import CountryInput from "@root/src/components/ui/country-input";
 import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
@@ -249,6 +250,23 @@ export function CarForm({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Cars.form.code.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Cars.form.code.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
           <FormField
             control={form.control}
@@ -271,40 +289,28 @@ export function CarForm({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
-              name="code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Cars.form.code.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Cars.form.code.placeholder")}
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="license_country"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("Cars.form.license_country.label")}</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder={t("Cars.form.license_country.placeholder")}
+                    <CountryInput
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
                       disabled={isLoading}
-                      {...field}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      ariaInvalid={false}
+                      texts={{
+                        placeholder: t("Forms.country.placeholder"),
+                        searchPlaceholder: t("Forms.country.search_placeholder"),
+                        noItems: t("Forms.country.no_items"),
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="license_plate"

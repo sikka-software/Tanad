@@ -102,7 +102,10 @@ export default function JobListingsPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("JobListings.title")} description={t("JobListings.description")} />
+      <CustomPageMeta
+        title={t("Pages.JobListings.title")}
+        description={t("Pages.JobListings.description")}
+      />
       <DataPageLayout count={jobListings?.length} itemsText={t("Pages.JobListings.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
