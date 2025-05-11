@@ -63,8 +63,8 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   noPadding?: boolean;
   dir?: "ltr" | "rtl";
   // For code cellType only:
-  onSerial?: (row: TData) => void;
-  onRandom?: (row: TData) => void;
+  onSerial?: (row: TData, rowIndex: number) => void;
+  onRandom?: (row: TData, rowIndex: number) => void;
 };
 
 /**
@@ -911,7 +911,7 @@ function SheetTable<
                     inCell
                     onSerial={() => {
                       if (colDef.onSerial) {
-                        colDef.onSerial(rowData);
+                        colDef.onSerial(rowData, rowIndex);
                       } else if (onEdit) {
                         const next = (parseInt(cellValue || "0", 10) + 1).toString();
                         onEdit(rowId, colKey as keyof T, next as T[keyof T]);
@@ -919,7 +919,7 @@ function SheetTable<
                     }}
                     onRandom={() => {
                       if (colDef.onRandom) {
-                        colDef.onRandom(rowData);
+                        colDef.onRandom(rowData, rowIndex);
                       } else if (onEdit) {
                         const random = Math.floor(100000 + Math.random() * 900000).toString();
                         onEdit(rowId, colKey as keyof T, random as T[keyof T]);
