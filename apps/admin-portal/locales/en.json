@@ -2762,10 +2762,6 @@
     }
   },
   "Locations": {
-    "title": "Locations",
-    "add_new": "New Location",
-    "search_locations": "Search locations...",
-    "no_locations": "No locations found",
     "types": {
       "office": "Office",
       "branch": "Branch",

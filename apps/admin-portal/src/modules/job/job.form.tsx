@@ -308,7 +308,7 @@ export function JobForm({
                       texts={{
                         placeholder: t("Jobs.form.location.placeholder"),
                         searchPlaceholder: t("Pages.Locations.search"),
-                        noItems: t("Pages.Locations.no_locations"),
+                        noItems: t("Pages.Locations.no_locations_found"),
                       }}
                       addText={t("Pages.Locations.add")}
                       onAddClick={() => setIsChooseLocationDialogOpen(true)}

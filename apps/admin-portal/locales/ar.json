@@ -406,7 +406,7 @@
       "create": "إنشاء موقع",
       "edit": "تعديل الموقع",
       "search": "بحث عن موقع",
-      "no_locations_found": "لا يوجد مواقع"
+      "no_locations_found": "لا توجد مواقع"
     },
     "Offices": {
       "title": "المكاتب",
@@ -3065,11 +3065,6 @@
     }
   },
   "Locations": {
-    "title": "المواقع",
-    "edit_location": "تعديل الموقع",
-    "update_location": "تحديث الموقع",
-    "search_locations": "البحث عن مواقع...",
-    "no_locations": "لا يوجد مواقع",
     "types": {
       "office": "مكتب",
       "branch": "فرع",

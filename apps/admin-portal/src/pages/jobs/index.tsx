@@ -35,15 +35,12 @@ export default function JobsPage() {
   const canReadJobs = useUserStore((state) => state.hasPermission("jobs.read"));
   const canCreateJobs = useUserStore((state) => state.hasPermission("jobs.create"));
 
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableJob, setActionableJob] = useState<JobUpdateData | null>(null);
 
-  const isLoading = useJobsStore((state) => state.isLoading);
-  const setIsLoading = useJobsStore((state) => state.setIsLoading);
+  const loadingSaveJob = useJobsStore((state) => state.isLoading);
+  const setLoadingSaveJob = useJobsStore((state) => state.setIsLoading);
 
-  const isFormDialogOpen = useJobsStore((state) => state.isFormDialogOpen);
-  const setIsFormDialogOpen = useJobsStore((state) => state.setIsFormDialogOpen);
-  const actionableItem = useJobsStore((state) => state.actionableItem);
-  const setActionableItem = useJobsStore((state) => state.setActionableItem);
   const viewMode = useJobsStore((state) => state.viewMode);
   const isDeleteDialogOpen = useJobsStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useJobsStore((state) => state.setIsDeleteDialogOpen);
@@ -146,19 +143,19 @@ export default function JobsPage() {
           onOpenChange={setIsFormDialogOpen}
           title={actionableJob ? t("Pages.Jobs.edit") : t("Pages.Jobs.add")}
           formId="job-form"
-          loadingSave={isLoading}
+          loadingSave={loadingSaveJob}
         >
           <JobForm
             formHtmlId="job-form"
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableItem(null);
-              setIsLoading(false);
+              setActionableJob(null);
+              setLoadingSaveJob(false);
               toast.success(t("General.successful_operation"), {
                 description: t("Jobs.success.update"),
               });
             }}
-            defaultValues={actionableItem}
+            defaultValues={actionableJob}
             editMode={true}
           />
         </FormDialog>
@@ -185,6 +182,7 @@ JobsPage.messages = [
   "OnlineStores",
   "Offices",
   "Departments",
+  "Forms",
   "General",
 ];
 

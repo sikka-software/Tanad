@@ -38,6 +38,7 @@ export default function OfficesPage() {
 
   const loadingSaveOffice = useOfficeStore((state) => state.isLoading);
   const setLoadingSaveOffice = useOfficeStore((state) => state.setIsLoading);
+
   const viewMode = useOfficeStore((state) => state.viewMode);
   const isDeleteDialogOpen = useOfficeStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useOfficeStore((state) => state.setIsDeleteDialogOpen);
