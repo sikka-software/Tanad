@@ -268,14 +268,6 @@ export function CarForm({
                       placeholder={t("Cars.form.year.placeholder")}
                       disabled={isLoading}
                       {...field}
-                      // onChange={(e) => {
-                      //   const value = e.target.value;
-                      //   const numberRegex = /^\d*$/;
-                      //   const isNumber
-                      //   if (numberRegex.test(value)) {
-                      //     field.onChange(value === "" ? undefined : Number(value));
-                      //   }
-                      // }}
                       maxLength={4}
                     />
                   </FormControl>
