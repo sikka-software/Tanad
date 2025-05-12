@@ -1,10 +1,11 @@
 import { FormDialog } from "@root/src/components/ui/form-dialog";
 import { WarehouseForm } from "@root/src/modules/warehouse/warehouse.form";
+import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -29,39 +30,44 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/warehouse/warehouse.optio
 import useWarehouseStore from "@/warehouse/warehouse.store";
 import WarehouseTable from "@/warehouse/warehouse.table";
 
-import { Warehouse } from "@/modules/warehouse/warehouse.type";
-import useUserStore from "@/stores/use-user-store";
+import { WarehouseUpdateData } from "@/modules/warehouse/warehouse.type";
 
 export default function WarehousesPage() {
   const t = useTranslations();
-  const columns = useWarehouseColumns();
   const router = useRouter();
 
-  const canReadWarehouses = useUserStore((state) => state.hasPermission("warehouses.read"));
-  const canCreateWarehouses = useUserStore((state) => state.hasPermission("warehouses.create"));
+  const columns = useWarehouseColumns();
+
+  const moduleHooks = createModuleStoreHooks(useWarehouseStore, "warehouses");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableWarehouse, setActionableWarehouse] = useState<Warehouse | null>(null);
+  const [actionableItem, setActionableItem] = useState<WarehouseUpdateData | null>(null);
 
-  const loadingSaveWarehouse = useWarehouseStore((state) => state.isLoading);
-  const setLoadingSaveWarehouse = useWarehouseStore((state) => state.setIsLoading);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const viewMode = useWarehouseStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useWarehouseStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useWarehouseStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useWarehouseStore((state) => state.selectedRows);
-  const setSelectedRows = useWarehouseStore((state) => state.setSelectedRows);
-  const clearSelection = useWarehouseStore((state) => state.clearSelection);
-  const sortRules = useWarehouseStore((state) => state.sortRules);
-  const sortCaseSensitive = useWarehouseStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useWarehouseStore((state) => state.sortNullsFirst);
-  const searchQuery = useWarehouseStore((state) => state.searchQuery);
-  const filterConditions = useWarehouseStore((state) => state.filterConditions);
-  const filterCaseSensitive = useWarehouseStore((state) => state.filterCaseSensitive);
-  const getFilteredWarehouses = useWarehouseStore((state) => state.getFilteredData);
-  const getSortedWarehouses = useWarehouseStore((state) => state.getSortedData);
-  const columnVisibility = useWarehouseStore((state) => state.columnVisibility);
-  const setColumnVisibility = useWarehouseStore((state) => state.setColumnVisibility);
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
 
   const { data: warehouses, isLoading, error } = useWarehouses();
   const { mutateAsync: deleteWarehouses, isPending: isDeleting } = useBulkDeleteWarehouses();
@@ -73,7 +79,7 @@ export default function WarehousesPage() {
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableWarehouse,
+    setActionableItem,
     duplicateMutation: duplicateWarehouse,
     moduleName: "Warehouses",
   });
@@ -88,15 +94,24 @@ export default function WarehousesPage() {
     },
   });
 
-  const filteredWarehouses = useMemo(() => {
-    return getFilteredWarehouses(warehouses || []);
-  }, [warehouses, getFilteredWarehouses, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useWarehouseStore((state) => state.data) || [];
+  const setData = useWarehouseStore((state) => state.setData);
 
-  const sortedWarehouses = useMemo(() => {
-    return getSortedWarehouses(filteredWarehouses);
-  }, [filteredWarehouses, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (warehouses && setData) {
+      setData(warehouses);
+    }
+  }, [warehouses, setData]);
 
-  if (!canReadWarehouses) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
 
@@ -121,9 +136,7 @@ export default function WarehousesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Warehouses.title")}
-            onAddClick={
-              canCreateWarehouses ? () => router.push(router.pathname + "/add") : undefined
-            }
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Warehouses.create")}
             searchPlaceholder={t("Pages.Warehouses.search")}
             hideOptions={warehouses?.length === 0}
@@ -139,17 +152,17 @@ export default function WarehousesPage() {
         <div>
           {viewMode === "table" ? (
             <WarehouseTable
-              data={sortedWarehouses}
+              data={sortedData}
               isLoading={isLoading}
-              error={error instanceof Error ? error : null}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedWarehouses}
+                data={sortedData}
                 isLoading={isLoading}
-                error={error instanceof Error ? error : null}
+                error={error}
                 emptyMessage={t("Warehouses.no_warehouses_found")}
                 renderItem={(warehouse) => <WarehouseCard warehouse={warehouse} />}
                 gridCols="3"
@@ -161,18 +174,18 @@ export default function WarehousesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableWarehouse ? t("Pages.Warehouses.edit") : t("Pages.Warehouses.add")}
+          title={actionableItem ? t("Pages.Warehouses.edit") : t("Pages.Warehouses.add")}
           formId="warehouse-form"
-          loadingSave={loadingSaveWarehouse}
+          loadingSave={loadingSave}
         >
           <WarehouseForm
             formHtmlId={"warehouse-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableWarehouse(null);
-              setLoadingSaveWarehouse(false);
+              setActionableItem(null);
+              setLoadingSave(false);
             }}
-            defaultValues={actionableWarehouse}
+            defaultValues={actionableItem}
             editMode={true}
           />
         </FormDialog>

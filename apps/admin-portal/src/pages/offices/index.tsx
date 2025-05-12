@@ -11,6 +11,8 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { createModuleStoreHooks } from "@/utils/module-hooks";
+
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
@@ -34,34 +36,36 @@ export default function OfficesPage() {
 
   const columns = useOfficeColumns();
 
-  const canReadOffices = useUserStore((state) => state.hasPermission("offices.read"));
-  const canCreateOffices = useUserStore((state) => state.hasPermission("offices.create"));
+  const moduleHooks = createModuleStoreHooks(useOfficeStore, "offices");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableOffice, setActionableOffice] = useState<OfficeUpdateData | null>(null);
 
-  const loadingSaveOffice = useOfficeStore((state) => state.isLoading);
-  const setLoadingSaveOffice = useOfficeStore((state) => state.setIsLoading);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const isDeleteDialogOpen = useOfficeStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useOfficeStore((state) => state.setIsDeleteDialogOpen);
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
 
-  const selectedRows = useOfficeStore((state) => state.selectedRows);
-  const setSelectedRows = useOfficeStore((state) => state.setSelectedRows);
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
 
-  const columnVisibility = useOfficeStore((state) => state.columnVisibility);
-  const setColumnVisibility = useOfficeStore((state) => state.setColumnVisibility);
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
 
-  const viewMode = useOfficeStore((state) => state.viewMode);
-  const clearSelection = useOfficeStore((state) => state.clearSelection);
-  const sortRules = useOfficeStore((state) => state.sortRules);
-  const sortCaseSensitive = useOfficeStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useOfficeStore((state) => state.sortNullsFirst);
-  const searchQuery = useOfficeStore((state) => state.searchQuery);
-  const filterConditions = useOfficeStore((state) => state.filterConditions);
-  const filterCaseSensitive = useOfficeStore((state) => state.filterCaseSensitive);
-  const getFilteredOffices = useOfficeStore((state) => state.getFilteredData);
-  const getSortedOffices = useOfficeStore((state) => state.getSortedData);
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
 
   const { data: offices, isLoading, error } = useOffices();
   const { mutateAsync: deleteOffices, isPending: isDeleting } = useBulkDeleteOffices();
@@ -97,15 +101,15 @@ export default function OfficesPage() {
     }
   }, [offices, setData]);
 
-  const filteredOffices = useMemo(() => {
-    return getFilteredOffices(storeData);
-  }, [storeData, getFilteredOffices, searchQuery, filterConditions, filterCaseSensitive]);
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const sortedOffices = useMemo(() => {
-    return getSortedOffices(filteredOffices);
-  }, [filteredOffices, sortRules, sortCaseSensitive, sortNullsFirst]);
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  if (!canReadOffices) {
+  if (!canRead) {
     return <NoPermission />;
   }
 
@@ -130,7 +134,7 @@ export default function OfficesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Offices.title")}
-            onAddClick={canCreateOffices ? () => router.push(router.pathname + "/add") : undefined}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Offices.add")}
             searchPlaceholder={t("Pages.Offices.search")}
             hideOptions={offices?.length === 0}
@@ -146,7 +150,7 @@ export default function OfficesPage() {
         <div>
           {viewMode === "table" ? (
             <OfficesTable
-              data={sortedOffices}
+              data={sortedData}
               isLoading={isLoading}
               error={error}
               onActionClicked={onActionClicked}
@@ -154,7 +158,7 @@ export default function OfficesPage() {
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedOffices}
+                data={sortedData}
                 isLoading={isLoading}
                 error={error}
                 emptyMessage={t("Pages.Offices.no_offices_found")}
@@ -170,14 +174,14 @@ export default function OfficesPage() {
           onOpenChange={setIsFormDialogOpen}
           title={actionableOffice ? t("Pages.Offices.edit") : t("Pages.Offices.add")}
           formId="office-form"
-          loadingSave={loadingSaveOffice}
+          loadingSave={loadingSave}
         >
           <OfficeForm
             formHtmlId="office-form"
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableOffice(null);
-              setLoadingSaveOffice(false);
+              setLoadingSave(false);
             }}
             defaultValues={actionableOffice}
             editMode={true}

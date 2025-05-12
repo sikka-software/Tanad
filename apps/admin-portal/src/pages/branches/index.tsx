@@ -1,9 +1,12 @@
 import { FormSheet } from "@root/src/components/ui/form-sheet";
+import useEmployeeRequestColumns from "@root/src/modules/employee-request/employee-request.columns";
+import useEmployeeRequestStore from "@root/src/modules/employee-request/employee-request.store";
+import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -31,36 +34,43 @@ import useUserStore from "@/stores/use-user-store";
 export default function BranchesPage() {
   const t = useTranslations();
   const router = useRouter();
+
   const columns = useBranchColumns();
 
-  const canReadBranches = useUserStore((state) => state.hasPermission("branches.read"));
-  const canCreateBranches = useUserStore((state) => state.hasPermission("branches.create"));
+  const moduleHooks = createModuleStoreHooks(useBranchStore, "branches");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableBranch, setActionableBranch] = useState<BranchUpdateData | null>(null);
+  const [actionableItem, setActionableItem] = useState<BranchUpdateData | null>(null);
 
-  const loadingSaveBranch = useBranchStore((state) => state.isLoading);
-  const setLoadingSaveBranch = useBranchStore((state) => state.setIsLoading);
-  const viewMode = useBranchStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useBranchStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useBranchStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useBranchStore((state) => state.selectedRows);
-  const setSelectedRows = useBranchStore((state) => state.setSelectedRows);
-  const clearSelection = useBranchStore((state) => state.clearSelection);
-  const sortRules = useBranchStore((state) => state.sortRules);
-  const sortCaseSensitive = useBranchStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useBranchStore((state) => state.sortNullsFirst);
-  const searchQuery = useBranchStore((state) => state.searchQuery);
-  const filterConditions = useBranchStore((state) => state.filterConditions);
-  const filterCaseSensitive = useBranchStore((state) => state.filterCaseSensitive);
-  const getFilteredBranches = useBranchStore((state) => state.getFilteredData);
-  const getSortedBranches = useBranchStore((state) => state.getSortedData);
-  const columnVisibility = useBranchStore((state) => state.columnVisibility);
-  const setColumnVisibility = useBranchStore((state) => state.setColumnVisibility);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const { data: branches, isLoading: loadingFetchBranches, error } = useBranches();
-  const { mutate: duplicateBranch } = useDuplicateBranch();
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
+
+  const { data: branches, isLoading, error } = useBranches();
   const { mutateAsync: deleteBranches, isPending: isDeleting } = useBulkDeleteBranches();
+  const { mutate: duplicateBranch } = useDuplicateBranch();
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
@@ -68,7 +78,7 @@ export default function BranchesPage() {
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableBranch,
+    setActionableItem,
     duplicateMutation: duplicateBranch,
     moduleName: "Branches",
   });
@@ -83,17 +93,27 @@ export default function BranchesPage() {
     },
   });
 
-  const filteredBranches = useMemo(() => {
-    return getFilteredBranches(branches || []);
-  }, [branches, getFilteredBranches, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useBranchStore((state) => state.data) || [];
+  const setData = useBranchStore((state) => state.setData);
 
-  const sortedBranches = useMemo(() => {
-    return getSortedBranches(filteredBranches);
-  }, [filteredBranches, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (branches && setData) {
+      setData(branches);
+    }
+  }, [branches, setData]);
 
-  if (!canReadBranches) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
+
   return (
     <div>
       <CustomPageMeta
@@ -115,7 +135,7 @@ export default function BranchesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Branches.title")}
-            onAddClick={canCreateBranches ? () => router.push(router.pathname + "/add") : undefined}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Branches.add")}
             searchPlaceholder={t("Pages.Branches.search")}
             hideOptions={branches?.length === 0}
@@ -131,17 +151,17 @@ export default function BranchesPage() {
         <div>
           {viewMode === "table" ? (
             <BranchesTable
-              data={sortedBranches}
-              isLoading={loadingFetchBranches}
-              error={error instanceof Error ? error : null}
+              data={sortedData}
+              isLoading={isLoading}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : viewMode === "cards" ? (
             <div className="p-4">
               <DataModelList
-                data={sortedBranches}
-                isLoading={loadingFetchBranches}
-                error={error as Error | null}
+                data={sortedData}
+                isLoading={isLoading}
+                error={error}
                 emptyMessage={t("Pages.Branches.no_branches_found")}
                 renderItem={(branch) => <BranchCard key={branch.id} branch={branch} />}
                 gridCols="3"
@@ -155,16 +175,16 @@ export default function BranchesPage() {
           onOpenChange={setIsFormDialogOpen}
           title={t("Pages.Branches.edit")}
           formId="branch-form"
-          loadingSave={loadingSaveBranch}
+          loadingSave={loadingSave}
         >
           <BranchForm
             formHtmlId={"branch-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableBranch(null);
-              setLoadingSaveBranch(false);
+              setActionableItem(null);
+              setLoadingSave(false);
             }}
-            defaultValues={actionableBranch as Branch}
+            defaultValues={actionableItem as Branch}
             editMode={true}
           />
         </FormSheet>

@@ -2,8 +2,7 @@ import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -11,6 +10,8 @@ import { FormDialog } from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
+
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
@@ -27,41 +28,47 @@ import ClientsTable from "@/client/client.table";
 import { ClientUpdateData } from "@/client/client.type";
 
 import useClientColumns from "@/modules/client/client.columns";
-import useUserStore from "@/stores/use-user-store";
 
 export default function ClientsPage() {
   const t = useTranslations();
   const router = useRouter();
+
   const columns = useClientColumns();
 
-  const canReadClients = useUserStore((state) => state.hasPermission("clients.read"));
-  const canCreateClients = useUserStore((state) => state.hasPermission("clients.create"));
+  const moduleHooks = createModuleStoreHooks(useClientStore, "clients");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableClient, setActionableClient] = useState<ClientUpdateData | null>(null);
+  const [actionableItem, setActionableItem] = useState<ClientUpdateData | null>(null);
 
-  const loadingSaveClient = useClientStore((state) => state.isLoading);
-  const setLoadingSaveClient = useClientStore((state) => state.setIsLoading);
-  const viewMode = useClientStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useClientStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useClientStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useClientStore((state) => state.selectedRows);
-  const setSelectedRows = useClientStore((state) => state.setSelectedRows);
-  const clearSelection = useClientStore((state) => state.clearSelection);
-  const sortRules = useClientStore((state) => state.sortRules);
-  const sortCaseSensitive = useClientStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useClientStore((state) => state.sortNullsFirst);
-  const searchQuery = useClientStore((state) => state.searchQuery);
-  const filterConditions = useClientStore((state) => state.filterConditions);
-  const filterCaseSensitive = useClientStore((state) => state.filterCaseSensitive);
-  const getFilteredClients = useClientStore((state) => state.getFilteredData);
-  const getSortedClients = useClientStore((state) => state.getSortedData);
-  const columnVisibility = useClientStore((state) => state.columnVisibility);
-  const setColumnVisibility = useClientStore((state) => state.setColumnVisibility);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
+
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
 
   const { data: clients, isLoading, error } = useClients();
-  const { mutate: duplicateClient } = useDuplicateClient();
   const { mutateAsync: deleteClients, isPending: isDeleting } = useBulkDeleteClients();
+  const { mutate: duplicateClient } = useDuplicateClient();
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
@@ -69,7 +76,7 @@ export default function ClientsPage() {
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableClient,
+    setActionableItem,
     duplicateMutation: duplicateClient,
     moduleName: "Clients",
   });
@@ -84,15 +91,24 @@ export default function ClientsPage() {
     },
   });
 
-  const filteredClients = useMemo(() => {
-    return getFilteredClients(clients || []);
-  }, [clients, getFilteredClients, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useClientStore((state) => state.data) || [];
+  const setData = useClientStore((state) => state.setData);
 
-  const sortedClients = useMemo(() => {
-    return getSortedClients(filteredClients);
-  }, [filteredClients, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (clients && setData) {
+      setData(clients);
+    }
+  }, [clients, setData]);
 
-  if (!canReadClients) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
 
@@ -117,7 +133,7 @@ export default function ClientsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Clients.title")}
-            onAddClick={canCreateClients ? () => router.push(router.pathname + "/add") : undefined}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Clients.add")}
             searchPlaceholder={t("Pages.Clients.search")}
             hideOptions={clients?.length === 0}
@@ -132,18 +148,18 @@ export default function ClientsPage() {
         <div>
           {viewMode === "table" ? (
             <ClientsTable
-              key={`sorted-${sortedClients?.length}-${JSON.stringify(sortRules)}`}
-              data={sortedClients || []}
+              key={`sorted-${sortedData?.length}-${JSON.stringify(sortRules)}`}
+              data={sortedData}
               isLoading={isLoading}
-              error={error instanceof Error ? error : null}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedClients || []}
+                data={sortedData}
                 isLoading={isLoading}
-                error={error instanceof Error ? error : null}
+                error={error}
                 emptyMessage={t("Clients.no_clients_found")}
                 renderItem={(client) => <ClientCard client={client} />}
                 gridCols="3"
@@ -155,18 +171,18 @@ export default function ClientsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableClient ? t("Pages.Clients.edit") : t("Pages.Clients.add")}
+          title={actionableItem ? t("Pages.Clients.edit") : t("Pages.Clients.add")}
           formId="client-form"
-          loadingSave={loadingSaveClient}
+          loadingSave={loadingSave}
         >
           <ClientForm
             formHtmlId={"client-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableClient(null);
-              setLoadingSaveClient(false);
+              setActionableItem(null);
+              setLoadingSave(false);
             }}
-            defaultValues={actionableClient}
+            defaultValues={actionableItem}
             editMode={true}
           />
         </FormDialog>

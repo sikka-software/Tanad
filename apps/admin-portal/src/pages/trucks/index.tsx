@@ -1,9 +1,10 @@
 import useTruckColumns from "@root/src/modules/truck/truck.columns";
+import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -25,7 +26,6 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/truck/truck.optio
 import useTruckStore from "@/modules/truck/truck.store";
 import TrucksTable from "@/modules/truck/truck.table";
 import { TruckUpdateData } from "@/modules/truck/truck.type";
-import useUserStore from "@/stores/use-user-store";
 
 export default function TrucksPage() {
   const t = useTranslations();
@@ -33,34 +33,40 @@ export default function TrucksPage() {
 
   const columns = useTruckColumns();
 
-  const canReadTrucks = useUserStore((state) => state.hasPermission("trucks.read"));
-  const canCreateTrucks = useUserStore((state) => state.hasPermission("trucks.create"));
+  const moduleHooks = createModuleStoreHooks(useTruckStore, "trucks");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableTruck, setActionableTruck] = useState<TruckUpdateData | null>(null);
+  const [actionableItem, setActionableItem] = useState<TruckUpdateData | null>(null);
 
-  const loadingSaveTruck = useTruckStore((state) => state.isLoading);
-  const setLoadingSaveTruck = useTruckStore((state) => state.setIsLoading);
-  const viewMode = useTruckStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useTruckStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useTruckStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useTruckStore((state) => state.selectedRows);
-  const setSelectedRows = useTruckStore((state) => state.setSelectedRows);
-  const clearSelection = useTruckStore((state) => state.clearSelection);
-  const sortRules = useTruckStore((state) => state.sortRules);
-  const sortCaseSensitive = useTruckStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useTruckStore((state) => state.sortNullsFirst);
-  const searchQuery = useTruckStore((state) => state.searchQuery);
-  const filterConditions = useTruckStore((state) => state.filterConditions);
-  const filterCaseSensitive = useTruckStore((state) => state.filterCaseSensitive);
-  const getFilteredTrucks = useTruckStore((state) => state.getFilteredData);
-  const getSortedTrucks = useTruckStore((state) => state.getSortedData);
-  const columnVisibility = useTruckStore((state) => state.columnVisibility);
-  const setColumnVisibility = useTruckStore((state) => state.setColumnVisibility);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const { data: trucks, isLoading: loadingFetchTrucks, error } = useTrucks();
-  const { mutate: duplicateTruck } = useDuplicateTruck();
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
+
+  const { data: trucks, isLoading, error } = useTrucks();
   const { mutateAsync: deleteTrucks, isPending: isDeleting } = useBulkDeleteTrucks();
+  const { mutate: duplicateTruck } = useDuplicateTruck();
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
@@ -68,7 +74,7 @@ export default function TrucksPage() {
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableTruck,
+    setActionableItem,
     duplicateMutation: duplicateTruck,
     moduleName: "Trucks",
   });
@@ -83,17 +89,27 @@ export default function TrucksPage() {
     },
   });
 
-  const filteredTrucks = useMemo(() => {
-    return getFilteredTrucks(trucks || []);
-  }, [trucks, getFilteredTrucks, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useTruckStore((state) => state.data) || [];
+  const setData = useTruckStore((state) => state.setData);
 
-  const sortedTrucks = useMemo(() => {
-    return getSortedTrucks(filteredTrucks);
-  }, [filteredTrucks, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (trucks && setData) {
+      setData(trucks);
+    }
+  }, [trucks, setData]);
 
-  if (!canReadTrucks) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
+
   return (
     <div>
       <CustomPageMeta title={t("Trucks.title")} description={t("Trucks.description")} />
@@ -112,7 +128,7 @@ export default function TrucksPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Trucks.title")}
-            onAddClick={canCreateTrucks ? () => router.push(router.pathname + "/add") : undefined}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Trucks.add")}
             searchPlaceholder={t("Pages.Trucks.search")}
             hideOptions={trucks?.length === 0}
@@ -128,17 +144,17 @@ export default function TrucksPage() {
         <div>
           {viewMode === "table" ? (
             <TrucksTable
-              data={sortedTrucks}
-              isLoading={loadingFetchTrucks}
-              error={error as Error | null}
+              data={sortedData}
+              isLoading={isLoading}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedTrucks}
-                isLoading={loadingFetchTrucks}
-                error={error as Error | null}
+                data={sortedData}
+                isLoading={isLoading}
+                error={error}
                 emptyMessage={t("Trucks.no_trucks_found")}
                 renderItem={(truck) => <TruckCard key={truck.id} truck={truck} />}
                 gridCols="3"
@@ -150,18 +166,18 @@ export default function TrucksPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableTruck ? t("Pages.Trucks.edit") : t("Pages.Trucks.add")}
+          title={actionableItem ? t("Pages.Trucks.edit") : t("Pages.Trucks.add")}
           formId="truck-form"
-          loadingSave={loadingSaveTruck}
+          loadingSave={loadingSave}
         >
           <TruckForm
             formHtmlId={"truck-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableTruck(null);
-              setLoadingSaveTruck(false);
+              setActionableItem(null);
+              setLoadingSave(false);
             }}
-            defaultValues={actionableTruck}
+            defaultValues={actionableItem}
             editMode={true}
           />
         </FormDialog>

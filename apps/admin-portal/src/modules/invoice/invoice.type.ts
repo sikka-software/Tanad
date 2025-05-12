@@ -18,13 +18,18 @@ export type InvoiceItemClientData = Omit<
   "invoice_id" | "id" | "created_at" | "amount"
 >;
 
-export type InvoiceCreateData = Omit<Database["public"]["Tables"]["invoices"]["Insert"], "notes"> & {
+export type InvoiceCreateData = Omit<
+  Database["public"]["Tables"]["invoices"]["Insert"],
+  "notes"
+> & {
   items: InvoiceItemClientData[];
   notes?: string | null; // Align notes with form usage (string) instead of Json
 };
 
-export type InvoiceUpdateData = Omit<Database["public"]["Tables"]["invoices"]["Update"], "notes"> & {
+export type InvoiceUpdateData = Omit<
+  Database["public"]["Tables"]["invoices"]["Update"],
+  "notes"
+> & {
   id: string; // Explicitly require id for update payloads
   items?: (InvoiceItemClientData & { id?: string })[]; // For items in an update, they might have an ID (if existing) or not (if new)
-  notes?: string | null; // Align notes with form usage
 };

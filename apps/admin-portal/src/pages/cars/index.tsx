@@ -1,4 +1,8 @@
 import useCarColumns from "@root/src/modules/car/car.columns";
+import useEmployeeRequestColumns from "@root/src/modules/employee-request/employee-request.columns";
+import { useEmployeeRequests } from "@root/src/modules/employee-request/employee-request.hooks";
+import useEmployeeRequestStore from "@root/src/modules/employee-request/employee-request.store";
+import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
@@ -33,34 +37,40 @@ export default function CarsPage() {
 
   const columns = useCarColumns();
 
-  const canReadCars = useUserStore((state) => state.hasPermission("cars.read"));
-  const canCreateCars = useUserStore((state) => state.hasPermission("cars.create"));
+  const moduleHooks = createModuleStoreHooks(useCarStore, "cars");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableCar, setActionableCar] = useState<CarUpdateData | null>(null);
+  const [actionableItem, setActionableItem] = useState<CarUpdateData | null>(null);
 
-  const loadingSaveCar = useCarStore((state) => state.isLoading);
-  const setLoadingSaveCar = useCarStore((state) => state.setIsLoading);
-  const viewMode = useCarStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useCarStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useCarStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useCarStore((state) => state.selectedRows);
-  const setSelectedRows = useCarStore((state) => state.setSelectedRows);
-  const clearSelection = useCarStore((state) => state.clearSelection);
-  const sortRules = useCarStore((state) => state.sortRules);
-  const sortCaseSensitive = useCarStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useCarStore((state) => state.sortNullsFirst);
-  const searchQuery = useCarStore((state) => state.searchQuery);
-  const filterConditions = useCarStore((state) => state.filterConditions);
-  const filterCaseSensitive = useCarStore((state) => state.filterCaseSensitive);
-  const getFilteredCars = useCarStore((state) => state.getFilteredData);
-  const getSortedCars = useCarStore((state) => state.getSortedData);
-  const columnVisibility = useCarStore((state) => state.columnVisibility);
-  const setColumnVisibility = useCarStore((state) => state.setColumnVisibility);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const { data: cars, isLoading: loadingFetchCars, error } = useCars();
-  const { mutate: duplicateCar } = useDuplicateCar();
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
+
+  const { data: cars, isLoading, error } = useCars();
   const { mutateAsync: deleteCars, isPending: isDeleting } = useBulkDeleteCars();
+  const { mutate: duplicateCar } = useDuplicateCar();
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
@@ -68,7 +78,7 @@ export default function CarsPage() {
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableCar,
+    setActionableItem,
     duplicateMutation: duplicateCar,
     moduleName: "Cars",
   });
@@ -83,28 +93,27 @@ export default function CarsPage() {
     },
   });
 
-  // Get the store's data for instant updates
   const storeData = useCarStore((state) => state.data) || [];
   const setData = useCarStore((state) => state.setData);
 
-  // When offices data changes (from server), update the store
   useEffect(() => {
     if (cars && setData) {
       setData(cars);
     }
   }, [cars, setData]);
 
-  const filteredCars = useMemo(() => {
-    return getFilteredCars(storeData);
-  }, [storeData, getFilteredCars, searchQuery, filterConditions, filterCaseSensitive]);
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const sortedCars = useMemo(() => {
-    return getSortedCars(filteredCars);
-  }, [filteredCars, sortRules, sortCaseSensitive, sortNullsFirst]);
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  if (!canReadCars) {
+  if (!canRead) {
     return <NoPermission />;
   }
+
   return (
     <div>
       <CustomPageMeta title={t("Cars.title")} description={t("Cars.description")} />
@@ -123,7 +132,7 @@ export default function CarsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Cars.title")}
-            onAddClick={canCreateCars ? () => router.push(router.pathname + "/add") : undefined}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Cars.add")}
             searchPlaceholder={t("Pages.Cars.search")}
             hideOptions={cars?.length === 0}
@@ -139,17 +148,17 @@ export default function CarsPage() {
         <div>
           {viewMode === "table" ? (
             <CarsTable
-              data={sortedCars}
-              isLoading={loadingFetchCars}
-              error={error as Error | null}
+              data={sortedData}
+              isLoading={isLoading}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedCars}
-                isLoading={loadingFetchCars}
-                error={error as Error | null}
+                data={sortedData}
+                isLoading={isLoading}
+                error={error}
                 emptyMessage={t("Cars.no_cars_found")}
                 renderItem={(car) => <CarCard key={car.id} car={car} />}
                 gridCols="3"
@@ -161,18 +170,18 @@ export default function CarsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableCar ? t("Pages.Cars.edit") : t("Pages.Cars.add")}
+          title={actionableItem ? t("Pages.Cars.edit") : t("Pages.Cars.add")}
           formId="car-form"
-          loadingSave={loadingSaveCar}
+          loadingSave={loadingSave}
         >
           <CarForm
             formHtmlId={"car-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableCar(null);
-              setLoadingSaveCar(false);
+              setActionableItem(null);
+              setLoadingSave(false);
             }}
-            defaultValues={actionableCar}
+            defaultValues={actionableItem}
             editMode={true}
           />
         </FormDialog>

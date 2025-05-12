@@ -1,11 +1,11 @@
 import useInvoiceColumns from "@root/src/modules/invoice/invoice.columns";
 import { InvoiceForm } from "@root/src/modules/invoice/invoice.form";
-import { ColumnDef, VisibilityState } from "@tanstack/react-table";
+import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -26,39 +26,44 @@ import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/invoice/invoice.options";
 import useInvoiceStore from "@/invoice/invoice.store";
 import InvoicesTable from "@/invoice/invoice.table";
 
-import { Invoice, InvoiceUpdateData } from "@/modules/invoice/invoice.type";
-import useUserStore from "@/stores/use-user-store";
+import { InvoiceUpdateData } from "@/modules/invoice/invoice.type";
 
 export default function InvoicesPage() {
   const t = useTranslations();
   const router = useRouter();
+
   const columns = useInvoiceColumns();
 
-  const canReadInvoices = useUserStore((state) => state.hasPermission("invoices.read"));
-  const canCreateInvoices = useUserStore((state) => state.hasPermission("invoices.create"));
+  const moduleHooks = createModuleStoreHooks(useInvoiceStore, "invoices");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableItem, setActionableItem] = useState<InvoiceUpdateData | null>(null);
 
-  const [actionableInvoice, setActionableInvoice] = useState<InvoiceUpdateData | null>(null);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const loadingSaveInvoice = useInvoiceStore((state) => state.isLoading);
-  const setLoadingSaveInvoice = useInvoiceStore((state) => state.setIsLoading);
-  const viewMode = useInvoiceStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useInvoiceStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useInvoiceStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useInvoiceStore((state) => state.selectedRows);
-  const setSelectedRows = useInvoiceStore((state) => state.setSelectedRows);
-  const clearSelection = useInvoiceStore((state) => state.clearSelection);
-  const sortRules = useInvoiceStore((state) => state.sortRules);
-  const sortCaseSensitive = useInvoiceStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useInvoiceStore((state) => state.sortNullsFirst);
-  const searchQuery = useInvoiceStore((state) => state.searchQuery);
-  const filterConditions = useInvoiceStore((state) => state.filterConditions);
-  const filterCaseSensitive = useInvoiceStore((state) => state.filterCaseSensitive);
-  const getFilteredInvoices = useInvoiceStore((state) => state.getFilteredData);
-  const getSortedInvoices = useInvoiceStore((state) => state.getSortedData);
-  const columnVisibility = useInvoiceStore((state) => state.columnVisibility);
-  const setColumnVisibility = useInvoiceStore((state) => state.setColumnVisibility);
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
 
   const { data: invoices, isLoading, error } = useInvoices();
   const { mutateAsync: deleteInvoices, isPending: isDeleting } = useBulkDeleteInvoices();
@@ -66,16 +71,16 @@ export default function InvoicesPage() {
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
-    data: invoices as InvoiceUpdateData[],
+    data: invoices,
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableInvoice as (item: InvoiceUpdateData | null) => void,
+    setActionableItem,
     duplicateMutation: duplicateInvoice,
-    moduleName: "Invoices",
     previewAction: (id: string) => {
       window.open(`/pay/${id}`, "_blank");
     },
+    moduleName: "Invoices",
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteInvoices, {
@@ -88,17 +93,27 @@ export default function InvoicesPage() {
     },
   });
 
-  const filteredInvoices = useMemo(() => {
-    return getFilteredInvoices(invoices || []);
-  }, [invoices, getFilteredInvoices, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useInvoiceStore((state) => state.data) || [];
+  const setData = useInvoiceStore((state) => state.setData);
 
-  const sortedInvoices = useMemo(() => {
-    return getSortedInvoices(filteredInvoices);
-  }, [filteredInvoices, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (invoices && setData) {
+      setData(invoices);
+    }
+  }, [invoices, setData]);
 
-  if (!canReadInvoices) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
+
   return (
     <div>
       <CustomPageMeta title={t("Invoices.title")} description={t("Invoices.description")} />
@@ -117,7 +132,7 @@ export default function InvoicesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Invoices.title")}
-            onAddClick={canCreateInvoices ? () => router.push("/invoices/add") : undefined}
+            onAddClick={canCreate ? () => router.push("/invoices/add") : undefined}
             createLabel={t("Pages.Invoices.add")}
             searchPlaceholder={t("Pages.Invoices.search")}
             hideOptions={invoices?.length === 0}
@@ -134,17 +149,17 @@ export default function InvoicesPage() {
         <div>
           {viewMode === "table" ? (
             <InvoicesTable
-              data={sortedInvoices}
+              data={sortedData}
               isLoading={isLoading}
-              error={error as Error | null}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedInvoices}
+                data={sortedData}
                 isLoading={isLoading}
-                error={error as Error | null}
+                error={error}
                 emptyMessage={t("Invoices.no_invoices_found")}
                 addFirstItemMessage={t("Invoices.add_first_invoice")}
                 renderItem={(invoice) => <InvoiceCard invoice={invoice} />}
@@ -157,18 +172,18 @@ export default function InvoicesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableInvoice ? t("Pages.Invoices.edit") : t("Pages.Invoices.add")}
+          title={actionableItem ? t("Pages.Invoices.edit") : t("Pages.Invoices.add")}
           formId="invoice-form"
-          loadingSave={loadingSaveInvoice}
+          loadingSave={loadingSave}
         >
           <InvoiceForm
             formHtmlId={"invoice-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableInvoice(null);
-              setLoadingSaveInvoice(false);
+              setActionableItem(null);
+              setLoadingSave(false);
             }}
-            defaultValues={actionableInvoice}
+            defaultValues={actionableItem}
             editMode={true}
           />
         </FormDialog>

@@ -12,6 +12,12 @@ export type CurrencyProps = (typeof currencies)[number];
 
 export type ThemeProps = "light" | "dark";
 
+export type ViewMode = "table" | "cards";
+
+export type SortRule = {
+  field: string;
+  direction: "asc" | "desc";
+};
 export type CalendarProps = "gregorian" | "hijri";
 export type MultiLangString = {
   [key: string]: string | undefined;

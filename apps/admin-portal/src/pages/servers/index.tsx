@@ -2,7 +2,7 @@ import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -10,6 +10,8 @@ import { FormDialog } from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
+
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
@@ -29,7 +31,6 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/server/server.opt
 import useServerStore from "@/modules/server/server.store";
 import ServersTable from "@/modules/server/server.table";
 import { ServerUpdateData } from "@/modules/server/server.type";
-import useUserStore from "@/stores/use-user-store";
 
 export default function ServersPage() {
   const t = useTranslations();
@@ -37,34 +38,40 @@ export default function ServersPage() {
 
   const columns = useServerColumns();
 
-  const canReadServers = useUserStore((state) => state.hasPermission("servers.read"));
-  const canCreateServers = useUserStore((state) => state.hasPermission("servers.create"));
+  const moduleHooks = createModuleStoreHooks(useServerStore, "servers");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableServer, setActionableServer] = useState<ServerUpdateData | null>(null);
+  const [actionableItem, setActionableItem] = useState<ServerUpdateData | null>(null);
 
-  const loadingSaveServer = useServerStore((state) => state.isLoading);
-  const setLoadingSaveServer = useServerStore((state) => state.setIsLoading);
-  const viewMode = useServerStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useServerStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useServerStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useServerStore((state) => state.selectedRows);
-  const setSelectedRows = useServerStore((state) => state.setSelectedRows);
-  const clearSelection = useServerStore((state) => state.clearSelection);
-  const sortRules = useServerStore((state) => state.sortRules);
-  const sortCaseSensitive = useServerStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useServerStore((state) => state.sortNullsFirst);
-  const searchQuery = useServerStore((state) => state.searchQuery);
-  const filterConditions = useServerStore((state) => state.filterConditions);
-  const filterCaseSensitive = useServerStore((state) => state.filterCaseSensitive);
-  const getFilteredServers = useServerStore((state) => state.getFilteredData);
-  const getSortedServers = useServerStore((state) => state.getSortedData);
-  const columnVisibility = useServerStore((state) => state.columnVisibility);
-  const setColumnVisibility = useServerStore((state) => state.setColumnVisibility);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const { data: servers, isLoading: loadingFetchServers, error } = useServers();
-  const { mutate: duplicateServer } = useDuplicateServer();
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
+
+  const { data: servers, isLoading, error } = useServers();
   const { mutateAsync: deleteServers, isPending: isDeleting } = useBulkDeleteServers();
+  const { mutate: duplicateServer } = useDuplicateServer();
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
@@ -72,7 +79,7 @@ export default function ServersPage() {
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableServer,
+    setActionableItem,
     duplicateMutation: duplicateServer,
     moduleName: "Servers",
   });
@@ -87,17 +94,27 @@ export default function ServersPage() {
     },
   });
 
-  const filteredServers = useMemo(() => {
-    return getFilteredServers(servers || []);
-  }, [servers, getFilteredServers, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useServerStore((state) => state.data) || [];
+  const setData = useServerStore((state) => state.setData);
 
-  const sortedServers = useMemo(() => {
-    return getSortedServers(filteredServers);
-  }, [filteredServers, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (servers && setData) {
+      setData(servers);
+    }
+  }, [servers, setData]);
 
-  if (!canReadServers) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
+
   return (
     <div>
       <CustomPageMeta
@@ -119,7 +136,7 @@ export default function ServersPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Servers.title")}
-            onAddClick={canCreateServers ? () => router.push(router.pathname + "/add") : undefined}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Servers.add")}
             searchPlaceholder={t("Pages.Servers.search")}
             hideOptions={servers?.length === 0}
@@ -135,17 +152,17 @@ export default function ServersPage() {
         <div>
           {viewMode === "table" ? (
             <ServersTable
-              data={sortedServers}
-              isLoading={loadingFetchServers}
-              error={error as Error | null}
+              data={sortedData}
+              isLoading={isLoading}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedServers}
-                isLoading={loadingFetchServers}
-                error={error as Error | null}
+                data={sortedData}
+                isLoading={isLoading}
+                error={error}
                 emptyMessage={t("Pages.Servers.no_servers_found")}
                 renderItem={(server) => <ServerCard key={server.id} server={server} />}
                 gridCols="3"
@@ -157,18 +174,18 @@ export default function ServersPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableServer ? t("Pages.Servers.edit") : t("Pages.Servers.add")}
+          title={actionableItem ? t("Pages.Servers.edit") : t("Pages.Servers.add")}
           formId="server-form"
-          loadingSave={loadingSaveServer}
+          loadingSave={loadingSave}
         >
           <ServerForm
             formHtmlId={"server-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableServer(null);
-              setLoadingSaveServer(false);
+              setActionableItem(null);
+              setLoadingSave(false);
             }}
-            defaultValues={actionableServer}
+            defaultValues={actionableItem}
             editMode={true}
           />
         </FormDialog>

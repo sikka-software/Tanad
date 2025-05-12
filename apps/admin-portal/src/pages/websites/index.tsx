@@ -1,4 +1,5 @@
 import useWebsiteColumns from "@root/src/modules/website/website.columns";
+import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
@@ -28,59 +29,56 @@ import {
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/website/website.options";
 import useWebsiteStore from "@/modules/website/website.store";
 import WebsitesTable from "@/modules/website/website.table";
-import { Website } from "@/modules/website/website.type";
-import useUserStore from "@/stores/use-user-store";
+import { WebsiteUpdateData } from "@/modules/website/website.type";
 
 export default function WebsitesPage() {
   const t = useTranslations();
   const router = useRouter();
+
   const columns = useWebsiteColumns();
 
-  const canReadWebsites = useUserStore((state) => state.hasPermission("websites.read"));
-  const canCreateWebsites = useUserStore((state) => state.hasPermission("websites.create"));
+  const moduleHooks = createModuleStoreHooks(useWebsiteStore, "websites");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableWebsite, setActionableWebsite] = useState<Website | null>(null);
-  const [displayData, setDisplayData] = useState<Website[]>([]);
+  const [actionableItem, setActionableItem] = useState<WebsiteUpdateData | null>(null);
 
-  const loadingSaveWebsite = useWebsiteStore((state) => state.isLoading);
-  const setLoadingSaveWebsite = useWebsiteStore((state) => state.setIsLoading);
-  const viewMode = useWebsiteStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useWebsiteStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useWebsiteStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useWebsiteStore((state) => state.selectedRows);
-  const setSelectedRows = useWebsiteStore((state) => state.setSelectedRows);
-  const clearSelection = useWebsiteStore((state) => state.clearSelection);
-  const sortRules = useWebsiteStore((state) => state.sortRules);
-  const sortCaseSensitive = useWebsiteStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useWebsiteStore((state) => state.sortNullsFirst);
-  const searchQuery = useWebsiteStore((state) => state.searchQuery);
-  const filterConditions = useWebsiteStore((state) => state.filterConditions);
-  const filterCaseSensitive = useWebsiteStore((state) => state.filterCaseSensitive);
-  const getFilteredWebsites = useWebsiteStore((state) => state.getFilteredData);
-  const getSortedWebsites = useWebsiteStore((state) => state.getSortedData);
-  const columnVisibility = useWebsiteStore((state) => state.columnVisibility);
-  const setColumnVisibility = useWebsiteStore((state) => state.setColumnVisibility);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const { data: websites, isLoading: loadingFetchWebsites, error } = useWebsites();
-  const { mutate: duplicateWebsite } = useDuplicateWebsite();
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
+
+  const { data: websites, isLoading, error } = useWebsites();
   const { mutateAsync: deleteWebsites, isPending: isDeleting } = useBulkDeleteWebsites();
+  const { mutate: duplicateWebsite } = useDuplicateWebsite();
   const { createDeleteHandler } = useDeleteHandler();
 
-  useEffect(() => {
-    if (websites) {
-      setDisplayData(websites);
-    } else {
-      setDisplayData([]);
-    }
-  }, [websites]);
-
-  const { handleAction: onActionClicked } = useDataTableActions<Website>({
-    data: displayData,
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: websites,
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableWebsite,
+    setActionableItem,
     duplicateMutation: duplicateWebsite,
     moduleName: "Websites",
   });
@@ -90,23 +88,32 @@ export default function WebsitesPage() {
     success: "Websites.success.delete",
     error: "Websites.error.delete",
     onSuccess: () => {
-      setDisplayData((current) => current.filter((row) => !selectedRows.includes(row.id)));
       clearSelection();
       setIsDeleteDialogOpen(false);
     },
   });
 
-  const filteredWebsites = useMemo(() => {
-    return getFilteredWebsites(displayData);
-  }, [displayData, getFilteredWebsites, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useWebsiteStore((state) => state.data) || [];
+  const setData = useWebsiteStore((state) => state.setData);
 
-  const sortedWebsites = useMemo(() => {
-    return getSortedWebsites(filteredWebsites);
-  }, [filteredWebsites, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (websites && setData) {
+      setData(websites);
+    }
+  }, [websites, setData]);
 
-  if (!canReadWebsites) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
+
   return (
     <div>
       <CustomPageMeta
@@ -128,10 +135,10 @@ export default function WebsitesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Websites.title")}
-            onAddClick={canCreateWebsites ? () => router.push(router.pathname + "/add") : undefined}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Websites.add")}
             searchPlaceholder={t("Pages.Websites.search")}
-            hideOptions={displayData?.length === 0}
+            hideOptions={sortedData?.length === 0}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={(updater) => {
               setColumnVisibility((prev) =>
@@ -144,17 +151,17 @@ export default function WebsitesPage() {
         <div>
           {viewMode === "table" ? (
             <WebsitesTable
-              data={sortedWebsites}
-              isLoading={loadingFetchWebsites}
-              error={error instanceof Error ? error : null}
+              data={sortedData}
+              isLoading={isLoading}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : viewMode === "cards" ? (
             <div className="p-4">
               <DataModelList
-                data={sortedWebsites}
-                isLoading={loadingFetchWebsites}
-                error={error as Error | null}
+                data={sortedData}
+                isLoading={isLoading}
+                error={error}
                 emptyMessage={t("Websites.no_websites_found")}
                 renderItem={(website) => <WebsiteCard key={website.id} website={website} />}
                 gridCols="3"
@@ -166,19 +173,19 @@ export default function WebsitesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableWebsite?.id ? t("Pages.Websites.edit") : t("Pages.Websites.add")}
+          title={actionableItem?.id ? t("Pages.Websites.edit") : t("Pages.Websites.add")}
           formId="website-form"
-          loadingSave={loadingSaveWebsite}
+          loadingSave={loadingSave}
         >
           <WebsiteForm
             formHtmlId={"website-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableWebsite(null);
-              setLoadingSaveWebsite(false);
+              setActionableItem(null);
+              setLoadingSave(false);
             }}
-            defaultValues={actionableWebsite}
-            editMode={!!actionableWebsite?.id}
+            defaultValues={actionableItem}
+            editMode={!!actionableItem?.id}
           />
         </FormDialog>
 

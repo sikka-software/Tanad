@@ -1,9 +1,8 @@
-import useEmployeeRequestColumns from "@root/src/modules/employee-request/employee-request.columns";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -12,6 +11,8 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { createModuleStoreHooks } from "@/utils/module-hooks";
+
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
@@ -19,6 +20,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import EmployeeRequestCard from "@/employee-request/employee-request.card";
+import useEmployeeRequestColumns from "@/employee-request/employee-request.columns";
 import { EmployeeRequestForm } from "@/employee-request/employee-request.form";
 import {
   useEmployeeRequests,
@@ -27,10 +29,9 @@ import {
 } from "@/employee-request/employee-request.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/employee-request/employee-request.options";
 import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
+import useEmployeeRequestStore from "@/employee-request/employee-request.store";
 import EmployeeRequestsTable from "@/employee-request/employee-request.table";
 import { EmployeeRequestUpdateData } from "@/employee-request/employee-request.type";
-
-import useUserStore from "@/stores/use-user-store";
 
 export default function EmployeeRequestsPage() {
   const t = useTranslations();
@@ -38,51 +39,49 @@ export default function EmployeeRequestsPage() {
 
   const columns = useEmployeeRequestColumns();
 
-  const canReadEmployeeRequests = useUserStore((state) =>
-    state.hasPermission("employee_requests.read"),
-  );
-  const canCreateEmployeeRequests = useUserStore((state) =>
-    state.hasPermission("employee_requests.create"),
-  );
+  const moduleHooks = createModuleStoreHooks(useEmployeeRequestStore, "employee_requests");
 
-  const [actionableEmployeeRequest, setActionableEmployeeRequest] =
-    useState<EmployeeRequestUpdateData | null>(null);
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableItem, setActionableItem] = useState<EmployeeRequestUpdateData | null>(null);
 
-  const isFormDialogOpen = useEmployeeRequestsStore((state) => state.isFormDialogOpen);
-  const setIsFormDialogOpen = useEmployeeRequestsStore((state) => state.setIsFormDialogOpen);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const loadingSaveEmployeeRequest = useEmployeeRequestsStore((state) => state.isLoading);
-  const setLoadingSaveEmployeeRequest = useEmployeeRequestsStore((state) => state.setIsLoading);
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
 
-  const viewMode = useEmployeeRequestsStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useEmployeeRequestsStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useEmployeeRequestsStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useEmployeeRequestsStore((state) => state.selectedRows);
-  const setSelectedRows = useEmployeeRequestsStore((state) => state.setSelectedRows);
-  const clearSelection = useEmployeeRequestsStore((state) => state.clearSelection);
-  const sortRules = useEmployeeRequestsStore((state) => state.sortRules);
-  const sortCaseSensitive = useEmployeeRequestsStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useEmployeeRequestsStore((state) => state.sortNullsFirst);
-  const searchQuery = useEmployeeRequestsStore((state) => state.searchQuery);
-  const filterConditions = useEmployeeRequestsStore((state) => state.filterConditions);
-  const filterCaseSensitive = useEmployeeRequestsStore((state) => state.filterCaseSensitive);
-  const getFilteredEmployeeRequests = useEmployeeRequestsStore((state) => state.getFilteredData);
-  const getSortedEmployeeRequests = useEmployeeRequestsStore((state) => state.getSortedData);
-  const columnVisibility = useEmployeeRequestsStore((state) => state.columnVisibility);
-  const setColumnVisibility = useEmployeeRequestsStore((state) => state.setColumnVisibility);
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
 
-  const { data: requests, isLoading, error } = useEmployeeRequests();
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
+
+  const { data: employeeRequests, isLoading, error } = useEmployeeRequests();
   const { mutateAsync: deleteEmployeeRequests, isPending: isDeleting } =
     useBulkDeleteEmployeeRequests();
   const { mutate: duplicateEmployeeRequest } = useDuplicateEmployeeRequest();
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
-    data: requests,
+    data: employeeRequests,
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableEmployeeRequest,
+    setActionableItem,
     duplicateMutation: duplicateEmployeeRequest,
     moduleName: "EmployeeRequests",
   });
@@ -97,15 +96,24 @@ export default function EmployeeRequestsPage() {
     },
   });
 
-  const filteredEmployeeRequests = useMemo(() => {
-    return getFilteredEmployeeRequests(requests || []);
-  }, [requests, getFilteredEmployeeRequests, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useEmployeeRequestStore((state) => state.data) || [];
+  const setData = useEmployeeRequestStore((state) => state.setData);
 
-  const sortedEmployeeRequests = useMemo(() => {
-    return getSortedEmployeeRequests(filteredEmployeeRequests);
-  }, [filteredEmployeeRequests, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (employeeRequests && setData) {
+      setData(employeeRequests);
+    }
+  }, [employeeRequests, setData]);
 
-  if (!canReadEmployeeRequests) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
 
@@ -115,7 +123,10 @@ export default function EmployeeRequestsPage() {
         title={t("Pages.EmployeeRequests.title")}
         description={t("Pages.EmployeeRequests.description")}
       />
-      <DataPageLayout count={requests?.length} itemsText={t("Pages.EmployeeRequests.title")}>
+      <DataPageLayout
+        count={employeeRequests?.length}
+        itemsText={t("Pages.EmployeeRequests.title")}
+      >
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -130,12 +141,10 @@ export default function EmployeeRequestsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.EmployeeRequests.title")}
-            onAddClick={
-              canCreateEmployeeRequests ? () => router.push(router.pathname + "/add") : undefined
-            }
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.EmployeeRequests.add")}
             searchPlaceholder={t("Pages.EmployeeRequests.search")}
-            hideOptions={requests?.length === 0}
+            hideOptions={employeeRequests?.length === 0}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={(updater) => {
               setColumnVisibility((prev) =>
@@ -147,17 +156,17 @@ export default function EmployeeRequestsPage() {
         <div>
           {viewMode === "table" ? (
             <EmployeeRequestsTable
-              data={sortedEmployeeRequests}
+              data={sortedData}
               isLoading={isLoading}
-              error={error as Error | null}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedEmployeeRequests}
+                data={sortedData}
                 isLoading={isLoading}
-                error={error as Error | null}
+                error={error}
                 emptyMessage={t("EmployeeRequests.no_requests")}
                 addFirstItemMessage={t("EmployeeRequests.add_first_request")}
                 renderItem={(request) => <EmployeeRequestCard employeeRequest={request} />}
@@ -172,15 +181,16 @@ export default function EmployeeRequestsPage() {
           onOpenChange={setIsFormDialogOpen}
           title={t("EmployeeRequests.edit_employee_request")}
           formId="employee-request-form"
-          loadingSave={loadingSaveEmployeeRequest}
+          loadingSave={loadingSave}
         >
           <EmployeeRequestForm
             formHtmlId={"employee-request-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableEmployeeRequest(null);
+              setActionableItem(null);
+              setLoadingSave(false);
             }}
-            defaultValues={actionableEmployeeRequest}
+            defaultValues={actionableItem}
             editMode={true}
           />
         </FormSheet>

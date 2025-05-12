@@ -1,15 +1,7 @@
 // stores/types.ts
-import { VisibilityState } from "@tanstack/react-table";
-import { Updater } from "@tanstack/react-table";
+import { VisibilityState, Updater } from "@tanstack/react-table";
 
-import { FilterCondition } from "@/types/common.type";
-
-export type ViewMode = "table" | "cards";
-
-export type SortRule = {
-  field: string;
-  direction: "asc" | "desc";
-};
+import { FilterCondition, SortRule, ViewMode } from "@/types/common.type";
 
 export type BaseStates<T> = {
   columnVisibility: VisibilityState;
