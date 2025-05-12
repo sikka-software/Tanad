@@ -1,3 +1,4 @@
+import { VisibilityState } from "@tanstack/react-table";
 import { Search, Plus, LayoutGrid, Table2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
@@ -44,7 +45,7 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
   filterableFields?: FilterableField[];
   hideOptions?: boolean;
   columns?: ExtendedColumnDef<any>[];
-  columnVisibility?: Record<string, boolean>;
+  columnVisibility?: VisibilityState;
   onColumnVisibilityChange?: (updater: any) => void;
 }
 
@@ -111,7 +112,7 @@ const PageSearchAndFilter = ({
               <ColumnViewPopover
                 columns={columns}
                 columnVisibility={columnVisibility || {}}
-                onColumnVisibilityChange={onColumnVisibilityChange || (() => {})}
+                onColumnVisibilityChange={(e) => console.log("e is ", e)}
               />
             )}
             <IconButton

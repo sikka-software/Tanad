@@ -50,8 +50,6 @@ import {
 // ** import lib
 import { cn } from "@/lib/utils";
 
-import { useTableStore } from "@/stores/table.store";
-
 import CodeInput from "./code-input";
 import { CommandSelect } from "./command-select";
 import { Input } from "./input";
@@ -370,13 +368,12 @@ function SheetTable<
     enableColumnSizing = false,
     rowActions,
     id,
+    columnVisibility,
+    onColumnVisibilityChange,
   } = props;
 
   const t = useTranslations();
   const locale = useLocale();
-
-  const columnVisibility = useTableStore((s) => s.columnVisibility);
-  const setColumnVisibility = useTableStore((s) => s.setColumnVisibility);
 
   // // Determine which columnVisibility/onColumnVisibilityChange to use
   // const columnVisibility =
@@ -478,9 +475,7 @@ function SheetTable<
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: () => {
-      setColumnVisibility(table.getState().columnVisibility);
-    },
+    onColumnVisibilityChange: onColumnVisibilityChange,
     onRowSelectionChange: setRowSelection,
   });
 

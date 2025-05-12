@@ -57,6 +57,7 @@ export default function InvoicesPage() {
   const filterCaseSensitive = useInvoiceStore((state) => state.filterCaseSensitive);
   const getFilteredInvoices = useInvoiceStore((state) => state.getFilteredData);
   const getSortedInvoices = useInvoiceStore((state) => state.getSortedData);
+  const columnVisibility = useInvoiceStore((state) => state.columnVisibility);
   const setColumnVisibility = useInvoiceStore((state) => state.setColumnVisibility);
 
   const { data: invoices, isLoading, error } = useInvoices();
@@ -121,7 +122,9 @@ export default function InvoicesPage() {
             searchPlaceholder={t("Pages.Invoices.search")}
             hideOptions={invoices?.length === 0}
             id="invoices-table"
+            columnVisibility={columnVisibility}
             onColumnVisibilityChange={(visibility) => {
+              console.log(visibility);
               setColumnVisibility(visibility);
             }}
           />
@@ -135,6 +138,7 @@ export default function InvoicesPage() {
               isLoading={isLoading}
               error={error as Error | null}
               onActionClicked={onActionClicked}
+              columnVisibility={columnVisibility}
             />
           ) : (
             <div className="p-4">
