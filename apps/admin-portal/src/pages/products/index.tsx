@@ -3,7 +3,7 @@ import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -25,29 +25,35 @@ import { useProducts, useBulkDeleteProducts, useDuplicateProduct } from "@/produ
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/product/product.options";
 import useProductStore from "@/product/product.store";
 import ProductsTable from "@/product/product.table";
-import { Product } from "@/product/product.type";
+import { ProductUpdateData } from "@/product/product.type";
 
 import useUserStore from "@/stores/use-user-store";
 
 export default function ProductsPage() {
   const t = useTranslations();
   const router = useRouter();
+
   const columns = useProductColumns();
 
   const canReadProducts = useUserStore((state) => state.hasPermission("products.read"));
   const canCreateProducts = useUserStore((state) => state.hasPermission("products.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableProduct, setActionableProduct] = useState<Product | null>(null);
+  const [actionableProduct, setActionableProduct] = useState<ProductUpdateData | null>(null);
 
   const loadingSaveProduct = useProductStore((state) => state.isLoading);
   const setLoadingSaveProduct = useProductStore((state) => state.setIsLoading);
 
-  const viewMode = useProductStore((state) => state.viewMode);
   const isDeleteDialogOpen = useProductStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useProductStore((state) => state.setIsDeleteDialogOpen);
+
   const selectedRows = useProductStore((state) => state.selectedRows);
   const setSelectedRows = useProductStore((state) => state.setSelectedRows);
+
+  const columnVisibility = useProductStore((state) => state.columnVisibility);
+  const setColumnVisibility = useProductStore((state) => state.setColumnVisibility);
+
+  const viewMode = useProductStore((state) => state.viewMode);
   const clearSelection = useProductStore((state) => state.clearSelection);
   const sortRules = useProductStore((state) => state.sortRules);
   const sortCaseSensitive = useProductStore((state) => state.sortCaseSensitive);
@@ -57,8 +63,6 @@ export default function ProductsPage() {
   const filterCaseSensitive = useProductStore((state) => state.filterCaseSensitive);
   const getFilteredProducts = useProductStore((state) => state.getFilteredData);
   const getSortedProducts = useProductStore((state) => state.getSortedData);
-  const columnVisibility = useProductStore((state) => state.columnVisibility);
-  const setColumnVisibility = useProductStore((state) => state.setColumnVisibility);
 
   const { data: products, isLoading, error } = useProducts();
   const { mutateAsync: deleteProducts, isPending: isDeleting } = useBulkDeleteProducts();
@@ -97,9 +101,18 @@ export default function ProductsPage() {
     },
   });
 
+  const storeData = useProductStore((state) => state.data) || [];
+  const setData = useProductStore((state) => state.setData);
+
+  useEffect(() => {
+    if (products && setData) {
+      setData(products);
+    }
+  }, [products, setData]);
+
   const filteredProducts = useMemo(() => {
-    return getFilteredProducts(products || []);
-  }, [products, getFilteredProducts, searchQuery, filterConditions, filterCaseSensitive]);
+    return getFilteredProducts(storeData);
+  }, [storeData, getFilteredProducts, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedProducts = useMemo(() => {
     return getSortedProducts(filteredProducts);
@@ -148,7 +161,7 @@ export default function ProductsPage() {
             <ProductsTable
               data={sortedProducts}
               isLoading={isLoading}
-              error={error as Error | null}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
@@ -156,7 +169,7 @@ export default function ProductsPage() {
               <DataModelList
                 data={sortedProducts}
                 isLoading={isLoading}
-                error={error as Error | null}
+                error={error}
                 emptyMessage={t("Products.no_products")}
                 addFirstItemMessage={t("Products.add_first_product")}
                 renderItem={(product) => <ProductCard product={product} />}
@@ -180,7 +193,7 @@ export default function ProductsPage() {
               setActionableProduct(null);
               setLoadingSaveProduct(false);
             }}
-            defaultValues={actionableProduct as Product}
+            defaultValues={actionableProduct}
             editMode={true}
           />
         </FormDialog>

@@ -40,15 +40,18 @@ export type QuoteCreateData = Omit<
   // subtotal, tax_amount, total are usually calculated on backend or just before insert
 };
 
-// For updating an existing quote
-export type QuoteUpdateData = Omit<
-  Database["public"]["Tables"]["quotes"]["Update"],
-  "notes" | "subtotal" | "tax_amount" | "total"
-> & {
-  id: string; // Explicitly require id for update payloads
+export type QuoteUpdateData = Database["public"]["Tables"]["quotes"]["Update"] & {
   items?: (QuoteItemClientData & { id?: string })[]; // Items can be new (no id) or existing (with id)
-  notes?: string | null; // Align notes with form usage
 };
+// For updating an existing quote
+// export type QuoteUpdateData = Omit<
+//   Database["public"]["Tables"]["quotes"]["Update"],
+//   "notes" | "subtotal" | "tax_amount" | "total"
+// > & {
+//   id: string; // Explicitly require id for update payloads
+//   items?: (QuoteItemClientData & { id?: string })[]; // Items can be new (no id) or existing (with id)
+//   notes?: string | null; // Align notes with form usage
+// };
 
 // For creating a quote item via the service layer, expecting numeric quantity/price
 export type QuoteItemCreateServiceData = QuoteItemClientData & {

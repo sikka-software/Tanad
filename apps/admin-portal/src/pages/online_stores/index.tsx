@@ -34,6 +34,7 @@ import useUserStore from "@/stores/use-user-store";
 export default function OnlineStoresPage() {
   const t = useTranslations();
   const router = useRouter();
+  
   const columns = useOnlineStoreColumns();
 
   const canReadOnlineStores = useUserStore((state) => state.hasPermission("online_stores.read"));

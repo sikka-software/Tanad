@@ -1,24 +1,24 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import CodeInput from "@/ui/code-input";
 import { CurrencyInput } from "@/ui/currency-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import CodeInput from "@/components/ui/code-input";
+import NotesSection from "@/components/forms/notes-section";
 
 import { ModuleFormProps } from "@/types/common.type";
 
-import useUserStore from "@/stores/use-user-store";
+import { useCreateProduct, useUpdateProduct, useProducts } from "@/product/product.hooks";
+import useProductStore from "@/product/product.store";
+import { ProductUpdateData, ProductCreateData } from "@/product/product.type";
 
-import { useCreateProduct, useUpdateProduct, useProducts } from "./product.hooks";
-import useProductStore from "./product.store";
-import { ProductUpdateData, ProductCreateData } from "./product.type";
+import useUserStore from "@/stores/use-user-store";
 
 export const createProductSchema = (t: (key: string) => string) =>
   z.object({

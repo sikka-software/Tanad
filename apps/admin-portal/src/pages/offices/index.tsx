@@ -1,4 +1,3 @@
-import useOfficeColumns from "@root/src/modules/office/office.columns";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
@@ -19,6 +18,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import OfficeCard from "@/office/office.card";
+import useOfficeColumns from "@/office/office.columns";
 import { OfficeForm } from "@/office/office.form";
 import { useOffices, useBulkDeleteOffices, useDuplicateOffice } from "@/office/office.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/office/office.options";
@@ -43,11 +43,16 @@ export default function OfficesPage() {
   const loadingSaveOffice = useOfficeStore((state) => state.isLoading);
   const setLoadingSaveOffice = useOfficeStore((state) => state.setIsLoading);
 
-  const viewMode = useOfficeStore((state) => state.viewMode);
   const isDeleteDialogOpen = useOfficeStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useOfficeStore((state) => state.setIsDeleteDialogOpen);
+
   const selectedRows = useOfficeStore((state) => state.selectedRows);
   const setSelectedRows = useOfficeStore((state) => state.setSelectedRows);
+
+  const columnVisibility = useOfficeStore((state) => state.columnVisibility);
+  const setColumnVisibility = useOfficeStore((state) => state.setColumnVisibility);
+
+  const viewMode = useOfficeStore((state) => state.viewMode);
   const clearSelection = useOfficeStore((state) => state.clearSelection);
   const sortRules = useOfficeStore((state) => state.sortRules);
   const sortCaseSensitive = useOfficeStore((state) => state.sortCaseSensitive);
@@ -57,8 +62,6 @@ export default function OfficesPage() {
   const filterCaseSensitive = useOfficeStore((state) => state.filterCaseSensitive);
   const getFilteredOffices = useOfficeStore((state) => state.getFilteredData);
   const getSortedOffices = useOfficeStore((state) => state.getSortedData);
-  const columnVisibility = useOfficeStore((state) => state.columnVisibility);
-  const setColumnVisibility = useOfficeStore((state) => state.setColumnVisibility);
 
   const { data: offices, isLoading, error } = useOffices();
   const { mutateAsync: deleteOffices, isPending: isDeleting } = useBulkDeleteOffices();
@@ -85,18 +88,15 @@ export default function OfficesPage() {
     },
   });
 
-  // Get the store's data for instant updates
   const storeData = useOfficeStore((state) => state.data) || [];
   const setData = useOfficeStore((state) => state.setData);
 
-  // When offices data changes (from server), update the store
   useEffect(() => {
     if (offices && setData) {
       setData(offices);
     }
   }, [offices, setData]);
 
-  // Apply filtering and sorting to the store's data
   const filteredOffices = useMemo(() => {
     return getFilteredOffices(storeData);
   }, [storeData, getFilteredOffices, searchQuery, filterConditions, filterCaseSensitive]);
@@ -148,7 +148,7 @@ export default function OfficesPage() {
             <OfficesTable
               data={sortedOffices}
               isLoading={isLoading}
-              error={error instanceof Error ? error : null}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
@@ -156,7 +156,7 @@ export default function OfficesPage() {
               <DataModelList
                 data={sortedOffices}
                 isLoading={isLoading}
-                error={error instanceof Error ? error : null}
+                error={error}
                 emptyMessage={t("Pages.Offices.no_offices_found")}
                 renderItem={(office) => <OfficeCard office={office} />}
                 gridCols="3"
