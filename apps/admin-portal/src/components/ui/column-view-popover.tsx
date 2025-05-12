@@ -1,10 +1,10 @@
-import { ColumnDef } from "@tanstack/react-table";
 import { Eye } from "lucide-react";
 
 import { DropdownMenuCheckbox } from "./dropdown-menu-checkbox";
 import IconButton from "./icon-button";
+import { ExtendedColumnDef } from "./sheet-table";
 
-const ColumnViewPopover = ({ columns }: { columns: ColumnDef<any>[] }) => {
+const ColumnViewPopover = ({ columns }: { columns: ExtendedColumnDef<any>[] }) => {
   return (
     <div>
       <DropdownMenuCheckbox

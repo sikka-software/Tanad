@@ -14,6 +14,7 @@ import ColumnViewPopover from "./column-view-popover";
 import FilterPopover from "./filter-popover";
 import IconButton from "./icon-button";
 import { Input } from "./input";
+import { ExtendedColumnDef } from "./sheet-table";
 import SortPopover from "./sort-popover";
 
 export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -44,7 +45,7 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
   sortableColumns: SortableColumn[];
   filterableFields?: FilterableField[];
   hideOptions?: boolean;
-  columns?: ColumnDef<any>[];
+  columns?: ExtendedColumnDef<any>[];
 }
 
 const PageSearchAndFilter = ({
