@@ -19,19 +19,34 @@ import {
   useReactTable,
   getCoreRowModel,
   getExpandedRowModel,
+  flexRender,
   TableOptions,
   ColumnDef,
   Row as TanStackRow,
   ColumnSizingState,
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { useLocale, useTranslations } from "next-intl";
 import React, { useState, useCallback, useEffect } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
 
-import { Table, TableBody } from "@/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableFooter,
+} from "@/ui/table";
 
-import SheetTableHeader from "@/components/tables/sheet-table-header";
-import SheetTableRow from "@/components/tables/sheet-table-row";
+// ** import lib
+import { cn } from "@/lib/utils";
+
+import CodeInput from "./code-input";
+import { CommandSelect } from "./command-select";
+import { Input } from "./input";
+import RowActionsPopover from "./popovers/row-actions-popover";
 
 export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   ColumnDef<TData, TValue>,
@@ -341,16 +356,32 @@ function SheetTable<
     disabledColumns = [],
     disabledRows = [],
     showHeader = true,
+    showSecondHeader = false,
+    secondHeaderTitle = "",
     enableRowSelection = false,
     enableRowActions = false,
     onRowSelectionChange,
+    // Footer props
+    totalRowValues,
+    totalRowLabel = "",
+    totalRowTitle,
+    footerElement,
+
+    // Additional TanStack config
     enableColumnSizing = false,
     tableOptions = {},
+
+    // Add/Remove Dynamic Row Actions
     rowActions,
+    handleAddRowFunction,
+    handleRemoveRowFunction,
     id,
     columnVisibility,
     onColumnVisibilityChange,
   } = props;
+
+  const t = useTranslations();
+  const locale = useLocale();
 
   /**
    * Ensure a minimum of 30 rows are displayed, padding with empty rows if needed.
@@ -622,23 +653,472 @@ function SheetTable<
     overscan: 10,
   });
 
+  // rowActions config
+  const addPos = rowActions?.add ?? null; // "left" | "right" | null
+  const removePos = rowActions?.remove ?? null; // "left" | "right" | null
+
+  const rowActionCellStyle: React.CSSProperties = {
+    width: "5px",
+    maxWidth: "5px",
+    outline: "none",
+  };
+  const rowActionCellClassName = "p-0 border-none bg-transparent";
+
+  /**
+   * Recursively renders a row and its sub-rows, handling:
+   * - Row content and cell editing
+   * - Hover-activated action icons (Add/Remove)
+   * - Sub-row indentation and expansion
+   * - Row-level error tracking and validation
+   * - Disabled state management
+   *
+   * @param row - TanStack row instance containing the data and state
+   * @param groupKey - Identifier for the row's group, used for validation and disabled state
+   * @param level - Nesting depth (0 = top-level), used for sub-row indentation
+   * @returns JSX element containing the row and its sub-rows
+   */
+
+  const renderRow = (row: TanStackRow<T>, groupKey: string, level = 0) => {
+    const rowId = row.id;
+    const rowIndex = row.index;
+    const rowData = row.original;
+
+    // Determine if this row or its group is disabled
+    const disabled = isRowDisabled(disabledRows, groupKey, rowIndex);
+
+    // TanStack expansion logic
+    const hasSubRows = row.getCanExpand();
+    const isExpanded = row.getIsExpanded();
+
+    // Determine if we show the rowAction icons on hover
+    const showRowActions = hoveredRowId === rowId; // only for hovered row
+
+    const stickyColumnId = "checkbox";
+    return (
+      <React.Fragment key={rowId}>
+        <TableRow
+          className={cn(
+            "relative", // it's will remove border for icons cells
+            disabled ? "bg-muted" : "",
+            row.getIsSelected() ? "bg-muted/50 dark:bg-muted/50" : "",
+          )}
+          // On mouse enter/leave, set hovered row
+          onMouseEnter={() => setHoveredRowId(rowId)}
+          onMouseLeave={() => setHoveredRowId((prev) => (prev === rowId ? null : prev))}
+          data-state={row.getIsSelected() && "selected"}
+        >
+          {/* Selection checkbox */}
+          {enableRowSelection && (
+            <TableCell className="bg-background sticky start-0 z-2 w-8 !max-w-8 min-w-8 border-y">
+              <div className="flex h-auto items-center justify-center">
+                <input
+                  type="checkbox"
+                  checked={row.getIsSelected()}
+                  onChange={row.getToggleSelectedHandler()}
+                  className="h-4 w-4 rounded-md border-gray-300"
+                />
+              </div>
+              <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
+            </TableCell>
+          )}
+          {/* Row actions */}
+          {enableRowActions && (
+            <TableCell
+              className="bg-background sticky start-8 z-2 border-y p-0"
+              style={{ width: "30px", minWidth: "30px", maxWidth: "30px" }}
+            >
+              <div className="flex h-auto min-h-9 items-center justify-center">
+                <RowActionsPopover
+                  texts={texts}
+                  onEdit={props.canEditAction ? () => onActionClicked?.("edit", rowId) : undefined}
+                  onDelete={
+                    props.canDeleteAction ? () => onActionClicked?.("delete", rowId) : undefined
+                  }
+                  onDuplicate={
+                    props.canDuplicateAction
+                      ? () => onActionClicked?.("duplicate", rowId)
+                      : undefined
+                  }
+                  onView={props.canViewAction ? () => onActionClicked?.("view", rowId) : undefined}
+                  onArchive={
+                    props.canArchiveAction ? () => onActionClicked?.("archive", rowId) : undefined
+                  }
+                  onPreview={
+                    props.canPreviewAction ? () => onActionClicked?.("preview", rowId) : undefined
+                  }
+                />
+              </div>
+              <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
+            </TableCell>
+          )}
+
+          {/**
+           * If the "Add" or "Remove" icons are on the left, we can render an extra <TableCell> for them,
+           * or overlay them.
+           * We'll do an approach that overlays them. For clarity, let's keep it simple:
+           * we'll just overlay or absolutely position them, or place them in the first cell.
+           */}
+          {row.getVisibleCells().map((cell, cellIndex) => {
+            const colDef = cell.column.columnDef as ExtendedColumnDef<T>;
+            const colKey = getColumnKey(colDef);
+            const isDisabled = disabled || disabledColumns.includes(colKey);
+            const errorMsg = cellErrors[groupKey]?.[rowId]?.[colKey] || null;
+
+            // Apply sizing logic & indentation
+            const style: React.CSSProperties = {};
+            if (enableColumnSizing) {
+              const size = cell.column.getSize();
+              if (size) style.width = `${size}px`;
+              if (colDef.minSize)
+                style.minWidth =
+                  typeof colDef.minSize === "number" ? `${colDef.minSize}px` : colDef.minSize;
+              if (colDef.maxSize)
+                style.maxWidth =
+                  typeof colDef.maxSize === "number" ? `${colDef.maxSize}px` : colDef.maxSize;
+            } else {
+              if (!colDef.size && !colDef.minSize && !colDef.maxSize) {
+                style.width = "150px";
+              }
+              if (!colDef.minSize && !style.minWidth) {
+                style.minWidth = "120px";
+              }
+              if (colDef.maxSize) {
+                style.maxWidth =
+                  typeof colDef.maxSize === "number" ? `${colDef.maxSize}px` : colDef.maxSize;
+                if (style.width) {
+                  const widthPx = parseInt(style.width.toString());
+                  const maxPx = parseInt(style.maxWidth.toString());
+                  if (widthPx > maxPx) style.width = style.maxWidth;
+                }
+              }
+            }
+
+            // Render cell content with customizations for the first cell
+            const rawCellContent = flexRender(cell.column.columnDef.cell, cell.getContext());
+
+            let cellContent: React.ReactNode = rawCellContent;
+
+            // if cell type is status, show a status element
+            if (colDef.cellType === "status" && colDef.options) {
+              const cellValue = cell.getValue() as string | number;
+              const selectedOption = colDef.options.find((opt) => opt.value === cellValue);
+
+              return (
+                <TableCell
+                  key={cell.id}
+                  className={cn(
+                    "relative overflow-hidden border p-0",
+                    {
+                      "bg-muted": isDisabled,
+                      "bg-destructive/25": errorMsg,
+                    },
+                    typeof colDef.className === "function"
+                      ? colDef.className(rowData)
+                      : colDef.className,
+                  )}
+                  style={{ ...style, overflow: "hidden", minWidth: 0 }}
+                >
+                  <CommandSelect
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                    data={colDef.options}
+                    inCell
+                    isLoading={false}
+                    defaultValue={String(selectedOption?.value)}
+                    popoverClassName="w-full max-w-full"
+                    buttonClassName="bg-transparent p-0 w-full max-w-full"
+                    placeholderClassName="w-full p-0"
+                    valueKey="value"
+                    labelKey="label"
+                    onChange={async (value) => {
+                      if (onEdit) {
+                        onEdit(rowId, colKey as keyof T, value as T[keyof T]);
+                      }
+                    }}
+                    texts={{ placeholder: ". . ." }}
+                    renderSelected={(item) => {
+                      return (
+                        <div
+                          className={cn(
+                            "flex h-full w-full items-center justify-center bg-green-500 p-0 !px-2 text-center text-xs font-bold",
+                            {
+                              "text-primary bg-green-200 hover:bg-green-200 dark:bg-green-700 dark:hover:bg-green-700":
+                                item.value === "active",
+                              "text-primary bg-red-200 hover:bg-red-200 dark:bg-red-700 dark:hover:bg-red-700":
+                                item.value === "inactive",
+                            },
+                          )}
+                        >
+                          {item.label}
+                        </div>
+                      );
+                    }}
+                    ariaInvalid={false}
+                  />
+                </TableCell>
+              );
+            }
+            // if cell type is select, show a select element
+            if (colDef.cellType === "select" && colDef.options) {
+              const cellValue = cell.getValue() as string | number;
+
+              return (
+                <TableCell
+                  key={cell.id}
+                  className={cn(
+                    "force-maxwidth-cell relative overflow-hidden border p-0",
+                    {
+                      "bg-muted": isDisabled,
+                      "bg-destructive/25": errorMsg,
+                    },
+                    typeof colDef.className === "function"
+                      ? colDef.className(rowData)
+                      : colDef.className,
+                  )}
+                  style={{ ...style, overflow: "hidden", minWidth: 0 }}
+                >
+                  <CommandSelect
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                    data={colDef.options}
+                    inCell
+                    isLoading={false}
+                    defaultValue={String(cellValue)}
+                    popoverClassName="w-full max-w-full"
+                    buttonClassName="bg-transparent w-full max-w-full"
+                    valueKey="value"
+                    labelKey="label"
+                    onChange={async (value) => {
+                      if (onEdit) {
+                        onEdit(rowId, colKey as keyof T, value as T[keyof T]);
+                      }
+                    }}
+                    texts={{
+                      placeholder: ". . .",
+                    }}
+                    renderOption={(item) => {
+                      return <div>{item.label}</div>;
+                    }}
+                    ariaInvalid={false}
+                  />
+                </TableCell>
+              );
+            }
+            // if cell type is code, show a code input element
+            if (colDef.cellType === "code") {
+              const cellValue = cell.getValue() as string | undefined;
+              return (
+                <TableCell
+                  key={cell.id}
+                  className={cn(
+                    "relative overflow-hidden border p-0",
+                    {
+                      "bg-muted": isDisabled,
+                      "bg-destructive/25": errorMsg,
+                    },
+                    typeof colDef.className === "function"
+                      ? colDef.className(rowData)
+                      : colDef.className,
+                  )}
+                  style={{ ...style, overflow: "hidden", minWidth: 0 }}
+                >
+                  <CodeInput
+                    inCell
+                    onSerial={() => {
+                      if (colDef.onSerial) {
+                        colDef.onSerial(rowData, rowIndex);
+                      } else if (onEdit) {
+                        const next = (parseInt(cellValue || "0", 10) + 1).toString();
+                        onEdit(rowId, colKey as keyof T, next as T[keyof T]);
+                      }
+                    }}
+                    onRandom={() => {
+                      if (colDef.onRandom) {
+                        colDef.onRandom(rowData, rowIndex);
+                      } else if (onEdit) {
+                        const random = Math.floor(100000 + Math.random() * 900000).toString();
+                        onEdit(rowId, colKey as keyof T, random as T[keyof T]);
+                      }
+                    }}
+                  >
+                    <Input
+                      inCell
+                      value={cellValue || ""}
+                      disabled={isDisabled}
+                      style={{ minHeight: 36 }}
+                      onFocus={(e) => handleCellFocus(e, groupKey, rowData, colDef)}
+                      onKeyDown={(e) => {
+                        if (
+                          (e.ctrlKey || e.metaKey) &&
+                          ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
+                        ) {
+                          return;
+                        }
+                        handleKeyDown(e, colDef);
+                      }}
+                      onPaste={(e) => handlePaste(e, colDef)}
+                      onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
+                      onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
+                      onChange={(e) => {
+                        if (onEdit) {
+                          onEdit(rowId, colKey as keyof T, e.target.value as T[keyof T]);
+                        }
+                      }}
+                    />
+                  </CodeInput>
+                </TableCell>
+              );
+            }
+
+            return (
+              <TableCell
+                key={rowId + colKey + String(cell.getValue() ?? "")}
+                className={cn(
+                  "tiny-scrollbar relative overflow-scroll border", // 'relative' for absolute icons if you prefer
+                  {
+                    "bg-muted": isDisabled,
+                    "bg-destructive/25": errorMsg,
+                  },
+                  colDef.noPadding ? "p-0" : "",
+                  typeof colDef.className === "function"
+                    ? colDef.className(rowData)
+                    : colDef.className,
+                )}
+                dir={colDef.dir}
+                style={style}
+                contentEditable={colDef.enableEditing !== false ? !isDisabled : false}
+                suppressContentEditableWarning
+                onFocus={(e) => {
+                  handleCellFocus(e, groupKey, rowData, colDef);
+                }}
+                onKeyDown={(e) => {
+                  if (
+                    (e.ctrlKey || e.metaKey) &&
+                    // Let user do Ctrl+A, C, X, Z, V, etc.
+                    ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
+                  ) {
+                    return; // do not block copy/paste
+                  }
+                  handleKeyDown(e, colDef);
+                }}
+                onPaste={(e) => {
+                  handlePaste(e, colDef);
+                }}
+                onInput={(e) => {
+                  handleCellInput(e, groupKey, rowData, colDef);
+                }}
+                onBlur={(e) => {
+                  handleCellBlur(e, groupKey, rowData, colDef);
+                }}
+              >
+                {/** The actual content */}
+                {cellContent}
+              </TableCell>
+            );
+          })}
+        </TableRow>
+      </React.Fragment>
+    );
+  };
+
+  // Memoize renderRow
+  const memoizedRenderRow = React.useCallback(
+    (row: TanStackRow<T>, groupKey: string, level = 0) => renderRow(row, groupKey, level),
+    [renderRow],
+  );
+
+  // Calculate total min width for the table
+  const totalMinWidth = React.useMemo(() => {
+    let minWidth = 0;
+    // Checkbox column
+    if (enableRowSelection) minWidth += 30;
+    // Actions column
+    if (enableRowActions) minWidth += 30;
+    // Data columns
+    columns.forEach((col) => {
+      if (col.minSize) {
+        minWidth += typeof col.minSize === "number" ? col.minSize : parseInt(col.minSize, 10);
+      } else {
+        minWidth += 120; // default min width
+      }
+    });
+    return minWidth;
+  }, [columns, enableRowSelection, enableRowActions]);
+
   return (
     <div ref={parentRef} className="relative max-h-[calc(100vh-7.6rem)] overflow-auto p-0 pb-2">
-      <Table id={id} style={{ minWidth: 1200 }}>
-        <SheetTableHeader
-          table={table}
-          enableRowSelection={enableRowSelection}
-          enableRowActions={enableRowActions}
-          showHeader={showHeader}
-          texts={texts}
-          canEditAction={props.canEditAction}
-          canDeleteAction={props.canDeleteAction}
-          canDuplicateAction={props.canDuplicateAction}
-          canViewAction={props.canViewAction}
-          canArchiveAction={props.canArchiveAction}
-          canPreviewAction={props.canPreviewAction}
-          enableColumnSizing={enableColumnSizing}
-        />
+      <Table id={id} style={{ minWidth: totalMinWidth }}>
+        {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
+        {/* Primary header */}
+        {showHeader && (
+          <TableHeader className="relative">
+            <TableRow className="border-none">
+              {/* Selection checkbox header */}
+              {enableRowSelection && (
+                <TableHead className="bg-muted sticky start-0 top-0 z-30 w-8 !max-w-8 min-w-8 border-none text-start">
+                  <div className="flex h-full items-center justify-center">
+                    <input
+                      type="checkbox"
+                      checked={table.getIsAllPageRowsSelected()}
+                      onChange={table.getToggleAllPageRowsSelectedHandler()}
+                      className="h-4 w-4 rounded-md border-gray-300"
+                      title={t("General.select_all")}
+                    />
+                  </div>
+                  <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
+                </TableHead>
+              )}
+              {enableRowActions && (
+                <TableHead
+                  className="bg-muted sticky start-8 top-0 !z-20 border-e border-none text-start"
+                  style={{ width: "20px", minWidth: "20px", maxWidth: "20px" }}
+                />
+              )}
+
+              {table.getHeaderGroups().map((headerGroup) =>
+                headerGroup.headers.map((header) => {
+                  const style: React.CSSProperties = {};
+                  const col = header.column.columnDef;
+                  if (enableColumnSizing) {
+                    const size = header.getSize();
+                    if (size) style.width = `${size}px`;
+                    if (col.minSize)
+                      style.minWidth =
+                        typeof col.minSize === "number" ? `${col.minSize}px` : col.minSize;
+                    if (col.maxSize)
+                      style.maxWidth =
+                        typeof col.maxSize === "number" ? `${col.maxSize}px` : col.maxSize;
+                  } else {
+                    if (!col.size && !col.minSize && !col.maxSize) {
+                      style.width = "150px";
+                    }
+                    if (!col.minSize && !style.minWidth) {
+                      style.minWidth = "120px";
+                    }
+                    if (col.maxSize) {
+                      style.maxWidth =
+                        typeof col.maxSize === "number" ? `${col.maxSize}px` : col.maxSize;
+                      if (style.width) {
+                        const widthPx = parseInt(style.width.toString());
+                        const maxPx = parseInt(style.maxWidth.toString());
+                        if (widthPx > maxPx) style.width = style.maxWidth;
+                      }
+                    }
+                  }
+
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className="bg-muted sticky top-0 !z-20 border-x text-start"
+                      style={style}
+                    >
+                      {flexRender(header.column.columnDef.header, header.getContext()) as string}
+                    </TableHead>
+                  );
+                }),
+              )}
+              {/* Action column */}
+            </TableRow>
+          </TableHeader>
+        )}
 
         <TableBody>
           {/* Top spacer */}
@@ -648,35 +1128,10 @@ function SheetTable<
           {/* Virtualized rows */}
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
             const { row, groupKey, level } = flatRows[virtualRow.index];
-            return (
-              <SheetTableRow
-                key={row.id}
-                row={row}
-                groupKey={groupKey}
-                level={level}
-                hoveredRowId={hoveredRowId}
-                setHoveredRowId={setHoveredRowId}
-                enableRowSelection={enableRowSelection}
-                enableRowActions={enableRowActions}
-                rowActions={rowActions}
-                cellErrors={cellErrors}
-                disabledColumns={disabledColumns}
-                disabledRows={disabledRows}
-                onActionClicked={onActionClicked}
-                onEdit={onEdit}
-                handleCellFocus={handleCellFocus}
-                handleKeyDown={handleKeyDown}
-                handlePaste={handlePaste}
-                handleCellInput={handleCellInput}
-                handleCellBlur={handleCellBlur}
-                texts={texts}
-                canEditAction={props.canEditAction}
-                canDuplicateAction={props.canDuplicateAction}
-                canViewAction={props.canViewAction}
-                canArchiveAction={props.canArchiveAction}
-                canDeleteAction={props.canDeleteAction}
-                canPreviewAction={props.canPreviewAction}
-              />
+            // Render as TableRow, not div
+            return React.cloneElement(
+              memoizedRenderRow(row, groupKey, level) as React.ReactElement,
+              { key: row.id },
             );
           })}
           {/* Bottom spacer */}

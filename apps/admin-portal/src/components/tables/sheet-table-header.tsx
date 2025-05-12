@@ -1,5 +1,7 @@
 import React from "react";
+
 import { TableHeader, TableRow, TableHead } from "@/components/ui/table";
+
 import { cn } from "@/lib/utils";
 
 /**
@@ -53,7 +55,13 @@ export function SheetTableHeader({
       <TableRow className="border-none">
         {/* Selection checkbox header */}
         {enableRowSelection && (
-          <TableHead className="bg-muted sticky start-0 top-0 z-30 w-8 !max-w-8 min-w-8 border-none text-start">
+          <TableHead
+            className={cn(
+              "bg-muted sticky start-0 top-0 z-30 w-8 border-none text-start",
+
+              // "!max-w-8 min-w-8"
+            )}
+          >
             <div className="flex h-full items-center justify-center">
               <input
                 type="checkbox"
@@ -80,11 +88,9 @@ export function SheetTableHeader({
               const size = header.getSize();
               if (size) style.width = `${size}px`;
               if (col.minSize)
-                style.minWidth =
-                  typeof col.minSize === "number" ? `${col.minSize}px` : col.minSize;
+                style.minWidth = typeof col.minSize === "number" ? `${col.minSize}px` : col.minSize;
               if (col.maxSize)
-                style.maxWidth =
-                  typeof col.maxSize === "number" ? `${col.maxSize}px` : col.maxSize;
+                style.maxWidth = typeof col.maxSize === "number" ? `${col.maxSize}px` : col.maxSize;
             } else {
               if (!col.size && !col.minSize && !col.maxSize) {
                 style.width = "150px";
@@ -93,8 +99,7 @@ export function SheetTableHeader({
                 style.minWidth = "120px";
               }
               if (col.maxSize) {
-                style.maxWidth =
-                  typeof col.maxSize === "number" ? `${col.maxSize}px` : col.maxSize;
+                style.maxWidth = typeof col.maxSize === "number" ? `${col.maxSize}px` : col.maxSize;
                 if (style.width && style.maxWidth) {
                   const widthPx = parseInt(style.width.toString());
                   const maxPx = parseInt(style.maxWidth.toString());
@@ -105,12 +110,33 @@ export function SheetTableHeader({
             return (
               <TableHead
                 key={header.id}
-                className="bg-muted sticky top-0 !z-20 border-x text-start"
+                className="bg-muted group sticky top-0 !z-20 border-x text-start"
                 style={style}
               >
-                {header.isPlaceholder
-                  ? null
-                  : header.column.columnDef.header}
+                {header.isPlaceholder ? null : (
+                  <div className="relative flex h-full items-center">
+                    <span className="truncate">{header.column.columnDef.header}</span>
+                    {enableColumnSizing && header.column.getCanResize() && (
+                      <div
+                        onMouseDown={header.getResizeHandler()}
+                        onTouchStart={header.getResizeHandler()}
+                        className={cn(
+                          "group-hover:bg-accent/30 absolute top-0 right-0 z-50 h-full w-2 cursor-col-resize bg-transparent transition select-none",
+                          header.column.getIsResizing() && "bg-primary/40",
+                        )}
+                        style={{ userSelect: "none" }}
+                        role="separator"
+                        aria-orientation="vertical"
+                        tabIndex={-1}
+                      >
+                        {/* Optionally, a visual indicator */}
+                        {header.column.getIsResizing() && (
+                          <div className="bg-primary/80 absolute top-0 right-0 h-full w-1 animate-pulse" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </TableHead>
             );
           }),
@@ -120,4 +146,4 @@ export function SheetTableHeader({
   );
 }
 
-export default SheetTableHeader; 
+export default SheetTableHeader;
