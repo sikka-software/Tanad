@@ -27,6 +27,7 @@ import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/employee/employee.options
 import useEmployeesStore from "@/employee/employee.store";
 import EmployeesTable from "@/employee/employee.table";
 
+import useEmployeeColumns from "@/modules/employee/employee.columns";
 import { EmployeeForm } from "@/modules/employee/employee.form";
 import { Employee } from "@/modules/employee/employee.types";
 import { useJobs } from "@/modules/job/job.hooks";
@@ -35,6 +36,7 @@ import useUserStore from "@/stores/use-user-store";
 export default function EmployeesPage() {
   const t = useTranslations();
   const router = useRouter();
+  const columns = useEmployeeColumns();
 
   const { data: jobs } = useJobs();
 
@@ -117,6 +119,7 @@ export default function EmployeesPage() {
         ) : (
           <PageSearchAndFilter
             store={useEmployeesStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Employees.title")}

@@ -1,24 +1,23 @@
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
-import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
-
-import CurrencyCell from "@/components/tables/currency-cell";
 
 import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useCarColumns from "./car.columns";
 import { useUpdateCar } from "./car.hooks";
 import useCarStore from "./car.store";
 import { Car } from "./car.type";
 
 const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Car>) => {
   const t = useTranslations();
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+
+  const columns = useCarColumns();
   const { mutate: updateCar } = useUpdateCar();
   const selectedRows = useCarStore((state) => state.selectedRows);
   const setSelectedRows = useCarStore((state) => state.setSelectedRows);
@@ -36,71 +35,6 @@ const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const columns: ExtendedColumnDef<Car>[] = [
-    {
-      accessorKey: "name",
-      header: t("Cars.form.name.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "code",
-      header: t("Cars.form.code.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "make",
-      header: t("Vehicles.form.make.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "model",
-      header: t("Vehicles.form.model.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "year",
-      header: t("Vehicles.form.year.label"),
-      validationSchema: z.number().min(0, "Required"),
-    },
-    {
-      accessorKey: "color",
-      header: t("Vehicles.form.color.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "vin",
-      header: t("Vehicles.form.vin.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "license_country",
-      header: t("Vehicles.form.license_country.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "license_plate",
-      header: t("Vehicles.form.license_plate.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "ownership_status",
-      header: t("Vehicles.form.ownership_status.label"),
-      validationSchema: z.string().min(1, "Required"),
-      cellType: "select",
-      options: [
-        { label: t("Vehicles.form.ownership_status.financed"), value: "financed" },
-        { label: t("Vehicles.form.ownership_status.owned"), value: "owned" },
-        { label: t("Vehicles.form.ownership_status.rented"), value: "rented" },
-      ],
-    },
-    {
-      accessorKey: "monthly_payment",
-      header: t("Cars.form.monthly_payment.label"),
-      validationSchema: z.number().min(0, "Required"),
-      cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
-    },
-  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;

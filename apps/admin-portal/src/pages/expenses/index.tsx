@@ -1,3 +1,4 @@
+import useExpenseColumns from "@root/src/modules/expense/expense.columns";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
@@ -31,6 +32,8 @@ import useUserStore from "@/stores/use-user-store";
 export default function ExpensesPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const columns = useExpenseColumns();
 
   const canReadExpenses = useUserStore((state) => state.hasPermission("expenses.read"));
   const canCreateExpenses = useUserStore((state) => state.hasPermission("expenses.create"));
@@ -108,6 +111,7 @@ export default function ExpensesPage() {
         ) : (
           <PageSearchAndFilter
             store={useExpenseStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Expenses.title")}

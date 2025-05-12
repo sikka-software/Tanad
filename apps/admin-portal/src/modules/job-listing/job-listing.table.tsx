@@ -1,17 +1,15 @@
-import { cn } from "@root/src/lib/utils";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
-import { z } from "zod";
 
-import { Badge } from "@/ui/badge";
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useJobListingColumns from "./job-listing.columns";
 import { useUpdateJobListing } from "./job-listing.hooks";
 import useJobListingsStore from "./job-listing.store";
 import { JobListingWithJobs } from "./job-listing.type";
@@ -23,6 +21,9 @@ const JobListingsTable = ({
   onActionClicked,
 }: ModuleTableProps<JobListingWithJobs>) => {
   const t = useTranslations();
+
+  const columns = useJobListingColumns();
+
   const { mutate: updateJobListing } = useUpdateJobListing();
 
   const columnVisibility = useJobListingsStore((state) => state.columnVisibility);
@@ -41,42 +42,6 @@ const JobListingsTable = ({
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const columns: ExtendedColumnDef<JobListingWithJobs>[] = [
-    {
-      accessorKey: "title",
-      header: t("JobListings.form.title.label"),
-      validationSchema: z.string().min(1, t("JobListings.form.title.required")),
-    },
-    {
-      accessorKey: "description",
-      header: t("JobListings.form.description.label"),
-      validationSchema: z.string().min(1, t("JobListings.form.description.required")),
-    },
-
-    {
-      accessorKey: "slug",
-      header: t("JobListings.form.slug.label"),
-      validationSchema: z.string().min(1, t("JobListings.form.slug.required")),
-    },
-    {
-      accessorKey: "jobs_count",
-      header: t("JobListings.jobs_count.label", { defaultMessage: "Jobs" }),
-      enableEditing: false,
-      cell: ({ row }) => row.original.jobs_count,
-    },
-    {
-      accessorKey: "status",
-      maxSize: 80,
-      header: t("JobListings.form.status.label"),
-      validationSchema: z.boolean(),
-      cellType: "status",
-      options: [
-        { value: "active", label: t("JobListings.form.status.active") },
-        { value: "inactive", label: t("JobListings.form.status.inactive") },
-      ],
-    },
-  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "job_listing_id") return;

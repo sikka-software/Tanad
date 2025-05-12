@@ -18,6 +18,8 @@ import { Employee, EmployeeUpdateData } from "@/employee/employee.types";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useEmployeeColumns from "./employee.columns";
+
 const EmployeesTable = ({
   data,
   isLoading,
@@ -26,7 +28,9 @@ const EmployeesTable = ({
 }: ModuleTableProps<Employee>) => {
   const t = useTranslations();
   const { data: departments } = useDepartments();
-  const { data: jobs } = useJobs();
+
+  const columns = useEmployeeColumns();
+
   const { mutateAsync: updateEmployee } = useUpdateEmployee();
   const selectedRows = useEmployeeStore((state) => state.selectedRows);
   const setSelectedRows = useEmployeeStore((state) => state.setSelectedRows);
@@ -44,60 +48,6 @@ const EmployeesTable = ({
   const [pendingUpdates, setPendingUpdates] = useState<Record<string, EmployeeUpdateData>>({});
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const columns: ExtendedColumnDef<Employee>[] = [
-    {
-      accessorKey: "first_name",
-      header: t("Employees.form.first_name.label"),
-      validationSchema: z.string().min(1, t("Employees.form.first_name.required")),
-    },
-    {
-      accessorKey: "last_name",
-      header: t("Employees.form.last_name.label"),
-      validationSchema: z.string().min(1, t("Employees.form.last_name.required")),
-    },
-    {
-      accessorKey: "email",
-      dir: "ltr",
-      header: t("Employees.form.email.label"),
-      validationSchema: z.string().email(t("Employees.form.email.invalid")),
-    },
-    {
-      accessorKey: "phone",
-      header: t("Employees.form.phone.label"),
-      validationSchema: z.string().optional(),
-    },
-    {
-      accessorKey: "job_id",
-      header: t("Employees.form.job.label"),
-      validationSchema: z.string().min(1, t("Employees.form.job.required")),
-      cell: ({ row }) => {
-        const jobId = row.original.job_id;
-        const job = jobs?.find((j) => j.id === jobId);
-        return job ? job.title : jobId || "-";
-      },
-    },
-    {
-      accessorKey: "nationality",
-      header: t("Employees.form.nationality.label"),
-      maxSize: 100,
-      validationSchema: z.string().min(1, t("Employees.form.nationality.required")),
-    },
-    {
-      accessorKey: "status",
-      maxSize: 100,
-      header: t("Employees.form.status.label"),
-      validationSchema: z.enum(["active", "inactive", "on_leave", "terminated", "resigned"]),
-      cellType: "select",
-      options: [
-        { label: t("Employees.form.status.active"), value: "active" },
-        { label: t("Employees.form.status.inactive"), value: "inactive" },
-        { label: t("Employees.form.status.on_leave"), value: "on_leave" },
-        { label: t("Employees.form.status.terminated"), value: "terminated" },
-        { label: t("Employees.form.status.resigned"), value: "resigned" },
-      ],
-    },
-  ];
 
   useEffect(() => {
     setCurrentData(data);

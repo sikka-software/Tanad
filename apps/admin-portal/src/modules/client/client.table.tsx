@@ -1,9 +1,8 @@
 import { useTranslations } from "next-intl";
 import { useCallback } from "react";
-import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
@@ -14,8 +13,12 @@ import { Client } from "@/client/client.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useClientColumns from "./client.columns";
+
 const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Client>) => {
   const t = useTranslations();
+
+  const columns = useClientColumns();
   const { mutate: updateClient } = useUpdateClient();
   const selectedRows = useClientStore((state) => state.selectedRows);
   const setSelectedRows = useClientStore((state) => state.setSelectedRows);
@@ -30,63 +33,6 @@ const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const canDeleteClient = useUserStore((state) => state.hasPermission("clients.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const columns: ExtendedColumnDef<Client>[] = [
-    {
-      accessorKey: "name",
-      header: t("Clients.form.name.label"),
-      validationSchema: z.string().min(1, t("Clients.form.name.required")),
-    },
-    {
-      accessorKey: "email",
-      header: t("Clients.form.email.label"),
-      validationSchema: z.string().email(t("Clients.form.email.invalid")),
-      cell: ({ row }) => <span dir="ltr">{row.original.email}</span>,
-    },
-    {
-      accessorKey: "phone",
-      header: t("Clients.form.phone.label"),
-      validationSchema: z.string().min(1, t("Clients.form.phone.required")),
-      cell: ({ row }) => <span dir="ltr">{row.original.phone}</span>,
-    },
-    {
-      accessorKey: "company_name",
-
-      header: t("Clients.form.company.label", { defaultValue: "Company" }),
-      cell: ({ row }) => {
-        const company = row.original.company;
-        if (company && typeof company === "object" && "name" in company) {
-          return (company as any).name || "-";
-        }
-        return "-";
-      },
-      enableEditing: false,
-    },
-
-    {
-      accessorKey: "city",
-      header: t("Forms.city.label"),
-      validationSchema: z.string().min(1, t("Forms.city.required")),
-    },
-    {
-      accessorKey: "region",
-      header: t("Forms.region.label"),
-      validationSchema: z.string().min(1, t("Forms.region.required")),
-    },
-
-    {
-      accessorKey: "status",
-      maxSize: 80,
-
-      header: t("Clients.form.status.label"),
-      validationSchema: z.enum(["active", "inactive"]),
-      cellType: "status",
-      options: [
-        { label: t("Clients.form.status.active"), value: "active" },
-        { label: t("Clients.form.status.inactive"), value: "inactive" },
-      ],
-    },
-  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "client_id") return;

@@ -1,3 +1,4 @@
+import useCarColumns from "@root/src/modules/car/car.columns";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
@@ -29,6 +30,8 @@ import useUserStore from "@/stores/use-user-store";
 export default function CarsPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const columns = useCarColumns();
 
   const canReadCars = useUserStore((state) => state.hasPermission("cars.read"));
   const canCreateCars = useUserStore((state) => state.hasPermission("cars.create"));
@@ -116,6 +119,7 @@ export default function CarsPage() {
         ) : (
           <PageSearchAndFilter
             store={useCarStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Cars.title")}

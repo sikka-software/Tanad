@@ -29,12 +29,15 @@ import useJobListingsStore from "@/job-listing/job-listing.store";
 import JobListingsTable from "@/job-listing/job-listing.table";
 import { JobListingWithJobs } from "@/job-listing/job-listing.type";
 
+import useJobListingColumns from "@/modules/job-listing/job-listing.columns";
 import { JobListingForm } from "@/modules/job-listing/job-listing.form";
 import useUserStore from "@/stores/use-user-store";
 
 export default function JobListingsPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const columns = useJobListingColumns();
 
   const canReadJobListings = useUserStore((state) => state.hasPermission("job_listings.read"));
   const canCreateJobListings = useUserStore((state) => state.hasPermission("job_listings.create"));
@@ -119,6 +122,7 @@ export default function JobListingsPage() {
         ) : (
           <PageSearchAndFilter
             store={useJobListingsStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.JobListings.title")}

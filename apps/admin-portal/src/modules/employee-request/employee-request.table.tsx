@@ -1,11 +1,8 @@
-import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import React from "react";
-import { z } from "zod";
 
-import { Badge } from "@/ui/badge";
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
@@ -16,6 +13,8 @@ import { EmployeeRequest } from "@/employee-request/employee-request.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useEmployeeRequestColumns from "./employee-request.columns";
+
 const EmployeeRequestsTable = ({
   data,
   isLoading,
@@ -23,6 +22,8 @@ const EmployeeRequestsTable = ({
   onActionClicked,
 }: ModuleTableProps<EmployeeRequest>) => {
   const t = useTranslations();
+
+  const columns = useEmployeeRequestColumns();
   const { mutate: updateEmployeeRequest } = useUpdateEmployeeRequest();
   const setSelectedRows = useEmployeeRequestsStore((state) => state.setSelectedRows);
   const selectedRows = useEmployeeRequestsStore((state) => state.selectedRows);
@@ -47,69 +48,6 @@ const EmployeeRequestsTable = ({
   );
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const columns: ExtendedColumnDef<EmployeeRequest>[] = [
-    {
-      accessorKey: "type",
-      header: t("EmployeeRequests.form.type.label"),
-      cell: ({ row }: { row: { original: EmployeeRequest } }) => (
-        <Badge variant="outline" className="capitalize">
-          {row.original.type}
-        </Badge>
-      ),
-    },
-    {
-      accessorKey: "title",
-      header: t("EmployeeRequests.form.title.label"),
-      validationSchema: z.string().min(1, t("EmployeeRequests.form.title.required")),
-    },
-
-    {
-      accessorKey: "start_date",
-      header: t("EmployeeRequests.form.date_range.start"),
-      cell: ({ row }: { row: { original: EmployeeRequest } }) =>
-        row.original.start_date ? format(new Date(row.original.start_date), "PP") : "-",
-    },
-    {
-      accessorKey: "end_date",
-      header: t("EmployeeRequests.form.date_range.end"),
-      cell: ({ row }: { row: { original: EmployeeRequest } }) =>
-        row.original.end_date ? format(new Date(row.original.end_date), "PP") : "-",
-    },
-    {
-      accessorKey: "amount",
-      header: t("EmployeeRequests.form.amount.label"),
-      cell: ({ row }: { row: { original: EmployeeRequest } }) =>
-        row.original.amount ? `$${row.original.amount.toFixed(2)}` : "-",
-    },
-    {
-      accessorKey: "description",
-      header: t("EmployeeRequests.form.description.label"),
-      validationSchema: z.string().nullable(),
-    },
-    {
-      accessorKey: "notes",
-      header: t("EmployeeRequests.form.notes.label"),
-      validationSchema: z.string().nullable(),
-    },
-    {
-      accessorKey: "status",
-      header: t("EmployeeRequests.form.status.label"),
-      cell: ({ row }: { row: { original: EmployeeRequest } }) => {
-        const variant =
-          row.original.status === "approved"
-            ? "secondary"
-            : row.original.status === "rejected"
-              ? "destructive"
-              : "default";
-        return (
-          <Badge variant={variant} className="capitalize">
-            {row.original.status}
-          </Badge>
-        );
-      },
-    },
-  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateEmployeeRequest({ id: rowId, updates: { [columnId]: value } });

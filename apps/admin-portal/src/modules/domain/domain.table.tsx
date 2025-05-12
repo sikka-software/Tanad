@@ -12,13 +12,15 @@ import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useDomainColumns from "./domain.columns";
 import { useUpdateDomain } from "./domain.hooks";
 import useDomainStore from "./domain.store";
 import { Domain } from "./domain.type";
 
 const DomainsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Domain>) => {
   const t = useTranslations();
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+  const columns = useDomainColumns();
+
   const { mutate: updateDomain } = useUpdateDomain();
   const selectedRows = useDomainStore((state) => state.selectedRows);
   const setSelectedRows = useDomainStore((state) => state.setSelectedRows);
@@ -34,52 +36,6 @@ const DomainsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const columns: ExtendedColumnDef<Domain>[] = [
-    {
-      accessorKey: "domain_name",
-      header: t("Domains.form.domain_name.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "registrar",
-      header: t("Domains.form.registrar.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "monthly_cost",
-      header: t("Domains.form.monthly_cost.label"),
-      validationSchema: z.number().min(0, "Required"),
-      cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
-    },
-    {
-      accessorKey: "annual_cost",
-      header: t("Domains.form.annual_cost.label"),
-      validationSchema: z.number().min(0, "Required"),
-      cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
-    },
-    {
-      accessorKey: "payment_cycle",
-      cellType: "select",
-      options: [
-        { label: t("Domains.form.payment_cycle.monthly"), value: "monthly" },
-        { label: t("Domains.form.payment_cycle.annual"), value: "annual" },
-      ],
-      header: t("Domains.form.payment_cycle.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "status",
-      maxSize: 80,
-      header: t("Domains.form.status.label"),
-      validationSchema: z.enum(["active", "inactive"]),
-      cellType: "status",
-      options: [
-        { label: t("Domains.form.status.active"), value: "active" },
-        { label: t("Domains.form.status.inactive"), value: "inactive" },
-      ],
-    },
-  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "domain_id") return;

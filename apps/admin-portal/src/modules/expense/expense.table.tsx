@@ -1,14 +1,9 @@
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
-import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
-
-import { MoneyFormatter } from "@/components/ui/currency-input";
-
-import { getCurrencySymbol } from "@/lib/currency-utils";
 
 import { ModuleTableProps } from "@/types/common.type";
 
@@ -18,9 +13,13 @@ import { Expense } from "@/expense/expense.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useExpenseColumns from "./expense.columns";
+
 const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Expense>) => {
   const t = useTranslations();
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+
+  const columns = useExpenseColumns();
+
   const { mutate: updateExpense } = useUpdateExpense();
   const selectedRows = useExpenseStore((state) => state.selectedRows);
   const setSelectedRows = useExpenseStore((state) => state.setSelectedRows);
@@ -36,56 +35,6 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const columns: ExtendedColumnDef<Expense>[] = [
-    {
-      accessorKey: "expense_number",
-      header: t("Expenses.form.expense_number.label"),
-      validationSchema: z.string().min(1, t("Expenses.form.expense_number.required")),
-    },
-    {
-      accessorKey: "issue_date",
-      header: t("Expenses.form.issue_date.label"),
-      validationSchema: z.string().min(1, t("Expenses.form.issue_date.required")),
-    },
-    {
-      accessorKey: "due_date",
-      header: t("Expenses.form.due_date.label"),
-      validationSchema: z.string().min(1, t("Expenses.form.due_date.required")),
-    },
-
-    {
-      accessorKey: "amount",
-      header: t("Expenses.form.amount.label"),
-      validationSchema: z.number().min(0, t("Expenses.form.amount.required")),
-      cell: ({ row }) => {
-        return (
-          <span className="flex flex-row items-center gap-1 text-sm font-medium">
-            {MoneyFormatter(row.getValue("amount"))}
-            {getCurrencySymbol(currency || "sar").symbol}
-          </span>
-        );
-      },
-    },
-    {
-      accessorKey: "category",
-      header: t("Expenses.form.category.label"),
-      validationSchema: z.string().min(1, t("Expenses.form.category.required")),
-    },
-
-    {
-      accessorKey: "status",
-      header: t("Expenses.form.status.label"),
-      validationSchema: z.enum(["paid", "pending", "rejected", "overdue"]),
-      cellType: "select",
-      options: [
-        { label: t("Expenses.form.status.paid"), value: "paid" },
-        { label: t("Expenses.form.status.pending"), value: "pending" },
-        { label: t("Expenses.form.status.rejected"), value: "rejected" },
-        { label: t("Expenses.form.status.overdue"), value: "overdue" },
-      ],
-    },
-  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "expense_id") return;

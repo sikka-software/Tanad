@@ -1,4 +1,5 @@
 import DomainCard from "@root/src/modules/domain/domain.card";
+import useDomainColumns from "@root/src/modules/domain/domain.columns";
 import { DomainForm } from "@root/src/modules/domain/domain.form";
 import {
   useDomains,
@@ -13,7 +14,6 @@ import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -34,6 +34,8 @@ import useUserStore from "@/stores/use-user-store";
 export default function DomainsPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const columns = useDomainColumns();
 
   const canReadDomains = useUserStore((state) => state.hasPermission("domains.read"));
   const canCreateDomains = useUserStore((state) => state.hasPermission("domains.create"));
@@ -110,6 +112,7 @@ export default function DomainsPage() {
         ) : (
           <PageSearchAndFilter
             store={useDomainStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Domains.title")}

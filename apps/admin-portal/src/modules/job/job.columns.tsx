@@ -1,0 +1,98 @@
+import { MoneyFormatter } from "@root/src/components/ui/currency-input";
+import { getCurrencySymbol } from "@root/src/lib/currency-utils";
+import useUserStore from "@root/src/stores/use-user-store";
+import { CellContext } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
+import { z } from "zod";
+
+import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+
+import { Job } from "./job.type";
+
+const useJobColumns = () => {
+  const t = useTranslations();
+  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+
+  const columns: ExtendedColumnDef<Job>[] = [
+    {
+      accessorKey: "title",
+      header: t("Jobs.form.title.label"),
+      validationSchema: z.string().min(1, t("Jobs.form.title.required")),
+    },
+    {
+      accessorKey: "type",
+      header: t("Jobs.form.type.label"),
+      cellType: "select",
+      options: [
+        { label: t("Jobs.form.type.full_time"), value: "full_time" },
+        { label: t("Jobs.form.type.part_time"), value: "part_time" },
+        { label: t("Jobs.form.type.contract"), value: "contract" },
+        { label: t("Jobs.form.type.internship"), value: "internship" },
+        { label: t("Jobs.form.type.temporary"), value: "temporary" },
+      ],
+      validationSchema: z.string().min(1, t("Jobs.form.type.required")),
+    },
+    {
+      accessorKey: "department",
+      header: t("Jobs.form.department.label"),
+      validationSchema: z.string().min(1, t("Jobs.form.department.required")),
+    },
+    {
+      accessorKey: "location",
+      header: t("Jobs.form.location.label"),
+      validationSchema: z.string().min(1, t("Jobs.form.location.required")),
+    },
+    {
+      accessorKey: "salary",
+      header: t("Jobs.form.salary.label"),
+      validationSchema: z.number().min(0, t("Jobs.form.salary.required")),
+      cell: (props: CellContext<Job, unknown>) =>
+        props.row.original.salary ? (
+          <span className="flex flex-row items-center gap-1 text-sm font-medium">
+            {MoneyFormatter(props.row.original.salary)}
+            {
+              getCurrencySymbol(currency || "sar", {
+                usdClassName: "-ms-1",
+              }).symbol
+            }
+          </span>
+        ) : (
+          "N/A"
+        ),
+    },
+    {
+      accessorKey: "total_positions",
+      header: t("Jobs.form.total_positions.label"),
+      cell: (props: CellContext<Job, unknown>) => {
+        const value = props.row.original.total_positions;
+        if (value === null || value === undefined) return "N/A";
+        const num = typeof value === "number" ? value : parseInt(value, 10);
+        return isNaN(num) ? "N/A" : num;
+      },
+    },
+    {
+      accessorKey: "occupied_positions",
+      header: t("Jobs.form.occupied_positions.label"),
+      cell: (props: CellContext<Job, unknown>) => {
+        const value = props.row.original.occupied_positions;
+        if (value === null || value === undefined) return "N/A";
+        const num = typeof value === "number" ? value : parseInt(value, 10);
+        return isNaN(num) ? "N/A" : num;
+      },
+    },
+    {
+      accessorKey: "status",
+      maxSize: 80,
+      header: t("Jobs.form.status.label"),
+      validationSchema: z.boolean(),
+      cellType: "status",
+      options: [
+        { value: "active", label: t("Jobs.form.status.active") },
+        { value: "inactive", label: t("Jobs.form.status.inactive") },
+      ],
+    },
+  ];
+  return columns;
+};
+
+export default useJobColumns;

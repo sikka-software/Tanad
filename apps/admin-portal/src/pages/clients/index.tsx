@@ -26,11 +26,13 @@ import useClientStore from "@/client/client.store";
 import ClientsTable from "@/client/client.table";
 import { ClientUpdateData } from "@/client/client.type";
 
+import useClientColumns from "@/modules/client/client.columns";
 import useUserStore from "@/stores/use-user-store";
 
 export default function ClientsPage() {
   const t = useTranslations();
   const router = useRouter();
+  const columns = useClientColumns();
 
   const canReadClients = useUserStore((state) => state.hasPermission("clients.read"));
   const canCreateClients = useUserStore((state) => state.hasPermission("clients.create"));
@@ -111,6 +113,7 @@ export default function ClientsPage() {
         ) : (
           <PageSearchAndFilter
             store={useClientStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Clients.title")}
