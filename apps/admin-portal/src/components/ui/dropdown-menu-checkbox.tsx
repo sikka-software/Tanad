@@ -25,6 +25,7 @@ export type DropdownMenuCheckboxProps = {
   menuLabel?: string;
   children?: React.ReactNode;
   contentClassName?: string;
+  dir?: "ltr" | "rtl";
 };
 
 export function DropdownMenuCheckbox({
@@ -32,9 +33,10 @@ export function DropdownMenuCheckbox({
   menuLabel = "Options",
   children,
   contentClassName = "w-56",
+  dir = "rtl",
 }: DropdownMenuCheckboxProps) {
   return (
-    <DropdownMenu>
+    <DropdownMenu dir={dir}>
       <DropdownMenuTrigger asChild>
         {children || <Button variant="outline">Open</Button>}
       </DropdownMenuTrigger>

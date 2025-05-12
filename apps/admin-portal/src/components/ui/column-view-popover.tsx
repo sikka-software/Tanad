@@ -1,10 +1,10 @@
+import { VisibilityState, Updater } from "@tanstack/react-table";
 import { Eye } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 
 import { DropdownMenuCheckbox } from "./dropdown-menu-checkbox";
 import IconButton from "./icon-button";
 import { ExtendedColumnDef } from "./sheet-table";
-
-import { VisibilityState, Updater } from "@tanstack/react-table";
 
 type ColumnViewPopoverProps = {
   columns: ExtendedColumnDef<any>[];
@@ -12,10 +12,18 @@ type ColumnViewPopoverProps = {
   onColumnVisibilityChange: (updater: Updater<VisibilityState>) => void;
 };
 
-const ColumnViewPopover = ({ columns, columnVisibility, onColumnVisibilityChange }: ColumnViewPopoverProps) => {
+const ColumnViewPopover = ({
+  columns,
+  columnVisibility,
+  onColumnVisibilityChange,
+}: ColumnViewPopoverProps) => {
+  const t = useTranslations();
+  const locale = useLocale();
   return (
     <div>
       <DropdownMenuCheckbox
+        dir={locale === "ar" ? "rtl" : "ltr"}
+        menuLabel={t("General.columns")}
         items={columns.map((column) => {
           const key = column.id || column.accessorKey || "";
           return {
@@ -30,7 +38,7 @@ const ColumnViewPopover = ({ columns, columnVisibility, onColumnVisibilityChange
           };
         })}
       >
-        <IconButton icon={<Eye className="h-4 w-4" />} label="Columns" />
+        <IconButton icon={<Eye className="h-4 w-4" />} label={t("General.columns")} />
       </DropdownMenuCheckbox>
     </div>
   );

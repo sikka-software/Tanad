@@ -114,7 +114,7 @@ export default function InvoicesPage() {
         ) : (
           <PageSearchAndFilter
             store={useInvoiceStore}
-            columns={columns || []}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Invoices.title")}

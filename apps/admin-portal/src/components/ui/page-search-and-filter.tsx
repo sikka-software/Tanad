@@ -109,6 +109,13 @@ const PageSearchAndFilter = ({
       <div className="flex items-center gap-2">
         {!hideOptions && (
           <>
+            {columns && columns.length > 0 && (
+              <ColumnViewPopover
+                columns={columns}
+                columnVisibility={columnVisibility || {}}
+                onColumnVisibilityChange={onColumnVisibilityChange || (() => {})}
+              />
+            )}
             <IconButton
               icon={
                 viewMode === "table" ? (
@@ -119,10 +126,6 @@ const PageSearchAndFilter = ({
               }
               label={viewMode === "table" ? t("General.cards_view") : t("General.table_view")}
               onClick={() => setViewMode(viewMode === "table" ? "cards" : "table")}
-            />
-            <ColumnViewPopover columns={columns || []}
-              columnVisibility={columnVisibility || {}}
-              onColumnVisibilityChange={onColumnVisibilityChange || (() => {})}
             />
 
             <FilterPopover
