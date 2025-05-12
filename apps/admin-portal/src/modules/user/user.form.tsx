@@ -204,9 +204,6 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
           id: defaultValues.id,
           data: { ...mutationData, role_id: roleId } as UserUpdateData,
         });
-        toast.success(t("General.successful_operation"), {
-          description: t("Users.success.update"),
-        });
       } else {
         // Ensure password exists for creation, handled by schema but double-check
         if (!values.password) {
@@ -215,9 +212,6 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
           return;
         }
         await createUser({ ...mutationData, role_id: roleId } as UserCreateData);
-        toast.success(t("General.successful_operation"), {
-          description: t("Users.success.create"),
-        });
       }
       // Reset form fields explicitly
       form.reset({

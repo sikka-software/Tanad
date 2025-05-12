@@ -87,7 +87,9 @@ function AppContent({ Component, pageProps, router }: AppProps) {
           timeZone="Asia/Riyadh"
           now={new Date()}
         >
-          <AuthLayout>{<Component {...pageProps} />}</AuthLayout>
+          <QueryProvider>
+            <AuthLayout>{<Component {...pageProps} />}</AuthLayout>
+          </QueryProvider>
         </NextIntlClientProvider>
       </div>
     );
