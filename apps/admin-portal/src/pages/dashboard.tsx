@@ -1,59 +1,24 @@
-import { ModulesOptions } from "@root/tanad.config";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-
-import { StatCard } from "@/ui/stat-card";
 
 import { createClient } from "@/utils/supabase/component";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import useDashboardStore from "@/stores/dashboard.store";
 import useUserStore from "@/stores/use-user-store";
 
-import { convertToPascalCase } from "../lib/utils";
-
-// Update state interface to match view column names (or map later)
-interface DashboardStats {
-  totalSalaries: number;
-  totalInvoices: number;
-  totalProducts: number;
-  totalRevenue: number;
-  pendingInvoices: number;
-  totalEmployees: number;
-  totalDepartments: number;
-  totalJobs: number;
-  totalClients: number;
-  totalCompanies: number;
-  totalVendors: number;
-  totalOffices: number;
-  totalWarehouses: number;
-  totalBranches: number;
-  totalCars: number;
-  totalTrucks: number;
-  totalExpenses: number;
-  totalPurchases: number;
-  totalQuotes: number;
-  totalRoles: number;
-  totalJobListings: number;
-  totalEmployeeRequests: number;
-  totalApplicants: number;
-  totalUsers: number;
-  totalDomains: number;
-  totalWebsites: number;
-  totalServers: number;
-  totalOnlineStores: number;
-}
-
-// New interface for activity count data
-interface ActivityCountData {
-  date: string; // YYYY-MM-DD
-  count: number;
-}
+import DashboardCards from "../components/app/DashboardStatsCards";
+import DashboardStatsVertical from "../components/app/DashboardStatsVertical";
+import { DashboardStats } from "../types/dashboard.types";
 
 export default function Dashboard() {
+  const viewMode = useDashboardStore((state) => state.viewMode);
+  const setViewMode = useDashboardStore((state) => state.setViewMode);
+
   const supabase = createClient();
   const [stats, setStats] = useState<DashboardStats>({
     totalInvoices: 0,
@@ -88,11 +53,6 @@ export default function Dashboard() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState<string | null>(null);
 
-  // State for activity calendar
-  const [activityCounts, setActivityCounts] = useState<ActivityCountData[]>([]);
-  const [loadingActivity, setLoadingActivity] = useState(true);
-  const [activityError, setActivityError] = useState<string | null>(null);
-
   const t = useTranslations();
   const { user, profile, enterprise } = useUserStore();
   const hasPermission = useUserStore((state) => state.hasPermission);
@@ -105,7 +65,6 @@ export default function Dashboard() {
       if (!isMounted || !user?.id || !enterprise?.id) {
         if (isMounted) {
           setLoadingStats(false);
-          setLoadingActivity(false);
         }
         return;
       }
@@ -114,9 +73,7 @@ export default function Dashboard() {
 
       // Reset states on new fetch
       setLoadingStats(true);
-      setLoadingActivity(true);
       setStatsError(null);
-      setActivityError(null);
 
       // --- Fetch Stats --- (extracted logic)
       const fetchStats = async () => {
@@ -349,70 +306,12 @@ export default function Dashboard() {
   return (
     <div>
       <CustomPageMeta title={t("Pages.Dashboard.title")} description={t("Pages.Dashboard.title")} />
-      {profile?.stripe_customer_id && (
-        <div className="bg-green-500/20 p-1 text-center text-xs text-green-700 dark:text-green-300">
-          ✓ Premium Account
-        </div>
+
+      {viewMode === "vertical" ? (
+        <DashboardStatsVertical stats={stats} loadingStats={loadingStats} />
+      ) : (
+        <DashboardCards stats={stats} loadingStats={loadingStats} />
       )}
-      <div className="space-y-8 p-4">
-        <div>
-          {Object.entries(
-            Object.entries(ModulesOptions).reduce(
-              (acc, [key, module]) => {
-                if (!module.category) {
-                  // If category is empty (e.g., "" or undefined)
-                  return acc; // Skip this module, don't add it to any category
-                }
-                const category = module.category; // Category is guaranteed to be a non-empty string here
-                if (!acc[category]) {
-                  acc[category] = [];
-                }
-                // Add the original key to the module object for use in loops
-                acc[category].push({ ...module, key });
-                return acc;
-              },
-              {} as Record<string, Array<(typeof ModulesOptions)[string] & { key: string }>>,
-            ),
-          ).map(([categoryName, modulesInCategory]) => (
-            <div key={categoryName} className="mb-8">
-              <h2 className="mb-4 text-2xl font-semibold capitalize">
-                {/* You might want to translate category names too if they are dynamic */}
-                {t(`Pages.${categoryName.replace(/\s+/g, "_")}.title`) || categoryName}
-              </h2>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {modulesInCategory.map((module) => {
-                  const skippedModules = [
-                    "dashboard",
-                    "activity_logs", // Still skipping these as per original logic
-                    "analytics",
-                    "sales",
-                    "human_resources",
-                    "internet",
-                    "storage",
-                    "recruitment",
-                    "settings",
-                  ];
-                  if (skippedModules.includes(module.key)) return null;
-                  // Permission check
-                  const permissionKey = `${module.key}.read`;
-                  if (!hasPermission(permissionKey)) return null;
-                  const pascalKey = convertToPascalCase(module.key);
-                  return (
-                    <StatCard
-                      key={module.key}
-                      icon={<module.icon className="bg--500 m-0 size-4" />}
-                      title={t(module.translationKey)}
-                      value={stats[`total${pascalKey}` as keyof DashboardStats]}
-                      loading={loadingStats}
-                      link={module.url}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

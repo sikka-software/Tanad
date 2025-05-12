@@ -2139,6 +2139,8 @@
   "Dashboard": {
     "title": "لوحة التحكم",
     "create_product": "إضافة منتج",
+    "vertical": "عمودي",
+    "horizontal": "أفقي",
     "total_invoices": "إجمالي الفواتير",
     "pending": "معلقة",
     "total_products": "إجمالي المنتجات",

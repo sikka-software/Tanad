@@ -1,7 +1,8 @@
 import Cookies from "js-cookie";
-import { Loader2 } from "lucide-react";
+import { LayoutGrid, Loader2, Rows4 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { ThemeProvider, useTheme } from "next-themes";
+import { useRouter } from "next/router";
 import { Toaster } from "sonner";
 
 import { AppSidebar } from "@/ui/app-sidebar";
@@ -18,15 +19,22 @@ import { useMainStore } from "@/hooks/main.store";
 import ProtectedRoute from "@/components/app/ProtectedRoute";
 import { AppBreadcrumb } from "@/components/ui/app-breadcrumb";
 
+import useDashboardStore from "@/stores/dashboard.store";
 import useUserStore from "@/stores/use-user-store";
+
+import IconButton from "../ui/icon-button";
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const t = useTranslations();
   const lang = useLocale();
+  const router = useRouter();
   const defaultOpen = Cookies.get("sidebar_state") === "true";
   const { setOpenCommandMenu } = useMainStore();
   const { theme } = useTheme();
   const { loading: isUserDataLoading, user } = useUserStore();
+
+  const setViewMode = useDashboardStore((state) => state.setViewMode);
+  const viewMode = useDashboardStore((state) => state.viewMode);
 
   if (isUserDataLoading) {
     return (
@@ -59,13 +67,29 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
                 </div>
               </div>
               <div className="flex flex-row gap-2">
+                {router.pathname.includes("dashboard") && (
+                  <IconButton
+                    icon={
+                      viewMode === "horizontal" ? (
+                        <Rows4 className="size-4" />
+                      ) : (
+                        <LayoutGrid className="size-4" />
+                      )
+                    }
+                    label={viewMode === "horizontal" ? t("Dashboard.vertical") : t("Dashboard.horizontal")}
+                    variant="outline"
+                    size="icon_sm"
+                    className="h-8"
+                    onClick={() => setViewMode(viewMode === "vertical" ? "horizontal" : "vertical")}
+                  />
+                )}
                 <Button
                   variant="outline"
                   size="sm"
                   className="h-8 ps-1.5"
                   onClick={() => setOpenCommandMenu(true)}
                 >
-                  <kbd className="bg-muted pointer-events-none hidden h-5 items-center gap-1 rounded-inner-1 border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex">
+                  <kbd className="bg-muted rounded-inner-1 pointer-events-none hidden h-5 items-center gap-1 border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex">
                     <span className="text-xs">⌘</span>K
                   </kbd>
                   <span className="text-muted-foreground text-xs">{t("General.quick_access")}</span>
@@ -76,7 +100,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
               </div>
             </div>
             <div className="relative mx-auto">
-              <div className="block md:hidden p-2 border-b">
+              <div className="block border-b p-2 md:hidden">
                 <AppBreadcrumb />
               </div>
               {children}
