@@ -1,5 +1,4 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { CheckCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";

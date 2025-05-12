@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@root/src/components/ui/button";
+
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -16,9 +18,13 @@ import { BankAccount } from "./bank_account.type";
 export function BankAccountsTable({
   data,
   isLoading,
+  onEdit,
+  onDelete,
 }: {
   data: BankAccount[];
   isLoading: boolean;
+  onEdit: (account: BankAccount) => void;
+  onDelete: (account: BankAccount) => void;
 }) {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -66,6 +72,14 @@ export function BankAccountsTable({
                 <TableCell>
                   <Badge className={getStatusColor(account.status)}>{account.status}</Badge>
                 </TableCell>
+                <TableCell>
+                  <Button onClick={() => onEdit(account)} variant="outline">
+                    Edit
+                  </Button>
+                  <Button onClick={() => onDelete(account)} variant="outline">
+                    Delete
+                  </Button>
+                </TableCell>
               </TableRow>
             ))
           )}
@@ -86,6 +100,7 @@ function TableSkeleton() {
             <TableHead>Bank Name</TableHead>
             <TableHead>Account Type</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -102,6 +117,9 @@ function TableSkeleton() {
               </TableCell>
               <TableCell>
                 <Skeleton className="h-4 w-[100px]" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-[80px]" />
               </TableCell>
               <TableCell>
                 <Skeleton className="h-4 w-[80px]" />

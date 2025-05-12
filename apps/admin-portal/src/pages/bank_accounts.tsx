@@ -30,6 +30,7 @@ export default function BankAccountsPage() {
   const isDeleteDialogOpen = useBankAccountStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useBankAccountStore((state) => state.setIsDeleteDialogOpen);
   const actionableBankAccount = useBankAccountStore((state) => state.actionableItem);
+  const setActionableBankAccount = useBankAccountStore((state) => state.setActionableItem);
   const loadingSaveBankAccount = useBankAccountStore((state) => state.isLoading);
   const setIsLoadingSavingBankAccount = useBankAccountStore((state) => state.setIsLoading);
 
@@ -63,6 +64,14 @@ export default function BankAccountsPage() {
           <BankAccountsTable
             data={bankAccounts as BankAccount[]}
             isLoading={loadingFetchBankAccounts}
+            onEdit={(id) => {
+              setIsFormDialogOpen(true);
+              setActionableBankAccount(id);
+            }}
+            onDelete={(account) => {
+              setIsDeleteDialogOpen(true);
+              setActionableBankAccount(account);
+            }}
           />
         </div>
 
@@ -82,18 +91,18 @@ export default function BankAccountsPage() {
               setIsLoadingSavingBankAccount(false);
             }}
             defaultValues={actionableBankAccount}
-            editMode={true}
+            editMode={!!actionableBankAccount}
           />
         </FormDialog>
 
-        {/* <ConfirmDelete
+        <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-        //   handleConfirmDelete={() => handleConfirmDelete()}
+          handleConfirmDelete={() => handleConfirmDelete(actionableBankAccount?.id || "")}
           title={t("BankAccounts.confirm_delete")}
           description={t("BankAccounts.delete_description", { count: 1 })}
-        /> */}
+        />
       </DataPageLayout>
     </div>
   );
