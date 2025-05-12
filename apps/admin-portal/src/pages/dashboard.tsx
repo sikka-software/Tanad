@@ -1,19 +1,7 @@
 import { ModulesOptions } from "@root/tanad.config";
 import { pick } from "lodash";
-import {
-  Briefcase,
-  Building2,
-  DollarSign,
-  FileText,
-  Package,
-  Store,
-  UserRound,
-  UsersRound,
-  Warehouse,
-} from "lucide-react";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import { StatCard } from "@/ui/stat-card";
@@ -23,7 +11,6 @@ import { createClient } from "@/utils/supabase/component";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { getActivityCountsByDate } from "@/modules/activity/activity.service";
 import useUserStore from "@/stores/use-user-store";
 
 import { convertToPascalCase } from "../lib/utils";
@@ -108,6 +95,7 @@ export default function Dashboard() {
 
   const t = useTranslations();
   const { user, profile, enterprise } = useUserStore();
+  const hasPermission = useUserStore((state) => state.hasPermission);
 
   // Fetch dashboard stats and activity data
   useEffect(() => {
@@ -164,8 +152,8 @@ export default function Dashboard() {
           };
 
           const [
-            totalInvoices,
             pendingInvoicesCount,
+            totalInvoices,
             totalRevenue,
             totalProducts,
             totalEmployees,
@@ -193,9 +181,9 @@ export default function Dashboard() {
             totalServers,
             totalOnlineStores,
           ] = await Promise.all([
+            fetchSum("invoices", "total"),
             fetchCount("invoices"),
             fetchCount("invoices", { status: "pending" }),
-            fetchSum("invoices", "total"),
             fetchCount("products"),
             fetchCount("employees"),
             fetchCount("departments"),
@@ -371,7 +359,8 @@ export default function Dashboard() {
           {Object.entries(
             Object.entries(ModulesOptions).reduce(
               (acc, [key, module]) => {
-                if (!module.category) { // If category is empty (e.g., "" or undefined)
+                if (!module.category) {
+                  // If category is empty (e.g., "" or undefined)
                   return acc; // Skip this module, don't add it to any category
                 }
                 const category = module.category; // Category is guaranteed to be a non-empty string here
@@ -404,6 +393,9 @@ export default function Dashboard() {
                     "settings",
                   ];
                   if (skippedModules.includes(module.key)) return null;
+                  // Permission check
+                  const permissionKey = `${module.key}.read`;
+                  if (!hasPermission(permissionKey)) return null;
                   const pascalKey = convertToPascalCase(module.key);
                   return (
                     <StatCard
