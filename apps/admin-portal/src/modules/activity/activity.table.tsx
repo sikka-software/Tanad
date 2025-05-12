@@ -16,6 +16,16 @@ import { useActivityLogs } from "./activity.hook";
 import { useActivityLogStore } from "./activity.store";
 import type { ActivityLogListData } from "./activity.type";
 
+const formatDateTime = (dateString: string) => {
+  const date = new Date(dateString);
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  let hours = date.getHours();
+  const ampm = hours >= 12 ? "pm" : "am";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(hours)}:${pad(date.getMinutes())}:${pad(date.getSeconds())} ${ampm}`;
+};
+
 export function ActivityLogTable() {
   const t = useTranslations();
   const { openDialog, filters } = useActivityLogStore();
@@ -152,9 +162,7 @@ export function ActivityLogTable() {
                       <div className="flex flex-col">
                         <span>{format.relativeTime(new Date(item.created_at))}</span>
                         <span className="text-muted-foreground hidden text-[10px] lg:block">
-                          {item.created_at
-                            ? format.dateTime(new Date(item.created_at), "PPpp")
-                            : "N/A"}
+                          {item.created_at ? formatDateTime(item.created_at) : "N/A"}
                         </span>
                       </div>
                     </TableCell>

@@ -59,6 +59,7 @@ export default function Auth() {
 
       if (error) throw error;
       toast.success(t("Auth.logged_in_successfully"));
+      router.push("/dashboard");
     } catch (error: any) {
       // Attempt to translate Supabase auth error codes
       const errorCode = error.code || error.message;
@@ -390,7 +391,7 @@ export default function Auth() {
   );
 }
 
-Auth.messages = ["Pages", "Auth", "General"];
+Auth.messages = ["Pages", "Auth", "General", "SEO"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
