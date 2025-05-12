@@ -73,60 +73,6 @@ export function SheetTableCell<T extends object>({
   if (colDef.maxSize)
     style.maxWidth = typeof colDef.maxSize === "number" ? `${colDef.maxSize}px` : colDef.maxSize;
 
-  // Cell content logic (status, select, code, text)
-  if (colDef.cellType === "status" && colDef.options) {
-    const cellValue = cell.getValue() as string | number;
-    const selectedOption = colDef.options.find((opt) => opt.value === cellValue);
-    return (
-      <TableCell
-        className={cn(
-          "relative overflow-hidden border p-0",
-          {
-            "bg-muted": isDisabled,
-            "bg-destructive/25": errorMsg,
-          },
-          typeof colDef.className === "function" ? colDef.className(rowData) : colDef.className,
-        )}
-        style={{ ...style, overflow: "hidden", minWidth: 0 }}
-        {...rest}
-      >
-        <CommandSelect
-          dir={locale === "ar" ? "rtl" : "ltr"}
-          data={colDef.options}
-          inCell
-          isLoading={false}
-          defaultValue={String(selectedOption?.value)}
-          popoverClassName="w-full max-w-full"
-          buttonClassName="bg-transparent p-0 w-full max-w-full"
-          placeholderClassName="w-full p-0"
-          valueKey="value"
-          labelKey="label"
-          onChange={async (value) => {
-            if (onEdit) {
-              onEdit(rowId, colKey as keyof T, value as T[keyof T]);
-            }
-          }}
-          texts={{ placeholder: ". . ." }}
-          renderSelected={(item) => (
-            <div
-              className={cn(
-                "flex h-full w-full items-center justify-center bg-green-500 p-0 !px-2 text-center text-xs font-bold",
-                {
-                  "text-primary bg-green-200 hover:bg-green-200 dark:bg-green-700 dark:hover:bg-green-700":
-                    item.value === "active",
-                  "text-primary bg-red-200 hover:bg-red-200 dark:bg-red-700 dark:hover:bg-red-700":
-                    item.value === "inactive",
-                },
-              )}
-            >
-              {item.label}
-            </div>
-          )}
-          ariaInvalid={false}
-        />
-      </TableCell>
-    );
-  }
   if (colDef.cellType === "select" && colDef.options) {
     const cellValue = cell.getValue() as string | number;
     return (

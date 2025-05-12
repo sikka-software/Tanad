@@ -7,7 +7,7 @@ import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 import { Company } from "./company.type";
 
 const useCompanyColumns = (
-  handleEdit: (rowId: string, columnId: string, value: unknown) => void,
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
 
@@ -83,7 +83,7 @@ const useCompanyColumns = (
               { label: t("Companies.form.status.active"), value: "active" },
               { label: t("Companies.form.status.inactive"), value: "inactive" },
             ]}
-            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />
         );
       },

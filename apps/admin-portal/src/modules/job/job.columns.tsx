@@ -10,7 +10,7 @@ import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { Job } from "./job.type";
 
-const useJobColumns = (handleEdit: (rowId: string, columnId: string, value: unknown) => void) => {
+const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unknown) => void) => {
   const t = useTranslations();
   const currency = useUserStore((state) => state.profile?.user_settings?.currency);
 
@@ -98,7 +98,7 @@ const useJobColumns = (handleEdit: (rowId: string, columnId: string, value: unkn
               { label: t("Jobs.form.status.active"), value: "active" },
               { label: t("Jobs.form.status.inactive"), value: "inactive" },
             ]}
-            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />
         );
       },

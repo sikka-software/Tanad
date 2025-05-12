@@ -7,7 +7,7 @@ import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 import { JobListingWithJobs } from "./job-listing.type";
 
 const useCompanyColumns = (
-  handleEdit: (rowId: string, columnId: string, value: unknown) => void,
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
 
@@ -51,7 +51,7 @@ const useCompanyColumns = (
               { label: t("JobListings.form.status.active"), value: "active" },
               { label: t("JobListings.form.status.inactive"), value: "inactive" },
             ]}
-            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />
         );
       },

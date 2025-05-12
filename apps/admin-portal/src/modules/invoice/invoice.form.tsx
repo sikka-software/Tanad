@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { getNotesValue } from "@root/src/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/router";
@@ -8,7 +9,6 @@ import { useForm, useFieldArray, FieldValues, FieldError } from "react-hook-form
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
@@ -186,7 +186,7 @@ export function InvoiceForm({
 
     try {
       if (editMode && defaultValues?.id) {
-        const invoiceDataForUpdate: InvoiceUpdateData = {
+        const invoiceDataForUpdate = {
           id: defaultValues.id as string,
           client_id: data.client_id,
           invoice_number: data.invoice_number,

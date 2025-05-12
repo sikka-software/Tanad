@@ -29,7 +29,7 @@ const CompanyCard = ({
             currentStatus={company.status as CommonStatusProps}
             statuses={Object.values(CommonStatus) as CommonStatusProps[]}
             onStatusChange={(status: CommonStatusProps) =>
-              updateCompany({ id: company.id, company: { status } })
+              updateCompany({ id: company.id, data: { status } })
             }
           />
           <CardActions

@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -10,7 +11,6 @@ import { z } from "zod";
 
 import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
@@ -134,10 +134,7 @@ export function EmployeeRequestForm({
         // EmployeeRequestUpdateData allows partial updates and matches the zod schema structure
         const updatePayload: EmployeeRequestUpdateData = baseSubmitData;
 
-        await updateEmployeeRequest({
-          id: defaultValues.id,
-          updates: updatePayload,
-        });
+        await updateEmployeeRequest({ id: defaultValues.id, data: updatePayload });
         onSuccess?.();
       } else {
         // For create, prepare data without user_id

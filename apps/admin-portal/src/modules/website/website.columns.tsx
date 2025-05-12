@@ -7,7 +7,7 @@ import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 import { Website } from "./website.type";
 
 const useWebsiteColumns = (
-  handleEdit: (rowId: string, columnId: string, value: unknown) => void,
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
   const locale = useLocale();
@@ -59,7 +59,7 @@ const useWebsiteColumns = (
               { label: t("Websites.form.status.active"), value: "active" },
               { label: t("Websites.form.status.inactive"), value: "inactive" },
             ]}
-            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />
         );
       },

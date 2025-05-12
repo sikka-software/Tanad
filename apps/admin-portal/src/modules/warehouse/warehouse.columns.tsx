@@ -9,7 +9,7 @@ import { useEmployees } from "../employee/employee.hooks";
 import { Warehouse } from "./warehouse.type";
 
 const useWarehouseColumns = (
-  handleEdit: (rowId: string, columnId: string, value: unknown) => void,
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
   const locale = useLocale();
@@ -62,7 +62,7 @@ const useWarehouseColumns = (
             isLoading={employeesLoading}
             buttonClassName="bg-transparent"
             defaultValue={warehouse.manager || ""}
-            onChange={async (value) => handleEdit(warehouse.id, "manager", value)}
+            onChange={async (value) => handleEdit?.(warehouse.id, "manager", value)}
             texts={{
               placeholder: ". . .",
               searchPlaceholder: t("Pages.Employees.search"),
@@ -111,7 +111,7 @@ const useWarehouseColumns = (
               { label: t("Warehouses.form.status.active"), value: "active" },
               { label: t("Warehouses.form.status.inactive"), value: "inactive" },
             ]}
-            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />
         );
       },

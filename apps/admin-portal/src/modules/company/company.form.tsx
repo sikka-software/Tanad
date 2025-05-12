@@ -7,11 +7,11 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import DigitsInput from "@/ui/digits-input";
 import { DocumentFile } from "@/ui/documents-uploader";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import PhoneInput from "@/ui/phone-input";
-import DigitsInput from "@/ui/digits-input";
 
 import { AddressFormSection } from "@/forms/address-form-section";
 import { createAddressSchema } from "@/forms/address-schema";
@@ -143,7 +143,7 @@ export function CompanyForm({
         await updateCompany(
           {
             id: defaultValues.id,
-            company: {
+            data: {
               name: data.name.trim(),
               email: data.email.trim(),
               phone: data.phone?.trim() || undefined,
@@ -331,23 +331,23 @@ export function CompanyForm({
               )}
             />
           </div>
-            <FormField
-              control={form.control}
-              name="vat_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Companies.form.vat_number.label")}</FormLabel>
-                  <FormControl>
-                    <DigitsInput
-                      disabled={isLoading}
-                      placeholder={t("Companies.form.vat_number.placeholder")}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="vat_number"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Companies.form.vat_number.label")}</FormLabel>
+                <FormControl>
+                  <DigitsInput
+                    disabled={isLoading}
+                    placeholder={t("Companies.form.vat_number.placeholder")}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <AddressFormSection

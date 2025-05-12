@@ -29,8 +29,6 @@ import useBranchStore from "@/branch/branch.store";
 import BranchesTable from "@/branch/branch.table";
 import { Branch, BranchUpdateData } from "@/branch/branch.type";
 
-import useUserStore from "@/stores/use-user-store";
-
 export default function BranchesPage() {
   const t = useTranslations();
   const router = useRouter();

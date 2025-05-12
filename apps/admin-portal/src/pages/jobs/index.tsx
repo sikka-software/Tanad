@@ -28,7 +28,6 @@ import JobTable from "@/job/job.table";
 import { JobUpdateData } from "@/job/job.type";
 
 import useJobColumns from "@/modules/job/job.columns";
-import useUserStore from "@/stores/use-user-store";
 
 export default function JobsPage() {
   const t = useTranslations();

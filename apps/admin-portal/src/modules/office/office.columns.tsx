@@ -1,17 +1,15 @@
 import StatusCell from "@root/src/components/tables/status-cell";
 import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import useUserStore from "@root/src/stores/use-user-store";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { useEmployees } from "../employee/employee.hooks";
-import { useUpdateOffice } from "./office.hooks";
 import { Office } from "./office.type";
 
 const useOfficeColumns = (
-  handleEdit: (rowId: string, columnId: string, value: unknown) => void,
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
   const locale = useLocale();
@@ -73,7 +71,7 @@ const useOfficeColumns = (
             buttonClassName="bg-transparent"
             defaultValue={office.manager || ""}
             onChange={async (value) => {
-              handleEdit(office.id, "manager", value);
+              handleEdit?.(office.id, "manager", value);
             }}
             texts={{
               placeholder: ". . .",
@@ -120,7 +118,7 @@ const useOfficeColumns = (
               { label: t("Offices.form.status.active"), value: "active" },
               { label: t("Offices.form.status.inactive"), value: "inactive" },
             ]}
-            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />
         );
       },

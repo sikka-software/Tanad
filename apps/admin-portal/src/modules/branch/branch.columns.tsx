@@ -10,7 +10,7 @@ import { useEmployees } from "../employee/employee.hooks";
 import { Branch } from "./branch.type";
 
 const useBranchColumns = (
-  handleEdit: (rowId: string, columnId: string, value: unknown) => void,
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
   const locale = useLocale();
@@ -57,7 +57,7 @@ const useBranchColumns = (
             isLoading={employeesLoading}
             buttonClassName="bg-transparent"
             defaultValue={branch.manager || ""}
-            onChange={async (value) => handleEdit(branch.id, "manager", value)}
+            onChange={async (value) => handleEdit?.(branch.id, "manager", value)}
             texts={{
               placeholder: ". . .",
               searchPlaceholder: t("Pages.Employees.search"),
@@ -107,7 +107,7 @@ const useBranchColumns = (
               { label: t("Branches.form.status.active"), value: "active" },
               { label: t("Branches.form.status.inactive"), value: "inactive" },
             ]}
-            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />
         );
       },

@@ -8,7 +8,7 @@ import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 import { OnlineStore } from "./online-store.type";
 
 const useOnlineStoreColumns = (
-  handleEdit: (rowId: string, columnId: string, value: unknown) => void,
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
 
@@ -47,7 +47,7 @@ const useOnlineStoreColumns = (
               { label: t("OnlineStores.form.status.active"), value: "active" },
               { label: t("OnlineStores.form.status.inactive"), value: "inactive" },
             ]}
-            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />
         );
       },

@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -7,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
@@ -106,7 +106,7 @@ export function VendorForm({
         await updateVendor(
           {
             id: defaultValues.id,
-            vendor: {
+            data: {
               name: data.name.trim(),
               email: data.email.trim(),
               phone: data.phone.trim(),
