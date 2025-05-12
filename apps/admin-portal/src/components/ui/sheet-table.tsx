@@ -670,7 +670,6 @@ function SheetTable<
   return (
     <div ref={parentRef} className="relative max-h-[calc(100vh-7.6rem)] overflow-auto p-0 pb-2">
       <Table id={id} style={{ minWidth: 1200 }}>
-        {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
         <SheetTableHeader
           table={table}
           enableRowSelection={enableRowSelection}
