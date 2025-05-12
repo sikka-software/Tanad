@@ -19,8 +19,16 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const t = useTranslations();
 
   const columns = useExpenseColumns();
-
   const { mutate: updateExpense } = useUpdateExpense();
+
+  const setData = useExpenseStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateExpense({ id: rowId, data: { [columnId]: value } });
+  };
+
   const selectedRows = useExpenseStore((state) => state.selectedRows);
   const setSelectedRows = useExpenseStore((state) => state.setSelectedRows);
 
@@ -33,13 +41,7 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canArchiveExpense = useUserStore((state) => state.hasPermission("expenses.archive"));
   const canDeleteExpense = useUserStore((state) => state.hasPermission("expenses.delete"));
 
-  // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "expense_id") return;
-    await updateExpense({ id: rowId, data: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: Expense[]) => {

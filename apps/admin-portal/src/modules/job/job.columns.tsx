@@ -1,3 +1,4 @@
+import StatusCell from "@root/src/components/tables/status-cell";
 import { MoneyFormatter } from "@root/src/components/ui/currency-input";
 import { getCurrencySymbol } from "@root/src/lib/currency-utils";
 import useUserStore from "@root/src/stores/use-user-store";
@@ -9,7 +10,7 @@ import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { Job } from "./job.type";
 
-const useJobColumns = () => {
+const useJobColumns = (handleEdit: (rowId: string, columnId: string, value: unknown) => void) => {
   const t = useTranslations();
   const currency = useUserStore((state) => state.profile?.user_settings?.currency);
 
@@ -84,12 +85,23 @@ const useJobColumns = () => {
       accessorKey: "status",
       maxSize: 80,
       header: t("Jobs.form.status.label"),
-      validationSchema: z.boolean(),
-      cellType: "status",
-      options: [
-        { value: "active", label: t("Jobs.form.status.active") },
-        { value: "inactive", label: t("Jobs.form.status.inactive") },
-      ],
+      validationSchema: z.enum(["active", "inactive"]),
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("Jobs.form.status.active"), value: "active" },
+              { label: t("Jobs.form.status.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
   return columns;

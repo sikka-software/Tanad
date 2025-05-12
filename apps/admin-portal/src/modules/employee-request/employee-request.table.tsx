@@ -22,9 +22,17 @@ const EmployeeRequestsTable = ({
   onActionClicked,
 }: ModuleTableProps<EmployeeRequest>) => {
   const t = useTranslations();
+  const { mutate: updateEmployeeRequest } = useUpdateEmployeeRequest();
+
+  const setData = useEmployeeRequestsStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateEmployeeRequest({ id: rowId, data: { [columnId]: value } });
+  };
 
   const columns = useEmployeeRequestColumns();
-  const { mutate: updateEmployeeRequest } = useUpdateEmployeeRequest();
   const setSelectedRows = useEmployeeRequestsStore((state) => state.setSelectedRows);
   const selectedRows = useEmployeeRequestsStore((state) => state.selectedRows);
 
@@ -48,10 +56,6 @@ const EmployeeRequestsTable = ({
   );
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateEmployeeRequest({ id: rowId, updates: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = (rows: EmployeeRequest[]) => {
     const newSelectedIds = rows.map((row) => row.id!);

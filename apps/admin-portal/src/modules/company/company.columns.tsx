@@ -1,14 +1,15 @@
-import useUserStore from "@root/src/stores/use-user-store";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
+import StatusCell from "@/components/tables/status-cell";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { Company } from "./company.type";
 
-const useCompanyColumns = () => {
+const useCompanyColumns = (
+  handleEdit: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
 
   const columns: ExtendedColumnDef<Company>[] = [
     {
@@ -69,12 +70,23 @@ const useCompanyColumns = () => {
       accessorKey: "status",
       maxSize: 80,
       header: t("Companies.form.status.label"),
-      validationSchema: z.boolean(),
-      cellType: "status",
-      options: [
-        { value: "active", label: t("Companies.form.status.active") },
-        { value: "inactive", label: t("Companies.form.status.inactive") },
-      ],
+      validationSchema: z.enum(["active", "inactive"]),
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("Companies.form.status.active"), value: "active" },
+              { label: t("Companies.form.status.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
 

@@ -17,8 +17,17 @@ import { Branch } from "./branch.type";
 const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Branch>) => {
   const t = useTranslations();
 
-  const columns = useBranchColumns();
   const { mutate: updateBranch } = useUpdateBranch();
+
+  const setData = useBranchStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateBranch({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useBranchColumns(handleEdit);
+
   const selectedRows = useBranchStore((state) => state.selectedRows);
   const setSelectedRows = useBranchStore((state) => state.setSelectedRows);
 
@@ -31,23 +40,7 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canArchiveBranch = useUserStore((state) => state.hasPermission("branches.archive"));
   const canDeleteBranch = useUserStore((state) => state.hasPermission("branches.delete"));
 
-  // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "branch_id") return;
-    const branch = data.find((b) => b.id === rowId);
-    if (!branch) return;
-    await updateBranch({
-      id: branch.id,
-      data: {
-        id: branch.id,
-        name: branch.name,
-        status: branch.status,
-        [columnId]: value,
-      },
-    });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: Branch[]) => {

@@ -25,6 +25,14 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const { mutate: updateOffice } = useUpdateOffice();
 
   const setData = useOfficeStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateOffice({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useOfficeColumns(handleEdit);
+
   const selectedRows = useOfficeStore((state) => state.selectedRows);
   const setSelectedRows = useOfficeStore((state) => state.setSelectedRows);
 
@@ -37,15 +45,7 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const canArchiveOffice = useUserStore((state) => state.hasPermission("offices.archive"));
   const canDeleteOffice = useUserStore((state) => state.hasPermission("offices.delete"));
 
-  // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "office_id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    updateOffice({ id: rowId, office: { [columnId]: value } });
-  };
-  const columns = useOfficeColumns(handleEdit);
 
   const handleRowSelectionChange = useCallback(
     (rows: Office[]) => {

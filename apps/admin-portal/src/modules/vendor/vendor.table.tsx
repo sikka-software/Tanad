@@ -11,18 +11,27 @@ import useUserStore from "@/stores/use-user-store";
 
 import useVendorColumns from "./vendor.columns";
 import { useUpdateVendor } from "./vendor.hooks";
-import useVendorsStore from "./vendor.store";
+import useVendorStore from "./vendor.store";
 import { Vendor } from "./vendor.type";
 
 const VendorsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Vendor>) => {
   const t = useTranslations("Vendors");
-  const columns = useVendorColumns();
-  const { mutateAsync: updateVendor } = useUpdateVendor();
-  const selectedRows = useVendorsStore((state) => state.selectedRows);
-  const setSelectedRows = useVendorsStore((state) => state.setSelectedRows);
 
-  const columnVisibility = useVendorsStore((state) => state.columnVisibility);
-  const setColumnVisibility = useVendorsStore((state) => state.setColumnVisibility);
+  const { mutate: updateVendor } = useUpdateVendor();
+  const setData = useVendorStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateVendor({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useVendorColumns();
+
+  const selectedRows = useVendorStore((state) => state.selectedRows);
+  const setSelectedRows = useVendorStore((state) => state.setSelectedRows);
+
+  const columnVisibility = useVendorStore((state) => state.columnVisibility);
+  const setColumnVisibility = useVendorStore((state) => state.setColumnVisibility);
 
   const canEditVendor = useUserStore((state) => state.hasPermission("vendors.update"));
   const canDuplicateVendor = useUserStore((state) => state.hasPermission("vendors.duplicate"));
@@ -31,10 +40,6 @@ const VendorsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const canDeleteVendor = useUserStore((state) => state.hasPermission("vendors.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateVendor({ id: rowId, vendor: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: Vendor[]) => {

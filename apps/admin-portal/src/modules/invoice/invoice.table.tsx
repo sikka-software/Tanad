@@ -17,8 +17,11 @@ import useInvoiceColumns from "./invoice.columns";
 
 const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Invoice>) => {
   const t = useTranslations();
-  const columns = useInvoiceColumns();
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
+  const setData = useInvoiceStore((state) => state.setData);
+
+  const columns = useInvoiceColumns();
+
   const selectedRows = useInvoiceStore((state) => state.selectedRows);
   const setSelectedRows = useInvoiceStore((state) => state.setSelectedRows);
 
@@ -30,7 +33,6 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canViewInvoice = useUserStore((state) => state.hasPermission("invoices.view"));
   const canArchiveInvoice = useUserStore((state) => state.hasPermission("invoices.archive"));
   const canDeleteInvoice = useUserStore((state) => state.hasPermission("invoices.delete"));
-  // const canPreviewInvoice = useUserStore((state) => state.hasPermission("invoices.preview"));
   const canPreviewInvoice = true;
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
@@ -40,6 +42,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     if (columnId === "issue_date" || columnId === "due_date") {
       processedValue = new Date(value as string).toISOString();
     }
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
     await updateInvoice({ id: rowId, data: { [columnId]: processedValue } as InvoiceUpdateData });
   };
 

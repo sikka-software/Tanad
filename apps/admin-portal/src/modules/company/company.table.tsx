@@ -17,8 +17,15 @@ import useCompanyColumns from "./company.columns";
 
 const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Company>) => {
   const t = useTranslations();
-  const columns = useCompanyColumns();
+  const setData = useCompanyStore((state) => state.setData);
   const { mutate: updateCompany } = useUpdateCompany();
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateCompany({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useCompanyColumns(handleEdit);
 
   const columnVisibility = useCompanyStore((state) => state.columnVisibility);
   const setColumnVisibility = useCompanyStore((state) => state.setColumnVisibility);
@@ -33,10 +40,6 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTable
   const setSelectedRows = useCompanyStore((state) => state.setSelectedRows);
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateCompany({ id: rowId, company: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: Company[]) => {

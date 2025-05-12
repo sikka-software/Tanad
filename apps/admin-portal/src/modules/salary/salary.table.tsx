@@ -1,19 +1,11 @@
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import { MoneyFormatter } from "@root/src/components/ui/currency-input";
-import { getCurrencySymbol } from "@root/src/lib/currency-utils";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import React from "react";
-import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import CurrencyCell from "@/components/tables/currency-cell";
-
 import { ModuleTableProps } from "@/types/common.type";
-
-import { useEmployees } from "@/employee/employee.hooks";
 
 import { useUpdateSalary } from "@/salary/salary.hooks";
 import useSalaryStore from "@/salary/salary.store";
@@ -25,9 +17,17 @@ import useSalaryColumns from "./salary.columns";
 
 const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Salary>) => {
   const t = useTranslations();
+  const { mutate: updateSalary } = useUpdateSalary();
+  const setData = useSalaryStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateSalary({ id: rowId, data: { [columnId]: value } });
+  };
+
   const columns = useSalaryColumns();
 
-  const { mutateAsync: updateSalary } = useUpdateSalary();
   const selectedRows = useSalaryStore((state) => state.selectedRows);
   const setSelectedRows = useSalaryStore((state) => state.setSelectedRows);
   const columnVisibility = useSalaryStore((state) => state.columnVisibility);
@@ -40,10 +40,6 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canDeleteSalary = useUserStore((state) => state.hasPermission("salaries.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateSalary({ id: rowId, data: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = (rows: Salary[]) => {
     const newSelectedIds = rows.map((row) => row.id!);
@@ -105,6 +101,8 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={salaryTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

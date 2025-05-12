@@ -65,22 +65,11 @@ const EmployeesTable = ({
 
   // Create a memoized handleEdit function
   const handleEdit = useCallback(
+    // TODO: add optimistic update
     (rowId: string, columnId: string, value: unknown) => {
       let updates: EmployeeUpdateData = {};
 
       if (columnId === "department_id") {
-        // Removed department_id update logic
-        // const department_id = value as string;
-        // const department = departments?.find((d) => d.id === department_id);
-        // if (department) {
-        //   updates = {
-        //     department_id: department_id,
-        //   };
-        // } else {
-        //   updates = {
-        //     department_id: null,
-        //   };
-        // }
       } else if (columnId === "status") {
         updates.status = value as "active" | "inactive" | "on_leave" | "terminated";
       } else {

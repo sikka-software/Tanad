@@ -1,3 +1,4 @@
+import StatusCell from "@root/src/components/tables/status-cell";
 import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
@@ -5,13 +6,14 @@ import { z } from "zod";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { useEmployees } from "../employee/employee.hooks";
-import { useUpdateWarehouse } from "./warehouse.hooks";
 import { Warehouse } from "./warehouse.type";
 
-const useWarehouseColumns = () => {
+const useWarehouseColumns = (
+  handleEdit: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
   const locale = useLocale();
-  const { mutate: updateWarehouse } = useUpdateWarehouse();
+
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const employeeOptions = employees.map((emp) => ({
     label: `${emp.first_name} ${emp.last_name}`,
@@ -60,14 +62,7 @@ const useWarehouseColumns = () => {
             isLoading={employeesLoading}
             buttonClassName="bg-transparent"
             defaultValue={warehouse.manager || ""}
-            onChange={async (value) => {
-              await updateWarehouse({
-                id: warehouse.id,
-                data: {
-                  manager: value || null,
-                },
-              });
-            }}
+            onChange={async (value) => handleEdit(warehouse.id, "manager", value)}
             texts={{
               placeholder: ". . .",
               searchPlaceholder: t("Pages.Employees.search"),
@@ -104,11 +99,22 @@ const useWarehouseColumns = () => {
       maxSize: 80,
       header: t("Warehouses.form.status.label"),
       validationSchema: z.enum(["active", "inactive"]),
-      cellType: "status",
-      options: [
-        { label: t("Warehouses.form.status.active"), value: "active" },
-        { label: t("Warehouses.form.status.inactive"), value: "inactive" },
-      ],
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("Warehouses.form.status.active"), value: "active" },
+              { label: t("Warehouses.form.status.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
 

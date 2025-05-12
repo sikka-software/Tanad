@@ -26,6 +26,14 @@ const DepartmentsTable = ({
 
   const { mutateAsync: updateDepartment } = useUpdateDepartment();
 
+  const setData = useDepartmentStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateDepartment({ id: rowId, data: { [columnId]: value } });
+  };
+
   const canEditDepartment = useUserStore((state) => state.hasPermission("departments.update"));
   const canDuplicateDepartment = useUserStore((state) =>
     state.hasPermission("departments.duplicate"),
@@ -41,10 +49,6 @@ const DepartmentsTable = ({
   const setColumnVisibility = useDepartmentStore((state) => state.setColumnVisibility);
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateDepartment({ id: rowId, data: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: Department[]) => {

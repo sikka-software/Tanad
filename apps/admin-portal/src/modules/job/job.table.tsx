@@ -17,12 +17,18 @@ import useJobColumns from "./job.columns";
 
 const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Job>) => {
   const t = useTranslations();
+  const { mutate: updateJob } = useUpdateJob();
+  const setData = useJobsStore((state) => state.setData);
 
-  const columns = useJobColumns();
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateJob({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useJobColumns(handleEdit);
 
-  const { mutateAsync: updateJob } = useUpdateJob();
-  const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
   const selectedRows = useJobsStore((state) => state.selectedRows);
+  const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
 
   const columnVisibility = useJobsStore((state) => state.columnVisibility);
   const setColumnVisibility = useJobsStore((state) => state.setColumnVisibility);
@@ -34,10 +40,6 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
   const canDeleteJob = useUserStore((state) => state.hasPermission("jobs.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateJob({ id: rowId, data: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = (rows: Job[]) => {
     const newSelectedIds = rows.map((row) => row.id!);

@@ -120,7 +120,7 @@ export function OfficeForm({
         await updateOffice(
           {
             id: defaultValues.id,
-            office: {
+            data: {
               name: data.name.trim(),
               code: data.code?.trim() || undefined,
               short_address: data.short_address?.trim() || undefined,

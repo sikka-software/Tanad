@@ -1,3 +1,4 @@
+import StatusCell from "@root/src/components/tables/status-cell";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
@@ -5,7 +6,9 @@ import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { Client } from "./client.type";
 
-const useCompanyColumns = () => {
+const useCompanyColumns = (
+  handleEdit: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
 
   const columns: ExtendedColumnDef<Client>[] = [
@@ -54,14 +57,24 @@ const useCompanyColumns = () => {
     {
       accessorKey: "status",
       maxSize: 80,
-
       header: t("Clients.form.status.label"),
       validationSchema: z.enum(["active", "inactive"]),
-      cellType: "status",
-      options: [
-        { label: t("Clients.form.status.active"), value: "active" },
-        { label: t("Clients.form.status.inactive"), value: "inactive" },
-      ],
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("Clients.form.status.active"), value: "active" },
+              { label: t("Clients.form.status.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
 

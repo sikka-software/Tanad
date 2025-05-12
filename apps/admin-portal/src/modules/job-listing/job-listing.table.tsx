@@ -22,9 +22,15 @@ const JobListingsTable = ({
 }: ModuleTableProps<JobListingWithJobs>) => {
   const t = useTranslations();
 
-  const columns = useJobListingColumns();
-
   const { mutate: updateJobListing } = useUpdateJobListing();
+  const setData = useJobListingsStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateJobListing({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useJobListingColumns(handleEdit);
 
   const columnVisibility = useJobListingsStore((state) => state.columnVisibility);
   const setColumnVisibility = useJobListingsStore((state) => state.setColumnVisibility);
@@ -40,13 +46,7 @@ const JobListingsTable = ({
   const canArchiveJobListing = useUserStore((state) => state.hasPermission("job_listings.archive"));
   const canDeleteJobListing = useUserStore((state) => state.hasPermission("job_listings.delete"));
 
-  // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "job_listing_id") return;
-    await updateJobListing({ id: rowId, jobListing: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: JobListingWithJobs[]) => {

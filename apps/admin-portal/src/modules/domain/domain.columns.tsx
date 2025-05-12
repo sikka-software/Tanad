@@ -1,4 +1,5 @@
 import CurrencyCell from "@root/src/components/tables/currency-cell";
+import StatusCell from "@root/src/components/tables/status-cell";
 import useUserStore from "@root/src/stores/use-user-store";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
@@ -7,10 +8,11 @@ import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { Domain } from "./domain.type";
 
-const useDomainColumns = () => {
+const useDomainColumns = (
+  handleEdit: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
   const currency = useUserStore((state) => state.profile?.user_settings?.currency);
-
   const columns: ExtendedColumnDef<Domain>[] = [
     {
       accessorKey: "domain_name",
@@ -49,11 +51,22 @@ const useDomainColumns = () => {
       maxSize: 80,
       header: t("Domains.form.status.label"),
       validationSchema: z.enum(["active", "inactive"]),
-      cellType: "status",
-      options: [
-        { label: t("Domains.form.status.active"), value: "active" },
-        { label: t("Domains.form.status.inactive"), value: "inactive" },
-      ],
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("Domains.form.status.active"), value: "active" },
+              { label: t("Domains.form.status.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
   return columns;

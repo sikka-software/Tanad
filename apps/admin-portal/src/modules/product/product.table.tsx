@@ -1,15 +1,9 @@
-import { CellContext } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
-import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
-
-import { MoneyFormatter } from "@/components/ui/currency-input";
-
-import { getCurrencySymbol } from "@/lib/currency-utils";
 
 import { ModuleTableProps } from "@/types/common.type";
 
@@ -24,15 +18,22 @@ import useProductColumns from "./product.columns";
 const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Product>) => {
   const t = useTranslations();
 
-  const columns = useProductColumns();
   const { mutateAsync: updateProduct } = useUpdateProduct();
+  const setData = useProductStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateProduct({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useProductColumns();
+
   const selectedRows = useProductStore((state) => state.selectedRows);
   const setSelectedRows = useProductStore((state) => state.setSelectedRows);
 
   const columnVisibility = useProductStore((state) => state.columnVisibility);
   const setColumnVisibility = useProductStore((state) => state.setColumnVisibility);
 
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
   const canEditProduct = useUserStore((state) => state.hasPermission("products.update"));
   const canDuplicateProduct = useUserStore((state) => state.hasPermission("products.duplicate"));
   const canViewProduct = useUserStore((state) => state.hasPermission("products.view"));
@@ -40,10 +41,6 @@ const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canDeleteProduct = useUserStore((state) => state.hasPermission("products.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateProduct({ id: rowId, data: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: Product[]) => {

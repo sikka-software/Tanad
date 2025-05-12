@@ -61,7 +61,7 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
 > & {
   id?: string;
   accessorKey?: string;
-  cellType?: "text" | "select" | "status" | "code";
+  cellType?: "text" | "select" | "code";
   options?: Array<{ label: string; value: string | number | boolean }>;
   validationSchema?: ZodType<any, ZodTypeDef, any>;
   className?: string | ((row: TData) => string); // Allows static or dynamic class names
@@ -69,7 +69,7 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   enableEditing?: boolean;
   noPadding?: boolean;
   dir?: "ltr" | "rtl";
-  // For code cellType only:
+
   onSerial?: (row: TData, rowIndex: number) => void;
   onRandom?: (row: TData, rowIndex: number) => void;
 };
@@ -798,65 +798,6 @@ function SheetTable<
 
             let cellContent: React.ReactNode = rawCellContent;
 
-            // if cell type is status, show a status element
-            if (colDef.cellType === "status" && colDef.options) {
-              const cellValue = cell.getValue() as string | number;
-              const selectedOption = colDef.options.find((opt) => opt.value === cellValue);
-
-              return (
-                <TableCell
-                  key={cell.id}
-                  className={cn(
-                    "relative overflow-hidden border p-0",
-                    {
-                      "bg-muted": isDisabled,
-                      "bg-destructive/25": errorMsg,
-                    },
-                    typeof colDef.className === "function"
-                      ? colDef.className(rowData)
-                      : colDef.className,
-                  )}
-                  style={{ ...style, overflow: "hidden", minWidth: 0 }}
-                >
-                  <CommandSelect
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                    data={colDef.options}
-                    inCell
-                    isLoading={false}
-                    defaultValue={String(selectedOption?.value)}
-                    popoverClassName="w-full max-w-full"
-                    buttonClassName="bg-transparent p-0 w-full max-w-full"
-                    placeholderClassName="w-full p-0"
-                    valueKey="value"
-                    labelKey="label"
-                    onChange={async (value) => {
-                      if (onEdit) {
-                        onEdit(rowId, colKey as keyof T, value as T[keyof T]);
-                      }
-                    }}
-                    texts={{ placeholder: ". . ." }}
-                    renderSelected={(item) => {
-                      return (
-                        <div
-                          className={cn(
-                            "flex h-full w-full items-center justify-center bg-green-500 p-0 !px-2 text-center text-xs font-bold",
-                            {
-                              "text-primary bg-green-200 hover:bg-green-200 dark:bg-green-700 dark:hover:bg-green-700":
-                                item.value === "active",
-                              "text-primary bg-red-200 hover:bg-red-200 dark:bg-red-700 dark:hover:bg-red-700":
-                                item.value === "inactive",
-                            },
-                          )}
-                        >
-                          {item.label}
-                        </div>
-                      );
-                    }}
-                    ariaInvalid={false}
-                  />
-                </TableCell>
-              );
-            }
             // if cell type is select, show a select element
             if (colDef.cellType === "select" && colDef.options) {
               const cellValue = cell.getValue() as string | number;
@@ -972,12 +913,12 @@ function SheetTable<
               <TableCell
                 key={rowId + colKey + String(cell.getValue() ?? "")}
                 className={cn(
-                  "tiny-scrollbar relative overflow-scroll border", // 'relative' for absolute icons if you prefer
+                  "tiny-scrollbar relative overflow-scroll border",
                   {
                     "bg-muted": isDisabled,
                     "bg-destructive/25": errorMsg,
+                    "p-0": colDef.noPadding,
                   },
-                  colDef.noPadding ? "p-0" : "",
                   typeof colDef.className === "function"
                     ? colDef.className(rowData)
                     : colDef.className,
@@ -986,9 +927,6 @@ function SheetTable<
                 style={style}
                 contentEditable={colDef.enableEditing !== false ? !isDisabled : false}
                 suppressContentEditableWarning
-                onFocus={(e) => {
-                  handleCellFocus(e, groupKey, rowData, colDef);
-                }}
                 onKeyDown={(e) => {
                   if (
                     (e.ctrlKey || e.metaKey) &&
@@ -999,17 +937,11 @@ function SheetTable<
                   }
                   handleKeyDown(e, colDef);
                 }}
-                onPaste={(e) => {
-                  handlePaste(e, colDef);
-                }}
-                onInput={(e) => {
-                  handleCellInput(e, groupKey, rowData, colDef);
-                }}
-                onBlur={(e) => {
-                  handleCellBlur(e, groupKey, rowData, colDef);
-                }}
+                onFocus={(e) => handleCellFocus(e, groupKey, rowData, colDef)}
+                onPaste={(e) => handlePaste(e, colDef)}
+                onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
+                onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
               >
-                {/** The actual content */}
                 {cellContent}
               </TableCell>
             );

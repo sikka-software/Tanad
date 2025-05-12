@@ -1,11 +1,15 @@
+import StatusCell from "@root/src/components/tables/status-cell";
 import { SERVER_OS, SERVER_PROVIDERS } from "@root/src/lib/constants";
 import { useTranslations } from "next-intl";
+import { z } from "zod";
 
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { Server } from "./server.type";
 
-const useServerColumns = () => {
+const useServerColumns = (
+  handleEdit: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
 
   const columns: ExtendedColumnDef<Server>[] = [
@@ -35,12 +39,24 @@ const useServerColumns = () => {
     {
       accessorKey: "status",
       maxSize: 80,
-      cellType: "status",
-      options: [
-        { label: t("Servers.form.status.active"), value: "active" },
-        { label: t("Servers.form.status.inactive"), value: "inactive" },
-      ],
       header: t("Servers.form.status.label"),
+      validationSchema: z.enum(["active", "inactive"]),
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("Servers.form.status.active"), value: "active" },
+              { label: t("Servers.form.status.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
 

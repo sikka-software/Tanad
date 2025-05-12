@@ -21,8 +21,17 @@ const OnlineStoresTable = ({
   onActionClicked,
 }: ModuleTableProps<OnlineStore>) => {
   const t = useTranslations();
-  const columns = useOnlineStoreColumns();
   const { mutate: updateOnlineStore } = useUpdateOnlineStore();
+  const setData = useOnlineStoreStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateOnlineStore({ id: rowId, data: { [columnId]: value } });
+  };
+
+  const columns = useOnlineStoreColumns(handleEdit);
+
   const selectedRows = useOnlineStoreStore((state) => state.selectedRows);
   const setSelectedRows = useOnlineStoreStore((state) => state.setSelectedRows);
 
@@ -39,13 +48,7 @@ const OnlineStoresTable = ({
   );
   const canDeleteOnlineStore = useUserStore((state) => state.hasPermission("online_stores.delete"));
 
-  // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "domain_id") return;
-    await updateOnlineStore({ id: rowId, data: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: OnlineStore[]) => {

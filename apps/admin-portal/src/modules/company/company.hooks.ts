@@ -57,8 +57,7 @@ export function useCreateCompany() {
 export function useUpdateCompany() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, company }: { id: string; company: CompanyUpdateData }) =>
-      updateCompany(id, company),
+    mutationFn: ({ id, data }: { id: string; data: CompanyUpdateData }) => updateCompany(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: companyKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
