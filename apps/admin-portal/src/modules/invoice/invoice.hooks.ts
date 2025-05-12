@@ -9,7 +9,7 @@ import {
   updateInvoice,
   duplicateInvoice,
 } from "@/invoice/invoice.service";
-import { Invoice, InvoiceCreateData, InvoiceUpdateData } from "@/invoice/invoice.type";
+import { InvoiceCreateData, InvoiceUpdateData } from "@/invoice/invoice.type";
 
 // Query keys
 export const invoiceKeys = {
@@ -38,12 +38,10 @@ export function useInvoice(id: string) {
 
 export function useCreateInvoice() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (data: InvoiceCreateData) => createInvoice(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() }),
+    meta: { toast: { success: "Invoices.success.create", error: "Invoices.error.create" } },
   });
 }
 
@@ -52,9 +50,8 @@ export function useDuplicateInvoice() {
 
   return useMutation({
     mutationFn: duplicateInvoice,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() }),
+    meta: { toast: { success: "Invoices.success.duplicate", error: "Invoices.error.duplicate" } },
   });
 }
 
@@ -67,6 +64,7 @@ export function useUpdateInvoice() {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
     },
+    meta: { toast: { success: "Invoices.success.update", error: "Invoices.error.update" } },
   });
 }
 
@@ -79,6 +77,7 @@ export function useDeleteInvoice() {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
       queryClient.removeQueries({ queryKey: invoiceKeys.detail(variables) });
     },
+    meta: { toast: { success: "Invoices.success.delete", error: "Invoices.error.delete" } },
   });
 }
 
@@ -86,8 +85,7 @@ export function useBulkDeleteInvoices() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: bulkDeleteInvoices,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() }),
+    meta: { toast: { success: "Invoices.success.delete", error: "Invoices.error.delete" } },
   });
 }

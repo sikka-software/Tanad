@@ -9,7 +9,7 @@ import {
   bulkDeleteCars,
   duplicateCar,
 } from "@/modules/car/car.service";
-import type { Car, CarCreateData, CarUpdateData } from "@/modules/car/car.type";
+import type { CarCreateData, CarUpdateData } from "@/modules/car/car.type";
 
 export const carKeys = {
   all: ["cars"] as const,
@@ -36,10 +36,10 @@ export function useCar(id: string) {
 
 export function useCreateCar() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (newCar: CarCreateData) => createCar(newCar),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: carKeys.lists() }),
+    meta: { toast: { success: "Cars.success.create", error: "Cars.error.create" } },
   });
 }
 
@@ -51,6 +51,7 @@ export function useUpdateCar() {
       queryClient.invalidateQueries({ queryKey: carKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: carKeys.lists() });
     },
+    meta: { toast: { success: "Cars.success.update", error: "Cars.error.update" } },
   });
 }
 
@@ -62,6 +63,7 @@ export function useDuplicateCar() {
       queryClient.invalidateQueries({ queryKey: carKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: carKeys.lists() });
     },
+    meta: { toast: { success: "Cars.success.duplicate", error: "Cars.error.duplicate" } },
   });
 }
 
@@ -74,6 +76,7 @@ export function useDeleteCar() {
       queryClient.invalidateQueries({ queryKey: carKeys.lists() });
       queryClient.removeQueries({ queryKey: carKeys.detail(variables) });
     },
+    meta: { toast: { success: "Cars.success.delete", error: "Cars.error.delete" } },
   });
 }
 
@@ -82,5 +85,6 @@ export function useBulkDeleteCars() {
   return useMutation({
     mutationFn: bulkDeleteCars,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: carKeys.lists() }),
+    meta: { toast: { success: "Cars.success.delete", error: "Cars.error.delete" } },
   });
 }

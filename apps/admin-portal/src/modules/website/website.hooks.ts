@@ -1,6 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
 import {
   createWebsite,
@@ -42,7 +40,6 @@ export function useWebsite(id: string) {
 // Hook for creating a new website
 export function useCreateWebsite() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: (newWebsite: WebsiteCreateData & { user_id: string }) => {
@@ -57,17 +54,14 @@ export function useCreateWebsite() {
     onSuccess: () => {
       // Invalidate the list query to refetch
       queryClient.invalidateQueries({ queryKey: websiteKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Websites.success.create"),
-      });
     },
+    meta: { toast: { success: "Websites.success.create", error: "Websites.error.create" } },
   });
 }
 
 // Hook for updating an existing website
 export function useUpdateWebsite() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: WebsiteUpdateData }) => updateWebsite(id, data),
@@ -114,9 +108,6 @@ export function useUpdateWebsite() {
       if (context?.previousWebsites) {
         queryClient.setQueryData(websiteKeys.lists(), context.previousWebsites);
       }
-      toast.error(t("General.error_operation"), {
-        description: t("Websites.error.update"),
-      });
     },
     onSettled: (data, error, { id }) => {
       // Invalidate queries to ensure eventual consistency
@@ -124,12 +115,8 @@ export function useUpdateWebsite() {
       queryClient.invalidateQueries({ queryKey: websiteKeys.lists() });
 
       // Show success toast only if the mutation succeeded
-      if (!error && data) {
-        toast.success(t("General.successful_operation"), {
-          description: t("Websites.success.update"),
-        });
-      }
     },
+    meta: { toast: { success: "Websites.success.update", error: "Websites.error.update" } },
   });
 }
 
@@ -142,6 +129,7 @@ export function useDuplicateWebsite() {
       queryClient.invalidateQueries({ queryKey: websiteKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: websiteKeys.lists() });
     },
+    meta: { toast: { success: "Websites.success.duplicate", error: "Websites.error.duplicate" } },
   });
 }
 
@@ -156,6 +144,7 @@ export function useDeleteWebsite() {
       queryClient.invalidateQueries({ queryKey: websiteKeys.lists() });
       queryClient.removeQueries({ queryKey: websiteKeys.detail(variables) });
     },
+    meta: { toast: { success: "Websites.success.delete", error: "Websites.error.delete" } },
   });
 }
 
@@ -165,9 +154,7 @@ export function useBulkDeleteWebsites() {
 
   return useMutation({
     mutationFn: bulkDeleteWebsites,
-    onSuccess: () => {
-      // Invalidate the list query
-      queryClient.invalidateQueries({ queryKey: websiteKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: websiteKeys.lists() }),
+    meta: { toast: { success: "Websites.success.delete", error: "Websites.error.delete" } },
   });
 }

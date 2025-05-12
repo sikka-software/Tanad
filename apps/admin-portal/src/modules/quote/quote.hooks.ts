@@ -9,7 +9,7 @@ import {
   bulkDeleteQuotes,
   duplicateQuote,
 } from "@/quote/quote.service";
-import { Quote, QuoteCreateData, QuoteUpdateData } from "@/quote/quote.type";
+import { QuoteCreateData, QuoteUpdateData } from "@/quote/quote.type";
 
 export const quoteKeys = {
   all: ["quotes"] as const,
@@ -39,12 +39,10 @@ export function useQuote(id: string) {
 // Hook for creating a new quote
 export function useCreateQuote() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (newQuote: QuoteCreateData) => createQuote(newQuote),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: quoteKeys.lists() }),
+    meta: { toast: { success: "Quotes.success.create", error: "Quotes.error.create" } },
   });
 }
 
@@ -54,9 +52,8 @@ export function useDuplicateQuote() {
 
   return useMutation({
     mutationFn: (id: string) => duplicateQuote(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: quoteKeys.lists() }),
+    meta: { toast: { success: "Quotes.success.duplicate", error: "Quotes.error.duplicate" } },
   });
 }
 
@@ -83,6 +80,7 @@ export function useDeleteQuote() {
       queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
       queryClient.removeQueries({ queryKey: quoteKeys.detail(variables) });
     },
+    meta: { toast: { success: "Quotes.success.delete", error: "Quotes.error.delete" } },
   });
 }
 
@@ -92,8 +90,7 @@ export const useBulkDeleteQuotes = () => {
 
   return useMutation({
     mutationFn: bulkDeleteQuotes,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: quoteKeys.lists() }),
+    meta: { toast: { success: "Quotes.success.delete", error: "Quotes.error.delete" } },
   });
 };

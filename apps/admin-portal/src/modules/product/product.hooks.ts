@@ -1,6 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
 import {
   bulkDeleteProducts,
@@ -42,35 +40,26 @@ export function useProduct(id: string) {
 // Hook for creating a new product
 export function useCreateProduct() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (newProduct: ProductCreateData) => {
-      return createProduct(newProduct);
-    },
-    onSuccess: () => {
-      // Invalidate the list query to refetch
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
-    },
+    mutationFn: (newProduct: ProductCreateData) => createProduct(newProduct),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: productKeys.lists() }),
+    meta: { toast: { success: "Products.success.create", error: "Products.error.create" } },
   });
 }
 
 // Hook for duplicating a product
 export function useDuplicateProduct() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (id: string) => duplicateProduct(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: productKeys.lists() }),
+    meta: { toast: { success: "Products.success.duplicate", error: "Products.error.duplicate" } },
   });
 }
 
 // Hook for updating an existing product
 export function useUpdateProduct() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
-
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: ProductUpdateData }) => updateProduct(id, data),
     onMutate: async ({ id, data }) => {
@@ -116,44 +105,33 @@ export function useUpdateProduct() {
       if (context?.previousProducts) {
         queryClient.setQueryData(productKeys.lists(), context.previousProducts);
       }
-      toast.error(t("General.error_operation"), {
-        description: t("Products.error.update"),
-      });
     },
     onSettled: (data, error, { id }) => {
       // Invalidate queries to ensure eventual consistency
       queryClient.invalidateQueries({ queryKey: productKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: productKeys.lists() });
-
-      // Show success toast only if the mutation succeeded
-      if (!error && data) {
-        toast.success(t("General.successful_operation"), {
-          description: t("Products.success.update"),
-        });
-      }
     },
+    meta: { toast: { success: "Products.success.update", error: "Products.error.update" } },
   });
 }
 
 // Hook for deleting a product
 export function useDeleteProduct() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (id: string) => deleteProduct(id),
     onSuccess: (_, variables) => {
-      // Invalidate the list and remove the specific detail query from cache
       queryClient.invalidateQueries({ queryKey: productKeys.lists() });
       queryClient.removeQueries({ queryKey: productKeys.detail(variables) });
     },
+    meta: { toast: { success: "Products.success.delete", error: "Products.error.delete" } },
   });
 }
 export function useBulkDeleteProducts() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: bulkDeleteProducts,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: productKeys.lists() }),
+    meta: { toast: { success: "Products.success.delete", error: "Products.error.delete" } },
   });
 }

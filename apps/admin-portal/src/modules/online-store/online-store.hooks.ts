@@ -1,7 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { useState, useCallback, useEffect } from "react";
-import { toast } from "sonner";
 
 import {
   createOnlineStore,
@@ -47,7 +44,6 @@ export function useOnlineStore(id: string) {
 // Hook for creating a new online store
 export function useCreateOnlineStore() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: (newOnlineStore: OnlineStoreCreateData & { user_id: string }) => {
@@ -59,20 +55,14 @@ export function useCreateOnlineStore() {
       };
       return createOnlineStore(onlineStoreData);
     },
-    onSuccess: () => {
-      // Invalidate the list query to refetch
-      queryClient.invalidateQueries({ queryKey: onlineStoreKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("OnlineStores.success.create"),
-      });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: onlineStoreKeys.lists() }),
+    meta: { toast: { success: "OnlineStores.success.create", error: "OnlineStores.error.create" } },
   });
 }
 
 // Hook for updating an existing branch
 export function useUpdateOnlineStore() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: OnlineStoreUpdateData }) =>
@@ -120,22 +110,12 @@ export function useUpdateOnlineStore() {
       if (context?.previousOnlineStores) {
         queryClient.setQueryData(onlineStoreKeys.lists(), context.previousOnlineStores);
       }
-      toast.error(t("General.error_operation"), {
-        description: t("OnlineStores.error.update"),
-      });
     },
     onSettled: (data, error, { id }) => {
-      // Invalidate queries to ensure eventual consistency
       queryClient.invalidateQueries({ queryKey: onlineStoreKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: onlineStoreKeys.lists() });
-
-      // Show success toast only if the mutation succeeded
-      if (!error && data) {
-        toast.success(t("General.successful_operation"), {
-          description: t("OnlineStores.success.update"),
-        });
-      }
     },
+    meta: { toast: { success: "OnlineStores.success.update", error: "OnlineStores.error.update" } },
   });
 }
 
@@ -147,6 +127,9 @@ export function useDuplicateOnlineStore() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: onlineStoreKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: onlineStoreKeys.lists() });
+    },
+    meta: {
+      toast: { success: "OnlineStores.success.duplicate", error: "OnlineStores.error.duplicate" },
     },
   });
 }
@@ -162,18 +145,16 @@ export function useDeleteOnlineStore() {
       queryClient.invalidateQueries({ queryKey: onlineStoreKeys.lists() });
       queryClient.removeQueries({ queryKey: onlineStoreKeys.detail(variables) });
     },
+    meta: { toast: { success: "OnlineStores.success.delete", error: "OnlineStores.error.delete" } },
   });
 }
 
-// Hook for bulk deleting online stores
 export function useBulkDeleteOnlineStores() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: bulkDeleteOnlineStores,
-    onSuccess: () => {
-      // Invalidate the list query
-      queryClient.invalidateQueries({ queryKey: onlineStoreKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: onlineStoreKeys.lists() }),
+    meta: { toast: { success: "OnlineStores.success.delete", error: "OnlineStores.error.delete" } },
   });
 }

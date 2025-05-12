@@ -107,12 +107,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ message: `${model} not found` });
     }
 
-    // if ("user_id" in record && record.user_id !== user.id) {
-    //   console.log("record is ", record);
-    //   console.log("user is ", user);
-    //   return res.status(403).json({ error: `Not authorized to duplicate this ${model}` });
-    // }
-
     // Create a copy of the record without the excluded fields
     const dataToDuplicate = Object.keys(record).reduce(
       (acc, key) => {

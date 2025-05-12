@@ -1,7 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { useState, useCallback, useEffect } from "react";
-import { toast } from "sonner";
 
 import {
   createBranch,
@@ -43,11 +40,8 @@ export function useBranch(id: string) {
 // Hook for creating a new branch
 export function useCreateBranch() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
-
   return useMutation({
     mutationFn: (newBranch: BranchCreateData & { user_id: string }) => {
-      // Map user_id to user_id for the service function
       const { user_id, ...rest } = newBranch;
       const branchData: BranchCreateData = {
         ...rest,
@@ -55,20 +49,14 @@ export function useCreateBranch() {
       };
       return createBranch(branchData);
     },
-    onSuccess: () => {
-      // Invalidate the list query to refetch
-      queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Branches.success.create"),
-      });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: branchKeys.lists() }),
+    meta: { toast: { success: "Branches.success.create", error: "Branches.error.create" } },
   });
 }
 
 // Hook for updating an existing branch
 export function useUpdateBranch() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: BranchUpdateData }) => updateBranch(id, data),
@@ -115,22 +103,12 @@ export function useUpdateBranch() {
       if (context?.previousBranches) {
         queryClient.setQueryData(branchKeys.lists(), context.previousBranches);
       }
-      toast.error(t("General.error_operation"), {
-        description: t("Branches.error.update"),
-      });
     },
     onSettled: (data, error, { id }) => {
-      // Invalidate queries to ensure eventual consistency
       queryClient.invalidateQueries({ queryKey: branchKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
-
-      // Show success toast only if the mutation succeeded
-      if (!error && data) {
-        toast.success(t("General.successful_operation"), {
-          description: t("Branches.success.update"),
-        });
-      }
     },
+    meta: { toast: { success: "Branches.success.update", error: "Branches.error.update" } },
   });
 }
 
@@ -143,6 +121,7 @@ export function useDuplicateBranch() {
       queryClient.invalidateQueries({ queryKey: branchKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
     },
+    meta: { toast: { success: "Branches.success.duplicate", error: "Branches.error.duplicate" } },
   });
 }
 
@@ -157,6 +136,7 @@ export function useDeleteBranch() {
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
       queryClient.removeQueries({ queryKey: branchKeys.detail(variables) });
     },
+    meta: { toast: { success: "Branches.success.delete", error: "Branches.error.delete" } },
   });
 }
 
@@ -166,99 +146,7 @@ export function useBulkDeleteBranches() {
 
   return useMutation({
     mutationFn: bulkDeleteBranches,
-    onSuccess: () => {
-      // Invalidate the list query
-      queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: branchKeys.lists() }),
+    meta: { toast: { success: "Branches.success.delete", error: "Branches.error.delete" } },
   });
-}
-
-// Define the type for the operations array from DataSheetGrid
-// Using 'any' for now, can be refined if specific operation types are known/needed
-type DataSheetOperation = any;
-
-export function useBranchDatasheet(initialData: Branch[] = []) {
-  const t = useTranslations();
-  const queryClient = useQueryClient();
-  const [datasheetData, setDatasheetData] = useState<Branch[]>(initialData);
-
-  // Update Mutation
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: BranchUpdateData }) => updateBranch(id, data),
-    onSuccess: (updatedBranch) => {
-      // Option 1: Manually update the specific branch in the main query cache
-      // queryClient.setQueryData(['branches'], (oldData: Branch[] | undefined) =>
-      //   oldData ? oldData.map(b => b.id === updatedBranch.id ? updatedBranch : b) : []
-      // );
-
-      // Option 2: Manually update the specific branch detail query cache
-      queryClient.setQueryData(branchKeys.detail(updatedBranch.id), updatedBranch);
-
-      // Avoid invalidating the whole list immediately to prevent flicker
-      // queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
-
-      toast.success(t("Branches.notifications.updateSuccess"));
-    },
-    onError: (error, variables) => {
-      console.error("Failed to update branch:", error);
-      toast.error(t("Branches.notifications.updateError"));
-      // Attempt to revert by refetching the specific branch data
-      queryClient.invalidateQueries({ queryKey: branchKeys.detail(variables.id) });
-      // And potentially refetch the list if the local state might be too out of sync
-      // queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
-    },
-  });
-
-  // onChange handler for the DataSheetGrid
-  const handleDatasheetChange = useCallback(
-    (updatedData: Branch[], operations: DataSheetOperation[]) => {
-      // Update local state immediately for responsive UI
-      setDatasheetData(updatedData);
-
-      // Process operations to find what changed and trigger API calls
-      operations.forEach((op) => {
-        // Example: Handle updates (most common case for cell edits)
-        if (op.type === "UPDATE") {
-          // Assuming UPDATE operation affects rows from fromRow to toRow
-          for (let i = op.fromRow; i <= op.toRow; i++) {
-            const changedBranch = updatedData[i];
-            if (changedBranch && changedBranch.id) {
-              // Extract only the changed fields if possible, or send the whole row
-              // For simplicity, sending the relevant part of the row object
-              // Ensure you are not sending fields that shouldn't be updated (like id, created_at)
-              const {
-                id: changedBranchId,
-                created_at: _createdAt,
-                ...updatePayload
-              } = changedBranch;
-              // console.log("Updating branch:", changedBranchId, updatePayload);
-              updateMutation.mutate({
-                id: changedBranchId,
-                data: updatePayload as BranchUpdateData,
-              });
-            } else {
-              console.warn("Skipping update for row without ID:", i, changedBranch);
-            }
-          }
-        }
-        // TODO: Handle CREATE and DELETE operations if the datasheet supports them
-        // else if (op.type === 'CREATE') { ... }
-        // else if (op.type === 'DELETE') { ... }
-      });
-    },
-    [updateMutation], // Add other dependencies if needed (like t)
-  );
-
-  // Effect to update local state if initialData changes from parent
-  // Useful if the parent component refetches data externally
-  useEffect(() => {
-    setDatasheetData(initialData);
-  }, [initialData]);
-
-  return {
-    datasheetData,
-    handleDatasheetChange,
-    // Expose mutation status if needed by the UI
-    isUpdating: updateMutation.isPending,
-  };
 }

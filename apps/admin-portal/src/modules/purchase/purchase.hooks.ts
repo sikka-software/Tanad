@@ -1,7 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { useState, useCallback, useEffect } from "react";
-import { toast } from "sonner";
 
 import {
   createPurchase,
@@ -43,7 +40,6 @@ export function usePurchase(id: string) {
 // Hook for creating a new purchase
 export function useCreatePurchase() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: (newPurchase: PurchaseCreateData & { user_id: string }) => {
@@ -55,20 +51,14 @@ export function useCreatePurchase() {
       };
       return createPurchase(purchaseData);
     },
-    onSuccess: () => {
-      // Invalidate the list query to refetch
-      queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Purchases.success.create"),
-      });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() }),
+    meta: { toast: { success: "Offices.success.create", error: "Offices.error.create" } },
   });
 }
 
 // Hook for updating an existing purchase
 export function useUpdatePurchase() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: PurchaseUpdateData }) =>
@@ -116,22 +106,12 @@ export function useUpdatePurchase() {
       if (context?.previousPurchases) {
         queryClient.setQueryData(purchaseKeys.lists(), context.previousPurchases);
       }
-      toast.error(t("General.error_operation"), {
-        description: t("Purchases.error.update"),
-      });
     },
     onSettled: (data, error, { id }) => {
-      // Invalidate queries to ensure eventual consistency
       queryClient.invalidateQueries({ queryKey: purchaseKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() });
-
-      // Show success toast only if the mutation succeeded
-      if (!error && data) {
-        toast.success(t("General.successful_operation"), {
-          description: t("Purchases.success.update"),
-        });
-      }
     },
+    meta: { toast: { success: "Purchases.success.update", error: "Purchases.error.update" } },
   });
 }
 
@@ -144,6 +124,7 @@ export function useDuplicatePurchase() {
       queryClient.invalidateQueries({ queryKey: purchaseKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() });
     },
+    meta: { toast: { success: "Purchases.success.duplicate", error: "Purchases.error.duplicate" } },
   });
 }
 
@@ -158,6 +139,7 @@ export function useDeletePurchase() {
       queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() });
       queryClient.removeQueries({ queryKey: purchaseKeys.detail(variables) });
     },
+    meta: { toast: { success: "Purchases.success.delete", error: "Purchases.error.delete" } },
   });
 }
 
@@ -167,9 +149,7 @@ export function useBulkDeletePurchases() {
 
   return useMutation({
     mutationFn: bulkDeletePurchases,
-    onSuccess: () => {
-      // Invalidate the list query
-      queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() }),
+    meta: { toast: { success: "Purchases.success.delete", error: "Purchases.error.delete" } },
   });
 }

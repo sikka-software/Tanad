@@ -1,6 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -28,7 +26,6 @@ const userKeys = {
 // Hook to fetch all users for an enterprise
 export function useUsers() {
   const { enterprise } = useUserStore();
-  const t = useTranslations();
 
   return useQuery({
     queryKey: userKeys.lists(),
@@ -51,89 +48,55 @@ export function useUser(id: string) {
 // Hook to create a user
 export function useCreateUser() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: (data: UserCreateData) => createUser(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
-    onError: (error) => {
-      console.error("Error creating user:", error);
-      const defaultError = t("Users.error.create");
-      const message = (error as any)?.message || defaultError;
-      if ((error as any)?.code === "23505") {
-        toast.error(t("Users.error.email_exists"));
-      } else {
-        toast.error(`${defaultError}: ${message}`);
-      }
-    },
+    meta: { toast: { success: "Users.success.create", error: "Users.error.create" } },
   });
 }
 
 export function useDuplicateUser() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: (id: string) => duplicateUser(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-    },
-    onError: (error) => {
-      console.error("Error duplicating user:", error);
-      toast.error(t("Users.error.duplicating"));
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.lists() }),
+    meta: { toast: { success: "Users.success.duplicate", error: "Users.error.duplicate" } },
   });
 }
 // Hook to update a user
 export function useUpdateUser() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UserUpdateData }) => updateUser(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-    },
-    onError: (error) => {
-      console.error("Error updating user:", error);
-      toast.error(t("Users.error.update"));
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.lists() }),
+    meta: { toast: { success: "Users.success.update", error: "Users.error.update" } },
   });
 }
 
 // Hook to delete a user
 export function useDeleteUser() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: (id: string) => deleteUser(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-    },
-    onError: (error) => {
-      console.error("Error deleting user:", error);
-      toast.error(t("Users.error.delete"));
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.lists() }),
+    meta: { toast: { success: "Users.success.delete", error: "Users.error.delete" } },
   });
 }
 
 // Hook to bulk delete users
 export function useBulkDeleteUsers() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteUsers(ids),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-    },
-    onError: (error) => {
-      console.error("Error bulk deleting users:", error);
-      toast.error(t("Users.error.bulk_deleting"));
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.lists() }),
+    meta: { toast: { success: "Users.success.delete", error: "Users.error.delete" } },
   });
 }
 

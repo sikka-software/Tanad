@@ -1,6 +1,8 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, QueryCache } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useTranslations } from "next-intl";
 import { ReactNode, useState } from "react";
+import { toast } from "sonner";
 
 import QueryGlobalToast from "@/components/QueryGlobalToast";
 
@@ -9,6 +11,7 @@ interface QueryProviderProps {
 }
 
 export function QueryProvider({ children }: QueryProviderProps) {
+  const t = useTranslations();
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -18,6 +21,13 @@ export function QueryProvider({ children }: QueryProviderProps) {
             refetchOnWindowFocus: false,
           },
         },
+
+        queryCache: new QueryCache({
+          onError: (error) => {
+            console.error("Query error:", error);
+            toast.error(t("General.error_operation"));
+          },
+        }),
       }),
   );
 

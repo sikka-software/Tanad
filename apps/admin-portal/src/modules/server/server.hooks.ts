@@ -1,6 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
 import {
   createServer,
@@ -11,7 +9,7 @@ import {
   bulkDeleteServers,
   duplicateServer,
 } from "@/modules/server/server.service";
-import type { Server, ServerCreateData, ServerUpdateData } from "@/modules/server/server.type";
+import type { ServerCreateData, ServerUpdateData } from "@/modules/server/server.type";
 
 // Query keys for servers
 export const serverKeys = {
@@ -42,7 +40,6 @@ export function useServer(id: string) {
 // Hook for creating a new server
 export function useCreateServer() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: (newServer: ServerCreateData) => {
@@ -54,30 +51,22 @@ export function useCreateServer() {
       };
       return createServer(serverData);
     },
-    onSuccess: () => {
-      // Invalidate the list query to refetch
-      queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Servers.success.create"),
-      });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: serverKeys.lists() }),
+    meta: { toast: { success: "Servers.success.create", error: "Servers.error.create" } },
   });
 }
 
 // Hook for updating an existing server
 export function useUpdateServer() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: ServerUpdateData }) => updateServer(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: serverKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Servers.success.update"),
-      });
     },
+    meta: { toast: { success: "Servers.success.update", error: "Servers.error.update" } },
   });
 }
 
@@ -90,13 +79,13 @@ export function useDuplicateServer() {
       queryClient.invalidateQueries({ queryKey: serverKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
     },
+    meta: { toast: { success: "Servers.success.duplicate", error: "Servers.error.duplicate" } },
   });
 }
 
 // Hook for deleting a server
 export function useDeleteServer() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (id: string) => deleteServer(id),
     onSuccess: (_, variables) => {
@@ -104,18 +93,16 @@ export function useDeleteServer() {
       queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
       queryClient.removeQueries({ queryKey: serverKeys.detail(variables) });
     },
+    meta: { toast: { success: "Servers.success.delete", error: "Servers.error.delete" } },
   });
 }
 
 // Hook for bulk deleting servers
 export function useBulkDeleteServers() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: bulkDeleteServers,
-    onSuccess: () => {
-      // Invalidate the list query
-      queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: serverKeys.lists() }),
+    meta: { toast: { success: "Servers.success.delete", error: "Servers.error.delete" } },
   });
 }

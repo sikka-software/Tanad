@@ -9,7 +9,7 @@ import {
   updateVendor,
   duplicateVendor,
 } from "@/vendor/vendor.service";
-import type { Vendor, VendorCreateData, VendorUpdateData } from "@/vendor/vendor.type";
+import type { VendorCreateData, VendorUpdateData } from "@/vendor/vendor.type";
 
 // Query keys for vendors
 export const vendorKeys = {
@@ -43,9 +43,8 @@ export function useCreateVendor() {
 
   return useMutation({
     mutationFn: (newVendor: VendorCreateData) => createVendor(newVendor),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: vendorKeys.lists() }),
+    meta: { toast: { success: "Vendors.success.create", error: "Vendors.error.create" } },
   });
 }
 
@@ -55,9 +54,8 @@ export function useDuplicateVendor() {
 
   return useMutation({
     mutationFn: (id: string) => duplicateVendor(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: vendorKeys.lists() }),
+    meta: { toast: { success: "Vendors.success.duplicate", error: "Vendors.error.duplicate" } },
   });
 }
 
@@ -73,6 +71,7 @@ export function useUpdateVendor() {
       queryClient.invalidateQueries({ queryKey: vendorKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
     },
+    meta: { toast: { success: "Vendors.success.update", error: "Vendors.error.update" } },
   });
 }
 
@@ -87,6 +86,7 @@ export function useDeleteVendor() {
       queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
       queryClient.removeQueries({ queryKey: vendorKeys.detail(variables) });
     },
+    meta: { toast: { success: "Vendors.success.delete", error: "Vendors.error.delete" } },
   });
 }
 
@@ -98,5 +98,6 @@ export function useBulkDeleteVendors() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
     },
+    meta: { toast: { success: "Vendors.success.delete", error: "Vendors.error.delete" } },
   });
 }

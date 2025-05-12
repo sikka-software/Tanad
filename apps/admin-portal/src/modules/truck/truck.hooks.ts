@@ -10,7 +10,7 @@ import {
   bulkDeleteTrucks,
   duplicateTruck,
 } from "@/modules/truck/truck.service";
-import type { Truck, TruckCreateData, TruckUpdateData } from "@/modules/truck/truck.type";
+import type { TruckCreateData, TruckUpdateData } from "@/modules/truck/truck.type";
 
 export const truckKeys = {
   all: ["trucks"] as const,
@@ -39,21 +39,17 @@ export function useTruck(id: string) {
 // Hook for creating a new truck
 export function useCreateTruck() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: (newTruck: TruckCreateData) => createTruck(newTruck),
-    onSuccess: () => {
-      // Invalidate the list query to refetch
-      queryClient.invalidateQueries({ queryKey: truckKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: truckKeys.lists() }),
+    meta: { toast: { success: "Trucks.success.create", error: "Trucks.error.create" } },
   });
 }
 
 // Hook for updating an existing truck
 export function useUpdateTruck() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: TruckUpdateData }) => updateTruck(id, data),
@@ -61,6 +57,7 @@ export function useUpdateTruck() {
       queryClient.invalidateQueries({ queryKey: truckKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: truckKeys.lists() });
     },
+    meta: { toast: { success: "Trucks.success.update", error: "Trucks.error.update" } },
   });
 }
 
@@ -73,6 +70,7 @@ export function useDuplicateTruck() {
       queryClient.invalidateQueries({ queryKey: truckKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: truckKeys.lists() });
     },
+    meta: { toast: { success: "Trucks.success.duplicate", error: "Trucks.error.duplicate" } },
   });
 }
 
@@ -87,6 +85,7 @@ export function useDeleteTruck() {
       queryClient.invalidateQueries({ queryKey: truckKeys.lists() });
       queryClient.removeQueries({ queryKey: truckKeys.detail(variables) });
     },
+    meta: { toast: { success: "Trucks.success.delete", error: "Trucks.error.delete" } },
   });
 }
 
@@ -96,9 +95,7 @@ export function useBulkDeleteTrucks() {
 
   return useMutation({
     mutationFn: bulkDeleteTrucks,
-    onSuccess: () => {
-      // Invalidate the list query
-      queryClient.invalidateQueries({ queryKey: truckKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: truckKeys.lists() }),
+    meta: { toast: { success: "Trucks.success.delete", error: "Trucks.error.delete" } },
   });
 }

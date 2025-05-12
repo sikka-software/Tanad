@@ -1,6 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
 import {
   createWarehouse,
@@ -56,6 +54,7 @@ export function useCreateWarehouse() {
         newWarehouse,
       ]);
     },
+    meta: { toast: { success: "Warehouses.success.create", error: "Warehouses.error.create" } },
   });
 }
 
@@ -71,13 +70,15 @@ export function useDuplicateWarehouse() {
       ]);
       queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(newWarehouse.id) });
     },
+    meta: {
+      toast: { success: "Warehouses.success.duplicate", error: "Warehouses.error.duplicate" },
+    },
   });
 }
 
 // Hook for updating an existing warehouse
 export function useUpdateWarehouse() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: WarehouseUpdateData }) =>
@@ -125,22 +126,13 @@ export function useUpdateWarehouse() {
       if (context?.previousWarehouses) {
         queryClient.setQueryData(warehouseKeys.lists(), context.previousWarehouses);
       }
-      toast.error(t("General.error_operation"), {
-        description: t("Warehouses.error.update"),
-      });
     },
     onSettled: (data, error, { id }) => {
       // Invalidate queries to ensure eventual consistency
       queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
-
-      // Show success toast only if the mutation succeeded
-      if (!error && data) {
-        toast.success(t("General.successful_operation"), {
-          description: t("Warehouses.success.update"),
-        });
-      }
     },
+    meta: { toast: { success: "Warehouses.success.update", error: "Warehouses.error.update" } },
   });
 }
 
@@ -155,6 +147,7 @@ export function useDeleteWarehouse() {
       queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
       queryClient.removeQueries({ queryKey: warehouseKeys.detail(variables) });
     },
+    meta: { toast: { success: "Warehouses.success.delete", error: "Warehouses.error.delete" } },
   });
 }
 
@@ -165,5 +158,6 @@ export function useBulkDeleteWarehouses() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
     },
+    meta: { toast: { success: "Warehouses.success.delete", error: "Warehouses.error.delete" } },
   });
 }

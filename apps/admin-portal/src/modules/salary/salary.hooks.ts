@@ -39,12 +39,10 @@ export function useSalary(id: string) {
 // Hook for creating a new salary
 export function useCreateSalary() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: createSalary,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: salaryKeys.lists() }),
+    meta: { toast: { success: "Salaries.success.create", error: "Salaries.error.create" } },
   });
 }
 
@@ -54,9 +52,8 @@ export function useDuplicateSalary() {
 
   return useMutation({
     mutationFn: (id: string) => duplicateSalary(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: salaryKeys.lists() }),
+    meta: { toast: { success: "Salaries.success.duplicate", error: "Salaries.error.duplicate" } },
   });
 }
 
@@ -70,6 +67,7 @@ export function useUpdateSalary() {
       queryClient.invalidateQueries({ queryKey: salaryKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
     },
+    meta: { toast: { success: "Salaries.success.update", error: "Salaries.error.update" } },
   });
 }
 
@@ -79,9 +77,8 @@ export function useDeleteSalary() {
 
   return useMutation({
     mutationFn: deleteSalary,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: salaryKeys.lists() }),
+    meta: { toast: { success: "Salaries.success.delete", error: "Salaries.error.delete" } },
   });
 }
 
@@ -91,8 +88,7 @@ export function useBulkDeleteSalaries() {
 
   return useMutation({
     mutationFn: bulkDeleteSalaries,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: salaryKeys.lists() }),
+    meta: { toast: { success: "Salaries.success.delete", error: "Salaries.error.delete" } },
   });
 }

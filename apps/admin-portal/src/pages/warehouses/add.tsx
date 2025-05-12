@@ -34,9 +34,6 @@ export default function AddWarehousePage() {
   };
 
   const onAddSuccess = () => {
-    toast.success(t("General.successful_operation"), {
-      description: t("Warehouses.success.create"),
-    });
     router.push("/warehouses");
     setIsLoading(false);
   };

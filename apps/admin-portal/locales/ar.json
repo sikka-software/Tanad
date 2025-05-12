@@ -16,6 +16,8 @@
     "clear_editor_description": "هل أنت متأكد أنك تريد مسح المحرر؟",
     "convert_from_markdown": "تحويل إلى Markdown",
     "canceling": "جاري الإلغاء",
+    "creating": "جاري الإنشاء",
+    "deleting": "جاري الحذف",
     "error_alert_title": "خطأ",
     "words": "الكلمات",
     "filters": "الفرز",

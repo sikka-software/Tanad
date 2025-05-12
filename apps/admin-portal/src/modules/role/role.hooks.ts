@@ -1,6 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
 import { createClient } from "@/utils/supabase/component";
 
@@ -112,7 +110,6 @@ export function useRoles() {
 // Create role hook - Uses RoleCreateData
 export function useCreateRole() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation<Role, Error, RoleCreateData & { enterprise_id: string }>({
     mutationFn: async (data: RoleCreateData & { enterprise_id: string }) => {
@@ -161,21 +158,14 @@ export function useCreateRole() {
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() });
       // Also invalidate the general custom roles list if used elsewhere
       queryClient.invalidateQueries({ queryKey: [...roleKeys.lists(), "custom"] });
-      toast.success(t("General.successful_operation"), {
-        description: t("Roles.success.create"),
-      });
     },
-    onError: (error) => {
-      console.error("Error creating role:", error);
-      toast.error(`Failed to create role: ${error.message}`);
-    },
+    meta: { toast: { success: "Roles.success.create", error: "Roles.error.create" } },
   });
 }
 
 // Update role hook - Uses RoleUpdateData
 export function useUpdateRole() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
 
   return useMutation<void, Error, { id: string; data: RoleUpdateData }>({
     mutationFn: async ({ id, data }: { id: string; data: RoleUpdateData }) => {
@@ -222,14 +212,8 @@ export function useUpdateRole() {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
       queryClient.invalidateQueries({ queryKey: roleKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Roles.success.update"),
-      });
     },
-    onError: (error) => {
-      console.error("Error updating role:", error);
-      toast.error(`Failed to update role: ${error.message}`);
-    },
+    meta: { toast: { success: "Roles.success.update", error: "Roles.error.update" } },
   });
 }
 
@@ -260,10 +244,7 @@ export function useDeleteRole() {
       queryClient.invalidateQueries({ queryKey: roleKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() }); // Also invalidate system roles
     },
-    onError: (error) => {
-      console.error("Error deleting role:", error);
-      toast.error(`Failed to delete role: ${error.message}`);
-    },
+    meta: { toast: { success: "Roles.success.delete", error: "Roles.error.delete" } },
   });
 }
 
@@ -295,18 +276,12 @@ export function useBulkDeleteRoles() {
       const { error } = await supabase.from("roles").delete().in("id", nonSystemRoleIds);
 
       if (error) throw error;
-      if (systemRolesAttempted) {
-        toast.warning("Skipped deletion of system roles.");
-      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() }); // Also invalidate system roles
     },
-    onError: (error) => {
-      console.error("Error deleting roles:", error);
-      toast.error(`Failed to delete roles: ${error.message}`);
-    },
+    meta: { toast: { success: "Roles.success.delete", error: "Roles.error.delete" } },
   });
 }
 
@@ -386,10 +361,7 @@ export function useDuplicateRole() {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() });
     },
-    onError: (error) => {
-      console.error("Error duplicating role:", error);
-      toast.error(`Failed to duplicate role: ${error.message}`);
-    },
+    meta: { toast: { success: "Roles.success.duplicate", error: "Roles.error.duplicate" } },
   });
 }
 
