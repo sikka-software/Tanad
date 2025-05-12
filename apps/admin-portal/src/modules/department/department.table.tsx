@@ -1,46 +1,30 @@
-import { Row } from "@tanstack/react-table";
-import { X } from "lucide-react";
+import { ModuleTableProps } from "@root/src/types/common.type";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
-import { z } from "zod";
 
-import { Button } from "@/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/ui/dropdown-menu";
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
-
-import { useOffices } from "@/office/office.hooks";
-
-import { useBranches } from "@/branch/branch.hooks";
 
 import { useUpdateDepartment } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";
 import { Department } from "@/department/department.type";
 
-import { useWarehouses } from "@/warehouse/warehouse.hooks";
-
 import useUserStore from "@/stores/use-user-store";
 
-interface DepartmentsTableProps {
-  data: Department[];
-  isLoading?: boolean;
-  error?: Error | null;
-  onActionClicked: (action: string, rowId: string) => void;
-}
+import useDepartmentColumns from "./department.columns";
 
-const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: DepartmentsTableProps) => {
+const DepartmentsTable = ({
+  data,
+  isLoading,
+  error,
+  onActionClicked,
+}: ModuleTableProps<Department>) => {
   const t = useTranslations();
-  const { mutateAsync: updateDepartment } = useUpdateDepartment();
 
-  const { data: offices } = useOffices();
-  const { data: branches } = useBranches();
-  const { data: warehouses } = useWarehouses();
+  const columns = useDepartmentColumns();
+
+  const { mutateAsync: updateDepartment } = useUpdateDepartment();
 
   const canEditDepartment = useUserStore((state) => state.hasPermission("departments.update"));
   const canDuplicateDepartment = useUserStore((state) =>
@@ -71,25 +55,6 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
     },
     [selectedRows, setSelectedRows],
   );
-
-  const getLocationName = (location_id: string) => {
-    const office = offices?.find((o) => o.id === location_id);
-    if (office) return office.name;
-
-    const branch = branches?.find((b) => b.id === location_id);
-    if (branch) return branch.name;
-
-    const warehouse = warehouses?.find((w) => w.id === location_id);
-    if (warehouse) return warehouse.name;
-
-    return location_id;
-  };
-
-  const handleRemoveLocation = async (row: Row<Department>, location_id: string) => {
-    const locations = row.original.locations || [];
-    const updatedLocations = locations.filter((location) => location.location_id !== location_id);
-    await updateDepartment({ id: row.original.id, data: { locations: updatedLocations } });
-  };
 
   if (isLoading) {
     return (

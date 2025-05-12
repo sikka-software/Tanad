@@ -1,15 +1,24 @@
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import useUserStore from "@root/src/stores/use-user-store";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+
+import { useEmployees } from "../employee/employee.hooks";
+import { useUpdateOffice } from "./office.hooks";
 import { Office } from "./office.type";
 
-
-const useCompanyColumns = () => {
+const useOfficeColumns = (handleEdit?: (id: string, field: string, value: string) => void) => {
   const t = useTranslations();
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
-
+  const { mutate: updateOffice } = useUpdateOffice();
+  const locale = useLocale();
+  // Employees for manager combobox
+  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const employeeOptions = employees.map((emp) => ({
+    label: `${emp.first_name} ${emp.last_name}`,
+    value: emp.id,
+  }));
   const columns: ExtendedColumnDef<Office>[] = [
     {
       accessorKey: "name",
@@ -20,7 +29,7 @@ const useCompanyColumns = () => {
       cellType: "code",
       onSerial: (row, rowIndex) => {
         const paddedNumber = String(rowIndex + 1).padStart(4, "0");
-        handleEdit(row.id, "code", `OF-${paddedNumber}`);
+        handleEdit?.(row.id, "code", `OF-${paddedNumber}`);
       },
       onRandom: (row) => {
         const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -28,7 +37,7 @@ const useCompanyColumns = () => {
         for (let i = 0; i < 5; i++) {
           randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
         }
-        handleEdit(row.id, "code", `OF-${randomCode}`);
+        handleEdit?.(row.id, "code", `OF-${randomCode}`);
       },
       accessorKey: "code",
       header: t("Offices.form.code.label"),
@@ -113,4 +122,4 @@ const useCompanyColumns = () => {
   return columns;
 };
 
-export default useCompanyColumns;
+export default useOfficeColumns;

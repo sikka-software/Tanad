@@ -1,3 +1,4 @@
+import useEmployeeRequestColumns from "@root/src/modules/employee-request/employee-request.columns";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
@@ -34,6 +35,8 @@ import useUserStore from "@/stores/use-user-store";
 export default function EmployeeRequestsPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const columns = useEmployeeRequestColumns();
 
   const canReadEmployeeRequests = useUserStore((state) =>
     state.hasPermission("employee_requests.read"),
@@ -123,6 +126,7 @@ export default function EmployeeRequestsPage() {
         ) : (
           <PageSearchAndFilter
             store={useEmployeeRequestsStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.EmployeeRequests.title")}

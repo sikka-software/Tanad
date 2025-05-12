@@ -1,3 +1,4 @@
+import useQuoteColumns from "@root/src/modules/quote/quote.columns";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
@@ -29,6 +30,8 @@ import useUserStore from "@/stores/use-user-store";
 export default function QuotesPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const columns = useQuoteColumns();
 
   const canReadQuotes = useUserStore((state) => state.hasPermission("quotes.read"));
   const canCreateQuotes = useUserStore((state) => state.hasPermission("quotes.create"));
@@ -105,6 +108,7 @@ export default function QuotesPage() {
         ) : (
           <PageSearchAndFilter
             store={useQuotesStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Quotes.title")}

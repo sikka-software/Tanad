@@ -19,6 +19,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import DepartmentCard from "@/department/department.card";
+import useDepartmentColumns from "@/department/department.columns";
 import DepartmentForm from "@/department/department.form";
 import {
   useDepartments,
@@ -35,6 +36,8 @@ import useUserStore from "@/stores/use-user-store";
 export default function DepartmentsPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const columns = useDepartmentColumns();
 
   const canReadDepartments = useUserStore((state) => state.hasPermission("departments.read"));
   const canCreateDepartments = useUserStore((state) => state.hasPermission("departments.create"));
@@ -115,6 +118,7 @@ export default function DepartmentsPage() {
         ) : (
           <PageSearchAndFilter
             store={useDepartmentsStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Departments.title")}

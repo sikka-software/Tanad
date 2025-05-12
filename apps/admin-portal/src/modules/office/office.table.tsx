@@ -17,9 +17,11 @@ import { useEmployees } from "@/employee/employee.hooks";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useOfficeColumns from "./office.columns";
+
 const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Office>) => {
   const t = useTranslations();
-  const locale = useLocale();
+
   const { mutate: updateOffice } = useUpdateOffice();
 
   const setData = useOfficeStore((state) => state.setData);
@@ -35,23 +37,15 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const canArchiveOffice = useUserStore((state) => state.hasPermission("offices.archive"));
   const canDeleteOffice = useUserStore((state) => state.hasPermission("offices.delete"));
 
-  // Employees for manager combobox
-  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
-  const employeeOptions = employees.map((emp) => ({
-    label: `${emp.first_name} ${emp.last_name}`,
-    value: emp.id,
-  }));
-
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const handleEdit = (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "office_id") return;
-    // Optimistically update the store's data
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    // Then call the API (fire and forget)
     updateOffice({ id: rowId, office: { [columnId]: value } });
   };
+  const columns = useOfficeColumns(handleEdit);
 
   const handleRowSelectionChange = useCallback(
     (rows: Office[]) => {
@@ -105,6 +99,8 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={officeTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

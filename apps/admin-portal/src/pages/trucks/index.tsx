@@ -1,3 +1,4 @@
+import useTruckColumns from "@root/src/modules/truck/truck.columns";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
@@ -29,6 +30,8 @@ import useUserStore from "@/stores/use-user-store";
 export default function TrucksPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const columns = useTruckColumns();
 
   const canReadTrucks = useUserStore((state) => state.hasPermission("trucks.read"));
   const canCreateTrucks = useUserStore((state) => state.hasPermission("trucks.create"));
@@ -105,6 +108,7 @@ export default function TrucksPage() {
         ) : (
           <PageSearchAndFilter
             store={useTruckStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Trucks.title")}

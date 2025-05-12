@@ -26,11 +26,14 @@ import useJobsStore from "@/job/job.store";
 import JobTable from "@/job/job.table";
 import { JobUpdateData } from "@/job/job.type";
 
+import useJobColumns from "@/modules/job/job.columns";
 import useUserStore from "@/stores/use-user-store";
 
 export default function JobsPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const columns = useJobColumns();
 
   const canReadJobs = useUserStore((state) => state.hasPermission("jobs.read"));
   const canCreateJobs = useUserStore((state) => state.hasPermission("jobs.create"));
@@ -108,6 +111,7 @@ export default function JobsPage() {
         ) : (
           <PageSearchAndFilter
             store={useJobsStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Jobs.title")}

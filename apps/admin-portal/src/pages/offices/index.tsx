@@ -1,3 +1,4 @@
+import useOfficeColumns from "@root/src/modules/office/office.columns";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
@@ -30,6 +31,8 @@ import useUserStore from "@/stores/use-user-store";
 export default function OfficesPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const columns = useOfficeColumns();
 
   const canReadOffices = useUserStore((state) => state.hasPermission("offices.read"));
   const canCreateOffices = useUserStore((state) => state.hasPermission("offices.create"));
@@ -123,6 +126,7 @@ export default function OfficesPage() {
         ) : (
           <PageSearchAndFilter
             store={useOfficeStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Offices.title")}
