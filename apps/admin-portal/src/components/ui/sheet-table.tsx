@@ -40,6 +40,7 @@ import {
   TableFooter,
 } from "@/ui/table";
 
+import SheetTableHeader from "@/components/tables/sheet-table-header";
 import SheetTableRow from "@/components/tables/sheet-table-row";
 
 // ** import lib
@@ -670,78 +671,20 @@ function SheetTable<
     <div ref={parentRef} className="relative max-h-[calc(100vh-7.6rem)] overflow-auto p-0 pb-2">
       <Table id={id} style={{ minWidth: 1200 }}>
         {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
-        {/* Primary header */}
-        {showHeader && (
-          <TableHeader className="relative">
-            <TableRow className="border-none">
-              {/* Selection checkbox header */}
-              {enableRowSelection && (
-                <TableHead className="bg-muted sticky start-0 top-0 z-30 w-8 !max-w-8 min-w-8 border-none text-start">
-                  <div className="flex h-full items-center justify-center">
-                    <input
-                      type="checkbox"
-                      checked={table.getIsAllPageRowsSelected()}
-                      onChange={table.getToggleAllPageRowsSelectedHandler()}
-                      className="h-4 w-4 rounded-md border-gray-300"
-                      title={t("General.select_all")}
-                    />
-                  </div>
-                  <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
-                </TableHead>
-              )}
-              {enableRowActions && (
-                <TableHead
-                  className="bg-muted sticky start-8 top-0 !z-20 border-e border-none text-start"
-                  style={{ width: "20px", minWidth: "20px", maxWidth: "20px" }}
-                />
-              )}
-
-              {table.getHeaderGroups().map((headerGroup) =>
-                headerGroup.headers.map((header) => {
-                  const style: React.CSSProperties = {};
-                  const col = header.column.columnDef;
-                  if (enableColumnSizing) {
-                    const size = header.getSize();
-                    if (size) style.width = `${size}px`;
-                    if (col.minSize)
-                      style.minWidth =
-                        typeof col.minSize === "number" ? `${col.minSize}px` : col.minSize;
-                    if (col.maxSize)
-                      style.maxWidth =
-                        typeof col.maxSize === "number" ? `${col.maxSize}px` : col.maxSize;
-                  } else {
-                    if (!col.size && !col.minSize && !col.maxSize) {
-                      style.width = "150px";
-                    }
-                    if (!col.minSize && !style.minWidth) {
-                      style.minWidth = "120px";
-                    }
-                    if (col.maxSize) {
-                      style.maxWidth =
-                        typeof col.maxSize === "number" ? `${col.maxSize}px` : col.maxSize;
-                      if (style.width) {
-                        const widthPx = parseInt(style.width.toString());
-                        const maxPx = parseInt(style.maxWidth.toString());
-                        if (widthPx > maxPx) style.width = style.maxWidth;
-                      }
-                    }
-                  }
-
-                  return (
-                    <TableHead
-                      key={header.id}
-                      className="bg-muted sticky top-0 !z-20 border-x text-start"
-                      style={style}
-                    >
-                      {flexRender(header.column.columnDef.header, header.getContext()) as string}
-                    </TableHead>
-                  );
-                }),
-              )}
-              {/* Action column */}
-            </TableRow>
-          </TableHeader>
-        )}
+        <SheetTableHeader
+          table={table}
+          enableRowSelection={enableRowSelection}
+          enableRowActions={enableRowActions}
+          showHeader={showHeader}
+          texts={texts}
+          canEditAction={props.canEditAction}
+          canDeleteAction={props.canDeleteAction}
+          canDuplicateAction={props.canDuplicateAction}
+          canViewAction={props.canViewAction}
+          canArchiveAction={props.canArchiveAction}
+          canPreviewAction={props.canPreviewAction}
+          enableColumnSizing={enableColumnSizing}
+        />
 
         <TableBody>
           {/* Top spacer */}
