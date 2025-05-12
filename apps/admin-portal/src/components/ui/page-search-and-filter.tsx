@@ -1,7 +1,5 @@
-import { ColumnDef } from "@tanstack/react-table";
 import { Search, Plus, LayoutGrid, Table2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import * as React from "react";
 import { StoreApi, useStore } from "zustand";
 
