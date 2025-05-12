@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Button } from "@/ui/button";
-import { ComboboxAdd } from "@/ui/combobox-add";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { CurrencyInput } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";

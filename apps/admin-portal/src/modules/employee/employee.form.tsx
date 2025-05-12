@@ -11,7 +11,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { ComboboxAdd } from "@/ui/combobox-add";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import CountryInput from "@/ui/country-input";
 import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";

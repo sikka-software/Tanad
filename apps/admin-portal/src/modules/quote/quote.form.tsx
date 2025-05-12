@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import CodeInput from "@/ui/code-input";
-import { ComboboxAdd } from "@/ui/combobox-add";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";

@@ -2,7 +2,7 @@ import { useLocale, useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 import { z } from "zod";
 
-import { ComboboxAdd } from "@/ui/combobox-add";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { CommandSelect } from "@/ui/command-select";
 import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";

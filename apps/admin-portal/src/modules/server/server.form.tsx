@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
-import { Combobox } from "@root/src/components/ui/combobox";
+import { Combobox } from "@root/src/components/ui/comboboxes/combobox";
 import CountryInput from "@root/src/components/ui/country-input";
 import { countries } from "@root/src/lib/constants/countries";
 import { getNotesValue } from "@root/src/lib/utils";

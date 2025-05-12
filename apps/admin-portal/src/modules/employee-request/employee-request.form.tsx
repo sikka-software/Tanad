@@ -10,7 +10,7 @@ import { z } from "zod";
 
 import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
-import { ComboboxAdd } from "@/ui/combobox-add";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";

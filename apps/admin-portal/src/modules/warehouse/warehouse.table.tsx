@@ -1,4 +1,4 @@
-import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { useLocale, useTranslations } from "next-intl";
 import React from "react";
 import { z } from "zod";

@@ -87,12 +87,14 @@ const DashboardStatsVertical = ({
                         onMouseEnter={() => setIsHovered(true)}
                         onMouseLeave={() => setIsHovered(false)}
                       >
-                        <div className="flex flex-row items-center justify-between gap-2 px-6 py-4">
-                          <h3 className="text-sm font-medium">{t(module.translationKey)}</h3>
-                          <p className="text-sm font-bold">
-                            {stats[`total${pascalKey}` as keyof DashboardStats]}
-                          </p>
-                        </div>
+                        <Link href={module.url || "/dashboard"}>
+                          <div className="flex flex-row items-center justify-between gap-2 px-6 py-4">
+                            <h3 className="text-sm font-medium">{t(module.translationKey)}</h3>
+                            <p className="text-sm font-bold">
+                              {stats[`total${pascalKey}` as keyof DashboardStats]}
+                            </p>
+                          </div>
+                        </Link>
                         <motion.div
                           initial={{ x: 16, opacity: 0 }}
                           animate={isHovered ? "hover" : "rest"}

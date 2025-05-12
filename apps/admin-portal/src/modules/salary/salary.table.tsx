@@ -1,4 +1,4 @@
-import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { MoneyFormatter } from "@root/src/components/ui/currency-input";
 import { getCurrencySymbol } from "@root/src/lib/currency-utils";
 import { useLocale, useTranslations } from "next-intl";

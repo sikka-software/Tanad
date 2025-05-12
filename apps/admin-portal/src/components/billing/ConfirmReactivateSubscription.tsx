@@ -10,7 +10,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@root/src/components/ui/dialogs/alert-dialog";
 import { Button } from "@/components/ui/button";
 
 export interface ConfirmReactivateSubscriptionProps {

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { FilterableField, SortableColumn, FilterCondition } from "@/types/common.type";
 
 import { Button } from "./button";
+import ColumnViewPopover from "./column-view-popover";
 import FilterPopover from "./filter-popover";
 import IconButton from "./icon-button";
 import { Input } from "./input";
@@ -111,6 +112,7 @@ const PageSearchAndFilter = ({
               label={viewMode === "table" ? t("General.cards_view") : t("General.table_view")}
               onClick={() => setViewMode(viewMode === "table" ? "cards" : "table")}
             />
+            <ColumnViewPopover />
 
             <FilterPopover
               fields={filterableFields}

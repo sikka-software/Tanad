@@ -46,7 +46,7 @@ import { cn } from "@/lib/utils";
 import CodeInput from "./code-input";
 import { CommandSelect } from "./command-select";
 import { Input } from "./input";
-import RowActionsPopover from "./row-actions-popover";
+import RowActionsPopover from "./popovers/row-actions-popover";
 
 export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   ColumnDef<TData, TValue>,

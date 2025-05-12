@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import AdjustableDialog from "@root/src/components/ui/dialogs/adjustable-dialog";
 import { Sparkles, Loader2, Trash, ArrowDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -8,27 +9,21 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import AdjustableDialog from "@/ui/adjustable-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 // UI
 import { Button } from "@/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import { Pukla } from "@/lib/types";
-
-import { useMainStore } from "@/hooks/main.store";
-import useUserStore from "@/stores/use-user-store";
 // import { checkExistingSlug } from "@/lib/operations";
 import { createClient } from "@/utils/supabase/component";
+
+import { useMainStore } from "@/hooks/main.store";
+
+import { Pukla } from "@/lib/types";
+
+import useUserStore from "@/stores/use-user-store";
 
 interface OnboardingDialogProps {
   onClose?: () => void;

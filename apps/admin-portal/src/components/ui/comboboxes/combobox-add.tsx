@@ -17,7 +17,7 @@ import { Skeleton } from "@/ui/skeleton";
 
 import { cn } from "@/lib/utils";
 
-import { Button } from "./button";
+import { Button } from "../button";
 
 type ComboboxAddTypes<T> = {
   labelKey?: keyof T | any;

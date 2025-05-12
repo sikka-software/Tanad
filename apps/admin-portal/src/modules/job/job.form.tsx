@@ -12,7 +12,7 @@ import * as z from "zod";
 
 import { Badge } from "@/ui/badge";
 import { Card, CardHeader, CardTitle } from "@/ui/card";
-import { ComboboxAdd } from "@/ui/combobox-add";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { CurrencyInput } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Dialog } from "@/ui/dialog";

@@ -1,5 +1,5 @@
 import CodeInput from "@root/src/components/ui/code-input";
-import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { CommandSelect } from "@root/src/components/ui/command-select";
 import { Input } from "@root/src/components/ui/input";
 import { useLocale, useTranslations } from "next-intl";
