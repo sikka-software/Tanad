@@ -1,5 +1,6 @@
 // stores/types.ts
 import { VisibilityState } from "@tanstack/react-table";
+import { Updater } from "@tanstack/react-table";
 
 import { FilterCondition } from "@/types/common.type";
 
@@ -30,7 +31,7 @@ export type BaseStates<T> = {
 };
 
 export type BaseActions<T> = {
-  setColumnVisibility: (columnVisibility: VisibilityState) => void;
+  setColumnVisibility: (columnVisibility: VisibilityState | Updater<VisibilityState>) => void;
   setData?: (data: T[]) => void;
   setDataLength?: (dataLength: number) => void;
   setIsLoading: (isLoading: boolean) => void;

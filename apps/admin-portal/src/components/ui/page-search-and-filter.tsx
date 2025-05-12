@@ -112,7 +112,7 @@ const PageSearchAndFilter = ({
               <ColumnViewPopover
                 columns={columns}
                 columnVisibility={columnVisibility || {}}
-                onColumnVisibilityChange={(e) => console.log("e is ", e)}
+                onColumnVisibilityChange={onColumnVisibilityChange || (() => {})}
               />
             )}
             <IconButton

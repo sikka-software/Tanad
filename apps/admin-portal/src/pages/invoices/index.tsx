@@ -123,9 +123,10 @@ export default function InvoicesPage() {
             hideOptions={invoices?.length === 0}
             id="invoices-table"
             columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(visibility) => {
-              console.log(visibility);
-              setColumnVisibility(visibility);
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev: VisibilityState) =>
+                typeof updater === "function" ? updater(prev) : updater
+              );
             }}
           />
         )}
@@ -139,6 +140,7 @@ export default function InvoicesPage() {
               error={error as Error | null}
               onActionClicked={onActionClicked}
               columnVisibility={columnVisibility}
+              onColumnVisibilityChange={setColumnVisibility}
             />
           ) : (
             <div className="p-4">

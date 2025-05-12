@@ -42,7 +42,15 @@ export function createGenericStore<T extends { id: string }>(
     actionableItem: null,
     ...initialState,
 
-    setColumnVisibility: (columnVisibility) => set({ columnVisibility }),
+    setColumnVisibility: (columnVisibilityOrUpdater) => {
+      set((state) => {
+        const next =
+          typeof columnVisibilityOrUpdater === "function"
+            ? columnVisibilityOrUpdater(state.columnVisibility)
+            : columnVisibilityOrUpdater;
+        return { columnVisibility: next };
+      });
+    },
     setIsLoading: (isLoading) => set({ isLoading }),
     setError: (error) => set({ error }),
     setDataLength: (dataLength) => set({ dataLength }),
