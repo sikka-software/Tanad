@@ -3,15 +3,14 @@
 // Usage:
 //   const { columnVisibility, setColumnVisibility } = useTableStore((s) => ({ ... }))
 //   setColumnVisibility(tableId, { colA: false, colB: true })
-
+import { VisibilityState } from "@tanstack/react-table";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 // Types
-export type ColumnVisibility = Record<string, boolean>;
 export type TableUIState = {
-  columnVisibility: Record<string, ColumnVisibility>; // tableId -> { colId: visible }
-  setColumnVisibility: (tableId: string, visibility: ColumnVisibility) => void;
+  columnVisibility: VisibilityState;
+  setColumnVisibility: (visibility: VisibilityState) => void;
   // Future: add order, sizing, etc.
 };
 
@@ -19,13 +18,7 @@ export const useTableStore = create<TableUIState>()(
   persist(
     (set, get) => ({
       columnVisibility: {},
-      setColumnVisibility: (tableId, visibility) =>
-        set((state) => ({
-          columnVisibility: {
-            ...state.columnVisibility,
-            [tableId]: visibility,
-          },
-        })),
+      setColumnVisibility: (visibility: VisibilityState) => set({ columnVisibility: visibility }),
       // Future: add order, sizing, etc.
     }),
     {
@@ -33,4 +26,4 @@ export const useTableStore = create<TableUIState>()(
       partialize: (state) => ({ columnVisibility: state.columnVisibility }),
     },
   ),
-); 
+);

@@ -1,3 +1,4 @@
+import { VisibilityState, Updater } from "@tanstack/react-table";
 import { format, parseISO } from "date-fns";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -21,8 +22,6 @@ import useUserStore from "@/stores/use-user-store";
 
 import useInvoiceColumns from "./invoice.columns";
 
-import { VisibilityState, Updater } from "@tanstack/react-table";
-
 const formatDate = (dateStr: string) => {
   try {
     // If the date includes time information, take only the date part
@@ -43,7 +42,14 @@ type ModuleTableProps<T> = {
   onColumnVisibilityChange?: (updater: Updater<VisibilityState>) => void;
 };
 
-const InvoicesTable = ({ data, isLoading, error, onActionClicked, columnVisibility, onColumnVisibilityChange }: ModuleTableProps<Invoice>) => {
+const InvoicesTable = ({
+  data,
+  isLoading,
+  error,
+  onActionClicked,
+  columnVisibility,
+  onColumnVisibilityChange,
+}: ModuleTableProps<Invoice>) => {
   const t = useTranslations();
   const columns = useInvoiceColumns();
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
@@ -124,6 +130,8 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked, columnVisibili
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={invoiceTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={onColumnVisibilityChange}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),
@@ -133,8 +141,6 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked, columnVisibili
         delete: t("General.delete"),
         preview: t("General.preview"),
       }}
-      columnVisibility={columnVisibility}
-      onColumnVisibilityChange={onColumnVisibilityChange}
     />
   );
 };

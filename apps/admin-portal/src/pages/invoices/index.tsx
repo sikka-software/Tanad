@@ -57,6 +57,7 @@ export default function InvoicesPage() {
   const filterCaseSensitive = useInvoiceStore((state) => state.filterCaseSensitive);
   const getFilteredInvoices = useInvoiceStore((state) => state.getFilteredData);
   const getSortedInvoices = useInvoiceStore((state) => state.getSortedData);
+  const setColumnVisibility = useInvoiceStore((state) => state.setColumnVisibility);
 
   const { data: invoices, isLoading, error } = useInvoices();
   const { mutateAsync: deleteInvoices, isPending: isDeleting } = useBulkDeleteInvoices();
@@ -94,9 +95,6 @@ export default function InvoicesPage() {
     return getSortedInvoices(filteredInvoices);
   }, [filteredInvoices, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  // Column visibility state
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-
   if (!canReadInvoices) {
     return <NoPermission />;
   }
@@ -122,20 +120,21 @@ export default function InvoicesPage() {
             createLabel={t("Pages.Invoices.add")}
             searchPlaceholder={t("Pages.Invoices.search")}
             hideOptions={invoices?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={setColumnVisibility}
+            id="invoices-table"
+            onColumnVisibilityChange={(visibility) => {
+              setColumnVisibility(visibility);
+            }}
           />
         )}
 
         <div>
           {viewMode === "table" ? (
             <InvoicesTable
+              // id="invoices-table"
               data={sortedInvoices}
               isLoading={isLoading}
               error={error as Error | null}
               onActionClicked={onActionClicked}
-              columnVisibility={columnVisibility}
-              onColumnVisibilityChange={setColumnVisibility}
             />
           ) : (
             <div className="p-4">

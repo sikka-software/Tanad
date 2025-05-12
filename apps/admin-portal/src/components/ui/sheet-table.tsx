@@ -24,10 +24,17 @@ import {
   ColumnDef,
   Row as TanStackRow,
   ColumnSizingState,
+  getPaginationRowModel,
+  VisibilityState,
+  SortingState,
+  ExpandedState,
+  ColumnFiltersState,
+  getSortedRowModel,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useLocale, useTranslations } from "next-intl";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
 
 import {
@@ -42,6 +49,8 @@ import {
 
 // ** import lib
 import { cn } from "@/lib/utils";
+
+import { useTableStore } from "@/stores/table.store";
 
 import CodeInput from "./code-input";
 import { CommandSelect } from "./command-select";
@@ -341,8 +350,7 @@ export function isRowDisabled(
  */
 function SheetTable<
   T extends {
-    // Common properties for each row
-    id?: string; // Each row should have a unique string/number ID
+    id?: string;
     headerKey?: string;
     subRows?: T[];
   },
@@ -356,32 +364,34 @@ function SheetTable<
     disabledColumns = [],
     disabledRows = [],
     showHeader = true,
-    showSecondHeader = false,
-    secondHeaderTitle = "",
     enableRowSelection = false,
     enableRowActions = false,
     onRowSelectionChange,
-    // Footer props
-    totalRowValues,
-    totalRowLabel = "",
-    totalRowTitle,
-    footerElement,
-
-    // Additional TanStack config
     enableColumnSizing = false,
-    tableOptions = {},
-
-    // Add/Remove Dynamic Row Actions
     rowActions,
-    handleAddRowFunction,
-    handleRemoveRowFunction,
     id,
-    columnVisibility,
-    onColumnVisibilityChange,
   } = props;
 
   const t = useTranslations();
   const locale = useLocale();
+
+  const columnVisibility = useTableStore((s) => s.columnVisibility);
+  const setColumnVisibility = useTableStore((s) => s.setColumnVisibility);
+
+  // // Determine which columnVisibility/onColumnVisibilityChange to use
+  // const columnVisibility =
+  //   propColumnVisibility !== undefined ? propColumnVisibility : storeColumnVisibility;
+  // const onColumnVisibilityChange =
+  //   propOnColumnVisibilityChange !== undefined
+  //     ? propOnColumnVisibilityChange
+  //     : (updater: any) => {
+  //         // TanStack Table passes either a new state or an updater function
+  //         const next = typeof updater === "function" ? updater(storeColumnVisibility) : updater;
+  //         // Only update if the value actually changes
+  //         if (JSON.stringify(next) !== JSON.stringify(storeColumnVisibility)) {
+  //           setStoreColumnVisibility(tableId, next);
+  //         }
+  //       };
 
   /**
    * Ensure a minimum of 30 rows are displayed, padding with empty rows if needed.
@@ -408,7 +418,7 @@ function SheetTable<
   /**
    * Expanded state for sub-rows. Keyed by row.id in TanStack Table.
    */
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  // const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   /**
    * Track errors/original content keyed by (groupKey, rowId) for editing.
@@ -425,59 +435,54 @@ function SheetTable<
    */
   const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
 
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = React.useState("");
+  const [expanded, setExpanded] = React.useState<ExpandedState>({});
+
+  // const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(() => {
+  //   const savedVisibility = localStorage.getItem("column-visibility");
+  //   return savedVisibility ? JSON.parse(savedVisibility) : {};
+  // });
+
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [selectedFilters, setSelectedFilters] = React.useState<string[]>([]);
+
   /**
-   * Build the final table options. Merge user-provided tableOptions with ours.
+   * Initialize the table using TanStack Table.
    */
-  const mergedOptions: TableOptions<T> = {
+  const table = useReactTable({
     data,
-    columns: React.useMemo(() => {
-      if (!columnVisibility) return columns;
-      return columns.filter((col) => {
-        const key = col.id || col.accessorKey || "";
-        return columnVisibility[key] !== false;
-      });
-    }, [columns, columnVisibility]),
+    columns: columns as ColumnDef<T>[],
     getRowId: (row) => row.id ?? String(Math.random()), // fallback if row.id is missing
-    getCoreRowModel: getCoreRowModel(),
     // Provide subRows if you have them:
     getSubRows: (row) => row.subRows ?? undefined,
     // Add expansions
-    getExpandedRowModel: getExpandedRowModel(),
     enableExpanding: true,
     // Add row selection
     enableRowSelection: true,
     enableMultiRowSelection: true,
     // External expanded state
     state: {
-      // If user also provided tableOptions.state, merge them
-      ...(tableOptions.state ?? {}),
+      columnFilters,
+      columnVisibility,
+      globalFilter,
+      rowSelection,
       expanded,
-      ...(enableColumnSizing
-        ? {
-            columnSizing,
-          }
-        : {}),
-      ...(columnVisibility ? { columnVisibility } : {}),
     },
-    onExpandedChange: setExpanded, // keep expansions in local state
 
-    // If sizing is enabled, pass sizing states:
-    ...(enableColumnSizing
-      ? {
-          onColumnSizingChange: setColumnSizing,
-          columnResizeMode: tableOptions.columnResizeMode ?? "onChange",
-        }
-      : {}),
-
-    // Spread any other user-provided table options
-    ...(onColumnVisibilityChange ? { onColumnVisibilityChange } : {}),
-    ...tableOptions,
-  } as TableOptions<T>;
-
-  /**
-   * Initialize the table using TanStack Table.
-   */
-  const table = useReactTable<T>(mergedOptions);
+    onExpandedChange: setExpanded,
+    getExpandedRowModel: getExpandedRowModel(),
+    onGlobalFilterChange: setGlobalFilter,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: () => {
+      setColumnVisibility(table.getState().columnVisibility);
+    },
+    onRowSelectionChange: setRowSelection,
+  });
 
   // Update parent component when row selection changes
   useEffect(() => {

@@ -25,6 +25,7 @@ export function createGenericStore<T extends { id: string }>(
 
   return create<BaseStates<T> & BaseActions<T>>((set, get) => ({
     data: [],
+    columnVisibility: {},
     dataLength: 0,
     isLoading: false,
     error: null,
@@ -41,6 +42,7 @@ export function createGenericStore<T extends { id: string }>(
     actionableItem: null,
     ...initialState,
 
+    setColumnVisibility: (columnVisibility) => set({ columnVisibility }),
     setIsLoading: (isLoading) => set({ isLoading }),
     setError: (error) => set({ error }),
     setDataLength: (dataLength) => set({ dataLength }),

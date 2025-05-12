@@ -1,4 +1,6 @@
 // stores/types.ts
+import { VisibilityState } from "@tanstack/react-table";
+
 import { FilterCondition } from "@/types/common.type";
 
 export type ViewMode = "table" | "cards";
@@ -9,6 +11,7 @@ export type SortRule = {
 };
 
 export type BaseStates<T> = {
+  columnVisibility: VisibilityState;
   data?: T[];
   dataLength?: number;
   isLoading: boolean;
@@ -27,6 +30,7 @@ export type BaseStates<T> = {
 };
 
 export type BaseActions<T> = {
+  setColumnVisibility: (columnVisibility: VisibilityState) => void;
   setData?: (data: T[]) => void;
   setDataLength?: (dataLength: number) => void;
   setIsLoading: (isLoading: boolean) => void;
