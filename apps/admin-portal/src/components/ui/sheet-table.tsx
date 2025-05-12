@@ -219,6 +219,9 @@ export interface SheetTableProps<T extends object> extends FooterProps {
   canArchiveAction?: boolean;
   canDeleteAction?: boolean;
   canPreviewAction?: boolean;
+  // --- Column visibility ---
+  columnVisibility?: Record<string, boolean>;
+  onColumnVisibilityChange?: (updater: any) => void;
 }
 
 /**
@@ -373,6 +376,8 @@ function SheetTable<
     handleAddRowFunction,
     handleRemoveRowFunction,
     id,
+    columnVisibility,
+    onColumnVisibilityChange,
   } = props;
 
   const t = useTranslations();
@@ -425,7 +430,13 @@ function SheetTable<
    */
   const mergedOptions: TableOptions<T> = {
     data,
-    columns,
+    columns: React.useMemo(() => {
+      if (!columnVisibility) return columns;
+      return columns.filter((col) => {
+        const key = col.id || col.accessorKey || "";
+        return columnVisibility[key] !== false;
+      });
+    }, [columns, columnVisibility]),
     getRowId: (row) => row.id ?? String(Math.random()), // fallback if row.id is missing
     getCoreRowModel: getCoreRowModel(),
     // Provide subRows if you have them:
@@ -446,6 +457,7 @@ function SheetTable<
             columnSizing,
           }
         : {}),
+      ...(columnVisibility ? { columnVisibility } : {}),
     },
     onExpandedChange: setExpanded, // keep expansions in local state
 
@@ -458,6 +470,7 @@ function SheetTable<
       : {}),
 
     // Spread any other user-provided table options
+    ...(onColumnVisibilityChange ? { onColumnVisibilityChange } : {}),
     ...tableOptions,
   } as TableOptions<T>;
 

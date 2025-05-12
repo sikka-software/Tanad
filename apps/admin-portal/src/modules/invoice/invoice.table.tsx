@@ -13,8 +13,6 @@ import { MoneyFormatter } from "@/components/ui/currency-input";
 
 import { getCurrencySymbol } from "@/lib/currency-utils";
 
-import { ModuleTableProps } from "@/types/common.type";
-
 import { useUpdateInvoice } from "@/invoice/invoice.hooks";
 import useInvoiceStore from "@/invoice/invoice.store";
 import { Invoice, InvoiceUpdateData } from "@/invoice/invoice.type";
@@ -22,6 +20,8 @@ import { Invoice, InvoiceUpdateData } from "@/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
 import useInvoiceColumns from "./invoice.columns";
+
+import { VisibilityState, Updater } from "@tanstack/react-table";
 
 const formatDate = (dateStr: string) => {
   try {
@@ -34,7 +34,16 @@ const formatDate = (dateStr: string) => {
   }
 };
 
-const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Invoice>) => {
+type ModuleTableProps<T> = {
+  data: T[];
+  isLoading: boolean;
+  error: Error | null;
+  onActionClicked?: (action: string, rowId: string) => void;
+  columnVisibility?: VisibilityState;
+  onColumnVisibilityChange?: (updater: Updater<VisibilityState>) => void;
+};
+
+const InvoicesTable = ({ data, isLoading, error, onActionClicked, columnVisibility, onColumnVisibilityChange }: ModuleTableProps<Invoice>) => {
   const t = useTranslations();
   const columns = useInvoiceColumns();
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
@@ -124,6 +133,8 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
         delete: t("General.delete"),
         preview: t("General.preview"),
       }}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={onColumnVisibilityChange}
     />
   );
 };

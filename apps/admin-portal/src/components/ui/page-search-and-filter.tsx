@@ -46,6 +46,8 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
   filterableFields?: FilterableField[];
   hideOptions?: boolean;
   columns?: ExtendedColumnDef<any>[];
+  columnVisibility?: Record<string, boolean>;
+  onColumnVisibilityChange?: (updater: any) => void;
 }
 
 const PageSearchAndFilter = ({
@@ -59,6 +61,8 @@ const PageSearchAndFilter = ({
   filterableFields,
   hideOptions = false,
   columns,
+  columnVisibility,
+  onColumnVisibilityChange,
   ...props
 }: PageSearchAndFilterProps) => {
   const viewMode = useStore(store, (state) => state.viewMode);
@@ -116,7 +120,10 @@ const PageSearchAndFilter = ({
               label={viewMode === "table" ? t("General.cards_view") : t("General.table_view")}
               onClick={() => setViewMode(viewMode === "table" ? "cards" : "table")}
             />
-            <ColumnViewPopover columns={columns || []} />
+            <ColumnViewPopover columns={columns || []}
+              columnVisibility={columnVisibility || {}}
+              onColumnVisibilityChange={onColumnVisibilityChange || (() => {})}
+            />
 
             <FilterPopover
               fields={filterableFields}
