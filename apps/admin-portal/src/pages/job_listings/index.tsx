@@ -59,6 +59,8 @@ export default function JobListingsPage() {
   const filterCaseSensitive = useJobListingsStore((state) => state.filterCaseSensitive);
   const getFilteredJobListings = useJobListingsStore((state) => state.getFilteredData);
   const getSortedJobListings = useJobListingsStore((state) => state.getSortedData);
+  const columnVisibility = useJobListingsStore((state) => state.columnVisibility);
+  const setColumnVisibility = useJobListingsStore((state) => state.setColumnVisibility);
 
   const { data: jobListings = [], isLoading, error } = useJobListings();
   const { mutateAsync: deleteJobListings, isPending: isDeleting } = useBulkDeleteJobListings();
@@ -126,6 +128,12 @@ export default function JobListingsPage() {
             createLabel={t("Pages.JobListings.add")}
             searchPlaceholder={t("Pages.JobListings.search")}
             hideOptions={jobListings?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

@@ -54,7 +54,8 @@ export default function OfficesPage() {
   const filterCaseSensitive = useOfficeStore((state) => state.filterCaseSensitive);
   const getFilteredOffices = useOfficeStore((state) => state.getFilteredData);
   const getSortedOffices = useOfficeStore((state) => state.getSortedData);
-  const setDataLength = useOfficeStore((state) => state.setDataLength);
+  const columnVisibility = useOfficeStore((state) => state.columnVisibility);
+  const setColumnVisibility = useOfficeStore((state) => state.setColumnVisibility);
 
   const { data: offices, isLoading, error } = useOffices();
   const { mutateAsync: deleteOffices, isPending: isDeleting } = useBulkDeleteOffices();
@@ -129,6 +130,12 @@ export default function OfficesPage() {
             createLabel={t("Pages.Offices.add")}
             searchPlaceholder={t("Pages.Offices.search")}
             hideOptions={offices?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

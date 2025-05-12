@@ -23,6 +23,9 @@ const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps
   const selectedRows = useCarStore((state) => state.selectedRows);
   const setSelectedRows = useCarStore((state) => state.setSelectedRows);
 
+  const columnVisibility = useCarStore((state) => state.columnVisibility);
+  const setColumnVisibility = useCarStore((state) => state.setColumnVisibility);
+
   const setData = useCarStore((state) => state.setData);
 
   const canEditCar = useUserStore((state) => state.hasPermission("cars.update"));
@@ -156,6 +159,8 @@ const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={carTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

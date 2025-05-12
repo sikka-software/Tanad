@@ -53,6 +53,9 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
   const selectedRows = useDepartmentStore((state) => state.selectedRows);
   const setSelectedRows = useDepartmentStore((state) => state.setSelectedRows);
 
+  const columnVisibility = useDepartmentStore((state) => state.columnVisibility);
+  const setColumnVisibility = useDepartmentStore((state) => state.setColumnVisibility);
+
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Department>[] = [
@@ -199,6 +202,8 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={departmentTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

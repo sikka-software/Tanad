@@ -1,8 +1,9 @@
+import useCompanyColumns from "@root/src/modules/company/company.columns";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { use, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -31,6 +32,7 @@ import useUserStore from "@/stores/use-user-store";
 export default function CompaniesPage() {
   const t = useTranslations();
   const router = useRouter();
+  const columns = useCompanyColumns();
 
   const canReadCompanies = useUserStore((state) => state.hasPermission("companies.read"));
   const canCreateCompanies = useUserStore((state) => state.hasPermission("companies.create"));
@@ -54,6 +56,8 @@ export default function CompaniesPage() {
   const filterCaseSensitive = useCompanyStore((state) => state.filterCaseSensitive);
   const getFilteredCompanies = useCompanyStore((state) => state.getFilteredData);
   const getSortedCompanies = useCompanyStore((state) => state.getSortedData);
+  const columnVisibility = useCompanyStore((state) => state.columnVisibility);
+  const setColumnVisibility = useCompanyStore((state) => state.setColumnVisibility);
 
   const { data: companies, isLoading: loadingFetchCompanies, error } = useCompanies();
   const { mutate: duplicateCompany } = useDuplicateCompany();
@@ -108,6 +112,7 @@ export default function CompaniesPage() {
         ) : (
           <PageSearchAndFilter
             store={useCompanyStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Companies.title")}
@@ -117,6 +122,13 @@ export default function CompaniesPage() {
             createLabel={t("Pages.Companies.create")}
             searchPlaceholder={t("Pages.Companies.search")}
             hideOptions={companies?.length === 0}
+            id="companies-table"
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

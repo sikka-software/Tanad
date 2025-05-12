@@ -1,29 +1,29 @@
-import { useLocale, useTranslations } from "next-intl";
+import SheetTable from "@root/src/components/ui/sheet-table";
+import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
-import { z } from "zod";
 
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import { CommandSelect } from "@/ui/command-select";
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import { useEmployees } from "@/employee/employee.hooks";
-
 import useUserStore from "@/stores/use-user-store";
 
+import useBranchColumns from "./branch.columns";
 import { useUpdateBranch } from "./branch.hooks";
 import useBranchStore from "./branch.store";
 import { Branch } from "./branch.type";
 
 const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Branch>) => {
   const t = useTranslations();
-  const locale = useLocale();
+
+  const columns = useBranchColumns();
   const { mutate: updateBranch } = useUpdateBranch();
   const selectedRows = useBranchStore((state) => state.selectedRows);
   const setSelectedRows = useBranchStore((state) => state.setSelectedRows);
+
+  const columnVisibility = useBranchStore((state) => state.columnVisibility);
+  const setColumnVisibility = useBranchStore((state) => state.setColumnVisibility);
 
   const canEditBranch = useUserStore((state) => state.hasPermission("branches.update"));
   const canDuplicateBranch = useUserStore((state) => state.hasPermission("branches.duplicate"));
@@ -31,107 +31,8 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canArchiveBranch = useUserStore((state) => state.hasPermission("branches.archive"));
   const canDeleteBranch = useUserStore((state) => state.hasPermission("branches.delete"));
 
-  // Employees for manager combobox
-  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
-  const employeeOptions = employees.map((emp) => ({
-    label: `${emp.first_name} ${emp.last_name}`,
-    value: emp.id,
-  }));
-
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const columns: ExtendedColumnDef<Branch>[] = [
-    {
-      accessorKey: "name",
-      header: t("Branches.form.name.label"),
-      validationSchema: z.string().min(1, t("Branches.form.name.required")),
-    },
-    {
-      accessorKey: "code",
-      header: t("Branches.form.code.label"),
-      validationSchema: z.string().min(1, t("Branches.form.code.required")),
-    },
-    {
-      accessorKey: "email",
-      header: t("Branches.form.email.label"),
-      validationSchema: z.string().email(t("Branches.form.email.invalid")),
-    },
-    {
-      accessorKey: "phone",
-      header: t("Branches.form.phone.label"),
-      validationSchema: z.string().nullable(),
-    },
-    {
-      accessorKey: "manager",
-      header: t("Branches.form.manager.label"),
-      noPadding: true,
-      validationSchema: z.string().nullable(),
-      cell: ({ row }) => {
-        const branch = row.original;
-        return (
-          <ComboboxAdd
-            dir={locale === "ar" ? "rtl" : "ltr"}
-            inCell
-            data={employeeOptions}
-            isLoading={employeesLoading}
-            buttonClassName="bg-transparent"
-            defaultValue={branch.manager || ""}
-            onChange={async (value) => {
-              await updateBranch({
-                id: branch.id,
-                data: {
-                  id: branch.id,
-                  name: branch.name,
-                  status: branch.status,
-                  manager: value || null,
-                },
-              });
-            }}
-            texts={{
-              placeholder: ". . .",
-              searchPlaceholder: t("Pages.Employees.search"),
-              noItems: t("Branches.form.manager.no_employees"),
-            }}
-            addText={t("Pages.Employees.add")}
-            ariaInvalid={false}
-          />
-        );
-      },
-    },
-
-    {
-      accessorKey: "address",
-      header: t("Forms.address.label"),
-      validationSchema: z.string().min(1, t("Forms.address.required")),
-    },
-    {
-      accessorKey: "city",
-      header: t("Forms.city.label"),
-      validationSchema: z.string().min(1, t("Forms.city.required")),
-    },
-    {
-      accessorKey: "region",
-      header: t("Forms.region.label"),
-      validationSchema: z.string().min(1, t("Forms.region.required")),
-    },
-    {
-      accessorKey: "zip_code",
-      header: t("Forms.zip_code.label"),
-      validationSchema: z.string().min(1, t("Forms.zip_code.required")),
-    },
-    {
-      accessorKey: "status",
-      maxSize: 80,
-      header: t("Branches.form.status.label"),
-      validationSchema: z.enum(["active", "inactive"]),
-      cellType: "status",
-      options: [
-        { label: t("Branches.form.status.active"), value: "active" },
-        { label: t("Branches.form.status.inactive"), value: "inactive" },
-      ],
-    },
-  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "branch_id") return;
@@ -199,6 +100,8 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={branchTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

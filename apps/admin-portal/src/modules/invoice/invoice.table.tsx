@@ -1,18 +1,11 @@
-import { VisibilityState, Updater } from "@tanstack/react-table";
-import { format, parseISO } from "date-fns";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import React from "react";
-import { z } from "zod";
 
-import { Button } from "@/ui/button";
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { MoneyFormatter } from "@/components/ui/currency-input";
-
-import { getCurrencySymbol } from "@/lib/currency-utils";
+import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateInvoice } from "@/invoice/invoice.hooks";
 import useInvoiceStore from "@/invoice/invoice.store";
@@ -22,39 +15,15 @@ import useUserStore from "@/stores/use-user-store";
 
 import useInvoiceColumns from "./invoice.columns";
 
-const formatDate = (dateStr: string) => {
-  try {
-    // If the date includes time information, take only the date part
-    const datePart = dateStr.split("T")[0];
-    return format(parseISO(datePart), "MMM dd, yyyy");
-  } catch (error) {
-    console.error("Error formatting date:", dateStr, error);
-    return "Invalid Date";
-  }
-};
-
-type ModuleTableProps<T> = {
-  data: T[];
-  isLoading: boolean;
-  error: Error | null;
-  onActionClicked?: (action: string, rowId: string) => void;
-  columnVisibility?: VisibilityState;
-  onColumnVisibilityChange?: (updater: Updater<VisibilityState>) => void;
-};
-
-const InvoicesTable = ({
-  data,
-  isLoading,
-  error,
-  onActionClicked,
-  columnVisibility,
-  onColumnVisibilityChange,
-}: ModuleTableProps<Invoice>) => {
+const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Invoice>) => {
   const t = useTranslations();
   const columns = useInvoiceColumns();
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
   const selectedRows = useInvoiceStore((state) => state.selectedRows);
   const setSelectedRows = useInvoiceStore((state) => state.setSelectedRows);
+
+  const columnVisibility = useInvoiceStore((state) => state.columnVisibility);
+  const setColumnVisibility = useInvoiceStore((state) => state.setColumnVisibility);
 
   const canEditInvoice = useUserStore((state) => state.hasPermission("invoices.update"));
   const canDuplicateInvoice = useUserStore((state) => state.hasPermission("invoices.duplicate"));
@@ -131,7 +100,7 @@ const InvoicesTable = ({
       tableOptions={invoiceTableOptions}
       onActionClicked={onActionClicked}
       columnVisibility={columnVisibility}
-      onColumnVisibilityChange={onColumnVisibilityChange}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

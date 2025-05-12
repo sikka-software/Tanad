@@ -31,6 +31,9 @@ const EmployeesTable = ({
   const selectedRows = useEmployeeStore((state) => state.selectedRows);
   const setSelectedRows = useEmployeeStore((state) => state.setSelectedRows);
 
+  const columnVisibility = useEmployeeStore((state) => state.columnVisibility);
+  const setColumnVisibility = useEmployeeStore((state) => state.setColumnVisibility);
+
   const canEditEmployee = useUserStore((state) => state.hasPermission("employees.update"));
   const canDuplicateEmployee = useUserStore((state) => state.hasPermission("employees.duplicate"));
   const canViewEmployee = useUserStore((state) => state.hasPermission("employees.view"));
@@ -220,6 +223,8 @@ const EmployeesTable = ({
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={employeeTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

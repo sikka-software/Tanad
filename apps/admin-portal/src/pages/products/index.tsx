@@ -1,3 +1,4 @@
+import useProductColumns from "@root/src/modules/product/product.columns";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
@@ -31,6 +32,7 @@ import useUserStore from "@/stores/use-user-store";
 export default function ProductsPage() {
   const t = useTranslations();
   const router = useRouter();
+  const columns = useProductColumns();
 
   const canReadProducts = useUserStore((state) => state.hasPermission("products.read"));
   const canCreateProducts = useUserStore((state) => state.hasPermission("products.create"));
@@ -55,6 +57,8 @@ export default function ProductsPage() {
   const filterCaseSensitive = useProductStore((state) => state.filterCaseSensitive);
   const getFilteredProducts = useProductStore((state) => state.getFilteredData);
   const getSortedProducts = useProductStore((state) => state.getSortedData);
+  const columnVisibility = useProductStore((state) => state.columnVisibility);
+  const setColumnVisibility = useProductStore((state) => state.setColumnVisibility);
 
   const { data: products, isLoading, error } = useProducts();
   const { mutateAsync: deleteProducts, isPending: isDeleting } = useBulkDeleteProducts();
@@ -122,6 +126,7 @@ export default function ProductsPage() {
         ) : (
           <PageSearchAndFilter
             store={useProductStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Products.title")}
@@ -129,6 +134,12 @@ export default function ProductsPage() {
             createLabel={t("Pages.Products.add")}
             searchPlaceholder={t("Pages.Products.search")}
             hideOptions={products?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

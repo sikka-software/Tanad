@@ -11,6 +11,17 @@ export function createGenericStore<T extends { id: string }>(
   searchFilterFn?: SearchFilterFn<T>,
   initialState?: Partial<BaseStates<T>>,
 ) {
+  // Read columnVisibility from localStorage if present
+  let persistedColumnVisibility = {};
+  if (typeof window !== "undefined") {
+    const stored = localStorage.getItem(`columnVisibility:${storeName}`);
+    if (stored) {
+      try {
+        persistedColumnVisibility = JSON.parse(stored);
+      } catch {}
+    }
+  }
+
   const defaultSearchFilter: SearchFilterFn<T> = (item, searchQuery) => {
     if ("name" in item) {
       return (item as any).name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -25,7 +36,7 @@ export function createGenericStore<T extends { id: string }>(
 
   return create<BaseStates<T> & BaseActions<T>>((set, get) => ({
     data: [],
-    columnVisibility: {},
+    columnVisibility: { ...persistedColumnVisibility, ...(initialState?.columnVisibility || {}) },
     dataLength: 0,
     isLoading: false,
     error: null,
@@ -48,6 +59,12 @@ export function createGenericStore<T extends { id: string }>(
           typeof columnVisibilityOrUpdater === "function"
             ? columnVisibilityOrUpdater(state.columnVisibility)
             : columnVisibilityOrUpdater;
+        // Persist to localStorage
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem(`columnVisibility:${storeName}`, JSON.stringify(next));
+          } catch {}
+        }
         return { columnVisibility: next };
       });
     },

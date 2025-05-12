@@ -25,6 +25,9 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const selectedRows = useExpenseStore((state) => state.selectedRows);
   const setSelectedRows = useExpenseStore((state) => state.setSelectedRows);
 
+  const columnVisibility = useExpenseStore((state) => state.columnVisibility);
+  const setColumnVisibility = useExpenseStore((state) => state.setColumnVisibility);
+
   const canEditExpense = useUserStore((state) => state.hasPermission("expenses.update"));
   const canDuplicateExpense = useUserStore((state) => state.hasPermission("expenses.duplicate"));
   const canViewExpense = useUserStore((state) => state.hasPermission("expenses.view"));
@@ -141,6 +144,8 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={expenseTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

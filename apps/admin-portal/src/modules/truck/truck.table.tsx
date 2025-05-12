@@ -1,27 +1,28 @@
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
-import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
-
-import CurrencyCell from "@/components/tables/currency-cell";
 
 import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useTruckColumns from "./truck.columns";
 import { useUpdateTruck } from "./truck.hooks";
 import useTruckStore from "./truck.store";
 import { Truck } from "./truck.type";
 
 const TrucksTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Truck>) => {
   const t = useTranslations();
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+  const columns = useTruckColumns();
   const { mutate: updateTruck } = useUpdateTruck();
   const selectedRows = useTruckStore((state) => state.selectedRows);
   const setSelectedRows = useTruckStore((state) => state.setSelectedRows);
+
+  const columnVisibility = useTruckStore((state) => state.columnVisibility);
+  const setColumnVisibility = useTruckStore((state) => state.setColumnVisibility);
 
   const canEditTruck = useUserStore((state) => state.hasPermission("trucks.update"));
   const canDuplicateTruck = useUserStore((state) => state.hasPermission("trucks.duplicate"));
@@ -29,56 +30,7 @@ const TrucksTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
   const canArchiveTruck = useUserStore((state) => state.hasPermission("trucks.archive"));
   const canDeleteTruck = useUserStore((state) => state.hasPermission("trucks.delete"));
 
-  // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const columns: ExtendedColumnDef<Truck>[] = [
-    {
-      accessorKey: "name",
-      header: t("Trucks.form.name.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "code",
-      header: t("Trucks.form.code.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "make",
-      header: t("Vehicles.form.make.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "model",
-      header: t("Vehicles.form.model.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "year",
-      header: t("Vehicles.form.year.label"),
-      validationSchema: z.number().min(0, "Required"),
-    },
-    {
-      accessorKey: "color",
-      header: t("Vehicles.form.color.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "vin",
-      header: t("Vehicles.form.vin.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "license_country",
-      header: t("Vehicles.form.license_country.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "license_plate",
-      header: t("Vehicles.form.license_plate.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
@@ -136,6 +88,8 @@ const TrucksTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={truckTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

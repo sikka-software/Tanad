@@ -55,6 +55,8 @@ export default function JobsPage() {
   const filterCaseSensitive = useJobsStore((state) => state.filterCaseSensitive);
   const getFilteredJobs = useJobsStore((state) => state.getFilteredData);
   const getSortedJobs = useJobsStore((state) => state.getSortedData);
+  const columnVisibility = useJobsStore((state) => state.columnVisibility);
+  const setColumnVisibility = useJobsStore((state) => state.setColumnVisibility);
 
   const { data: jobs, isLoading: loadingFetchJobs, error } = useJobs();
   const { mutateAsync: duplicateJob } = useDuplicateJob();
@@ -113,6 +115,12 @@ export default function JobsPage() {
             createLabel={t("Pages.Jobs.add")}
             searchPlaceholder={t("Pages.Jobs.search")}
             hideOptions={jobs?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

@@ -24,6 +24,10 @@ const JobListingsTable = ({
 }: ModuleTableProps<JobListingWithJobs>) => {
   const t = useTranslations();
   const { mutate: updateJobListing } = useUpdateJobListing();
+
+  const columnVisibility = useJobListingsStore((state) => state.columnVisibility);
+  const setColumnVisibility = useJobListingsStore((state) => state.setColumnVisibility);
+
   const selectedRows = useJobListingsStore((state) => state.selectedRows);
   const setSelectedRows = useJobListingsStore((state) => state.setSelectedRows);
 
@@ -132,6 +136,8 @@ const JobListingsTable = ({
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={jobListingTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

@@ -65,6 +65,8 @@ export default function EmployeeRequestsPage() {
   const filterCaseSensitive = useEmployeeRequestsStore((state) => state.filterCaseSensitive);
   const getFilteredEmployeeRequests = useEmployeeRequestsStore((state) => state.getFilteredData);
   const getSortedEmployeeRequests = useEmployeeRequestsStore((state) => state.getSortedData);
+  const columnVisibility = useEmployeeRequestsStore((state) => state.columnVisibility);
+  const setColumnVisibility = useEmployeeRequestsStore((state) => state.setColumnVisibility);
 
   const { data: requests, isLoading, error } = useEmployeeRequests();
   const { mutateAsync: deleteEmployeeRequests, isPending: isDeleting } =
@@ -130,6 +132,12 @@ export default function EmployeeRequestsPage() {
             createLabel={t("Pages.EmployeeRequests.add")}
             searchPlaceholder={t("Pages.EmployeeRequests.search")}
             hideOptions={requests?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
         <div>

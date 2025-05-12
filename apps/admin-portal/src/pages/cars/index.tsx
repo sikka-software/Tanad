@@ -52,6 +52,8 @@ export default function CarsPage() {
   const filterCaseSensitive = useCarStore((state) => state.filterCaseSensitive);
   const getFilteredCars = useCarStore((state) => state.getFilteredData);
   const getSortedCars = useCarStore((state) => state.getSortedData);
+  const columnVisibility = useCarStore((state) => state.columnVisibility);
+  const setColumnVisibility = useCarStore((state) => state.setColumnVisibility);
 
   const { data: cars, isLoading: loadingFetchCars, error } = useCars();
   const { mutate: duplicateCar } = useDuplicateCar();
@@ -121,6 +123,12 @@ export default function CarsPage() {
             createLabel={t("Pages.Cars.add")}
             searchPlaceholder={t("Pages.Cars.search")}
             hideOptions={cars?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

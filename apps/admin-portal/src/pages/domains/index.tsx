@@ -57,6 +57,8 @@ export default function DomainsPage() {
   const filterCaseSensitive = useDomainStore((state) => state.filterCaseSensitive);
   const getFilteredDomains = useDomainStore((state) => state.getFilteredData);
   const getSortedDomains = useDomainStore((state) => state.getSortedData);
+  const columnVisibility = useDomainStore((state) => state.columnVisibility);
+  const setColumnVisibility = useDomainStore((state) => state.setColumnVisibility);
 
   const { data: domains, isLoading: loadingFetchDomains, error } = useDomains();
   const { mutate: duplicateDomain } = useDuplicateDomain();
@@ -115,6 +117,12 @@ export default function DomainsPage() {
             createLabel={t("Pages.Domains.add")}
             searchPlaceholder={t("Pages.Domains.search")}
             hideOptions={domains?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

@@ -18,6 +18,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import PurchaseCard from "@/purchase/purchase.card";
+import usePurchaseColumns from "@/purchase/purchase.columns";
 import { PurchaseForm } from "@/purchase/purchase.form";
 import {
   usePurchases,
@@ -35,6 +36,8 @@ import useUserStore from "@/stores/use-user-store";
 export default function PurchasesPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const columns = usePurchaseColumns();
 
   const canReadPurchases = useUserStore((state) => state.hasPermission("purchases.read"));
   const canCreatePurchases = useUserStore((state) => state.hasPermission("purchases.create"));
@@ -59,7 +62,8 @@ export default function PurchasesPage() {
   const filterCaseSensitive = usePurchaseStore((state) => state.filterCaseSensitive);
   const getFilteredPurchases = usePurchaseStore((state) => state.getFilteredData);
   const getSortedPurchases = usePurchaseStore((state) => state.getSortedData);
-  const setViewMode = usePurchaseStore((state) => state.setViewMode);
+  const columnVisibility = usePurchaseStore((state) => state.columnVisibility);
+  const setColumnVisibility = usePurchaseStore((state) => state.setColumnVisibility);
 
   const { data: purchases, isLoading: loadingFetchPurchases, error } = usePurchases();
   const { mutate: duplicatePurchase } = useDuplicatePurchase();
@@ -124,6 +128,7 @@ export default function PurchasesPage() {
         ) : (
           <PageSearchAndFilter
             store={usePurchaseStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Purchases.title")}
@@ -133,6 +138,12 @@ export default function PurchasesPage() {
             createLabel={t("Pages.Purchases.add")}
             searchPlaceholder={t("Pages.Purchases.search")}
             hideOptions={displayData?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

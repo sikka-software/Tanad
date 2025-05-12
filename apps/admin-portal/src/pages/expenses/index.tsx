@@ -54,6 +54,8 @@ export default function ExpensesPage() {
   const filterCaseSensitive = useExpenseStore((state) => state.filterCaseSensitive);
   const getFilteredExpenses = useExpenseStore((state) => state.getFilteredData);
   const getSortedExpenses = useExpenseStore((state) => state.getSortedData);
+  const columnVisibility = useExpenseStore((state) => state.columnVisibility);
+  const setColumnVisibility = useExpenseStore((state) => state.setColumnVisibility);
 
   const { data: expenses, isLoading: loadingFetchExpenses, error } = useExpenses();
   const { mutateAsync: deleteExpenses, isPending: isDeleting } = useBulkDeleteExpenses();
@@ -113,6 +115,12 @@ export default function ExpensesPage() {
             createLabel={t("Pages.Expenses.add")}
             searchPlaceholder={t("Pages.Expenses.search")}
             hideOptions={expenses?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

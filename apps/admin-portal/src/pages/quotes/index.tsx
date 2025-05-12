@@ -50,6 +50,8 @@ export default function QuotesPage() {
   const filterCaseSensitive = useQuotesStore((state) => state.filterCaseSensitive);
   const getFilteredQuotes = useQuotesStore((state) => state.getFilteredData);
   const getSortedQuotes = useQuotesStore((state) => state.getSortedData);
+  const columnVisibility = useQuotesStore((state) => state.columnVisibility);
+  const setColumnVisibility = useQuotesStore((state) => state.setColumnVisibility);
 
   const { data: quotes, isLoading, error } = useQuotes();
   const { mutateAsync: deleteQuotes, isPending: isDeleting } = useBulkDeleteQuotes();
@@ -110,6 +112,12 @@ export default function QuotesPage() {
             createLabel={t("Pages.Quotes.add")}
             searchPlaceholder={t("Pages.Quotes.search")}
             hideOptions={quotes?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

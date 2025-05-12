@@ -22,6 +22,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import VendorCard from "@/vendor/vendor.card";
+import useVendorColumns from "@/vendor/vendor.columns";
 import { useVendors, useBulkDeleteVendors, useDuplicateVendor } from "@/vendor/vendor.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/vendor/vendor.options";
 import useVendorStore from "@/vendor/vendor.store";
@@ -33,13 +34,13 @@ import useUserStore from "@/stores/use-user-store";
 export default function VendorsPage() {
   const t = useTranslations();
   const router = useRouter();
+  const columns = useVendorColumns();
 
   const canReadVendors = useUserStore((state) => state.hasPermission("vendors.read"));
   const canCreateVendors = useUserStore((state) => state.hasPermission("vendors.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableVendor, setActionableVendor] = useState<VendorUpdateData | null>(null);
-  const [displayData, setDisplayData] = useState<Vendor[]>([]);
 
   const loadingSaveVendor = useVendorStore((state) => state.isLoading);
   const setLoadingSaveVendor = useVendorStore((state) => state.setIsLoading);
@@ -58,6 +59,8 @@ export default function VendorsPage() {
   const filterCaseSensitive = useVendorStore((state) => state.filterCaseSensitive);
   const getFilteredVendors = useVendorStore((state) => state.getFilteredData);
   const getSortedVendors = useVendorStore((state) => state.getSortedData);
+  const columnVisibility = useVendorStore((state) => state.columnVisibility);
+  const setColumnVisibility = useVendorStore((state) => state.setColumnVisibility);
 
   const { data: vendors, isLoading, error } = useVendors();
   const { mutateAsync: deleteVendors, isPending: isDeleting } = useBulkDeleteVendors();
@@ -111,6 +114,7 @@ export default function VendorsPage() {
         ) : (
           <PageSearchAndFilter
             store={useVendorStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Vendors.title")}
@@ -118,6 +122,12 @@ export default function VendorsPage() {
             createLabel={t("Pages.Vendors.add")}
             searchPlaceholder={t("Pages.Vendors.search")}
             hideOptions={vendors?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

@@ -21,6 +21,7 @@ const useInvoiceColumns = () => {
     {
       enableEditing: false,
       accessorKey: "client.name",
+      id: "client.name",
       header: t("Invoices.form.client.label"),
       cell: ({ row }) => {
         const client = row.original.client;

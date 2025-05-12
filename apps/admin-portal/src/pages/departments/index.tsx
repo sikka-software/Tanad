@@ -58,6 +58,8 @@ export default function DepartmentsPage() {
   const filterCaseSensitive = useDepartmentsStore((state) => state.filterCaseSensitive);
   const getFilteredDepartments = useDepartmentsStore((state) => state.getFilteredData);
   const getSortedDepartments = useDepartmentsStore((state) => state.getSortedData);
+  const columnVisibility = useDepartmentsStore((state) => state.columnVisibility);
+  const setColumnVisibility = useDepartmentsStore((state) => state.setColumnVisibility);
 
   const { data: departments, isLoading, error } = useDepartments();
   const { mutate: duplicateDepartment } = useDuplicateDepartment();
@@ -122,6 +124,12 @@ export default function DepartmentsPage() {
             createLabel={t("Pages.Departments.add")}
             searchPlaceholder={t("Pages.Departments.search")}
             hideOptions={departments?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

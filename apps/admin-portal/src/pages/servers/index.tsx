@@ -3,7 +3,6 @@ import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -19,6 +18,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import ServerCard from "@/modules/server/server.card";
+import useServerColumns from "@/modules/server/server.columns";
 import { ServerForm } from "@/modules/server/server.form";
 import {
   useServers,
@@ -34,6 +34,8 @@ import useUserStore from "@/stores/use-user-store";
 export default function ServersPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const columns = useServerColumns();
 
   const canReadServers = useUserStore((state) => state.hasPermission("servers.read"));
   const canCreateServers = useUserStore((state) => state.hasPermission("servers.create"));
@@ -57,6 +59,8 @@ export default function ServersPage() {
   const filterCaseSensitive = useServerStore((state) => state.filterCaseSensitive);
   const getFilteredServers = useServerStore((state) => state.getFilteredData);
   const getSortedServers = useServerStore((state) => state.getSortedData);
+  const columnVisibility = useServerStore((state) => state.columnVisibility);
+  const setColumnVisibility = useServerStore((state) => state.setColumnVisibility);
 
   const { data: servers, isLoading: loadingFetchServers, error } = useServers();
   const { mutate: duplicateServer } = useDuplicateServer();
@@ -111,6 +115,7 @@ export default function ServersPage() {
         ) : (
           <PageSearchAndFilter
             store={useServerStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Servers.title")}
@@ -118,6 +123,12 @@ export default function ServersPage() {
             createLabel={t("Pages.Servers.add")}
             searchPlaceholder={t("Pages.Servers.search")}
             hideOptions={servers?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

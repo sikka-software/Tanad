@@ -21,14 +21,17 @@ import { Salary } from "@/salary/salary.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useSalaryColumns from "./salary.columns";
+
 const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Salary>) => {
   const t = useTranslations();
-  const locale = useLocale();
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+  const columns = useSalaryColumns();
 
   const { mutateAsync: updateSalary } = useUpdateSalary();
   const selectedRows = useSalaryStore((state) => state.selectedRows);
   const setSelectedRows = useSalaryStore((state) => state.setSelectedRows);
+  const columnVisibility = useSalaryStore((state) => state.columnVisibility);
+  const setColumnVisibility = useSalaryStore((state) => state.setColumnVisibility);
 
   const canEditSalary = useUserStore((state) => state.hasPermission("salaries.update"));
   const canDuplicateSalary = useUserStore((state) => state.hasPermission("salaries.duplicate"));
@@ -36,84 +39,7 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canArchiveSalary = useUserStore((state) => state.hasPermission("salaries.archive"));
   const canDeleteSalary = useUserStore((state) => state.hasPermission("salaries.delete"));
 
-  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
-  const employeeOptions = employees.map((employee) => ({
-    label: `${employee.first_name} ${employee.last_name}`,
-    value: employee.id,
-  }));
-
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const columns: ExtendedColumnDef<Salary>[] = [
-    {
-      accessorKey: "employee_name",
-      header: t("Salaries.form.employee_name.label"),
-      noPadding: true,
-      validationSchema: z.string().nullable(),
-      cell: ({ row }) => {
-        const salary = row.original;
-        return (
-          <ComboboxAdd
-            dir={locale === "ar" ? "rtl" : "ltr"}
-            inCell
-            data={employeeOptions}
-            isLoading={employeesLoading}
-            buttonClassName="bg-transparent"
-            defaultValue={salary.employee_id || ""}
-            onChange={async (value) => {
-              await updateSalary({
-                id: salary.id,
-                data: {
-                  id: salary.id,
-                  employee_id: value || null,
-                },
-              });
-            }}
-            texts={{
-              placeholder: ". . .",
-              searchPlaceholder: t("Pages.Employees.search"),
-              noItems: t("Salaries.form.employee_name.no_employees"),
-            }}
-            addText={t("Pages.Employees.add")}
-            ariaInvalid={false}
-          />
-        );
-      },
-    },
-    {
-      accessorKey: "amount",
-      header: t("Salaries.form.gross_amount.label"),
-      cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
-    },
-
-    {
-      accessorKey: "payment_date",
-      header: t("Salaries.form.payment_date.label"),
-      cell: ({ getValue }) => getValue() as string,
-    },
-    // {
-    //   accessorKey: "pay_period_start",
-    //   header: t("Salaries.form.pay_period_start.label"),
-    //   cell: ({ getValue }) => getValue() as string,
-    // },
-    // {
-    //   accessorKey: "pay_period_end",
-    //   header: t("Salaries.form.pay_period_end.label"),
-    //   cell: ({ getValue }) => getValue() as string,
-    // },
-    {
-      accessorKey: "notes",
-      header: t("Salaries.form.notes.label"),
-    },
-  ];
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateSalary({ id: rowId, data: { [columnId]: value } });

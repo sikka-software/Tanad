@@ -1,24 +1,28 @@
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
-import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useVendorColumns from "./vendor.columns";
 import { useUpdateVendor } from "./vendor.hooks";
 import useVendorsStore from "./vendor.store";
 import { Vendor } from "./vendor.type";
 
 const VendorsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Vendor>) => {
   const t = useTranslations("Vendors");
+  const columns = useVendorColumns();
   const { mutateAsync: updateVendor } = useUpdateVendor();
   const selectedRows = useVendorsStore((state) => state.selectedRows);
   const setSelectedRows = useVendorsStore((state) => state.setSelectedRows);
+
+  const columnVisibility = useVendorsStore((state) => state.columnVisibility);
+  const setColumnVisibility = useVendorsStore((state) => state.setColumnVisibility);
 
   const canEditVendor = useUserStore((state) => state.hasPermission("vendors.update"));
   const canDuplicateVendor = useUserStore((state) => state.hasPermission("vendors.duplicate"));
@@ -27,54 +31,6 @@ const VendorsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const canDeleteVendor = useUserStore((state) => state.hasPermission("vendors.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const columns: ExtendedColumnDef<Vendor>[] = [
-    {
-      accessorKey: "name",
-      header: t("form.name.label"),
-      validationSchema: z.string().min(1, t("form.name.required")),
-    },
-    {
-      accessorKey: "company",
-      header: t("form.company.label"),
-      validationSchema: z.string().optional(),
-    },
-    {
-      accessorKey: "email",
-      header: t("form.email.label"),
-      validationSchema: z.string().email(t("form.email.invalid")).min(1, t("form.email.required")),
-    },
-    {
-      accessorKey: "phone",
-      header: t("form.phone.label"),
-      validationSchema: z.string().optional(),
-    },
-    {
-      accessorKey: "address",
-      header: t("Forms.address.label"),
-      validationSchema: z.string().min(1, t("Forms.address.required")),
-    },
-    {
-      accessorKey: "city",
-      header: t("Forms.city.label"),
-      validationSchema: z.string().min(1, t("Forms.city.required")),
-    },
-    {
-      accessorKey: "region",
-      header: t("Forms.region.label"),
-      validationSchema: z.string().min(1, t("Forms.region.required")),
-    },
-    {
-      accessorKey: "zip_code",
-      header: t("Forms.zip_code.label"),
-      validationSchema: z.string().min(1, t("Forms.zip_code.required")),
-    },
-    {
-      accessorKey: "products",
-      header: t("form.products.label"),
-      validationSchema: z.string().optional(),
-    },
-  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateVendor({ id: rowId, vendor: { [columnId]: value } });
@@ -131,6 +87,8 @@ const VendorsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={vendorTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

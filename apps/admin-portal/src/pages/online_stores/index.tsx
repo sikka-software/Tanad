@@ -18,6 +18,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import OnlineStoreCard from "@/modules/online-store/online-store.card";
+import useOnlineStoreColumns from "@/modules/online-store/online-store.columns";
 import { OnlineStoreForm } from "@/modules/online-store/online-store.form";
 import {
   useBulkDeleteOnlineStores,
@@ -33,6 +34,7 @@ import useUserStore from "@/stores/use-user-store";
 export default function OnlineStoresPage() {
   const t = useTranslations();
   const router = useRouter();
+  const columns = useOnlineStoreColumns();
 
   const canReadOnlineStores = useUserStore((state) => state.hasPermission("online_stores.read"));
   const canCreateOnlineStores = useUserStore((state) =>
@@ -60,6 +62,8 @@ export default function OnlineStoresPage() {
   const filterCaseSensitive = useOnlineStoreStore((state) => state.filterCaseSensitive);
   const getFilteredOnlineStores = useOnlineStoreStore((state) => state.getFilteredData);
   const getSortedOnlineStores = useOnlineStoreStore((state) => state.getSortedData);
+  const columnVisibility = useOnlineStoreStore((state) => state.columnVisibility);
+  const setColumnVisibility = useOnlineStoreStore((state) => state.setColumnVisibility);
 
   const { data: onlineStores, isLoading: loadingFetchOnlineStores, error } = useOnlineStores();
   const { mutate: duplicateOnlineStore } = useDuplicateOnlineStore();
@@ -111,6 +115,7 @@ export default function OnlineStoresPage() {
         ) : (
           <PageSearchAndFilter
             store={useOnlineStoreStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("OnlineStores.title")}
@@ -120,6 +125,12 @@ export default function OnlineStoresPage() {
             createLabel={t("Pages.OnlineStores.add")}
             searchPlaceholder={t("Pages.OnlineStores.search")}
             hideOptions={onlineStores?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

@@ -23,6 +23,9 @@ const DomainsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const selectedRows = useDomainStore((state) => state.selectedRows);
   const setSelectedRows = useDomainStore((state) => state.setSelectedRows);
 
+  const columnVisibility = useDomainStore((state) => state.columnVisibility);
+  const setColumnVisibility = useDomainStore((state) => state.setColumnVisibility);
+
   const canEditDomain = useUserStore((state) => state.hasPermission("domains.update"));
   const canDuplicateDomain = useUserStore((state) => state.hasPermission("domains.duplicate"));
   const canViewDomain = useUserStore((state) => state.hasPermission("domains.view"));
@@ -134,6 +137,8 @@ const DomainsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={domainTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

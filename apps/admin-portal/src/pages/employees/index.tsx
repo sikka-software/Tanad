@@ -63,6 +63,8 @@ export default function EmployeesPage() {
   const filterCaseSensitive = useEmployeesStore((state) => state.filterCaseSensitive);
   const getFilteredEmployees = useEmployeesStore((state) => state.getFilteredData);
   const getSortedEmployees = useEmployeesStore((state) => state.getSortedData);
+  const columnVisibility = useEmployeesStore((state) => state.columnVisibility);
+  const setColumnVisibility = useEmployeesStore((state) => state.setColumnVisibility);
 
   const { data: employees, isLoading, error } = useEmployees();
   const { mutateAsync: deleteEmployees, isPending: isDeleting } = useBulkDeleteEmployees();
@@ -124,6 +126,12 @@ export default function EmployeesPage() {
             createLabel={t("Pages.Employees.add")}
             searchPlaceholder={t("Pages.Employees.search")}
             hideOptions={employees?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
         <div>

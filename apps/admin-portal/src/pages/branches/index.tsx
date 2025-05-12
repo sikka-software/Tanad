@@ -3,11 +3,10 @@ import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
-import { FormDialog } from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
@@ -19,13 +18,9 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import BranchCard from "@/branch/branch.card";
+import useBranchColumns from "@/branch/branch.columns";
 import { BranchForm } from "@/branch/branch.form";
-import {
-  useBranches,
-  useBulkDeleteBranches,
-  useDuplicateBranch,
-  useUpdateBranch,
-} from "@/branch/branch.hooks";
+import { useBranches, useBulkDeleteBranches, useDuplicateBranch } from "@/branch/branch.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/branch/branch.options";
 import useBranchStore from "@/branch/branch.store";
 import BranchesTable from "@/branch/branch.table";
@@ -36,6 +31,7 @@ import useUserStore from "@/stores/use-user-store";
 export default function BranchesPage() {
   const t = useTranslations();
   const router = useRouter();
+  const columns = useBranchColumns();
 
   const canReadBranches = useUserStore((state) => state.hasPermission("branches.read"));
   const canCreateBranches = useUserStore((state) => state.hasPermission("branches.create"));
@@ -59,6 +55,8 @@ export default function BranchesPage() {
   const filterCaseSensitive = useBranchStore((state) => state.filterCaseSensitive);
   const getFilteredBranches = useBranchStore((state) => state.getFilteredData);
   const getSortedBranches = useBranchStore((state) => state.getSortedData);
+  const columnVisibility = useBranchStore((state) => state.columnVisibility);
+  const setColumnVisibility = useBranchStore((state) => state.setColumnVisibility);
 
   const { data: branches, isLoading: loadingFetchBranches, error } = useBranches();
   const { mutate: duplicateBranch } = useDuplicateBranch();
@@ -113,6 +111,7 @@ export default function BranchesPage() {
         ) : (
           <PageSearchAndFilter
             store={useBranchStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Branches.title")}
@@ -120,6 +119,12 @@ export default function BranchesPage() {
             createLabel={t("Pages.Branches.add")}
             searchPlaceholder={t("Pages.Branches.search")}
             hideOptions={branches?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

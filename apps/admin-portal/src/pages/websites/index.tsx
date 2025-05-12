@@ -1,3 +1,4 @@
+import useWebsiteColumns from "@root/src/modules/website/website.columns";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
@@ -33,6 +34,7 @@ import useUserStore from "@/stores/use-user-store";
 export default function WebsitesPage() {
   const t = useTranslations();
   const router = useRouter();
+  const columns = useWebsiteColumns();
 
   const canReadWebsites = useUserStore((state) => state.hasPermission("websites.read"));
   const canCreateWebsites = useUserStore((state) => state.hasPermission("websites.create"));
@@ -57,7 +59,8 @@ export default function WebsitesPage() {
   const filterCaseSensitive = useWebsiteStore((state) => state.filterCaseSensitive);
   const getFilteredWebsites = useWebsiteStore((state) => state.getFilteredData);
   const getSortedWebsites = useWebsiteStore((state) => state.getSortedData);
-  const setViewMode = useWebsiteStore((state) => state.setViewMode);
+  const columnVisibility = useWebsiteStore((state) => state.columnVisibility);
+  const setColumnVisibility = useWebsiteStore((state) => state.setColumnVisibility);
 
   const { data: websites, isLoading: loadingFetchWebsites, error } = useWebsites();
   const { mutate: duplicateWebsite } = useDuplicateWebsite();
@@ -121,6 +124,7 @@ export default function WebsitesPage() {
         ) : (
           <PageSearchAndFilter
             store={useWebsiteStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Websites.title")}
@@ -128,6 +132,12 @@ export default function WebsitesPage() {
             createLabel={t("Pages.Websites.add")}
             searchPlaceholder={t("Pages.Websites.search")}
             hideOptions={displayData?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

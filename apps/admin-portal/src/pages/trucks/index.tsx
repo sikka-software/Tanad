@@ -52,6 +52,8 @@ export default function TrucksPage() {
   const filterCaseSensitive = useTruckStore((state) => state.filterCaseSensitive);
   const getFilteredTrucks = useTruckStore((state) => state.getFilteredData);
   const getSortedTrucks = useTruckStore((state) => state.getSortedData);
+  const columnVisibility = useTruckStore((state) => state.columnVisibility);
+  const setColumnVisibility = useTruckStore((state) => state.setColumnVisibility);
 
   const { data: trucks, isLoading: loadingFetchTrucks, error } = useTrucks();
   const { mutate: duplicateTruck } = useDuplicateTruck();
@@ -110,6 +112,12 @@ export default function TrucksPage() {
             createLabel={t("Pages.Trucks.add")}
             searchPlaceholder={t("Pages.Trucks.search")}
             hideOptions={trucks?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

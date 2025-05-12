@@ -1,9 +1,8 @@
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
-import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
@@ -14,9 +13,15 @@ import { Company } from "@/company/company.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useCompanyColumns from "./company.columns";
+
 const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Company>) => {
   const t = useTranslations();
+  const columns = useCompanyColumns();
   const { mutate: updateCompany } = useUpdateCompany();
+
+  const columnVisibility = useCompanyStore((state) => state.columnVisibility);
+  const setColumnVisibility = useCompanyStore((state) => state.setColumnVisibility);
 
   const canEditCompany = useUserStore((state) => state.hasPermission("companies.update"));
   const canDuplicateCompany = useUserStore((state) => state.hasPermission("companies.duplicate"));
@@ -28,74 +33,6 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTable
   const setSelectedRows = useCompanyStore((state) => state.setSelectedRows);
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const columns: ExtendedColumnDef<Company>[] = [
-    {
-      accessorKey: "name",
-      header: t("Companies.form.name.label"),
-      validationSchema: z.string().min(1, t("Companies.form.name.required")),
-    },
-    {
-      accessorKey: "industry",
-      header: t("Companies.form.industry.label"),
-      validationSchema: z.string().optional(),
-    },
-    {
-      accessorKey: "email",
-      header: t("Companies.form.email.label"),
-      validationSchema: z.string().email(t("Companies.form.email.invalid")),
-    },
-    {
-      accessorKey: "phone",
-      header: t("Companies.form.phone.label"),
-      cell: ({ row }) => {
-        return <span dir="ltr"> {row.original.phone}</span>;
-      },
-      validationSchema: z.string().optional(),
-    },
-    {
-      accessorKey: "website",
-      header: t("Companies.form.website.label"),
-      validationSchema: z.string().url(t("Companies.form.website.invalid")),
-    },
-    {
-      accessorKey: "address",
-      header: t("Forms.address.label"),
-      validationSchema: z.string().optional(),
-    },
-    {
-      accessorKey: "city",
-      header: t("Forms.city.label"),
-      validationSchema: z.string().optional(),
-    },
-
-    {
-      accessorKey: "region",
-      header: t("Forms.region.label"),
-      validationSchema: z.string().optional(),
-    },
-    {
-      accessorKey: "zip_code",
-      header: t("Forms.zip_code.label"),
-      validationSchema: z.string().optional(),
-    },
-    {
-      accessorKey: "size",
-      header: t("Companies.form.size.label"),
-      validationSchema: z.number().min(0, t("Companies.form.size.invalid")),
-    },
-    {
-      accessorKey: "status",
-      maxSize: 80,
-      header: t("Companies.form.status.label"),
-      validationSchema: z.boolean(),
-      cellType: "status",
-      options: [
-        { value: "active", label: t("Companies.form.status.active") },
-        { value: "inactive", label: t("Companies.form.status.inactive") },
-      ],
-    },
-  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateCompany({ id: rowId, company: { [columnId]: value } });
@@ -153,6 +90,8 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTable
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={companyTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

@@ -54,6 +54,8 @@ export default function UsersPage() {
   const filterCaseSensitive = useEnterpriseUsersStore((state) => state.filterCaseSensitive);
   const getFilteredUsers = useEnterpriseUsersStore((state) => state.getFilteredData);
   const getSortedUsers = useEnterpriseUsersStore((state) => state.getSortedData);
+  const columnVisibility = useEnterpriseUsersStore((state) => state.columnVisibility);
+  const setColumnVisibility = useEnterpriseUsersStore((state) => state.setColumnVisibility);
 
   const { data: users, isLoading, error, refetch: refetchUsers } = useUsers();
   const { mutateAsync: deleteUsers, isPending: isDeleting } = useBulkDeleteUsers();
@@ -125,6 +127,12 @@ export default function UsersPage() {
             createLabel={t("Pages.Users.add")}
             searchPlaceholder={t("Pages.Users.search")}
             hideOptions={users?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

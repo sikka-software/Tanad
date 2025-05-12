@@ -54,6 +54,8 @@ export default function ClientsPage() {
   const filterCaseSensitive = useClientStore((state) => state.filterCaseSensitive);
   const getFilteredClients = useClientStore((state) => state.getFilteredData);
   const getSortedClients = useClientStore((state) => state.getSortedData);
+  const columnVisibility = useClientStore((state) => state.columnVisibility);
+  const setColumnVisibility = useClientStore((state) => state.setColumnVisibility);
 
   const { data: clients, isLoading, error } = useClients();
   const { mutate: duplicateClient } = useDuplicateClient();
@@ -116,6 +118,12 @@ export default function ClientsPage() {
             createLabel={t("Pages.Clients.add")}
             searchPlaceholder={t("Pages.Clients.search")}
             hideOptions={clients?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
         <div>

@@ -26,6 +26,9 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
   const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
   const selectedRows = useJobsStore((state) => state.selectedRows);
 
+  const columnVisibility = useJobsStore((state) => state.columnVisibility);
+  const setColumnVisibility = useJobsStore((state) => state.setColumnVisibility);
+
   const canEditJob = useUserStore((state) => state.hasPermission("jobs.update"));
   const canDuplicateJob = useUserStore((state) => state.hasPermission("jobs.duplicate"));
   const canViewJob = useUserStore((state) => state.hasPermission("jobs.view"));
@@ -173,6 +176,8 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={jobTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

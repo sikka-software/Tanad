@@ -27,6 +27,9 @@ const EmployeeRequestsTable = ({
   const setSelectedRows = useEmployeeRequestsStore((state) => state.setSelectedRows);
   const selectedRows = useEmployeeRequestsStore((state) => state.selectedRows);
 
+  const columnVisibility = useEmployeeRequestsStore((state) => state.columnVisibility);
+  const setColumnVisibility = useEmployeeRequestsStore((state) => state.setColumnVisibility);
+
   const canEditEmployeeRequest = useUserStore((state) =>
     state.hasPermission("employee_requests.update"),
   );
@@ -167,6 +170,8 @@ const EmployeeRequestsTable = ({
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={employeeRequestTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

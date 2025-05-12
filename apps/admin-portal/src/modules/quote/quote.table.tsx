@@ -1,11 +1,8 @@
-import { type CellContext } from "@tanstack/react-table";
-import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import React from "react";
-import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
@@ -16,11 +13,17 @@ import { Quote, QuoteUpdateData } from "@/quote/quote.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useQuoteColumns from "./quote.columns";
+
 const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Quote>) => {
   const t = useTranslations();
+  const columns = useQuoteColumns();
   const { mutateAsync: updateQuote } = useUpdateQuote();
   const setSelectedRows = useQuotesStore((state) => state.setSelectedRows);
   const selectedRows = useQuotesStore((state) => state.selectedRows);
+
+  const columnVisibility = useQuotesStore((state) => state.columnVisibility);
+  const setColumnVisibility = useQuotesStore((state) => state.setColumnVisibility);
 
   const canEditQuote = useUserStore((state) => state.hasPermission("quotes.update"));
   const canDuplicateQuote = useUserStore((state) => state.hasPermission("quotes.duplicate"));
@@ -29,59 +32,6 @@ const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
   const canDeleteQuote = useUserStore((state) => state.hasPermission("quotes.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const columns: ExtendedColumnDef<Quote>[] = [
-    {
-      accessorKey: "quote_number",
-      header: t("Quotes.form.quote_number"),
-      validationSchema: z.string().min(1, t("Quotes.form.quote_number.required")),
-    },
-    {
-      accessorKey: "client_id",
-      header: t("Companies.title"),
-      cell: (props: CellContext<Quote, unknown>) => props.row.original.client?.company || "N/A",
-    },
-    {
-      accessorKey: "issue_date",
-      header: t("Quotes.form.issue_date"),
-      cell: (props: CellContext<Quote, unknown>) => {
-        try {
-          return format(new Date(props.row.original.issue_date), "MMM dd, yyyy");
-        } catch (e) {
-          return t("General.invalid_date");
-        }
-      },
-    },
-    {
-      accessorKey: "expiry_date",
-      header: t("Quotes.form.expiry_date"),
-      cell: (props: CellContext<Quote, unknown>) => {
-        try {
-          return format(new Date(props.row.original.expiry_date), "MMM dd, yyyy");
-        } catch (e) {
-          return t("General.invalid_date");
-        }
-      },
-    },
-    {
-      accessorKey: "subtotal",
-      header: t("Quotes.form.subtotal"),
-      validationSchema: z.number().min(0, t("Quotes.form.subtotal.required")),
-      cell: (props: CellContext<Quote, unknown>) =>
-        `$${Number(props.row.original.subtotal || 0).toFixed(2)}`,
-    },
-    {
-      accessorKey: "tax_rate",
-      header: t("Quotes.form.tax_rate"),
-      validationSchema: z.number().min(0, t("Quotes.form.tax_rate.required")),
-      cell: (props: CellContext<Quote, unknown>) => `${props.row.original.tax_rate || 0}%`,
-    },
-    {
-      accessorKey: "status",
-      header: t("Quotes.form.status.title"),
-      validationSchema: z.enum(["draft", "sent", "accepted", "rejected", "expired"]),
-    },
-  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "client_id") return;
@@ -143,6 +93,8 @@ const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={quoteTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

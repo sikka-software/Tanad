@@ -124,8 +124,8 @@ export default function InvoicesPage() {
             id="invoices-table"
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev: VisibilityState) =>
-                typeof updater === "function" ? updater(prev) : updater
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
               );
             }}
           />
@@ -134,13 +134,10 @@ export default function InvoicesPage() {
         <div>
           {viewMode === "table" ? (
             <InvoicesTable
-              // id="invoices-table"
               data={sortedInvoices}
               isLoading={isLoading}
               error={error as Error | null}
               onActionClicked={onActionClicked}
-              columnVisibility={columnVisibility}
-              onColumnVisibilityChange={setColumnVisibility}
             />
           ) : (
             <div className="p-4">

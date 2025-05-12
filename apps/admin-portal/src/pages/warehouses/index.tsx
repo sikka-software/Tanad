@@ -19,6 +19,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import WarehouseCard from "@/warehouse/warehouse.card";
+import useWarehouseColumns from "@/warehouse/warehouse.columns";
 import {
   useBulkDeleteWarehouses,
   useWarehouses,
@@ -33,6 +34,7 @@ import useUserStore from "@/stores/use-user-store";
 
 export default function WarehousesPage() {
   const t = useTranslations();
+  const columns = useWarehouseColumns();
   const router = useRouter();
 
   const canReadWarehouses = useUserStore((state) => state.hasPermission("warehouses.read"));
@@ -58,6 +60,8 @@ export default function WarehousesPage() {
   const filterCaseSensitive = useWarehouseStore((state) => state.filterCaseSensitive);
   const getFilteredWarehouses = useWarehouseStore((state) => state.getFilteredData);
   const getSortedWarehouses = useWarehouseStore((state) => state.getSortedData);
+  const columnVisibility = useWarehouseStore((state) => state.columnVisibility);
+  const setColumnVisibility = useWarehouseStore((state) => state.setColumnVisibility);
 
   const { data: warehouses, isLoading, error } = useWarehouses();
   const { mutateAsync: deleteWarehouses, isPending: isDeleting } = useBulkDeleteWarehouses();
@@ -113,6 +117,7 @@ export default function WarehousesPage() {
         ) : (
           <PageSearchAndFilter
             store={useWarehouseStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Warehouses.title")}
@@ -122,6 +127,12 @@ export default function WarehousesPage() {
             createLabel={t("Pages.Warehouses.create")}
             searchPlaceholder={t("Pages.Warehouses.search")}
             hideOptions={warehouses?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
 

@@ -20,6 +20,9 @@ const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const selectedRows = useClientStore((state) => state.selectedRows);
   const setSelectedRows = useClientStore((state) => state.setSelectedRows);
 
+  const columnVisibility = useClientStore((state) => state.columnVisibility);
+  const setColumnVisibility = useClientStore((state) => state.setColumnVisibility);
+
   const canEditClient = useUserStore((state) => state.hasPermission("clients.update"));
   const canDuplicateClient = useUserStore((state) => state.hasPermission("clients.duplicate"));
   const canViewClient = useUserStore((state) => state.hasPermission("clients.view"));
@@ -141,6 +144,8 @@ const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={clientTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

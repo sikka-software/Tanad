@@ -26,12 +26,14 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/salary/salary.options";
 import useSalaryStore from "@/salary/salary.store";
 import SalariesTable from "@/salary/salary.table";
 
+import useSalaryColumns from "@/modules/salary/salary.columns";
 import { Salary } from "@/modules/salary/salary.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function SalariesPage() {
   const t = useTranslations();
   const router = useRouter();
+  const columns = useSalaryColumns();
 
   const canReadSalaries = useUserStore((state) => state.hasPermission("salaries.read"));
   const canCreateSalaries = useUserStore((state) => state.hasPermission("salaries.create"));
@@ -55,6 +57,8 @@ export default function SalariesPage() {
   const filterCaseSensitive = useSalaryStore((state) => state.filterCaseSensitive);
   const getFilteredSalaries = useSalaryStore((state) => state.getFilteredData);
   const getSortedSalaries = useSalaryStore((state) => state.getSortedData);
+  const columnVisibility = useSalaryStore((state) => state.columnVisibility);
+  const setColumnVisibility = useSalaryStore((state) => state.setColumnVisibility);
 
   const { data: salaries, isLoading, error } = useSalaries();
   const { mutate: duplicateSalary } = useDuplicateSalary();
@@ -110,6 +114,7 @@ export default function SalariesPage() {
         ) : (
           <PageSearchAndFilter
             store={useSalaryStore}
+            columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Salaries.title")}
@@ -117,6 +122,12 @@ export default function SalariesPage() {
             createLabel={t("Pages.Salaries.create")}
             searchPlaceholder={t("Pages.Salaries.search")}
             hideOptions={salaries?.length === 0}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={(updater) => {
+              setColumnVisibility((prev) =>
+                typeof updater === "function" ? updater(prev) : updater,
+              );
+            }}
           />
         )}
         <div>

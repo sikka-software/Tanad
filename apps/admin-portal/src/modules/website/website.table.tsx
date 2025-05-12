@@ -10,16 +10,21 @@ import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useWebsiteColumns from "./website.columns";
 import { useUpdateWebsite } from "./website.hooks";
 import useWebsiteStore from "./website.store";
 import { Website } from "./website.type";
 
 const WebsitesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Website>) => {
   const t = useTranslations();
-  const locale = useLocale();
+  const columns = useWebsiteColumns();
+
   const { mutate: updateWebsite } = useUpdateWebsite();
   const selectedRows = useWebsiteStore((state: any) => state.selectedRows);
   const setSelectedRows = useWebsiteStore((state: any) => state.setSelectedRows);
+
+  const columnVisibility = useWebsiteStore((state) => state.columnVisibility);
+  const setColumnVisibility = useWebsiteStore((state) => state.setColumnVisibility);
 
   const canEditWebsite = useUserStore((state) => state.hasPermission("websites.update"));
   const canDuplicateWebsite = useUserStore((state) => state.hasPermission("websites.duplicate"));
@@ -28,49 +33,6 @@ const WebsitesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canDeleteWebsite = useUserStore((state) => state.hasPermission("websites.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id: string) => [id, true]));
-
-  const columns: ExtendedColumnDef<Website>[] = [
-    {
-      accessorKey: "domain_name",
-      header: t("Websites.form.domain_name.label"),
-      validationSchema: z.string().min(1, t("Websites.form.domain_name.required")),
-    },
-
-    {
-      accessorKey: "notes",
-      header: t("Websites.form.notes.label"),
-      validationSchema: z.string().nullable(),
-    },
-    {
-      accessorKey: "created_at",
-      header: t("Websites.form.created_at.label"),
-      enableEditing: false,
-      cell: ({ row }) => {
-        const date = row.original.created_at;
-        return date ? new Date(date).toLocaleDateString(locale) : "-";
-      },
-    },
-    {
-      accessorKey: "updated_at",
-      header: t("Websites.form.updated_at.label"),
-      enableEditing: false,
-      cell: ({ row }) => {
-        const date = row.original.updated_at;
-        return date ? new Date(date).toLocaleDateString(locale) : "-";
-      },
-    },
-    {
-      accessorKey: "status",
-      maxSize: 80,
-      header: t("Websites.form.status.label"),
-      validationSchema: z.enum(["active", "inactive"]),
-      cellType: "status",
-      options: [
-        { label: t("Websites.form.status.active"), value: "active" },
-        { label: t("Websites.form.status.inactive"), value: "inactive" },
-      ],
-    },
-  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     const website = data.find((w) => w.id === rowId);
@@ -141,6 +103,8 @@ const WebsitesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       canDeleteAction={canDeleteWebsite}
       tableOptions={websiteTableOptions}
       onActionClicked={onActionClicked}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),
