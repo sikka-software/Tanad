@@ -1,3 +1,4 @@
+import { ColumnDef } from "@tanstack/react-table";
 import { Search, Plus, LayoutGrid, Table2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -43,6 +44,7 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
   sortableColumns: SortableColumn[];
   filterableFields?: FilterableField[];
   hideOptions?: boolean;
+  columns?: ColumnDef<any>[];
 }
 
 const PageSearchAndFilter = ({
@@ -55,6 +57,7 @@ const PageSearchAndFilter = ({
   sortableColumns,
   filterableFields,
   hideOptions = false,
+  columns,
   ...props
 }: PageSearchAndFilterProps) => {
   const viewMode = useStore(store, (state) => state.viewMode);
@@ -112,7 +115,7 @@ const PageSearchAndFilter = ({
               label={viewMode === "table" ? t("General.cards_view") : t("General.table_view")}
               onClick={() => setViewMode(viewMode === "table" ? "cards" : "table")}
             />
-            <ColumnViewPopover />
+            <ColumnViewPopover columns={columns || []} />
 
             <FilterPopover
               fields={filterableFields}

@@ -13,34 +13,44 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type Checked = DropdownMenuCheckboxItemProps["checked"];
+export type DropdownMenuCheckboxItemConfig = {
+  label: string;
+  checked: DropdownMenuCheckboxItemProps["checked"];
+  onCheckedChange: (checked: DropdownMenuCheckboxItemProps["checked"]) => void;
+  disabled?: boolean;
+};
 
-export function DropdownMenuCheckboxes() {
-  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
-  const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
-  const [showPanel, setShowPanel] = React.useState<Checked>(false);
+export type DropdownMenuCheckboxProps = {
+  items: DropdownMenuCheckboxItemConfig[];
+  menuLabel?: string;
+  children?: React.ReactNode;
+  contentClassName?: string;
+};
 
+export function DropdownMenuCheckbox({
+  items,
+  menuLabel = "Options",
+  children,
+  contentClassName = "w-56",
+}: DropdownMenuCheckboxProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">Open</Button>
+        {children || <Button variant="outline">Open</Button>}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+      <DropdownMenuContent className={contentClassName}>
+        <DropdownMenuLabel>{menuLabel}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuCheckboxItem checked={showStatusBar} onCheckedChange={setShowStatusBar}>
-          Status Bar
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
-          checked={showActivityBar}
-          onCheckedChange={setShowActivityBar}
-          disabled
-        >
-          Activity Bar
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem checked={showPanel} onCheckedChange={setShowPanel}>
-          Panel
-        </DropdownMenuCheckboxItem>
+        {items.map((item, idx) => (
+          <DropdownMenuCheckboxItem
+            key={item.label + idx}
+            checked={item.checked}
+            onCheckedChange={item.onCheckedChange}
+            disabled={item.disabled}
+          >
+            {item.label}
+          </DropdownMenuCheckboxItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

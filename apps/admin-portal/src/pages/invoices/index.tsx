@@ -1,3 +1,6 @@
+import useInvoiceColumns from "@root/src/modules/invoice/invoice.columns";
+import { InvoiceForm } from "@root/src/modules/invoice/invoice.form";
+import { ColumnDef } from "@tanstack/react-table";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
@@ -23,13 +26,13 @@ import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/invoice/invoice.options";
 import useInvoiceStore from "@/invoice/invoice.store";
 import InvoicesTable from "@/invoice/invoice.table";
 
-import { InvoiceForm } from "@/modules/invoice/invoice.form";
-import { InvoiceUpdateData } from "@/modules/invoice/invoice.type";
+import { Invoice, InvoiceUpdateData } from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function InvoicesPage() {
   const t = useTranslations();
   const router = useRouter();
+  const columns = useInvoiceColumns();
 
   const canReadInvoices = useUserStore((state) => state.hasPermission("invoices.read"));
   const canCreateInvoices = useUserStore((state) => state.hasPermission("invoices.create"));
@@ -108,6 +111,7 @@ export default function InvoicesPage() {
         ) : (
           <PageSearchAndFilter
             store={useInvoiceStore}
+            columns={columns as ColumnDef<Invoice>[]}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Invoices.title")}
