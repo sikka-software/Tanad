@@ -19,7 +19,6 @@ import {
   useReactTable,
   getCoreRowModel,
   getExpandedRowModel,
-  flexRender,
   TableOptions,
   ColumnDef,
   Row as TanStackRow,
@@ -30,26 +29,10 @@ import { useLocale, useTranslations } from "next-intl";
 import React, { useState, useCallback, useEffect } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableFooter,
-} from "@/ui/table";
+import { Table, TableBody } from "@/ui/table";
 
 import SheetTableHeader from "@/components/tables/sheet-table-header";
 import SheetTableRow from "@/components/tables/sheet-table-row";
-
-// ** import lib
-import { cn } from "@/lib/utils";
-
-import CodeInput from "./code-input";
-import { CommandSelect } from "./command-select";
-import { Input } from "./input";
-import RowActionsPopover from "./popovers/row-actions-popover";
 
 export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   ColumnDef<TData, TValue>,
@@ -359,32 +342,16 @@ function SheetTable<
     disabledColumns = [],
     disabledRows = [],
     showHeader = true,
-    showSecondHeader = false,
-    secondHeaderTitle = "",
     enableRowSelection = false,
     enableRowActions = false,
     onRowSelectionChange,
-    // Footer props
-    totalRowValues,
-    totalRowLabel = "",
-    totalRowTitle,
-    footerElement,
-
-    // Additional TanStack config
     enableColumnSizing = false,
     tableOptions = {},
-
-    // Add/Remove Dynamic Row Actions
     rowActions,
-    handleAddRowFunction,
-    handleRemoveRowFunction,
     id,
     columnVisibility,
     onColumnVisibilityChange,
   } = props;
-
-  const t = useTranslations();
-  const locale = useLocale();
 
   /**
    * Ensure a minimum of 30 rows are displayed, padding with empty rows if needed.
@@ -655,17 +622,6 @@ function SheetTable<
     estimateSize: () => 48, // Adjust to your row height
     overscan: 10,
   });
-
-  // rowActions config
-  const addPos = rowActions?.add ?? null; // "left" | "right" | null
-  const removePos = rowActions?.remove ?? null; // "left" | "right" | null
-
-  const rowActionCellStyle: React.CSSProperties = {
-    width: "5px",
-    maxWidth: "5px",
-    outline: "none",
-  };
-  const rowActionCellClassName = "p-0 border-none bg-transparent";
 
   return (
     <div ref={parentRef} className="relative max-h-[calc(100vh-7.6rem)] overflow-auto p-0 pb-2">
