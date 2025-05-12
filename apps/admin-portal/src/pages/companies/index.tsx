@@ -147,7 +147,13 @@ export default function CompaniesPage() {
                 isLoading={loadingFetchCompanies}
                 error={error as Error | null}
                 emptyMessage={t("Companies.no_companies_found")}
-                renderItem={(company) => <CompanyCard key={company.id} company={company} />}
+                renderItem={(company) => (
+                  <CompanyCard
+                    key={company.id}
+                    company={company}
+                    onActionClicked={onActionClicked}
+                  />
+                )}
                 gridCols="3"
               />
             </div>

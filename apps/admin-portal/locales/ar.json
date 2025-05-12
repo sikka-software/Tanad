@@ -3814,7 +3814,9 @@
       "active": "نشط",
       "inactive": "غير نشط",
       "published": "منشور",
-      "unpublished": "غير منشور"
+      "unpublished": "غير منشور",
+      "archived": "مؤرشف",
+      "draft": "مسودة"
     },
     "validation": {
       "name_required": "اسم الشركة مطلوب",

@@ -47,24 +47,26 @@ export function StatCard({ title, value, loading, link, additionalText, icon }: 
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             // className="absolute -end-3 top-1/2 flex -translate-y-1/2 items-center justify-center group-hover:z-10"
           >
-            <Button
-              size="icon_sm"
-              variant="outline"
-              className={
-                "relative cursor-pointer rounded-e-none rounded-t-none border-e-0 border-t-0 bg-transparent group-hover:z-10"
-              }
-              // className="absolute end-0 top-0 cursor-pointer rounded-e-none rounded-t-none border-e-0 border-t-0 opacity-0 transition-opacity group-hover:opacity-100"
-              style={{
-                borderStartEndRadius: "var(--radius)",
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                router.push(linkToAdd || "/dashboard");
-              }}
-            >
-              <Plus className="size-4" />
-            </Button>
+            <Link href={linkToAdd || "/dashboard"}>
+              <Button
+                size="icon_sm"
+                variant="outline"
+                className={
+                  "relative cursor-pointer rounded-e-none rounded-t-none border-e-0 border-t-0 bg-transparent group-hover:z-10"
+                }
+                // className="absolute end-0 top-0 cursor-pointer rounded-e-none rounded-t-none border-e-0 border-t-0 opacity-0 transition-opacity group-hover:opacity-100"
+                style={{
+                  borderStartEndRadius: "var(--radius)",
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  // router.push(linkToAdd || "/dashboard");
+                }}
+              >
+                <Plus className="size-4" />
+              </Button>
+            </Link>
           </motion.div>
         </CardHeader>
         <CardContent className="p-4">
