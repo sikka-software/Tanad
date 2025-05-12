@@ -22,36 +22,36 @@ function getInvoiceStatusColor(status: string): string {
 }
 
 const InvoiceCard = ({ invoice }: { invoice: Invoice }) => {
-  const t = useTranslations("Invoices");
+  const t = useTranslations();
   return (
     <Card key={invoice.id} className="transition-shadow hover:shadow-lg">
       <CardHeader className="flex flex-row items-start justify-between">
         <div>
           <h3 className="text-lg font-semibold">
-            {t("invoice_number", { number: invoice.invoice_number })}
+            {t("Invoices.form.invoice_number.label", { number: invoice.invoice_number })}
           </h3>
           <p className="text-sm text-gray-500">{invoice.client?.company ?? "N/A"}</p>
         </div>
         <Badge className={getInvoiceStatusColor(invoice.status)}>
-          {t(`status.${invoice.status.toLowerCase()}`)}
+          {t(`Invoices.form.status.${invoice.status.toLowerCase()}`)}
         </Badge>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className="text-sm text-gray-500">{t("issue_date")}</span>
+            <span className="text-sm text-gray-500">{t("Invoices.form.issue_date.label")}</span>
             <span className="text-sm">
               {invoice.issue_date ? format(new Date(invoice.issue_date), "MMM dd, yyyy") : "N/A"}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-sm text-gray-500">{t("due_date")}</span>
+            <span className="text-sm text-gray-500">{t("Invoices.form.due_date.label")}</span>
             <span className="text-sm">
               {invoice.due_date ? format(new Date(invoice.due_date), "MMM dd, yyyy") : "N/A"}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-sm text-gray-500">{t("amount")}</span>
+            <span className="text-sm text-gray-500">{t("Invoices.form.total.label")}</span>
             <span className="text-lg font-bold">${invoice.total?.toFixed(2) ?? "0.00"}</span>
           </div>
           <div className="border-t pt-2">
@@ -63,7 +63,7 @@ const InvoiceCard = ({ invoice }: { invoice: Invoice }) => {
         <div className="mt-4 flex justify-end">
           <Button variant="outline" size="sm" asChild>
             <Link href={`/pay/${invoice.id}`} target="_blank">
-              Preview
+              {t("General.preview")}
             </Link>
           </Button>
         </div>
