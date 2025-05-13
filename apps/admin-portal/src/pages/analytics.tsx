@@ -1,7 +1,7 @@
-import { differenceInDays, endOfDay, endOfMonth, format, parseISO, startOfMonth } from "date-fns";
+import { differenceInDays, endOfDay, format, parseISO, startOfMonth } from "date-fns";
 import { ar } from "date-fns/locale";
 import { pick } from "lodash";
-import { Calendar as CalendarIcon, TrendingUp } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
