@@ -270,205 +270,203 @@ export function EmployeeForm({
     <>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-          <div className="form-container">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="first_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Employees.form.first_name.label")} *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t("Employees.form.first_name.placeholder")}
-                        disabled={isEmployeeSaving}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <div className="form-container form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="first_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Employees.form.first_name.label")} *</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Employees.form.first_name.placeholder")}
+                      disabled={isEmployeeSaving}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="last_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Employees.form.last_name.label")} *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t("Employees.form.last_name.placeholder")}
-                        disabled={isEmployeeSaving}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="last_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Employees.form.last_name.label")} *</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Employees.form.last_name.placeholder")}
+                      disabled={isEmployeeSaving}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Employees.form.email.label")} *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t("Employees.form.email.placeholder")}
-                        disabled={isEmployeeSaving}
-                        type="email"
-                        dir="ltr"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Employees.form.email.label")} *</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Employees.form.email.placeholder")}
+                      disabled={isEmployeeSaving}
+                      type="email"
+                      dir="ltr"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Employees.form.phone.label")}</FormLabel>
-                    <FormControl>
-                      <PhoneInput
-                        disabled={isEmployeeSaving}
-                        {...field}
-                        value={field.value ?? ""}
-                        ariaInvalid={form.formState.errors.phone !== undefined}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Employees.form.phone.label")}</FormLabel>
+                  <FormControl>
+                    <PhoneInput
+                      disabled={isEmployeeSaving}
+                      {...field}
+                      value={field.value ?? ""}
+                      ariaInvalid={form.formState.errors.phone !== undefined}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="job_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Employees.form.job.label")} *</FormLabel>
-                    <FormControl>
-                      <ComboboxAdd
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={jobOptions}
-                        defaultValue={field.value ?? undefined}
-                        onChange={field.onChange}
-                        isLoading={jobsLoading}
-                        disabled={isEmployeeSaving}
-                        texts={{
-                          placeholder: t("Employees.form.job.placeholder"),
-                          searchPlaceholder: t("Pages.Jobs.search"),
-                          noItems: t("Pages.Jobs.no_jobs_found"),
-                        }}
-                        addText={t("Pages.Jobs.add")}
-                        onAddClick={() => setIsJobDialogOpen(true)}
-                        renderOption={(option) => (
-                          <div className="flex flex-row items-center justify-between gap-2">
-                            <div className="flex flex-col">
-                              <span>{option.label}</span>
-                              <span className="text-xs text-gray-500">{option.department}</span>
-                            </div>
-                            <Tooltip delayDuration={500}>
-                              <TooltipTrigger>
-                                <span className="text-xs text-gray-500">
-                                  {option.occupied_positions} / {option.total_positions}
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {t("Jobs.form.occupied_positions.label") +
-                                  " / " +
-                                  t("Jobs.form.total_positions.label")}
-                              </TooltipContent>
-                            </Tooltip>
-                          </div>
-                        )}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="hire_date"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>{t("Employees.form.hire_date.label")} *</FormLabel>
-                    <FormControl>
-                      <DatePicker
-                        placeholder={t("Employees.form.hire_date.placeholder")}
-                        date={field.value}
-                        onSelect={field.onChange}
-                        disabled={isEmployeeSaving}
-                        ariaInvalid={form.formState.errors.hire_date !== undefined}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="nationality"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Employees.form.nationality.label")} *</FormLabel>
-                    <FormControl>
-                      <CountryInput
-                        value={field.value ?? ""}
-                        onChange={field.onChange}
-                        disabled={isEmployeeSaving}
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        labelKey={locale === "ar" ? "arabic_label" : "label"}
-                        texts={{
-                          placeholder: t("Employees.form.nationality.placeholder"),
-                          searchPlaceholder: t("Forms.country.search_placeholder"),
-                          noItems: t("Forms.country.no_items"),
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Employees.form.status.label")} *</FormLabel>
-                    <Select
-                      defaultValue={field.value}
-                      onValueChange={field.onChange}
+            <FormField
+              control={form.control}
+              name="job_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Employees.form.job.label")} *</FormLabel>
+                  <FormControl>
+                    <ComboboxAdd
                       dir={locale === "ar" ? "rtl" : "ltr"}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t("Employees.form.status.placeholder")} />
-                        </SelectTrigger>
-                      </FormControl>
+                      data={jobOptions}
+                      defaultValue={field.value ?? undefined}
+                      onChange={field.onChange}
+                      isLoading={jobsLoading}
+                      disabled={isEmployeeSaving}
+                      texts={{
+                        placeholder: t("Employees.form.job.placeholder"),
+                        searchPlaceholder: t("Pages.Jobs.search"),
+                        noItems: t("Pages.Jobs.no_jobs_found"),
+                      }}
+                      addText={t("Pages.Jobs.add")}
+                      onAddClick={() => setIsJobDialogOpen(true)}
+                      renderOption={(option) => (
+                        <div className="flex flex-row items-center justify-between gap-2">
+                          <div className="flex flex-col">
+                            <span>{option.label}</span>
+                            <span className="text-xs text-gray-500">{option.department}</span>
+                          </div>
+                          <Tooltip delayDuration={500}>
+                            <TooltipTrigger>
+                              <span className="text-xs text-gray-500">
+                                {option.occupied_positions} / {option.total_positions}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {t("Jobs.form.occupied_positions.label") +
+                                " / " +
+                                t("Jobs.form.total_positions.label")}
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      )}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-                      <SelectContent>
-                        {EmployeeStatus.map((status) => (
-                          <SelectItem key={status} value={status}>
-                            {t(`Employees.form.status.${status}`)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="hire_date"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>{t("Employees.form.hire_date.label")} *</FormLabel>
+                  <FormControl>
+                    <DatePicker
+                      placeholder={t("Employees.form.hire_date.placeholder")}
+                      date={field.value}
+                      onSelect={field.onChange}
+                      disabled={isEmployeeSaving}
+                      ariaInvalid={form.formState.errors.hire_date !== undefined}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="nationality"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Employees.form.nationality.label")} *</FormLabel>
+                  <FormControl>
+                    <CountryInput
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      disabled={isEmployeeSaving}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                      labelKey={locale === "ar" ? "arabic_label" : "label"}
+                      texts={{
+                        placeholder: t("Employees.form.nationality.placeholder"),
+                        searchPlaceholder: t("Forms.country.search_placeholder"),
+                        noItems: t("Forms.country.no_items"),
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Employees.form.status.label")} *</FormLabel>
+                  <Select
+                    defaultValue={field.value}
+                    onValueChange={field.onChange}
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("Employees.form.status.placeholder")} />
+                      </SelectTrigger>
+                    </FormControl>
+
+                    <SelectContent>
+                      {EmployeeStatus.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {t(`Employees.form.status.${status}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
           <FormSectionHeader

@@ -259,7 +259,6 @@ export default function DepartmentForm({
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="description"
@@ -273,7 +272,6 @@ export default function DepartmentForm({
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="locations"

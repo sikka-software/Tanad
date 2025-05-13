@@ -264,7 +264,7 @@ export function InvoiceForm({
       <Form {...form}>
         <form id={formHtmlId || "invoice-form"} onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="form-container">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="client_id"
@@ -291,7 +291,6 @@ export function InvoiceForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="invoice_number"

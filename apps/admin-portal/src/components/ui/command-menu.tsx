@@ -1,4 +1,7 @@
+import { Plus } from "lucide-react";
+import { motion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -17,6 +20,8 @@ import { Dialog, DialogContent } from "@/ui/dialog";
 import { useMainStore } from "@/hooks/main.store";
 
 import { commandList } from "@/lib/command-list";
+
+import { Button } from "./button";
 
 type ShortcutCommand = {
   key: string;
@@ -86,6 +91,8 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
     return translationKey.split(".")[1];
   };
 
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <Dialog open={openCommandMenu} onOpenChange={setOpenCommandMenu}>
       <DialogContent className="max-w-xl overflow-hidden p-0" dir={locale === "ar" ? "rtl" : "ltr"}>
@@ -107,10 +114,29 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
                         key={item.href}
                         onSelect={() => runCommand(() => router.push(item.href))}
                         value={`${englishLabel} ${arabicLabel}`}
+                        onMouseEnter={() => setIsHovered(true)}
+                        onMouseLeave={() => setIsHovered(false)}
+                        className="group flex flex-row items-center justify-between"
                       >
-                        <item.icon className="ms-2 h-4 w-4" />
-                        <span>{arabicLabel}</span>
-                        <CommandShortcut>{item.shortcut}</CommandShortcut>
+                        <div className="flex flex-row items-center">
+                          <item.icon className="me-2 h-4 w-4" />
+                          <span>{arabicLabel}</span>
+                        </div>
+                        <div className="flex flex-row items-center gap-2">
+                          {item.addHref && (
+                            <Link href={item.addHref}>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="relative size-7 translate-x-4 cursor-pointer opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
+                                type="button"
+                              >
+                                <Plus className="size-4" />
+                              </Button>
+                            </Link>
+                          )}
+                          <CommandShortcut>{item.shortcut}</CommandShortcut>
+                        </div>
                       </CommandItem>
                     );
                   })}

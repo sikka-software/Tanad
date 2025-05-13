@@ -185,9 +185,7 @@ export function DomainForm({
                 </FormItem>
               )}
             />
-          </div>
 
-          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="payment_cycle"
@@ -263,6 +261,7 @@ export function DomainForm({
               />
             )}
           </div>
+
           <div className="form-fields-cols-1">
             <FormField
               control={form.control}
