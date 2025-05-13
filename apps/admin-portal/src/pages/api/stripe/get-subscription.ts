@@ -51,17 +51,49 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (subscriptions.data.length > 0) {
       const subscription = subscriptions.data[0];
 
+      // Determine the most accurate cancel_at value (prioritize Stripe over profile)
+      const cancelAt = subscription.cancel_at || profile?.cancel_at || null;
+      const cancelAtPeriodEnd =
+        subscription.cancel_at_period_end || profile?.cancel_at_period_end || false;
+
+      // Check if the subscription is in the final billing period
+      const now = Math.floor(Date.now() / 1000);
+      const currentPeriodEnd = (subscription as any).current_period_end;
+      const isInFinalBillingPeriod =
+        cancelAtPeriodEnd || (cancelAt && cancelAt > now && cancelAt <= currentPeriodEnd);
+
+      // Determine display status for UI - correctly handle canceling vs canceled
+      const displayStatus =
+        subscription.status === "active" && (cancelAtPeriodEnd || cancelAt)
+          ? "canceling"
+          : cancelAt && now > cancelAt
+            ? "canceled"
+            : subscription.status;
+
+      // Log important dates for debugging
+      console.log("Subscription cancel dates check:", {
+        cancelAt: cancelAt ? new Date(cancelAt * 1000).toISOString() : null,
+        currentPeriodEnd: currentPeriodEnd ? new Date(currentPeriodEnd * 1000).toISOString() : null,
+        now: new Date(now * 1000).toISOString(),
+        isInFinalBillingPeriod,
+        actualStatus: subscription.status,
+        displayStatus,
+      });
+
       return res.status(200).json({
         subscription,
         profile,
         subscription_info: {
           id: subscription.id,
           status: subscription.status,
+          status_display: displayStatus,
           lookup_key: subscription.items?.data[0]?.price?.lookup_key,
           price_id: subscription.items?.data[0]?.price?.id,
           subscribed_to: profile?.subscribed_to || null,
-          cancel_at_period_end: profile?.cancel_at_period_end || subscription.cancel_at_period_end,
-          cancel_at: profile?.cancel_at || subscription.cancel_at,
+          cancel_at_period_end: cancelAtPeriodEnd,
+          cancel_at: cancelAt,
+          is_in_final_billing_period: isInFinalBillingPeriod,
+          current_period_end: currentPeriodEnd,
         },
       });
     }
@@ -74,11 +106,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         subscription_info: {
           id: null,
           status: null,
+          status_display: null,
           lookup_key: null,
           price_id: profile.price_id || null,
           subscribed_to: profile.subscribed_to || null,
           cancel_at_period_end: profile.cancel_at_period_end || false,
           cancel_at: profile.cancel_at || null,
+          is_in_final_billing_period: profile.cancel_at_period_end || false,
+          current_period_end: null,
         },
       });
     }
@@ -90,11 +125,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       subscription_info: {
         id: null,
         status: null,
+        status_display: null,
         lookup_key: null,
         price_id: null,
         subscribed_to: null,
         cancel_at_period_end: false,
         cancel_at: null,
+        is_in_final_billing_period: false,
+        current_period_end: null,
       },
     });
   } catch (error) {
