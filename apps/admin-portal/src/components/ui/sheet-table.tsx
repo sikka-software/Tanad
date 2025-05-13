@@ -370,6 +370,7 @@ function SheetTable<
     id,
     columnVisibility,
     onColumnVisibilityChange,
+    tableOptions,
   } = props;
 
   const t = useTranslations();
@@ -455,6 +456,7 @@ function SheetTable<
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: onColumnVisibilityChange,
     onRowSelectionChange: setRowSelection,
+    ...(tableOptions || {}), // Spread tableOptions last so it can override defaults
   });
 
   // Update parent component when row selection changes

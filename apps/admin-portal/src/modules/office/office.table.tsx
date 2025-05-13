@@ -65,9 +65,7 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   }
 
   const officeTableOptions = {
-    state: {
-      rowSelection,
-    },
+    state: { rowSelection },
     enableRowSelection: true,
     enableMultiRowSelection: true,
     getRowId: (row: Office) => row.id!,
