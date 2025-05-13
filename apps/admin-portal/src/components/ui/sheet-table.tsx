@@ -732,12 +732,7 @@ function SheetTable<
                   texts={texts}
                   onEdit={props.canEditAction ? () => onActionClicked?.("edit", rowId) : undefined}
                   onDelete={
-                    props.canDeleteAction
-                      ? () => {
-                          console.log("row id is ", rowId);
-                          onActionClicked?.("delete", rowId);
-                        }
-                      : undefined
+                    props.canDeleteAction ? () => onActionClicked?.("delete", rowId) : undefined
                   }
                   onDuplicate={
                     props.canDuplicateAction

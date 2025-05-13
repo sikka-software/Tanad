@@ -19,8 +19,6 @@ const CardStatusAction = ({
 }) => {
   const t = useTranslations();
   const lang = useLocale();
-  console.log("currentStatus", currentStatus);
-  console.log("statuses", statuses);
 
   const statusTranslationKey = (status: CommonStatusProps) =>
     moduleName === "Forms"

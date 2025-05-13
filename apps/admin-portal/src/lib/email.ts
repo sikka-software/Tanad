@@ -7,6 +7,4 @@ export const sendEmailViaWebhook = async (webhookURL: string, body: any) => {
     },
     body: JSON.stringify(body),
   });
-
-  console.log("email sent successfully");
 };
