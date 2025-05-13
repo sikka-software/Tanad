@@ -402,35 +402,15 @@ function SheetTable<
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [expanded, setExpanded] = React.useState<ExpandedState>({});
 
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [selectedFilters, setSelectedFilters] = React.useState<string[]>([]);
-
   /**
    * Initialize the table using TanStack Table.
    */
   const table = useReactTable({
     data,
     columns: columns as ColumnDef<T>[],
-    getRowId: (row) => row.id ?? String(Math.random()), // fallback if row.id is missing
     // Provide subRows if you have them:
     getSubRows: (row) => row.subRows ?? undefined,
-    // Add expansions
-    enableExpanding: true,
-    // Add row selection
-    enableRowSelection: true,
-    enableMultiRowSelection: true,
-    // External expanded state
-    state: {
-      columnFilters,
-      columnVisibility,
-      globalFilter,
-      rowSelection,
-      expanded,
-      pagination: {
-        pageSize: data.length,
-        pageIndex: 0,
-      },
-    },
+    // enableExpanding: true,
     onExpandedChange: setExpanded,
     getExpandedRowModel: getExpandedRowModel(),
     onGlobalFilterChange: setGlobalFilter,
@@ -440,8 +420,18 @@ function SheetTable<
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: onColumnVisibilityChange,
-    onRowSelectionChange: setRowSelection,
-    ...(tableOptions || {}), // Spread tableOptions last so it can override defaults
+    ...(tableOptions || {}),
+    state: {
+      ...tableOptions?.state,
+      columnFilters,
+      columnVisibility,
+      globalFilter,
+      expanded,
+      pagination: {
+        pageSize: data.length,
+        pageIndex: 0,
+      },
+    },
   });
 
   // Update parent component when row selection changes
