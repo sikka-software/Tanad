@@ -13,7 +13,7 @@ import NumberInput from "@/components/ui/number-input";
 import FormSectionHeader from "./form-section-header";
 
 interface AddressFormSectionProps {
-  control: Control<any>; // Use Control<AddressFormValues> or Control<any>
+  control: Control<any>;
   isLoading?: boolean;
   title: string;
   inDialog?: boolean;
@@ -32,7 +32,6 @@ export function AddressFormSection({
   return (
     <div>
       <FormSectionHeader inDialog={inDialog} title={title} />
-
       <div className="mx-auto grid max-w-2xl grid-cols-1 gap-4 p-4 md:grid-cols-2">
         <FormField
           control={control}
@@ -76,7 +75,6 @@ export function AddressFormSection({
             </FormItem>
           )}
         />
-
         <FormField
           control={control}
           name="building_number"

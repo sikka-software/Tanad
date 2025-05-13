@@ -124,7 +124,10 @@ export default function OfficesPage() {
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
-            clearSelection={clearSelection}
+            clearSelection={() => {
+              setSelectedRows([]);
+              console.log("e is ", selectedRows);
+            }}
             isDeleting={isDeleting}
             setIsDeleteDialogOpen={(open) => {
               if (open) setPendingDeleteIds(selectedRows);

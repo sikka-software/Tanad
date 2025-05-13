@@ -415,6 +415,7 @@
     },
     "Offices": {
       "title": "المكاتب",
+      "description": "إدارة المكاتب",
       "singular": "مكتب",
       "add": "إضافة مكتب جديد",
       "create": "إنشاء مكتب",
@@ -3744,11 +3745,13 @@
     },
     "region": {
       "label": "المنطقة",
-      "placeholder": "أدخل المنطقة"
+      "placeholder": "أدخل المنطقة",
+      "required": "المنطقة مطلوبة"
     },
     "city": {
       "label": "المدينة",
-      "placeholder": "أدخل المدينة"
+      "placeholder": "أدخل المدينة",
+      "required": "المدينة مطلوبة"
     },
     "country": {
       "label": "الدولة",
@@ -3759,7 +3762,8 @@
 
     "zip_code": {
       "label": "الرمز البريدي",
-      "placeholder": "أدخل الرمز البريدي"
+      "placeholder": "أدخل الرمز البريدي",
+      "required": "الرمز البريدي مطلوب"
     },
     "industry": {
       "label": "المجال",
@@ -4181,7 +4185,8 @@
         "label": "المدير",
         "placeholder": "اختر المدير",
         "required": "المدير مطلوب",
-        "invalid_uuid": "يجب إختيار مدير من القائمة"
+        "invalid_uuid": "يجب إختيار مدير من القائمة",
+        "no_employees": "لا يوجد موظفين"
       },
 
       "city": {
@@ -4201,7 +4206,8 @@
       },
       "phone": {
         "label": "الهاتف",
-        "placeholder": "أدخل رقم الهاتف"
+        "placeholder": "أدخل رقم الهاتف",
+        "required": "الهاتف مطلوب"
       },
       "email": {
         "label": "البريد الإلكتروني",
