@@ -45,35 +45,60 @@ export function ConfirmCancelSubscriptionDialog({
           </DialogTitle>
           <DialogDescription>
             {t("Billing.cancel_subscription.description", {
-              fallback:
-                "هل أنت متأكد من رغبتك في إلغاء اشتراكك؟ ستفقد الوصول إلى الميزات المتقدمة في نهاية فترة الفوترة الحالية.",
+              fallback: "هل أنت متأكد أنك تريد إلغاء اشتراكك؟",
             })}
-          </DialogDescription>
-          <DialogDescription className="text-muted-foreground mt-2 text-sm">
-            {cancelAtPeriodEnd
-              ? t("Billing.cancel_subscription.features_end_notice", {
-                  fallback: "ستظل جميع الميزات متاحة حتى نهاية دورة الفوترة الحالية.",
-                })
-              : t("Billing.cancel_subscription.immediate_cancellation_notice", {
-                  fallback: "سيتم إلغاء اشتراكك على الفور وستفقد الوصول إلى الميزات المتقدمة.",
-                })}
           </DialogDescription>
         </DialogHeader>
 
-        <div className={`flex items-center ${dir === "rtl" ? "space-x-reverse" : ""} gap-2 py-4`}>
-          <Checkbox
-            id="cancel-at-period-end"
-            checked={cancelAtPeriodEnd}
-            onCheckedChange={(checked) => setCancelAtPeriodEnd(checked as boolean)}
-          />
-          <label
-            htmlFor="cancel-at-period-end"
-            className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        <div className="my-4 space-y-4">
+          <div
+            className={`rounded-md border p-4 ${cancelAtPeriodEnd ? "bg-muted/50 border-primary/50" : ""}`}
           >
-            {t("Billing.cancel_subscription.cancel_at_period_end", {
-              fallback: "إلغاء في نهاية فترة الفوترة الحالية",
-            })}
-          </label>
+            <div className={`flex items-start ${dir === "rtl" ? "space-x-reverse" : ""} gap-2`}>
+              <Checkbox
+                id="cancel-at-period-end"
+                checked={cancelAtPeriodEnd}
+                onCheckedChange={(checked) => setCancelAtPeriodEnd(checked as boolean)}
+                className="mt-1"
+              />
+              <div>
+                <label
+                  htmlFor="cancel-at-period-end"
+                  className="text-sm font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {t("Billing.cancel_subscription.cancel_at_period_end", {
+                    fallback: "إلغاء في نهاية دورة الفوترة الحالية",
+                  })}
+                </label>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {t("Billing.cancel_subscription.features_end_notice", {
+                    fallback: "ستظل جميع الميزات متاحة حتى نهاية دورة الفوترة الحالية.",
+                  })}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            className={`rounded-md border p-4 ${!cancelAtPeriodEnd ? "bg-muted/50 border-destructive/50" : ""}`}
+          >
+            <div className="space-y-1">
+              <p className="text-sm font-medium">
+                {cancelAtPeriodEnd
+                  ? t("Billing.cancel_subscription.alternative_option", {
+                      fallback: "الخيار البديل:",
+                    })
+                  : t("Billing.cancel_subscription.immediate_option", {
+                      fallback: "إلغاء فوري:",
+                    })}
+              </p>
+              <p className="text-muted-foreground text-sm">
+                {t("Billing.cancel_subscription.immediate_cancellation_notice", {
+                  fallback: "سيتم إلغاء اشتراكك على الفور وستفقد الوصول إلى الميزات المتقدمة.",
+                })}
+              </p>
+            </div>
+          </div>
         </div>
 
         <DialogFooter className="mt-4 flex-col gap-2 sm:flex-row sm:justify-between">
