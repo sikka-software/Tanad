@@ -42,6 +42,7 @@ export default function ServersPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<ServerUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
@@ -77,6 +78,7 @@ export default function ServersPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: servers,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
     setActionableItem,
@@ -90,6 +92,7 @@ export default function ServersPage() {
     error: "Servers.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
@@ -127,7 +130,10 @@ export default function ServersPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -194,7 +200,7 @@ export default function ServersPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
           title={t("Servers.confirm_delete")}
           description={t("Servers.delete_description", { count: selectedRows.length })}
         />

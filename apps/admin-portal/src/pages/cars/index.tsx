@@ -1,7 +1,4 @@
 import useCarColumns from "@root/src/modules/car/car.columns";
-import useEmployeeRequestColumns from "@root/src/modules/employee-request/employee-request.columns";
-import { useEmployeeRequests } from "@root/src/modules/employee-request/employee-request.hooks";
-import useEmployeeRequestStore from "@root/src/modules/employee-request/employee-request.store";
 import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
@@ -29,7 +26,6 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/car/car.options";
 import useCarStore from "@/modules/car/car.store";
 import CarsTable from "@/modules/car/car.table";
 import { CarUpdateData } from "@/modules/car/car.type";
-import useUserStore from "@/stores/use-user-store";
 
 export default function CarsPage() {
   const t = useTranslations();
@@ -41,6 +37,7 @@ export default function CarsPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<CarUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
@@ -76,6 +73,7 @@ export default function CarsPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: cars,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
     setActionableItem,
@@ -89,6 +87,7 @@ export default function CarsPage() {
     error: "Cars.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
@@ -123,7 +122,10 @@ export default function CarsPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -190,7 +192,7 @@ export default function CarsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
           title={t("Cars.confirm_delete")}
           description={t("Cars.delete_description", { count: selectedRows.length })}
         />

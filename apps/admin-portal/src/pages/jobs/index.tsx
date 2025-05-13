@@ -39,6 +39,7 @@ export default function JobsPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<JobUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
@@ -74,6 +75,7 @@ export default function JobsPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: jobs,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
     setActionableItem,
@@ -87,6 +89,7 @@ export default function JobsPage() {
     error: "Jobs.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
@@ -111,7 +114,10 @@ export default function JobsPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -181,7 +187,7 @@ export default function JobsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
           title={t("Jobs.delete.title")}
           description={t("Jobs.delete.description", { count: selectedRows.length })}
         />

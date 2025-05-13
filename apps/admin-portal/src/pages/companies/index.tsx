@@ -1,5 +1,3 @@
-import useCompanyColumns from "@root/src/modules/company/company.columns";
-import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
@@ -13,6 +11,8 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { createModuleStoreHooks } from "@/utils/module-hooks";
+
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
@@ -20,6 +20,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import CompanyCard from "@/company/company.card";
+import useCompanyColumns from "@/company/company.columns";
 import { CompanyForm } from "@/company/company.form";
 import { useCompanies, useBulkDeleteCompanies, useDuplicateCompany } from "@/company/company.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/company/company.options";
@@ -37,6 +38,7 @@ export default function CompaniesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<CompanyUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
@@ -72,6 +74,7 @@ export default function CompaniesPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: companies,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
     setActionableItem,
@@ -85,6 +88,7 @@ export default function CompaniesPage() {
     error: "Companies.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
@@ -110,71 +114,6 @@ export default function CompaniesPage() {
     return <NoPermission />;
   }
 
-  // const t = useTranslations();
-  // const router = useRouter();
-  // const columns = useCompanyColumns();
-
-  // const canReadCompanies = useUserStore((state) => state.hasPermission("companies.read"));
-  // const canCreateCompanies = useUserStore((state) => state.hasPermission("companies.create"));
-
-  // const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  // const [actionableCompany, setActionableCompany] = useState<Company | null>(null);
-
-  // const loadingSaveCompany = useCompanyStore((state) => state.isLoading);
-  // const setLoadingSaveCompany = useCompanyStore((state) => state.setIsLoading);
-  // const viewMode = useCompanyStore((state) => state.viewMode);
-  // const isDeleteDialogOpen = useCompanyStore((state) => state.isDeleteDialogOpen);
-  // const setIsDeleteDialogOpen = useCompanyStore((state) => state.setIsDeleteDialogOpen);
-  // const selectedRows = useCompanyStore((state) => state.selectedRows);
-  // const setSelectedRows = useCompanyStore((state) => state.setSelectedRows);
-  // const clearSelection = useCompanyStore((state) => state.clearSelection);
-  // const sortRules = useCompanyStore((state) => state.sortRules);
-  // const sortCaseSensitive = useCompanyStore((state) => state.sortCaseSensitive);
-  // const sortNullsFirst = useCompanyStore((state) => state.sortNullsFirst);
-  // const searchQuery = useCompanyStore((state) => state.searchQuery);
-  // const filterConditions = useCompanyStore((state) => state.filterConditions);
-  // const filterCaseSensitive = useCompanyStore((state) => state.filterCaseSensitive);
-  // const getFilteredCompanies = useCompanyStore((state) => state.getFilteredData);
-  // const getSortedCompanies = useCompanyStore((state) => state.getSortedData);
-  // const columnVisibility = useCompanyStore((state) => state.columnVisibility);
-  // const setColumnVisibility = useCompanyStore((state) => state.setColumnVisibility);
-
-  // const { data: companies, isLoading: loadingFetchCompanies, error } = useCompanies();
-  // const { mutate: duplicateCompany } = useDuplicateCompany();
-  // const { mutateAsync: deleteCompanies, isPending: isDeleting } = useBulkDeleteCompanies();
-  // const { createDeleteHandler } = useDeleteHandler();
-
-  // const { handleAction: onActionClicked } = useDataTableActions({
-  //   data: companies,
-  //   setSelectedRows,
-  //   setIsDeleteDialogOpen,
-  //   setIsFormDialogOpen,
-  //   setActionableItem: setActionableCompany,
-  //   duplicateMutation: duplicateCompany,
-  //   moduleName: "Companies",
-  // });
-
-  // const handleConfirmDelete = createDeleteHandler(deleteCompanies, {
-  //   loading: "Companies.loading.delete",
-  //   success: "Companies.success.delete",
-  //   error: "Companies.error.delete",
-  //   onSuccess: () => {
-  //     clearSelection();
-  //     setIsDeleteDialogOpen(false);
-  //   },
-  // });
-
-  // const filteredCompanies = useMemo(() => {
-  //   return getFilteredCompanies(companies || []);
-  // }, [companies, getFilteredCompanies, searchQuery, filterConditions, filterCaseSensitive]);
-
-  // const sortedCompanies = useMemo(() => {
-  //   return getSortedCompanies(filteredCompanies);
-  // }, [filteredCompanies, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  // if (!canReadCompanies) {
-  //   return <NoPermission />;
-  // }
   return (
     <div>
       <CustomPageMeta
@@ -187,7 +126,10 @@ export default function CompaniesPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -261,7 +203,7 @@ export default function CompaniesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
           title={t("Companies.confirm_delete", { count: selectedRows.length })}
           description={t("Companies.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}

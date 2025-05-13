@@ -45,6 +45,7 @@ export default function EmployeesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<EmployeeUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
@@ -80,6 +81,7 @@ export default function EmployeesPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: employees,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
     setActionableItem,
@@ -93,6 +95,7 @@ export default function EmployeesPage() {
     error: "Employees.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
@@ -127,7 +130,10 @@ export default function EmployeesPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -198,7 +204,7 @@ export default function EmployeesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
           title={t("Employees.confirm_delete_title")}
           description={t("Employees.confirm_delete", { count: selectedRows.length })}
         />

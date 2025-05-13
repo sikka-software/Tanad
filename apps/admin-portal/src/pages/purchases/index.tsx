@@ -43,6 +43,7 @@ export default function PurchasesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionablePurchase, setActionablePurchase] = useState<PurchaseUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   const loadingSavePurchase = usePurchaseStore((state) => state.isLoading);
   const setLoadingSavePurchase = usePurchaseStore((state) => state.setIsLoading);
@@ -75,6 +76,7 @@ export default function PurchasesPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: purchases,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
     setActionableItem: setActionablePurchase,
@@ -88,6 +90,7 @@ export default function PurchasesPage() {
     error: "Purchases.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
@@ -124,7 +127,10 @@ export default function PurchasesPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -193,7 +199,7 @@ export default function PurchasesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
           title={t("Purchases.confirm_delete")}
           description={t("Purchases.delete_description", { count: selectedRows.length })}
         />

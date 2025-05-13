@@ -42,6 +42,7 @@ export default function DomainsPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<DomainUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
@@ -77,6 +78,7 @@ export default function DomainsPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: domains,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
     setActionableItem,
@@ -90,6 +92,7 @@ export default function DomainsPage() {
     error: "Domains.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
@@ -115,72 +118,6 @@ export default function DomainsPage() {
     return <NoPermission />;
   }
 
-  // const t = useTranslations();
-  // const router = useRouter();
-
-  // const columns = useDomainColumns();
-
-  // const canReadDomains = useUserStore((state) => state.hasPermission("domains.read"));
-  // const canCreateDomains = useUserStore((state) => state.hasPermission("domains.create"));
-
-  // const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  // const [actionableDomain, setActionableDomain] = useState<DomainUpdateData | null>(null);
-
-  // const loadingSaveDomain = useDomainStore((state) => state.isLoading);
-  // const setLoadingSaveDomain = useDomainStore((state) => state.setIsLoading);
-  // const viewMode = useDomainStore((state) => state.viewMode);
-  // const isDeleteDialogOpen = useDomainStore((state) => state.isDeleteDialogOpen);
-  // const setIsDeleteDialogOpen = useDomainStore((state) => state.setIsDeleteDialogOpen);
-  // const selectedRows = useDomainStore((state) => state.selectedRows);
-  // const setSelectedRows = useDomainStore((state) => state.setSelectedRows);
-  // const clearSelection = useDomainStore((state) => state.clearSelection);
-  // const sortRules = useDomainStore((state) => state.sortRules);
-  // const sortCaseSensitive = useDomainStore((state) => state.sortCaseSensitive);
-  // const sortNullsFirst = useDomainStore((state) => state.sortNullsFirst);
-  // const searchQuery = useDomainStore((state) => state.searchQuery);
-  // const filterConditions = useDomainStore((state) => state.filterConditions);
-  // const filterCaseSensitive = useDomainStore((state) => state.filterCaseSensitive);
-  // const getFilteredDomains = useDomainStore((state) => state.getFilteredData);
-  // const getSortedDomains = useDomainStore((state) => state.getSortedData);
-  // const columnVisibility = useDomainStore((state) => state.columnVisibility);
-  // const setColumnVisibility = useDomainStore((state) => state.setColumnVisibility);
-
-  // const { data: domains, isLoading: loadingFetchDomains, error } = useDomains();
-  // const { mutate: duplicateDomain } = useDuplicateDomain();
-  // const { mutateAsync: deleteDomains, isPending: isDeleting } = useBulkDeleteDomains();
-  // const { createDeleteHandler } = useDeleteHandler();
-
-  // const { handleAction: onActionClicked } = useDataTableActions({
-  //   data: domains,
-  //   setSelectedRows,
-  //   setIsDeleteDialogOpen,
-  //   setIsFormDialogOpen,
-  //   setActionableItem: setActionableDomain,
-  //   duplicateMutation: duplicateDomain,
-  //   moduleName: "Domains",
-  // });
-
-  // const handleConfirmDelete = createDeleteHandler(deleteDomains, {
-  //   loading: "Domains.loading.delete",
-  //   success: "Domains.success.delete",
-  //   error: "Domains.error.delete",
-  //   onSuccess: () => {
-  //     clearSelection();
-  //     setIsDeleteDialogOpen(false);
-  //   },
-  // });
-
-  // const filteredDomains = useMemo(() => {
-  //   return getFilteredDomains(domains || []);
-  // }, [domains, getFilteredDomains, searchQuery, filterConditions, filterCaseSensitive]);
-
-  // const sortedDomains = useMemo(() => {
-  //   return getSortedDomains(filteredDomains);
-  // }, [filteredDomains, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  // if (!canReadDomains) {
-  //   return <NoPermission />;
-  // }
   return (
     <div>
       <CustomPageMeta title={t("Domains.title")} description={t("Domains.description")} />
@@ -190,7 +127,10 @@ export default function DomainsPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -257,7 +197,7 @@ export default function DomainsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
           title={t("Domains.confirm_delete")}
           description={t("Domains.delete_description", { count: selectedRows.length })}
         />

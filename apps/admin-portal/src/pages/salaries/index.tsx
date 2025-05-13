@@ -1,8 +1,4 @@
 import { FormSheet } from "@root/src/components/ui/form-sheet";
-import { BranchForm } from "@root/src/modules/branch/branch.form";
-import { Branch } from "@root/src/modules/branch/branch.type";
-import useEmployeeRequestColumns from "@root/src/modules/employee-request/employee-request.columns";
-import useEmployeeRequestStore from "@root/src/modules/employee-request/employee-request.store";
 import { SalaryForm } from "@root/src/modules/salary/salary.form";
 import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
@@ -31,7 +27,6 @@ import SalariesTable from "@/salary/salary.table";
 
 import useSalaryColumns from "@/modules/salary/salary.columns";
 import { Salary, SalaryUpdateData } from "@/modules/salary/salary.type";
-import useUserStore from "@/stores/use-user-store";
 
 export default function SalariesPage() {
   const t = useTranslations();
@@ -43,6 +38,7 @@ export default function SalariesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<SalaryUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
@@ -78,6 +74,7 @@ export default function SalariesPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: salaries,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
     setActionableItem,
@@ -91,6 +88,7 @@ export default function SalariesPage() {
     error: "Salaries.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
@@ -128,7 +126,10 @@ export default function SalariesPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -194,7 +195,7 @@ export default function SalariesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
           title={t("Salaries.delete_salary")}
           description={t("Salaries.confirm_delete")}
         />

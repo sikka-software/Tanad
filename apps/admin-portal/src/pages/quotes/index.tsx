@@ -40,6 +40,7 @@ export default function QuotesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableQuote, setActionableQuote] = useState<QuoteUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   const loadingSaveQuote = useQuotesStore((state) => state.isLoading);
   const setLoadingSaveQuote = useQuotesStore((state) => state.setIsLoading);
@@ -72,6 +73,7 @@ export default function QuotesPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: quotes,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
     setActionableItem: setActionableQuote,
@@ -85,6 +87,7 @@ export default function QuotesPage() {
     error: "Quotes.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
@@ -120,7 +123,10 @@ export default function QuotesPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -188,7 +194,7 @@ export default function QuotesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
           title={t("Quotes.confirm_delete_title")}
           description={t("Quotes.confirm_delete", { count: selectedRows.length })}
         />

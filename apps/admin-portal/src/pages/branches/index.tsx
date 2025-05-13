@@ -1,6 +1,4 @@
 import { FormSheet } from "@root/src/components/ui/form-sheet";
-import useEmployeeRequestColumns from "@root/src/modules/employee-request/employee-request.columns";
-import useEmployeeRequestStore from "@root/src/modules/employee-request/employee-request.store";
 import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
@@ -27,7 +25,7 @@ import { useBranches, useBulkDeleteBranches, useDuplicateBranch } from "@/branch
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/branch/branch.options";
 import useBranchStore from "@/branch/branch.store";
 import BranchesTable from "@/branch/branch.table";
-import { Branch, BranchUpdateData } from "@/branch/branch.type";
+import { BranchUpdateData } from "@/branch/branch.type";
 
 export default function BranchesPage() {
   const t = useTranslations();
@@ -39,6 +37,7 @@ export default function BranchesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<BranchUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
@@ -74,6 +73,7 @@ export default function BranchesPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: branches,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
     setActionableItem,
@@ -87,6 +87,7 @@ export default function BranchesPage() {
     error: "Branches.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
@@ -124,7 +125,10 @@ export default function BranchesPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -182,7 +186,7 @@ export default function BranchesPage() {
               setActionableItem(null);
               setLoadingSave(false);
             }}
-            defaultValues={actionableItem as Branch}
+            defaultValues={actionableItem}
             editMode={true}
           />
         </FormSheet>
@@ -191,7 +195,7 @@ export default function BranchesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
           title={t("Branches.confirm_delete")}
           description={t("Branches.delete_description", { count: selectedRows.length })}
         />

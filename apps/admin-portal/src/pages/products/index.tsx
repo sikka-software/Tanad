@@ -40,6 +40,7 @@ export default function ProductsPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableProduct, setActionableProduct] = useState<ProductUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   const loadingSaveProduct = useProductStore((state) => state.isLoading);
   const setLoadingSaveProduct = useProductStore((state) => state.setIsLoading);
@@ -72,6 +73,7 @@ export default function ProductsPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: products,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
     setActionableItem: setActionableProduct,
@@ -85,6 +87,7 @@ export default function ProductsPage() {
     error: "Products.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
     onError: (error: Error) => {
@@ -134,7 +137,10 @@ export default function ProductsPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -202,7 +208,7 @@ export default function ProductsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
           title={t("Products.confirm_delete_title")}
           description={t("Products.confirm_delete", { count: selectedRows.length })}
         />
