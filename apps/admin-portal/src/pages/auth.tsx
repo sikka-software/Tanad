@@ -36,17 +36,16 @@ export default function Auth() {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const user = useUserStore((state) => state.user);
+  const loadingUser = useUserStore((state) => state.loading);
 
   useEffect(() => {
     setIsSignUp(router.asPath.includes("#signup"));
-    if (user) {
-      // Check if there's a redirect path in sessionStorage
+    if (user && !loadingUser && router.pathname === "/auth") {
       const redirectPath = sessionStorage.getItem("redirectAfterAuth") || "/dashboard";
       sessionStorage.removeItem("redirectAfterAuth");
-      // router.replace(redirectPath);
-      router.push("/dashboard");
+      router.push(redirectPath);
     }
-  }, [user, router]);
+  }, [user, loadingUser, router]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
