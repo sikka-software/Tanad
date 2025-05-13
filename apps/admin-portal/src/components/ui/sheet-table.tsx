@@ -375,21 +375,6 @@ function SheetTable<
   const t = useTranslations();
   const locale = useLocale();
 
-  // // Determine which columnVisibility/onColumnVisibilityChange to use
-  // const columnVisibility =
-  //   propColumnVisibility !== undefined ? propColumnVisibility : storeColumnVisibility;
-  // const onColumnVisibilityChange =
-  //   propOnColumnVisibilityChange !== undefined
-  //     ? propOnColumnVisibilityChange
-  //     : (updater: any) => {
-  //         // TanStack Table passes either a new state or an updater function
-  //         const next = typeof updater === "function" ? updater(storeColumnVisibility) : updater;
-  //         // Only update if the value actually changes
-  //         if (JSON.stringify(next) !== JSON.stringify(storeColumnVisibility)) {
-  //           setStoreColumnVisibility(tableId, next);
-  //         }
-  //       };
-
   /**
    * Ensure a minimum of 30 rows are displayed, padding with empty rows if needed.
    */
@@ -413,11 +398,6 @@ function SheetTable<
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
 
   /**
-   * Expanded state for sub-rows. Keyed by row.id in TanStack Table.
-   */
-  // const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-
-  /**
    * Track errors/original content keyed by (groupKey, rowId) for editing.
    */
   const [cellErrors, setCellErrors] = useState<
@@ -435,11 +415,6 @@ function SheetTable<
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [expanded, setExpanded] = React.useState<ExpandedState>({});
-
-  // const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(() => {
-  //   const savedVisibility = localStorage.getItem("column-visibility");
-  //   return savedVisibility ? JSON.parse(savedVisibility) : {};
-  // });
 
   const [rowSelection, setRowSelection] = React.useState({});
   const [selectedFilters, setSelectedFilters] = React.useState<string[]>([]);
@@ -465,8 +440,11 @@ function SheetTable<
       globalFilter,
       rowSelection,
       expanded,
+      pagination: {
+        pageSize: data.length,
+        pageIndex: 0,
+      },
     },
-
     onExpandedChange: setExpanded,
     getExpandedRowModel: getExpandedRowModel(),
     onGlobalFilterChange: setGlobalFilter,
