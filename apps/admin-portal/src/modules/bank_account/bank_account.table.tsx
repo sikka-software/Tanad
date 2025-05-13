@@ -1,6 +1,10 @@
 "use client";
 
 import { Button } from "@root/src/components/ui/button";
+import IconButton from "@root/src/components/ui/icon-button";
+import { PencilIcon } from "lucide-react";
+import { TrashIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,6 +30,7 @@ export function BankAccountsTable({
   onEdit: (account: BankAccount) => void;
   onDelete: (account: BankAccount) => void;
 }) {
+  const t = useTranslations();
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "active":
@@ -48,18 +53,19 @@ export function BankAccountsTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Account Name</TableHead>
-            <TableHead>Account Number</TableHead>
-            <TableHead>Bank Name</TableHead>
-            <TableHead>Account Type</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>{t("BankAccounts.form.account_name")}</TableHead>
+            <TableHead>{t("BankAccounts.form.account_number")}</TableHead>
+            <TableHead>{t("BankAccounts.form.bank_name")}</TableHead>
+            <TableHead>{t("BankAccounts.form.account_type")}</TableHead>
+            <TableHead>{t("BankAccounts.form.status")}</TableHead>
+            <TableHead></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} className="h-24 text-center">
-                No bank accounts found. Add your first account.
+                {t("Pages.BankAccounts.no_bank_accounts")}
               </TableCell>
             </TableRow>
           ) : (
@@ -72,13 +78,17 @@ export function BankAccountsTable({
                 <TableCell>
                   <Badge className={getStatusColor(account.status)}>{account.status}</Badge>
                 </TableCell>
-                <TableCell>
-                  <Button onClick={() => onEdit(account)} variant="outline">
-                    Edit
-                  </Button>
-                  <Button onClick={() => onDelete(account)} variant="outline">
-                    Delete
-                  </Button>
+                <TableCell className="flex gap-2">
+                  <IconButton
+                    label={t("General.edit")}
+                    icon={<PencilIcon className="size-4" />}
+                    onClick={() => onEdit(account)}
+                  />
+                  <IconButton
+                    label={t("General.delete")}
+                    icon={<TrashIcon className="size-4" />}
+                    onClick={() => onDelete(account)}
+                  />
                 </TableCell>
               </TableRow>
             ))
@@ -90,17 +100,18 @@ export function BankAccountsTable({
 }
 
 function TableSkeleton() {
+  const t = useTranslations();
   return (
     <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Account Name</TableHead>
-            <TableHead>Account Number</TableHead>
-            <TableHead>Bank Name</TableHead>
-            <TableHead>Account Type</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>{t("BankAccounts.form.account_name")}</TableHead>
+            <TableHead>{t("BankAccounts.form.account_number")}</TableHead>
+            <TableHead>{t("BankAccounts.form.bank_name")}</TableHead>
+            <TableHead>{t("BankAccounts.form.account_type")}</TableHead>
+            <TableHead>{t("BankAccounts.form.status")}</TableHead>
+            <TableHead></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

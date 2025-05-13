@@ -576,7 +576,7 @@ export function EmployeeForm({
                       dir={locale === "ar" ? "rtl" : "ltr"}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger onClear={() => field.onChange("")}>
                           <SelectValue
                             placeholder={t("Employees.form.onboarding_status.placeholder")}
                           />

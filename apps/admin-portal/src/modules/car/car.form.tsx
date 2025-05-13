@@ -363,7 +363,7 @@ export function CarForm({
                       disabled={isLoading}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger onClear={() => field.onChange("")}>
                           <SelectValue
                             placeholder={t("Vehicles.form.ownership_status.placeholder")}
                           />
@@ -420,7 +420,7 @@ export function CarForm({
                       disabled={isLoading}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger onClear={() => field.onChange("")}>
                           <SelectValue placeholder={t("Vehicles.form.status.placeholder")} />
                         </SelectTrigger>
                       </FormControl>

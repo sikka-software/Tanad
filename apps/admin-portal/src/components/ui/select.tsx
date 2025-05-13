@@ -1,8 +1,10 @@
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, XIcon } from "lucide-react";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+
+import { Button } from "./button";
 
 function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
   return (
@@ -33,9 +35,11 @@ function SelectTrigger({
   className,
   size = "default",
   children,
+  onClear,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: "sm" | "default";
+  onClear?: () => void;
 }) {
   return (
     <SelectPrimitive.Trigger
@@ -49,7 +53,22 @@ function SelectTrigger({
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="size-4 opacity-50" />
+        {onClear ? (
+          <button
+            autoFocus={false}
+            type="button"
+            className="pointer-events-auto"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onClear();
+            }}
+          >
+            <XIcon className="size-4 opacity-50" />
+          </button>
+        ) : (
+          <ChevronDownIcon className="size-4 opacity-50" />
+        )}
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
