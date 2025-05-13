@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronsUpDown, Pen, Plus, Settings } from "lucide-react";
+import useUserStore from "@root/src/stores/use-user-store";
+import { Asterisk, ChevronsUpDown, Pen, Plus, Settings } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import * as React from "react";
@@ -25,7 +26,7 @@ export function EnterpriseSwitcher({
 }: {
   enterprises: {
     name: string;
-    logo: React.ElementType;
+    logo: string;
     plan: string;
   }[];
 }) {
@@ -34,6 +35,7 @@ export function EnterpriseSwitcher({
   const { isMobile } = useSidebar();
   const [activeEnterprise, setActiveEnterprise] = React.useState(enterprises[0]);
 
+  const { enterprise, setEnterprise } = useUserStore();
   if (!activeEnterprise) {
     return null;
   }
@@ -47,14 +49,22 @@ export function EnterpriseSwitcher({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <activeEnterprise.logo className="size-4" />
+              <div className="bg-sidebar-primary text-sidebar-primary-foreground aspect-squre flex size-8 !max-w-8 min-w-8 items-center justify-center overflow-hidden rounded-lg p-0">
+                {enterprise?.logo ? (
+                  <img
+                    src={enterprise?.logo}
+                    alt={enterprise?.name || ""}
+                    className="w-8 object-cover object-center"
+                  />
+                ) : (
+                  <Asterisk className="size-4" />
+                )}
               </div>
               <div className="grid flex-1 text-start text-sm leading-tight">
-                <span className="truncate font-semibold">{activeEnterprise.name}</span>
+                <span className="truncate font-semibold">{enterprise?.name}</span>
                 <span className="truncate text-xs">{activeEnterprise.plan}</span>
               </div>
-              <ChevronsUpDown className="ms-auto" />
+              {/* <ChevronsUpDown className="ms-auto" /> */}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -73,8 +83,16 @@ export function EnterpriseSwitcher({
                 className="justify-between gap-2 p-2"
               >
                 <div className="flex flex-row items-center gap-2">
-                  <div className="flex size-6 items-center justify-center rounded-sm border">
-                    <enterprise.logo className="size-4 shrink-0" />
+                  <div className="flex size-6 items-center justify-center overflow-hidden rounded-sm border">
+                    {enterprise?.logo ? (
+                      <img
+                        src={enterprise?.logo}
+                        alt={enterprise?.name || ""}
+                        className="object-cover"
+                      />
+                    ) : (
+                      <Asterisk className="size-4" />
+                    )}
                   </div>
                   <span>{enterprise.name}</span>
                 </div>

@@ -4,7 +4,7 @@ import { pick } from "lodash";
 import { Asterisk, Edit, Loader2 } from "lucide-react";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
-import type React from "react";
+import React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -15,7 +15,10 @@ import { EnterpriseForm, EnterpriseFormValues } from "@/modules/enterprise/enter
 import useUserStore from "@/stores/use-user-store";
 
 const EnterprisePage = () => {
+  const t = useTranslations();
+
   const enterprise = useUserStore((state) => state.enterprise);
+  const setEnterprise = useUserStore((state) => state.setEnterprise);
 
   if (!enterprise) {
     return <div>Loading enterprise details...</div>;
@@ -25,6 +28,7 @@ const EnterprisePage = () => {
   const [enterpriseData, setEnterpriseData] = useState(enterprise);
   const [formData, setFormData] = useState(enterprise);
   const [isSaving, setIsSaving] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -59,18 +63,16 @@ const EnterprisePage = () => {
     setIsEditing(false);
   };
 
-  const t = useTranslations();
-
   return (
     <div>
       <div className="mx-auto flex flex-col gap-4 p-4">
         <div className="flex flex-row items-start justify-between">
           <div className="flex items-center gap-4">
-            {enterpriseData.logo ? (
+            {enterprise.logo ? (
               <img
-                src={enterpriseData.logo}
+                src={enterprise.logo}
                 alt={`${enterpriseData.name} logo`}
-                className="h-16 w-16 rounded-md border object-contain p-2"
+                className="h-16 w-16 rounded-md border object-contain"
               />
             ) : (
               <Asterisk className="h-16 w-16 rounded-md border object-contain p-2" />

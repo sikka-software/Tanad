@@ -223,7 +223,7 @@ export function AppSidebar() {
       <SidebarHeader className="border-b">
         <div className="flex items-center gap-2">
           <EnterpriseSwitcher
-            enterprises={[{ name: enterprise?.name || "", logo: Asterisk, plan: "" }]}
+            enterprises={[{ name: enterprise?.name || "", logo: enterprise?.logo || "", plan: "" }]}
           />
         </div>
         {state === "expanded" && (

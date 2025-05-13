@@ -213,6 +213,12 @@ const useUserStore = create<UserState>((set, get) => ({
           }
           // console.log("[UserStore] Enterprise data:", enterpriseData);
           if (enterpriseData) {
+            if (enterpriseData.logo) {
+              const { data: imageData } = await supabase.storage
+                .from("enterprise-images")
+                .createSignedUrl(enterpriseData.logo, 60 * 60);
+              enterpriseData.logo = imageData?.signedUrl;
+            }
             set({ enterprise: enterpriseData as EnterpriseType });
           }
           // console.log("[UserStore] Fetching permissions for user and enterprise");
