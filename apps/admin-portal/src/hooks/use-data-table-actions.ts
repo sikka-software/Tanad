@@ -10,6 +10,7 @@ interface UseDataTableActionsProps<T extends { id: string }> {
   duplicateMutation: (id: string, options?: any) => void;
   moduleName: string;
   previewAction?: (id: string) => void;
+  setPendingDeleteIds?: (ids: string[]) => void;
 }
 
 export function useDataTableActions<T extends { id: string }>({
@@ -21,6 +22,7 @@ export function useDataTableActions<T extends { id: string }>({
   duplicateMutation,
   moduleName,
   previewAction,
+  setPendingDeleteIds,
 }: UseDataTableActionsProps<T>) {
   const t = useTranslations();
 
@@ -32,6 +34,7 @@ export function useDataTableActions<T extends { id: string }>({
 
     if (action === "delete") {
       setSelectedRows([rowId]);
+      setPendingDeleteIds && setPendingDeleteIds([rowId]);
       setIsDeleteDialogOpen(true);
     }
 

@@ -107,6 +107,7 @@ export function createApiHandler({ tableName, customHandlers = {} }: Options) {
           }
 
           const { ids } = req.body;
+          console.log("req obdy ", req.body);
           if (!Array.isArray(ids) || ids.length === 0) {
             return res
               .status(400)
