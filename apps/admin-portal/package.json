@@ -16,6 +16,8 @@
     "start": "next start -p 3037",
     "lint": "next lint",
     "check-types": "tsc --noEmit",
+    "i18n-check-en": "i18n-check --locales locales -s en -f i18next",
+    "i18n-check-ar": "i18n-check --locales locales -s ar -f i18next",
     "db:pull": "infisical run --env=dev npx drizzle-kit pull",
     "db:generate": "infisical run --env=dev npx drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
@@ -138,6 +140,7 @@
     "zustand": "^5.0.4"
   },
   "devDependencies": {
+    "@lingual/i18n-check": "^0.8.3",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/cookie": "^1.0.0",
     "@types/js-cookie": "^3.0.6",
