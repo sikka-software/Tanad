@@ -556,7 +556,11 @@ export const enterprises = pgTable(
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
     email: text(),
     industry: text(),
+    founded: smallint(),
     size: text(),
+    logo: text(),
+    address: text(),
+    description: text(),
   },
   (table) => [
     index("enterprises_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),

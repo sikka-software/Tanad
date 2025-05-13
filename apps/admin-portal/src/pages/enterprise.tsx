@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 
+import { EnterpriseForm, EnterpriseFormValues } from "@/modules/enterprise/enterprise.form";
 import useUserStore from "@/stores/use-user-store";
 
 const EnterprisePage = () => {
@@ -117,111 +118,43 @@ const EnterprisePage = () => {
         <Card className="w-full">
           <CardHeader></CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Enterprise Name</Label>
-                  <Input
-                    readOnly={!isEditing}
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="industry">Industry</Label>
-                  <Input
-                    readOnly={!isEditing}
-                    id="industry"
-                    name="industry"
-                    value={formData.industry ?? ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="founded">Founded</Label>
-                  <Input
-                    readOnly={!isEditing}
-                    id="founded"
-                    name="founded"
-                    //   value={formData.founded ?? ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="employees">Number of Employees</Label>
-                  <Input
-                    readOnly={!isEditing}
-                    id="employees"
-                    name="employees"
-                    //   value={formData.employees ?? ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="website">Website</Label>
-                  <Input
-                    readOnly={!isEditing}
-                    id="website"
-                    name="website"
-                    //   value={formData.website ?? ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    readOnly={!isEditing}
-                    id="email"
-                    name="email"
-                    value={formData.email ?? ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    readOnly={!isEditing}
-                    id="phone"
-                    name="phone"
-                    //   value={formData.phone ?? ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="logo">Logo URL</Label>
-                  <Input
-                    readOnly={!isEditing}
-                    id="logo"
-                    name="logo"
-                    //   value={formData.logo ?? ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Input
-                  readOnly={!isEditing}
-                  id="address"
-                  name="address"
-                  // value={formData.address ?? ""}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  readOnly={!isEditing}
-                  id="description"
-                  name="description"
-                  // value={formData.description ?? ""}
-                  onChange={handleInputChange}
-                  rows={4}
-                />
-              </div>
-            </div>
+            <EnterpriseForm
+              defaultValues={{
+                ...formData,
+                industry: formData.industry ?? undefined,
+                email: formData.email ?? undefined,
+              }}
+              readOnly={!isEditing}
+              loading={isSaving}
+              onSubmit={async (values) => {
+                setIsSaving(true);
+                try {
+                  const response = await fetch("/api/enterprise", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ...values, id: enterprise.id }),
+                  });
+                  if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || "Failed to update enterprise");
+                  }
+                  const updated = await response.json();
+                  setEnterpriseData(updated);
+                  setFormData(updated);
+                  setIsEditing(false);
+                  toast.success("Enterprise information updated", {
+                    description: "The enterprise information has been successfully updated.",
+                  });
+                } catch (err: any) {
+                  toast.error("Failed to update enterprise", {
+                    description: err.message,
+                  });
+                } finally {
+                  setIsSaving(false);
+                }
+              }}
+              onCancel={handleCancel}
+            />
           </CardContent>
         </Card>
       </div>

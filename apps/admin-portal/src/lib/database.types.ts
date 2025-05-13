@@ -749,26 +749,38 @@ export type Database = {
       }
       enterprises: {
         Row: {
+          address: string | null
           created_at: string | null
+          description: string | null
           email: string | null
+          founded: number | null
           id: string
           industry: string | null
+          logo: string | null
           name: string
           size: string | null
         }
         Insert: {
+          address?: string | null
           created_at?: string | null
+          description?: string | null
           email?: string | null
+          founded?: number | null
           id?: string
           industry?: string | null
+          logo?: string | null
           name: string
           size?: string | null
         }
         Update: {
+          address?: string | null
           created_at?: string | null
+          description?: string | null
           email?: string | null
+          founded?: number | null
           id?: string
           industry?: string | null
+          logo?: string | null
           name?: string
           size?: string | null
         }
@@ -2191,6 +2203,10 @@ export type Database = {
       }
     }
     Functions: {
+      check_user_can_create_role_in_enterprise: {
+        Args: { p_enterprise_id: string }
+        Returns: boolean
+      }
       create_enterprise: {
         Args: {
           enterprise_name: string
