@@ -1,7 +1,7 @@
 "use client";
 
 import { pick } from "lodash";
-import { Asterisk, Edit, Save, X } from "lucide-react";
+import { Asterisk, Edit, Save, X, Loader2 } from "lucide-react";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import type React from "react";
@@ -34,6 +34,7 @@ const EnterprisePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [enterpriseData, setEnterpriseData] = useState(enterprise);
   const [formData, setFormData] = useState(enterprise);
+  const [isSaving, setIsSaving] = useState(false);
 
   //   const isSuperAdmin = userRole === "superadmin";
 
@@ -46,6 +47,7 @@ const EnterprisePage = () => {
   };
 
   const handleSave = async () => {
+    setIsSaving(true);
     try {
       const response = await fetch("/api/enterprise", {
         method: "PUT",
@@ -67,6 +69,8 @@ const EnterprisePage = () => {
       toast.error("Failed to update enterprise", {
         description: err.message,
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -98,7 +102,9 @@ const EnterprisePage = () => {
               <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
                 {t("General.cancel")}
               </Button>
-              <Button onClick={handleSave}>{t("General.save")}</Button>
+              <Button onClick={handleSave} disabled={isSaving}>
+                {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("General.save")}
+              </Button>
             </div>
           ) : (
             <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
