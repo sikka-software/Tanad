@@ -53,6 +53,7 @@ const useOfficeColumns = (
         const office = row.original;
         return (
           <CodeCell
+            onChange={(e) => handleEdit?.(row.id, "code", e.target.value)}
             onRandom={() => {
               const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
               let randomCode = "";

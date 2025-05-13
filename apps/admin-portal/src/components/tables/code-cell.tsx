@@ -1,8 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
-
-import { CommandSelect } from "@/ui/command-select";
-
-import { cn } from "@/lib/utils";
+import { ChangeEvent } from "react";
 
 import CodeInput from "../ui/code-input";
 import { Input } from "../ui/input";
@@ -12,10 +9,12 @@ const CodeCell = ({
   onCodeChange,
   onSerial,
   onRandom,
+  onChange,
 }: {
   code: string;
   onCodeChange: (value: string) => void;
   onSerial: () => void;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onRandom: () => void;
 }) => {
   const lang = useLocale();
@@ -23,19 +22,7 @@ const CodeCell = ({
   const cellValue = code;
   return (
     <div>
-      <CodeInput
-        inCell
-        onSerial={onSerial}
-    
-        onRandom={onRandom}
-        // () => {
-        // // if (colDef.onRandom) {
-        // //   colDef.onRandom(rowData, rowIndex);
-        // // } else if (onEdit) {
-        // //   const random = Math.floor(100000 + Math.random() * 900000).toString();
-        // //   onEdit(rowId, colKey as keyof T, random as T[keyof T]);
-        // // }
-      >
+      <CodeInput inCell onSerial={onSerial} onRandom={onRandom}>
         <Input
           inCell
           value={cellValue || ""}
@@ -54,11 +41,7 @@ const CodeCell = ({
           // onPaste={(e) => handlePaste(e, colDef)}
           // onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
           // onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
-          // onChange={(e) => {
-          //   if (onEdit) {
-          //     onEdit(rowId, colKey as keyof T, e.target.value as T[keyof T]);
-          //   }
-          // }}
+          onChange={onChange}
         />
       </CodeInput>
     </div>
