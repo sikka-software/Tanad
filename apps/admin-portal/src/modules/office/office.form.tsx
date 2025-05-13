@@ -1,12 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
 import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import { CommandSelect } from "@root/src/components/ui/command-select";
 import { FormDialog } from "@root/src/components/ui/form-dialog";
-import { createAddressSchema } from "@root/src/lib/schemas/address.schema";
+import { offices } from "@root/src/db/schema";
 import { getNotesValue } from "@root/src/lib/utils";
+import { createSelectSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -31,7 +30,7 @@ import useOfficeStore from "./office.store";
 import { OfficeCreateData, OfficeUpdateData } from "./office.type";
 
 const createOfficeSchema = (t: (key: string) => string) => {
-  const baseOfficeSchema = z.object({
+  const OfficeSelectSchema = createSelectSchema(offices, {
     name: z.string().min(1, t("Offices.form.name.required")),
     code: z.string().optional().or(z.literal("")),
     email: z
@@ -49,11 +48,7 @@ const createOfficeSchema = (t: (key: string) => string) => {
     }),
     notes: z.any().optional().nullable(),
   });
-
-  const addressSchema = createAddressSchema(t);
-  const mergedSchema = baseOfficeSchema.merge(addressSchema);
-
-  return mergedSchema;
+  return OfficeSelectSchema;
 };
 
 export type OfficeFormValues = z.input<ReturnType<typeof createOfficeSchema>>;

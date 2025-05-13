@@ -636,18 +636,24 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string | null
+          education_level: string | null
           email: string
           emergency_contact: Json | null
+          employee_number: string | null
           enterprise_id: string
           eqama_id: string | null
           first_name: string
+          gender: string | null
           hire_date: string | null
           id: string
           job_id: string | null
           last_name: string
+          marital_status: string | null
           national_id: string | null
           nationality: string | null
           notes: Json | null
+          offboarding_status: string | null
+          onboarding_status: string | null
           phone: string | null
           region: string | null
           salary: Json | null
@@ -666,18 +672,24 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          education_level?: string | null
           email: string
           emergency_contact?: Json | null
+          employee_number?: string | null
           enterprise_id: string
           eqama_id?: string | null
           first_name: string
+          gender?: string | null
           hire_date?: string | null
           id?: string
           job_id?: string | null
           last_name: string
+          marital_status?: string | null
           national_id?: string | null
           nationality?: string | null
           notes?: Json | null
+          offboarding_status?: string | null
+          onboarding_status?: string | null
           phone?: string | null
           region?: string | null
           salary?: Json | null
@@ -696,18 +708,24 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          education_level?: string | null
           email?: string
           emergency_contact?: Json | null
+          employee_number?: string | null
           enterprise_id?: string
           eqama_id?: string | null
           first_name?: string
+          gender?: string | null
           hire_date?: string | null
           id?: string
           job_id?: string | null
           last_name?: string
+          marital_status?: string | null
           national_id?: string | null
           nationality?: string | null
           notes?: Json | null
+          offboarding_status?: string | null
+          onboarding_status?: string | null
           phone?: string | null
           region?: string | null
           salary?: Json | null

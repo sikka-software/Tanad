@@ -3630,6 +3630,19 @@
         "invalid": "البريد الإلكتروني غير صالح",
         "duplicate": "البريد الإلكتروني مستخدم من قبل موظف آخر"
       },
+      "birth_date": {
+        "label": "تاريخ الميلاد",
+        "placeholder": "أدخل تاريخ الميلاد",
+        "required": "تاريخ الميلاد مطلوب"
+      },
+      "national_id": {
+        "label": "رقم الهوية الوطنية",
+        "required": "رقم الهوية الوطنية مطلوب"
+      },
+      "eqama_id": {
+        "label": "رقم الإقامة",
+        "required": "رقم الإقامة مطلوب"
+      },
       "phone": {
         "label": "رقم الهاتف",
         "placeholder": "أدخل رقم الهاتف",
@@ -3654,7 +3667,6 @@
         "placeholder": "أدخل تاريخ التعيين",
         "required": "تاريخ التعيين مطلوب"
       },
-
       "salary": {
         "label": "الراتب",
         "placeholder": "أدخل الراتب",
@@ -3677,6 +3689,42 @@
         "terminated": "منقطع",
         "retired": "متقاعد",
         "suspended": "مجمد"
+      },
+      "gender": {
+        "label": "الجنس",
+        "male": "ذكر",
+        "female": "أنثى"
+      },
+      "marital_status": {
+        "label": "الحالة الإجتماعية",
+        "single": "مطلق",
+        "married": "متزوج",
+        "divorced": "مؤمن",
+        "widowed": "مأمور"
+      },
+      "education_level": {
+        "label": "المستوى التعليمي",
+        "primary": "إبتدائي",
+        "secondary": "ثانوي",
+        "bachelor": "بكالوريوس",
+        "master": "ماجستير",
+        "phd": "دكتوراه"
+      },
+      "employee_number": {
+        "label": "رقم الموظف",
+        "placeholder": "أدخل رقم الموظف"
+      },
+      "onboarding_status": {
+        "label": "حالة إعداد الموظف",
+        "placeholder": "اختر حالة إعداد الموظف",
+        "pending": "قيد الإعداد",
+        "completed": "مكتمل"
+      },
+      "offboarding_status": {
+        "label": "حالة إنهاء الموظف",
+        "placeholder": "اختر حالة إنهاء الموظف",
+        "pending": "قيد الإنهاء",
+        "completed": "منهي"
       },
       "address": {
         "label": "العنوان",

@@ -3,8 +3,11 @@ import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import NotesSection from "@root/src/components/forms/notes-section";
 import BooleanTabs from "@root/src/components/ui/boolean-tabs";
 import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
+import DigitsInput from "@root/src/components/ui/digits-input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@root/src/components/ui/tooltip";
+import { employees } from "@root/src/db/schema";
 import { getNotesValue } from "@root/src/lib/utils";
+import { createSelectSchema } from "drizzle-zod";
 import { PlusCircle, Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -91,8 +94,7 @@ export function EmployeeForm({
 
   const createEmployeeFormSchema = () => {
     const supabase = createClient();
-
-    return z.object({
+    const EmployeeSelectSchema = createSelectSchema(employees, {
       first_name: z.string().min(1, t("Employees.form.first_name.required")),
       last_name: z.string().min(1, t("Employees.form.last_name.required")),
       email: z
@@ -134,8 +136,26 @@ export function EmployeeForm({
       salary: z.array(salaryComponentSchema).optional(),
       status: z.enum(EmployeeStatus),
       nationality: z.string().optional(),
+      birth_date: z.date().optional(),
+      national_id: z.string().optional(),
+      eqama_id: z.string().optional(),
+      gender: z.string().optional(),
+      marital_status: z.string().optional(),
+      education_level: z.string().optional(),
+      employee_number: z.string().optional(),
+      onboarding_status: z.string().optional(),
+      offboarding_status: z.string().optional(),
+      emergency_contact: z
+        .object({
+          name: z.string().optional(),
+          phone: z.string().optional(),
+          relationship: z.string().optional(),
+        })
+        .optional(),
       notes: z.any().optional().nullable(),
     });
+
+    return EmployeeSelectSchema;
   };
 
   const form = useForm<z.input<ReturnType<typeof createEmployeeFormSchema>>>({
@@ -151,6 +171,15 @@ export function EmployeeForm({
       status: (defaultValues?.status as EmployeeStatusProps) || "active",
       notes: getNotesValue(defaultValues) || "",
       nationality: defaultValues?.nationality || "",
+      birth_date: defaultValues?.birth_date ? new Date(defaultValues.birth_date) : undefined,
+      national_id: defaultValues?.national_id || "",
+      eqama_id: defaultValues?.eqama_id || "",
+      gender: defaultValues?.gender || "male",
+      marital_status: defaultValues?.marital_status || "single",
+      education_level: defaultValues?.education_level || "",
+      employee_number: defaultValues?.employee_number || "",
+      onboarding_status: defaultValues?.onboarding_status || "",
+      offboarding_status: defaultValues?.offboarding_status || "",
     },
   });
 
@@ -172,6 +201,21 @@ export function EmployeeForm({
           (defaultValues.salary as { type: string; amount: number }[] | undefined) || undefined,
         notes: getNotesValue(defaultValues) || "",
         nationality: defaultValues.nationality || "",
+        birth_date: defaultValues.birth_date ? new Date(defaultValues.birth_date) : undefined,
+        national_id: defaultValues.national_id || "",
+        eqama_id: defaultValues.eqama_id || "",
+        gender: defaultValues.gender || "male",
+        marital_status: defaultValues.marital_status || "single",
+        education_level: defaultValues.education_level || "",
+        employee_number: defaultValues.employee_number || "",
+        onboarding_status: defaultValues.onboarding_status || "",
+        offboarding_status: defaultValues.offboarding_status || "",
+        emergency_contact:
+          typeof defaultValues.emergency_contact === "object" &&
+          defaultValues.emergency_contact !== null &&
+          !Array.isArray(defaultValues.emergency_contact)
+            ? defaultValues.emergency_contact
+            : undefined,
       });
     } else {
       // Optionally reset to empty if defaultValues becomes null (e.g., switching modes)
@@ -205,34 +249,41 @@ export function EmployeeForm({
       onSuccess?.();
       return;
     }
-
-    const submitData = {
-      ...data,
-      first_name: data.first_name.trim(),
-      last_name: data.last_name.trim(),
-      email: data.email.trim(),
-      phone: data.phone?.trim() || undefined,
-      hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
-      notes: data.notes,
-      salary: (data.salary || []).map((comp) => ({
-        ...comp,
-        amount: Number(comp.amount) || 0,
-      })),
-    };
-
-    const finalSubmitData = submitData;
-
     try {
       if (editMode) {
         await updateEmployeeMutate({
           id: actualEmployeeId!,
-          data: { ...finalSubmitData },
+          data: {
+            ...data,
+            first_name: data.first_name.trim(),
+            last_name: data.last_name.trim(),
+            email: data.email.trim(),
+            phone: data.phone?.trim() || undefined,
+            hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
+            birth_date: data.birth_date ? data.birth_date.toISOString().split("T")[0] : undefined,
+            notes: data.notes,
+            salary: (data.salary || []).map((comp) => ({
+              ...comp,
+              amount: Number(comp.amount) || 0,
+            })),
+          },
         });
         onSuccess?.();
       } else {
         const { membership, user } = useUserStore.getState();
         await createEmployeeMutate({
-          ...finalSubmitData,
+          ...data,
+          birth_date: data.birth_date ? data.birth_date.toISOString().split("T")[0] : undefined,
+          first_name: data.first_name.trim(),
+          last_name: data.last_name.trim(),
+          email: data.email.trim(),
+          phone: data.phone?.trim() || undefined,
+          hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
+          notes: data.notes,
+          salary: (data.salary || []).map((comp) => ({
+            ...comp,
+            amount: Number(comp.amount) || 0,
+          })),
           enterprise_id: membership?.enterprise_id || "",
           user_id: user?.id || "",
         });
@@ -270,203 +321,337 @@ export function EmployeeForm({
     <>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-          <div className="form-container form-fields-cols-2">
-            <FormField
-              control={form.control}
-              name="first_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Employees.form.first_name.label")} *</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Employees.form.first_name.placeholder")}
-                      disabled={isEmployeeSaving}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="last_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Employees.form.last_name.label")} *</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Employees.form.last_name.placeholder")}
-                      disabled={isEmployeeSaving}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Employees.form.email.label")} *</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Employees.form.email.placeholder")}
-                      disabled={isEmployeeSaving}
-                      type="email"
-                      dir="ltr"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Employees.form.phone.label")}</FormLabel>
-                  <FormControl>
-                    <PhoneInput
-                      disabled={isEmployeeSaving}
-                      {...field}
-                      value={field.value ?? ""}
-                      ariaInvalid={form.formState.errors.phone !== undefined}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="job_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Employees.form.job.label")} *</FormLabel>
-                  <FormControl>
-                    <ComboboxAdd
-                      dir={locale === "ar" ? "rtl" : "ltr"}
-                      data={jobOptions}
-                      defaultValue={field.value ?? undefined}
-                      onChange={field.onChange}
-                      isLoading={jobsLoading}
-                      disabled={isEmployeeSaving}
-                      texts={{
-                        placeholder: t("Employees.form.job.placeholder"),
-                        searchPlaceholder: t("Pages.Jobs.search"),
-                        noItems: t("Pages.Jobs.no_jobs_found"),
-                      }}
-                      addText={t("Pages.Jobs.add")}
-                      onAddClick={() => setIsJobDialogOpen(true)}
-                      renderOption={(option) => (
-                        <div className="flex flex-row items-center justify-between gap-2">
-                          <div className="flex flex-col">
-                            <span>{option.label}</span>
-                            <span className="text-xs text-gray-500">{option.department}</span>
-                          </div>
-                          <Tooltip delayDuration={500}>
-                            <TooltipTrigger>
-                              <span className="text-xs text-gray-500">
-                                {option.occupied_positions} / {option.total_positions}
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {t("Jobs.form.occupied_positions.label") +
-                                " / " +
-                                t("Jobs.form.total_positions.label")}
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
-                      )}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="hire_date"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>{t("Employees.form.hire_date.label")} *</FormLabel>
-                  <FormControl>
-                    <DatePicker
-                      placeholder={t("Employees.form.hire_date.placeholder")}
-                      date={field.value}
-                      onSelect={field.onChange}
-                      disabled={isEmployeeSaving}
-                      ariaInvalid={form.formState.errors.hire_date !== undefined}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="nationality"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Employees.form.nationality.label")} *</FormLabel>
-                  <FormControl>
-                    <CountryInput
-                      value={field.value ?? ""}
-                      onChange={field.onChange}
-                      disabled={isEmployeeSaving}
-                      dir={locale === "ar" ? "rtl" : "ltr"}
-                      labelKey={locale === "ar" ? "arabic_label" : "label"}
-                      texts={{
-                        placeholder: t("Employees.form.nationality.placeholder"),
-                        searchPlaceholder: t("Forms.country.search_placeholder"),
-                        noItems: t("Forms.country.no_items"),
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Employees.form.status.label")} *</FormLabel>
-                  <Select
-                    defaultValue={field.value}
-                    onValueChange={field.onChange}
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                  >
+          <div className="form-container">
+            <div className="form-fields-cols-2">
+              <FormField
+                control={form.control}
+                name="first_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.first_name.label")} *</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("Employees.form.status.placeholder")} />
-                      </SelectTrigger>
+                      <Input
+                        placeholder={t("Employees.form.first_name.placeholder")}
+                        disabled={isEmployeeSaving}
+                        {...field}
+                      />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="last_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.last_name.label")} *</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t("Employees.form.last_name.placeholder")}
+                        disabled={isEmployeeSaving}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.email.label")} *</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t("Employees.form.email.placeholder")}
+                        disabled={isEmployeeSaving}
+                        type="email"
+                        dir="ltr"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.phone.label")}</FormLabel>
+                    <FormControl>
+                      <PhoneInput
+                        disabled={isEmployeeSaving}
+                        {...field}
+                        value={field.value ?? ""}
+                        ariaInvalid={form.formState.errors.phone !== undefined}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="job_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.job.label")} *</FormLabel>
+                    <FormControl>
+                      <ComboboxAdd
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        data={jobOptions}
+                        defaultValue={field.value ?? undefined}
+                        onChange={field.onChange}
+                        isLoading={jobsLoading}
+                        disabled={isEmployeeSaving}
+                        texts={{
+                          placeholder: t("Employees.form.job.placeholder"),
+                          searchPlaceholder: t("Pages.Jobs.search"),
+                          noItems: t("Pages.Jobs.no_jobs_found"),
+                        }}
+                        addText={t("Pages.Jobs.add")}
+                        onAddClick={() => setIsJobDialogOpen(true)}
+                        renderOption={(option) => (
+                          <div className="flex flex-row items-center justify-between gap-2">
+                            <div className="flex flex-col">
+                              <span>{option.label}</span>
+                              <span className="text-xs text-gray-500">{option.department}</span>
+                            </div>
+                            <Tooltip delayDuration={500}>
+                              <TooltipTrigger>
+                                <span className="text-xs text-gray-500">
+                                  {option.occupied_positions} / {option.total_positions}
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {t("Jobs.form.occupied_positions.label") +
+                                  " / " +
+                                  t("Jobs.form.total_positions.label")}
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        )}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="hire_date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>{t("Employees.form.hire_date.label")} *</FormLabel>
+                    <FormControl>
+                      <DatePicker
+                        placeholder={t("Employees.form.hire_date.placeholder")}
+                        date={field.value}
+                        onSelect={field.onChange}
+                        disabled={isEmployeeSaving}
+                        ariaInvalid={form.formState.errors.hire_date !== undefined}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="nationality"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.nationality.label")} *</FormLabel>
+                    <FormControl>
+                      <CountryInput
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        disabled={isEmployeeSaving}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        labelKey={locale === "ar" ? "arabic_label" : "label"}
+                        texts={{
+                          placeholder: t("Employees.form.nationality.placeholder"),
+                          searchPlaceholder: t("Forms.country.search_placeholder"),
+                          noItems: t("Forms.country.no_items"),
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="birth_date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>{t("Employees.form.birth_date.label")} *</FormLabel>
+                    <FormControl>
+                      <DatePicker
+                        placeholder={t("Employees.form.birth_date.placeholder")}
+                        date={field.value}
+                        onSelect={field.onChange}
+                        disabled={isEmployeeSaving}
+                        ariaInvalid={form.formState.errors.birth_date !== undefined}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.status.label")} *</FormLabel>
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Employees.form.status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
 
-                    <SelectContent>
-                      {EmployeeStatus.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {t(`Employees.form.status.${status}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                      <SelectContent>
+                        {EmployeeStatus.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`Employees.form.status.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.gender.label")} *</FormLabel>
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Employees.form.gender.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        {["male", "female"].map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`Employees.form.gender.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="onboarding_status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.onboarding_status.label")} *</FormLabel>
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={t("Employees.form.onboarding_status.placeholder")}
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        {["pending", "completed"].map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`Employees.form.onboarding_status.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="offboarding_status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.offboarding_status.label")} *</FormLabel>
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={t("Employees.form.offboarding_status.placeholder")}
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        {["pending", "completed"].map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`Employees.form.offboarding_status.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="form-fields-cols-1">
+              <FormField
+                control={form.control}
+                name="national_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.national_id.label")}</FormLabel>
+                    <FormControl>
+                      <DigitsInput maxLength={10} disabled={isEmployeeSaving} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="eqama_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.eqama_id.label")}</FormLabel>
+                    <FormControl>
+                      <DigitsInput maxLength={10} disabled={isEmployeeSaving} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
 
           <FormSectionHeader
