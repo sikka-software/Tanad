@@ -118,7 +118,10 @@ export default function ExpensesPage() {
   }
   return (
     <div>
-      <CustomPageMeta title={t("Expenses.title")} description={t("Expenses.description")} />
+      <CustomPageMeta
+        title={t("Pages.Expenses.title")}
+        description={t("Pages.Expenses.description")}
+      />
       <DataPageLayout count={expenses?.length} itemsText={t("Pages.Expenses.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode

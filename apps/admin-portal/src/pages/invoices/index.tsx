@@ -119,7 +119,10 @@ export default function InvoicesPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Invoices.title")} description={t("Invoices.description")} />
+      <CustomPageMeta
+        title={t("Pages.Invoices.title")}
+        description={t("Pages.Invoices.description")}
+      />
       <DataPageLayout count={invoices?.length} itemsText={t("Pages.Invoices.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode

@@ -120,7 +120,10 @@ export default function DomainsPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Domains.title")} description={t("Domains.description")} />
+      <CustomPageMeta
+        title={t("Pages.Domains.title")}
+        description={t("Pages.Domains.description")}
+      />
       <DataPageLayout count={domains?.length} itemsText={t("Pages.Domains.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode

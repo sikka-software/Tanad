@@ -123,7 +123,10 @@ export default function EmployeesPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Employees.title")} description={t("Employees.description")} />
+      <CustomPageMeta
+        title={t("Pages.Employees.title")}
+        description={t("Pages.Employees.description")}
+      />
       <DataPageLayout count={employees?.length} itemsText={t("Pages.Employees.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode

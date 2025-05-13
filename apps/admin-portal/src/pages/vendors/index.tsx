@@ -116,7 +116,10 @@ export default function VendorsPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Vendors.title")} description={t("Vendors.description")} />
+      <CustomPageMeta
+        title={t("Pages.Vendors.title")}
+        description={t("Pages.Vendors.description")}
+      />
       <DataPageLayout count={vendors?.length} itemsText={t("Pages.Vendors.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode

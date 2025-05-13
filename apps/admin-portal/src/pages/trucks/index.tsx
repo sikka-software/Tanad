@@ -115,7 +115,7 @@ export default function TrucksPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Trucks.title")} description={t("Trucks.description")} />
+      <CustomPageMeta title={t("Pages.Trucks.title")} description={t("Pages.Trucks.description")} />
       <DataPageLayout count={trucks?.length} itemsText={t("Pages.Trucks.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode

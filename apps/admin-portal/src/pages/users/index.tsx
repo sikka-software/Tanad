@@ -104,8 +104,6 @@ export default function UsersPage() {
     return <NoPermission />;
   }
 
-  const formDialogTitle = actionableUser ? t("Pages.Users.edit") : t("Pages.Users.add");
-
   return (
     <div>
       <CustomPageMeta title={t("Pages.Users.title")} description={t("Pages.Users.description")} />

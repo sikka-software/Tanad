@@ -117,7 +117,10 @@ export default function OnlineStoresPage() {
   }
   return (
     <div>
-      <CustomPageMeta title={t("OnlineStores.title")} description={t("OnlineStores.description")} />
+      <CustomPageMeta
+        title={t("Pages.OnlineStores.title")}
+        description={t("Pages.OnlineStores.description")}
+      />
       <DataPageLayout count={onlineStores?.length} itemsText={t("Pages.OnlineStores.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
