@@ -618,17 +618,6 @@ function SheetTable<
     overscan: 10,
   });
 
-  // rowActions config
-  const addPos = rowActions?.add ?? null; // "left" | "right" | null
-  const removePos = rowActions?.remove ?? null; // "left" | "right" | null
-
-  const rowActionCellStyle: React.CSSProperties = {
-    width: "5px",
-    maxWidth: "5px",
-    outline: "none",
-  };
-  const rowActionCellClassName = "p-0 border-none bg-transparent";
-
   /**
    * Recursively renders a row and its sub-rows, handling:
    * - Row content and cell editing
@@ -651,14 +640,6 @@ function SheetTable<
     // Determine if this row or its group is disabled
     const disabled = isRowDisabled(disabledRows, groupKey, rowIndex);
 
-    // TanStack expansion logic
-    const hasSubRows = row.getCanExpand();
-    const isExpanded = row.getIsExpanded();
-
-    // Determine if we show the rowAction icons on hover
-    const showRowActions = hoveredRowId === rowId; // only for hovered row
-
-    const stickyColumnId = "checkbox";
     return (
       <React.Fragment key={rowId}>
         <TableRow
@@ -805,7 +786,6 @@ function SheetTable<
     );
   };
 
-  // Memoize renderRow
   const memoizedRenderRow = React.useCallback(
     (row: TanStackRow<T>, groupKey: string, level = 0) => renderRow(row, groupKey, level),
     [renderRow],
@@ -832,12 +812,9 @@ function SheetTable<
   return (
     <div ref={parentRef} className="relative max-h-[calc(100vh-7.6rem)] overflow-auto p-0 pb-2">
       <Table id={id} style={{ minWidth: totalMinWidth }}>
-        {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
-        {/* Primary header */}
         {showHeader && (
           <TableHeader className="relative">
             <TableRow className="border-none">
-              {/* Selection checkbox header */}
               {enableRowSelection && (
                 <TableHead className="bg-muted sticky start-0 top-0 z-30 w-8 !max-w-8 min-w-8 border-none text-start">
                   <div className="flex h-full items-center justify-center">
@@ -914,13 +891,11 @@ function SheetTable<
           {/* Virtualized rows */}
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
             const { row, groupKey, level } = flatRows[virtualRow.index];
-            // Render as TableRow, not div
             return React.cloneElement(
               memoizedRenderRow(row, groupKey, level) as React.ReactElement,
               { key: row.id },
             );
           })}
-          {/* Bottom spacer */}
           {rowVirtualizer.getVirtualItems().length > 0 && (
             <tr
               style={{

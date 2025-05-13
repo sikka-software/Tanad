@@ -151,7 +151,7 @@ export default function OfficesPage() {
           />
         )}
 
-        <div>
+        <div className="bg--200">
           {viewMode === "table" ? (
             <OfficesTable
               data={sortedData}
