@@ -22,7 +22,7 @@ export default function AddOfficePage() {
     const dummyData = generateDummyData();
     const form = (window as any).officeForm;
     if (form) {
-      form.setValue("name", "Office " + dummyData.randomNumber);
+      form.setValue("name", "Office " + dummyData.randomNumber(5));
       form.setValue("email", dummyData.email);
       form.setValue("phone", dummyData.phone);
       form.setValue("building_number", String(dummyData.address));

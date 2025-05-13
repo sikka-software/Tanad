@@ -25,11 +25,11 @@ export default function AddProductPage() {
     const dummyData = generateDummyData();
     const form = (window as any).productForm;
     if (form) {
-      form.setValue("name", `Product ${dummyData.randomNumber}`);
+      form.setValue("name", `Product ${dummyData.randomNumber(3)}`);
       form.setValue("description", dummyData.randomString);
-      form.setValue("price", String(dummyData.randomNumber));
+      form.setValue("price", String(dummyData.randomNumber(4)));
       form.setValue("sku", dummyData.randomString);
-      form.setValue("stock_quantity", String(dummyData.randomNumber));
+      form.setValue("stock_quantity", String(dummyData.randomNumber(3)));
     }
   };
 

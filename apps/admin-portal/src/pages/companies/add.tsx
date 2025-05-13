@@ -31,10 +31,10 @@ export default function AddCompanyPage() {
       form.setValue("city", dummyData.city);
       form.setValue("region", "Eastern");
       form.setValue("zip_code", String(dummyData.zip_code));
-      form.setValue("building_number", String(dummyData.randomNumber));
-      form.setValue("additional_number", String(dummyData.randomNumber));
+      form.setValue("building_number", String(dummyData.randomNumber(5)));
+      form.setValue("additional_number", String(dummyData.randomNumber(5)));
       form.setValue("industry", dummyData.randomString);
-      form.setValue("size", String(dummyData.randomNumber));
+      form.setValue("size", String(dummyData.randomNumber(3)));
     }
   };
 
