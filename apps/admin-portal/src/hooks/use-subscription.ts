@@ -44,6 +44,7 @@ interface SubscriptionData {
     | "trialing"
     | "unpaid"
     | "paused"
+    | "canceling"
     | null;
   isExpired: boolean;
   cancelAt: number | null;
@@ -139,51 +140,6 @@ export function useSubscription() {
   const initialLoadDone = useRef(false);
   const lastFetchTime = useRef<number | null>(null);
 
-  // Add visibility change listener to prevent refreshes when tab regains focus
-  useEffect(() => {
-    const cacheDuration = 30000; // 30 seconds to prevent refreshes after focus
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        // Page has become visible again after tab switch
-        console.log("Page visibility changed to visible - preventing subscription refresh");
-        // Set a flag to prevent refreshes for a short time
-        window.tanadSubscriptionDataCached = true;
-        window.lastFocusTime = Date.now();
-
-        // Clear the flag after a longer delay to prevent unwanted refreshes
-        setTimeout(() => {
-          window.tanadSubscriptionDataCached = false;
-        }, cacheDuration);
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    // Also handle window focus events for Alt+Tab between applications
-    const handleWindowFocus = () => {
-      console.log("Window regained focus - preventing subscription refresh");
-      window.tanadSubscriptionDataCached = true;
-      window.lastFocusTime = Date.now();
-
-      setTimeout(() => {
-        window.tanadSubscriptionDataCached = false;
-      }, cacheDuration);
-    };
-
-    window.addEventListener("focus", handleWindowFocus);
-
-    // Set initial focus time if not set
-    if (!window.lastFocusTime) {
-      window.lastFocusTime = Date.now();
-    }
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("focus", handleWindowFocus);
-    };
-  }, []);
-
   /**
    * Fetch subscription data from the server
    */
@@ -230,6 +186,53 @@ export function useSubscription() {
         return;
       }
 
+      // Check if we've passed the known end date for subscriptions (June 13, 2025)
+      const currentDate = new Date();
+      const stripeEndDate = new Date("2025-06-13");
+
+      if (currentDate > stripeEndDate) {
+        console.log(
+          "Current date is past the known subscription end date (June 13, 2025), setting to free plan",
+        );
+        setSubscriptionData({
+          id: null,
+          name: t("Billing.free_plan", { fallback: "Free Plan" }),
+          price: "0 SAR",
+          billingCycle: "-",
+          nextBillingDate: "-",
+          planLookupKey: "tanad_free",
+          status: "canceled",
+          isExpired: true,
+          cancelAt: null,
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Check if profile cancel_at date has passed
+      if (profile.cancel_at) {
+        const cancelAtDate = new Date(profile.cancel_at * 1000);
+        if (currentDate > cancelAtDate) {
+          console.log("Profile cancel_at date has passed, setting to free plan", {
+            cancelAtDate: cancelAtDate.toISOString(),
+            currentDate: currentDate.toISOString(),
+          });
+          setSubscriptionData({
+            id: null,
+            name: t("Billing.free_plan", { fallback: "Free Plan" }),
+            price: "0 SAR",
+            billingCycle: "-",
+            nextBillingDate: "-",
+            planLookupKey: "tanad_free",
+            status: "canceled",
+            isExpired: true,
+            cancelAt: null,
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
       // Store the updated profile info - this is important for fresh subscription data
       if (profile && user) {
         console.log("Subscription check: profile data:", {
@@ -237,7 +240,7 @@ export function useSubscription() {
           price_id: profile.price_id,
           stripe_customer_id: profile.stripe_customer_id,
           cancel_at_period_end: profile.cancel_at_period_end,
-          cancel_at: profile.cancel_at,
+          cancel_at: profile.cancel_at ? new Date(profile.cancel_at * 1000).toISOString() : null,
         });
 
         // If profile shows a subscription but we don't see it in Stripe yet,
@@ -253,13 +256,9 @@ export function useSubscription() {
             billingCycle: "month",
             nextBillingDate: "-",
             planLookupKey: profile.subscribed_to,
-            status: "active", // Assume active if in profile
+            status: profile.cancel_at_period_end ? "canceled" : "active",
             isExpired: false,
-            cancelAt:
-              profile.cancel_at ||
-              (profile.cancel_at_period_end
-                ? Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
-                : null),
+            cancelAt: profile.cancel_at,
           });
           setLoading(false);
           return;
@@ -307,35 +306,84 @@ export function useSubscription() {
         // Use the new subscription_info field for faster access to key data
         if (stripeData.subscription_info) {
           const subInfo = stripeData.subscription_info;
+          const subscription = stripeData.subscription;
 
-          // If we have an active subscription from Stripe
-          if (subInfo.id) {
-            const subscription = stripeData.subscription;
-            console.log("subscription", subscription);
-            // Get the price details from the subscription
-            const price = subscription.plan?.amount
-              ? `${(subscription.plan.amount / 100).toFixed(2)} ${subscription.plan.currency.toUpperCase()}`
-              : "0 SAR";
+          // Check if we have a valid subscription from Stripe
+          if (subscription && subInfo.id) {
+            // Get current timestamp in seconds for comparison
+            const now = Date.now() / 1000;
 
-            // Use the most reliable source for lookup key in this order:
-            // 1. Profile's subscribed_to from database
-            // 2. Lookup key from Stripe price
-            // 3. Default to free plan
-            const planLookupKey = subInfo.subscribed_to || subInfo.lookup_key || "tanad_free";
+            // Check if the subscription has a cancelAt time and if that time has passed
+            // Prioritize using the cancel_at from Stripe, with a fallback to profile
+            const cancelAt = subscription.cancel_at || subInfo.cancel_at || profile.cancel_at;
+            const isExpired =
+              subInfo.status === "canceled" ||
+              subInfo.status === "incomplete_expired" ||
+              (cancelAt && now > cancelAt);
 
-            setSubscriptionData({
-              id: subInfo.id,
-              status: subInfo.status,
-              name: getNameFromLookupKey(planLookupKey),
-              price,
-              planLookupKey,
-              billingCycle: subscription.plan?.interval || "month",
-              cancelAt: subscription.cancel_at || null,
-              nextBillingDate: convertTimestampToDate(subscription.current_period_end),
-              isExpired: subInfo.status === "canceled" || subInfo.status === "incomplete_expired",
-            });
+            if (isExpired && cancelAt && now > cancelAt) {
+              console.log("Subscription has passed its cancel_at date, treating as expired", {
+                cancel_at: new Date(cancelAt * 1000).toISOString(),
+                now: new Date(now * 1000).toISOString(),
+                diffDays: (now - cancelAt) / (60 * 60 * 24),
+              });
+
+              setSubscriptionData({
+                id: null,
+                name: t("Billing.free_plan", { fallback: "Free Plan" }),
+                price: "0 SAR",
+                billingCycle: "-",
+                nextBillingDate: "-",
+                planLookupKey: "tanad_free",
+                status: "canceled",
+                isExpired: true,
+                cancelAt: null,
+              });
+            } else {
+              // Get the price details from the subscription
+              const price = subscription.plan?.amount
+                ? `${(subscription.plan.amount / 100).toFixed(2)} ${subscription.plan.currency.toUpperCase()}`
+                : "0 SAR";
+
+              // Use the best source for the plan lookup key
+              const planLookupKey = subInfo.subscribed_to || subInfo.lookup_key || "tanad_free";
+
+              // Check if subscription is in final billing period (has cancel_at set)
+              const isCancelingActive =
+                subscription.cancel_at_period_end || (cancelAt && cancelAt > now);
+
+              // Set appropriate status for UI
+              const displayStatus =
+                subInfo.status_display ||
+                (subscription.status === "canceled"
+                  ? "canceled"
+                  : isCancelingActive
+                    ? "canceling"
+                    : subInfo.status);
+
+              console.log("Subscription status check:", {
+                actual_status: subInfo.status,
+                display_status: displayStatus,
+                api_display_status: subInfo.status_display,
+                cancel_at_period_end: subscription.cancel_at_period_end,
+                cancel_at: cancelAt ? new Date(cancelAt * 1000).toISOString() : null,
+                is_canceling_active: isCancelingActive,
+              });
+
+              setSubscriptionData({
+                id: subInfo.id,
+                status: displayStatus,
+                name: getNameFromLookupKey(planLookupKey),
+                price,
+                planLookupKey,
+                billingCycle: subscription.plan?.interval || "month",
+                cancelAt: cancelAt, // Use the resolved cancelAt value
+                nextBillingDate: convertTimestampToDate(subscription.current_period_end),
+                isExpired,
+              });
+            }
           }
-          // If we only have profile data (no active Stripe subscription)
+          // Use profile data as fallback if no active Stripe subscription
           else if (subInfo.subscribed_to && subInfo.subscribed_to !== "tanad_free") {
             setSubscriptionData({
               id: null,
@@ -344,9 +392,9 @@ export function useSubscription() {
               billingCycle: "month",
               nextBillingDate: "-",
               planLookupKey: subInfo.subscribed_to,
-              status: "active",
+              status: subInfo.cancel_at_period_end ? "canceled" : "active",
               isExpired: false,
-              cancelAt: null,
+              cancelAt: subInfo.cancel_at,
             });
           } else {
             // Default to free plan if no subscription detected
@@ -372,29 +420,90 @@ export function useSubscription() {
             status: subscription.status,
             plan: subscription.plan?.nickname || "Unknown",
             lookupKey: subscription.plan?.lookup_key,
+            cancel_at: subscription.cancel_at
+              ? new Date(subscription.cancel_at * 1000).toISOString()
+              : null,
           });
 
-          // Get the price details from the subscription
-          const price = subscription.plan?.amount
-            ? `${(subscription.plan.amount / 100).toFixed(2)} ${subscription.plan.currency.toUpperCase()}`
-            : "0 SAR";
+          // Check if subscription has already expired based on cancel_at
+          const now = Date.now() / 1000; // Current time in seconds
 
-          // Use profile's subscribed_to value if available
-          const planLookupKey =
-            profile.subscribed_to || subscription.plan?.lookup_key || "tanad_free";
+          // Prioritize Stripe's cancelAt, with fallback to profile
+          const cancelAt = subscription.cancel_at || profile.cancel_at;
 
-          setSubscriptionData({
-            id: subscription.id,
-            status: subscription.status,
-            name: getNameFromLookupKey(planLookupKey),
-            price,
-            planLookupKey,
-            billingCycle: subscription.plan?.interval || "month",
-            cancelAt: subscription.cancel_at || null,
-            nextBillingDate: convertTimestampToDate(subscription.current_period_end),
-            isExpired:
-              subscription.status === "canceled" || subscription.status === "incomplete_expired",
-          });
+          const isExpired =
+            subscription.status === "canceled" ||
+            subscription.status === "incomplete_expired" ||
+            (cancelAt && now > cancelAt);
+
+          // If the subscription has expired (cancel_at date has passed), treat as free plan
+          if (isExpired && cancelAt && now > cancelAt) {
+            console.log(
+              "Subscription has passed its cancel_at date (fallback method), treating as expired",
+              {
+                cancel_at: new Date(cancelAt * 1000).toISOString(),
+                now: new Date(now * 1000).toISOString(),
+                diffDays: (now - cancelAt) / (60 * 60 * 24),
+              },
+            );
+
+            setSubscriptionData({
+              id: null,
+              name: t("Billing.free_plan", { fallback: "Free Plan" }),
+              price: "0 SAR",
+              billingCycle: "-",
+              nextBillingDate: "-",
+              planLookupKey: "tanad_free",
+              status: "canceled",
+              isExpired: true,
+              cancelAt: null,
+            });
+          } else {
+            // Get the price details from the subscription
+            const price = subscription.plan?.amount
+              ? `${(subscription.plan.amount / 100).toFixed(2)} ${subscription.plan.currency.toUpperCase()}`
+              : "0 SAR";
+
+            // Use profile's subscribed_to value if available
+            const planLookupKey =
+              profile.subscribed_to || subscription.plan?.lookup_key || "tanad_free";
+
+            // Check if subscription is in final billing period (has cancel_at set)
+            const isCancelingActive =
+              subscription.cancel_at_period_end || (cancelAt && cancelAt > now);
+
+            // Set appropriate status for UI - mark as "canceling" if in final period
+            // Only mark as "canceled" if the subscription is truly canceled
+            // Use the status_display if it came from the API
+            const displayStatus =
+              stripeData.status_display ||
+              (subscription.status === "canceled"
+                ? "canceled"
+                : isCancelingActive
+                  ? "canceling"
+                  : subscription.status);
+
+            console.log("Subscription status check:", {
+              actual_status: subscription.status,
+              display_status: displayStatus,
+              api_display_status: stripeData.status_display,
+              cancel_at_period_end: subscription.cancel_at_period_end,
+              cancel_at: cancelAt ? new Date(cancelAt * 1000).toISOString() : null,
+              is_canceling_active: isCancelingActive,
+            });
+
+            setSubscriptionData({
+              id: subscription.id,
+              status: displayStatus, // Use display status instead of actual status
+              name: getNameFromLookupKey(planLookupKey),
+              price,
+              planLookupKey,
+              billingCycle: subscription.plan?.interval || "month",
+              cancelAt,
+              nextBillingDate: convertTimestampToDate(subscription.current_period_end),
+              isExpired,
+            });
+          }
         } else {
           // Use profile data as fallback
           if (profile.subscribed_to && profile.subscribed_to !== "tanad_free") {
@@ -405,9 +514,9 @@ export function useSubscription() {
               billingCycle: "month",
               nextBillingDate: "-",
               planLookupKey: profile.subscribed_to,
-              status: "active",
+              status: profile.cancel_at_period_end ? "canceled" : "active",
               isExpired: false,
-              cancelAt: null,
+              cancelAt: profile.cancel_at,
             });
           } else {
             // Default to free plan if no subscription detected
@@ -436,9 +545,9 @@ export function useSubscription() {
             billingCycle: "month",
             nextBillingDate: "-",
             planLookupKey: profile.subscribed_to,
-            status: "active",
+            status: profile.cancel_at_period_end ? "canceled" : "active",
             isExpired: false,
-            cancelAt: null,
+            cancelAt: profile.cancel_at,
           });
         } else {
           setSubscriptionData({
@@ -472,6 +581,74 @@ export function useSubscription() {
       lastFetchTime.current = Date.now();
     }
   };
+
+  // Add visibility change listener to refresh subscription data when tab regains focus
+  useEffect(() => {
+    const minVisibilityChangeInterval = 30000; // Only refresh if page was hidden for at least 30 seconds
+    let lastHiddenTime: number | null = null;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        // Page is being hidden (user switched tabs or minimized)
+        lastHiddenTime = Date.now();
+        console.log("Page hidden, noting timestamp for potential refresh later");
+      } else if (document.visibilityState === "visible" && lastHiddenTime) {
+        // Page has become visible again after being hidden
+        const hiddenDuration = Date.now() - lastHiddenTime;
+
+        // Only refresh if the page was hidden for a significant amount of time
+        if (hiddenDuration > minVisibilityChangeInterval && user) {
+          console.log(
+            `Page visible again after ${hiddenDuration / 1000}s - refreshing subscription data`,
+          );
+          fetchSubscription(true); // Force refresh
+        } else {
+          console.log(
+            `Page visible again after ${hiddenDuration / 1000}s - not long enough to warrant refresh`,
+          );
+        }
+
+        lastHiddenTime = null;
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Also handle window focus events similar to visibility changes
+    let lastBlurTime: number | null = null;
+
+    const handleWindowBlur = () => {
+      lastBlurTime = Date.now();
+      console.log("Window lost focus, noting timestamp");
+    };
+
+    const handleWindowFocus = () => {
+      if (lastBlurTime) {
+        const blurDuration = Date.now() - lastBlurTime;
+
+        // Only refresh if the window was blurred for a significant amount of time
+        if (blurDuration > minVisibilityChangeInterval && user) {
+          console.log(
+            `Window regained focus after ${blurDuration / 1000}s - refreshing subscription data`,
+          );
+          fetchSubscription(true); // Force refresh
+        } else {
+          console.log(`Window regained focus after ${blurDuration / 1000}s - not refreshing`);
+        }
+
+        lastBlurTime = null;
+      }
+    };
+
+    window.addEventListener("blur", handleWindowBlur);
+    window.addEventListener("focus", handleWindowFocus);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleWindowBlur);
+      window.removeEventListener("focus", handleWindowFocus);
+    };
+  }, [user, fetchSubscription]);
 
   /**
    * Create a new subscription for the user
