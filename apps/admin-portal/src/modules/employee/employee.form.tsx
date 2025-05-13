@@ -566,10 +566,13 @@ export function EmployeeForm({
                 name="onboarding_status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Employees.form.onboarding_status.label")} *</FormLabel>
+                    <FormLabel>{t("Employees.form.onboarding_status.label")}</FormLabel>
                     <Select
-                      defaultValue={field.value}
-                      onValueChange={field.onChange}
+                      key={field.value}
+                      value={field.value}
+                      onValueChange={(val) => {
+                        field.onChange(val);
+                      }}
                       dir={locale === "ar" ? "rtl" : "ltr"}
                     >
                       <FormControl>
@@ -597,10 +600,16 @@ export function EmployeeForm({
                 name="offboarding_status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Employees.form.offboarding_status.label")} *</FormLabel>
+                    <FormLabel>{t("Employees.form.offboarding_status.label")}</FormLabel>
                     <Select
-                      defaultValue={field.value}
-                      onValueChange={field.onChange}
+                      value={field.value}
+                      onValueChange={(val) => {
+                        if (val === field.value) {
+                          field.onChange("");
+                        } else {
+                          field.onChange(val);
+                        }
+                      }}
                       dir={locale === "ar" ? "rtl" : "ltr"}
                     >
                       <FormControl>
