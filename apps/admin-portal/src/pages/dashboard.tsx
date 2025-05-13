@@ -77,47 +77,56 @@ export default function Dashboard() {
 
       // --- Fetch Stats --- (extracted logic)
       const fetchStats = async () => {
-        const entUsers = await supabase;
-        //   .from("users")
+        const fetchCount = async (
+          tableName: string,
+          additionalFilter?: object,
+        ): Promise<number> => {
+          const query = supabase
+            .from(tableName)
+            .select("id", { count: "exact", head: true })
+            .eq("enterprise_id", enterpriseId);
+
+          if (additionalFilter) {
+            Object.entries(additionalFilter).forEach(([key, value]) => {
+              query.eq(key, value);
+            });
+          }
+
+          const { count, error } = await query;
+          if (error) throw error;
+          return count ?? 0;
+        };
+
+        const fetchSum = async (tableName: string, columnName: string): Promise<number> => {
+          const { data, error } = await supabase
+            .from(tableName)
+            .select(columnName)
+            .eq("enterprise_id", enterpriseId);
+
+          if (error) throw error;
+          return data?.reduce((sum, row) => sum + ((row as any)[columnName] || 0), 0) ?? 0;
+        };
+
+        const fetchUserCount = async (): Promise<number> => {
+          // Count distinct profile_id in memberships for this enterprise
+          const { count, error } = await supabase
+            .from("memberships")
+            .select("profile_id", { count: "exact", head: true })
+            .eq("enterprise_id", enterpriseId);
+          if (error) throw error;
+          return count ?? 0;
+        };
+
+        // const invoices = await supabase
+        //   .from("invoices")
         //   .select("id", { count: "exact", head: true })
         //   .eq("enterprise_id", enterpriseId);
 
-        // console.log("entUsers", entUsers);
+        // const totalInvoices = await fetchCount("invoices");
+        // console.log("invoices", totalInvoices);
         try {
-          const fetchCount = async (
-            tableName: string,
-            additionalFilter?: object,
-          ): Promise<number> => {
-            const query = supabase
-              .from(tableName)
-              .select("id", { count: "exact", head: true })
-              .eq("enterprise_id", enterpriseId);
-
-            if (additionalFilter) {
-              Object.entries(additionalFilter).forEach(([key, value]) => {
-                query.eq(key, value);
-              });
-            }
-
-            const { count, error } = await query;
-            if (error) throw error;
-            return count ?? 0;
-          };
-
-          const fetchSum = async (tableName: string, columnName: string): Promise<number> => {
-            const { data, error } = await supabase
-              .from(tableName)
-              .select(columnName)
-              .eq("enterprise_id", enterpriseId);
-
-            if (error) throw error;
-            return data?.reduce((sum, row) => sum + ((row as any)[columnName] || 0), 0) ?? 0;
-          };
-
           const [
-            // pendingInvoicesCount,
-            // totalInvoices,
-            // totalRevenue,
+            totalInvoices,
             totalProducts,
             totalEmployees,
             totalDepartments,
@@ -144,9 +153,7 @@ export default function Dashboard() {
             totalServers,
             totalOnlineStores,
           ] = await Promise.all([
-            // fetchSum("invoices", "total"),
-            // fetchCount("invoices"),
-            // fetchCount("invoices", { status: "pending" }),
+            fetchCount("invoices"),
             fetchCount("products"),
             fetchCount("employees"),
             fetchCount("departments"),
@@ -167,7 +174,7 @@ export default function Dashboard() {
             fetchCount("job_listings"),
             fetchCount("employee_requests"),
             // fetchCount("applicants"),
-            fetchCount("users"),
+            fetchUserCount(),
             fetchCount("domains"),
             fetchCount("websites"),
             fetchCount("servers"),
@@ -175,9 +182,7 @@ export default function Dashboard() {
           ]);
 
           setStats({
-            // totalInvoices,
-            // pendingInvoices: pendingInvoicesCount,
-            // totalRevenue,
+            totalInvoices,
             totalProducts,
             totalEmployees,
             totalDepartments,

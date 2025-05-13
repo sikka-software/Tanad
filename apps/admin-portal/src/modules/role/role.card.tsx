@@ -134,7 +134,7 @@ export default function RoleCard({ role, onActionClick, disableActions = false }
                           <ScrollArea className="h-auto max-h-48">
                             <div className="p-4">
                               <h5 className="mb-2 text-sm leading-none font-medium">
-                                {t(`${displayCategory}.title`)}
+                                {t(`Pages.${displayCategory}.title`)}
                               </h5>
                               <ul className="space-y-1 text-center text-xs">
                                 {assignedPerms.map((perm) => (

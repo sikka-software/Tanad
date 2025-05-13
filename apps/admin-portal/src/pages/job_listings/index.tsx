@@ -39,7 +39,7 @@ export default function JobListingsPage() {
 
   const columns = useJobListingColumns();
 
-  const moduleHooks = createModuleStoreHooks(useJobListingsStore, "jobListings");
+  const moduleHooks = createModuleStoreHooks(useJobListingsStore, "job_listings");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<JobListingUpdateData | null>(null);
