@@ -42,8 +42,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { error: updateError } = await supabase
         .from("profiles")
         .update({
-          cancel_at_period_end: true,
-          cancel_at: cancelAt,
+          cancel_at_period_end: cancelAtPeriodEnd,
+          cancel_at: cancelAtPeriodEnd ? cancelAt : Math.floor(Date.now() / 1000), // If immediate cancellation, set to now
         })
         .eq("id", userId);
 

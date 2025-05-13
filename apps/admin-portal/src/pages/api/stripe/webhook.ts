@@ -118,18 +118,79 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         break;
 
       case "customer.subscription.updated":
-        if (subscription.cancel_at && subscription.cancellation_details?.reason) {
-          console.log("subscription cancelled");
-        } else {
-          // Get the price details to get the lookup_key
+        if (subscription.cancel_at || subscription.cancel_at_period_end) {
+          console.log("Subscription scheduled for cancellation", {
+            cancel_at: subscription.cancel_at
+              ? new Date(subscription.cancel_at * 1000).toISOString()
+              : null,
+            cancel_at_period_end: subscription.cancel_at_period_end,
+            current_period_end: new Date(
+              (subscription as any).current_period_end * 1000,
+            ).toISOString(),
+          });
 
+          // Update profile to mark subscription as being canceled
+          await supabase
+            .from("profiles")
+            .update({
+              cancel_at_period_end: true,
+              cancel_at: subscription.cancel_at || (subscription as any).current_period_end,
+              // Keep the current subscription for now
+              subscribed_to: price.lookup_key,
+              price_id: priceId,
+            })
+            .eq("stripe_customer_id", customerId);
+
+          console.log("✓ Updated profile to mark subscription as being canceled:", {
+            customerId,
+            cancel_at: subscription.cancel_at,
+            cancel_at_period_end: subscription.cancel_at_period_end,
+          });
+
+          // Check if we're in the final billing period (current date is within the final period)
+          const now = Math.floor(Date.now() / 1000);
+          const currentPeriodEnd = (subscription as any).current_period_end;
+          const isInFinalBillingPeriod =
+            currentPeriodEnd > now &&
+            (subscription.cancel_at_period_end ||
+              (subscription.cancel_at && subscription.cancel_at <= currentPeriodEnd));
+
+          if (isInFinalBillingPeriod) {
+            console.log("✓ Subscription is in final billing period, marked as canceling");
+          }
+
+          // Send email about cancellation
+          try {
+            await sendEmailViaWebhook(process.env.SUB_UPDATED_WEBHOOK_URL!, {
+              customerId,
+              email: profile?.email,
+              planName: price.lookup_key,
+              amount: (price.unit_amount! / 100).toString(),
+              currency: price.currency.toUpperCase(),
+              billingInterval: `per ${price.recurring?.interval || "month"}`,
+              language: subscription.metadata?.language || "ar",
+              status: "canceling", // Custom status to indicate being canceled
+              cancelAt: subscription.cancel_at
+                ? new Date(subscription.cancel_at * 1000).toISOString()
+                : new Date((subscription as any).current_period_end * 1000).toISOString(),
+            });
+            console.log("✓ Cancellation email sent successfully");
+          } catch (error) {
+            console.error("❌ Failed to send cancellation email:", error);
+          }
+        } else {
+          // Regular subscription update (not cancellation)
           await supabase
             .from("profiles")
             .update({
               subscribed_to: price.lookup_key,
               price_id: priceId,
+              // Clear cancellation flags if they exist
+              cancel_at_period_end: false,
+              cancel_at: null,
             })
             .eq("stripe_customer_id", customerId);
+
           try {
             await sendEmailViaWebhook(process.env.SUB_UPDATED_WEBHOOK_URL!, {
               customerId,
@@ -146,7 +207,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             console.error("❌ Failed to send updated subscription email:", error);
           }
         }
-
         break;
 
       case "customer.subscription.deleted":
@@ -155,7 +215,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await supabase
           .from("profiles")
           .update({
-            subscribed_to: "lazim_free",
+            subscribed_to: "tanad_free",
             price_id: process.env.FREE_PLAN_ID,
           })
           .eq("stripe_customer_id", customerId);
