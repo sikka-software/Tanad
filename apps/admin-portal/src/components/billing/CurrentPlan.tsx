@@ -43,13 +43,11 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
 
   // Add a function to handle forced refresh with router
   const forcePageRefresh = () => {
-    console.log("CurrentPlan: Forcing page refresh via router");
     router.push({
       pathname: router.pathname,
       query: { ...router.query, refresh: Date.now() },
     });
   };
-  console.log("subscription", subscription);
 
   // Memoize the refresh function to prevent unnecessary re-renders
   const refreshData = useCallback(async () => {
@@ -60,11 +58,9 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
 
     // Refresh both subscription data and user data
     try {
-      console.log("Manually refreshing subscription and user data");
       await fetchUserAndProfile();
       await subscription.refetch();
       setLastRefreshTime(Date.now()); // Update refresh timestamp
-      console.log("Data refresh complete");
     } catch (error) {
       console.error("Error refreshing data:", error);
 
@@ -85,7 +81,6 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
   // Listen for subscription update events
   useEffect(() => {
     const handleSubscriptionUpdated = () => {
-      console.log("Subscription updated event received, refreshing data");
       refreshData();
     };
 
@@ -109,6 +104,49 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
       refreshData();
     }
   }, [user, refreshData]);
+
+  // One-time check to detect if a subscription has expired but UI hasn't updated
+  useEffect(() => {
+    // Skip if already checked or no user
+    if (!user) return;
+
+    // Get current date
+    const now = new Date();
+
+    // Also check against the cancel_at date if it exists
+    if (subscription.cancelAt) {
+      // Convert the cancelAt to a Date object
+      const cancelAtDate = new Date(subscription.cancelAt * 1000);
+
+      // If current date is past the cancelAt date, force refresh
+      if (now > cancelAtDate) {
+        // Force immediate refresh including API calls
+        refreshData().then(() => {
+          // If subscription still shows as canceling, force a full page reload
+          if (subscription.status === "canceling" || subscription.status === "active") {
+            setTimeout(() => {
+              console.log("Cancel date has passed, forcing page refresh to update status");
+              window.location.href = window.location.href.split("?")[0] + "?refresh=" + Date.now();
+            }, 1000);
+          }
+        });
+      } else {
+        // If not expired yet, but will expire soon (within 2 days), set a timer to refresh
+        const msUntilExpiration = cancelAtDate.getTime() - now.getTime();
+        const daysUntilExpiration = msUntilExpiration / (1000 * 60 * 60 * 24);
+
+        if (daysUntilExpiration < 2) {
+          const timeoutMs = Math.min(msUntilExpiration, 1000 * 60 * 60); // Max 1 hour
+          console.log(
+            `Subscription will cancel soon (${daysUntilExpiration.toFixed(1)} days). Setting refresh timer for ${(timeoutMs / 1000 / 60).toFixed(1)} minutes.`,
+          );
+          setTimeout(() => {
+            refreshData();
+          }, timeoutMs);
+        }
+      }
+    }
+  }, [user, subscription.cancelAt, subscription.status, refreshData]);
 
   // Add handler for cancel subscription
   const handleCancelSubscription = async (cancelAtPeriodEnd: boolean = true) => {
@@ -324,6 +362,8 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
     }
   };
 
+  console.log("subscription", subscription);
+
   return (
     <>
       <div className="bg-background relative flex-1 rounded-md border p-6">
@@ -356,12 +396,17 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
                     {t("Billing.free_plan_badge", { fallback: "مجانية" })}
                   </Badge>
                 )}
-                {subscription.cancelAt && (
+                {subscription.status === "canceling" && (
                   <Badge
                     variant="outline"
                     className="border-orange-200 bg-orange-50 text-orange-700"
                   >
                     {t("Billing.subscription_status.canceling", { fallback: "قيد الإلغاء" })}
+                  </Badge>
+                )}
+                {subscription.status === "canceled" && (
+                  <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700">
+                    {t("Billing.subscription_status.canceled", { fallback: "ملغي" })}
                   </Badge>
                 )}
               </div>
@@ -475,10 +520,20 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
                           )}
 
                           <p className="mt-1.5 text-orange-600">
-                            {t("Billing.service_end.message", {
-                              fallback:
-                                "ستظل جميع الميزات متاحة حتى نهاية الفترة، ثم سيتم تحويل الحساب إلى الباقة المجانية.",
-                            })}
+                            {subscription.status === "canceled"
+                              ? t("Billing.service_end.message_already_canceled", {
+                                  fallback:
+                                    "تم إلغاء الاشتراك، وسيتم تحويل الحساب إلى الباقة المجانية في التاريخ المحدد.",
+                                })
+                              : subscription.status === "canceling"
+                                ? t("Billing.service_end.message_canceling", {
+                                    fallback:
+                                      "تم إلغاء الاشتراك، وستظل جميع الميزات متاحة حتى نهاية الفترة، ثم سيتم تحويل الحساب إلى الباقة المجانية.",
+                                  })
+                                : t("Billing.service_end.message", {
+                                    fallback:
+                                      "ستظل جميع الميزات متاحة حتى نهاية الفترة، ثم سيتم تحويل الحساب إلى الباقة المجانية.",
+                                  })}
                           </p>
                         </div>
                       </div>
@@ -526,7 +581,7 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
                 onClick={() => setIsReactivateDialogOpen(true)}
               >
                 <Undo2 className="h-4 w-4" />
-                {t("Billing.reactivate_subscription", { fallback: "إعادة تفعيل الاشتراك" })}
+                {t("Billing.reactivate_subscription.title", { fallback: "إعادة تفعيل الاشتراك" })}
               </Button>
             </div>
           )}
