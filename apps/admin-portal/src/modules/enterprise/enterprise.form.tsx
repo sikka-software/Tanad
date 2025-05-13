@@ -1,12 +1,14 @@
+import { Loader2 } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+
+import { createClient } from "@/utils/supabase/component";
+
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import type React from "react";
-import { createClient } from "@/utils/supabase/component";
-import { useState } from "react";
 
 export type EnterpriseFormValues = {
   id?: string;
@@ -28,6 +30,7 @@ interface EnterpriseFormProps {
   loading?: boolean;
   onSubmit: (values: EnterpriseFormValues) => void;
   onCancel: () => void;
+  formId: string;
 }
 
 export const EnterpriseForm: React.FC<EnterpriseFormProps> = ({
@@ -36,6 +39,7 @@ export const EnterpriseForm: React.FC<EnterpriseFormProps> = ({
   loading = false,
   onSubmit,
   onCancel,
+  formId,
 }) => {
   const { register, handleSubmit, setValue, watch, formState } = useForm<EnterpriseFormValues>({
     defaultValues,
@@ -55,10 +59,14 @@ export const EnterpriseForm: React.FC<EnterpriseFormProps> = ({
       const enterpriseId = defaultValues.id || "unknown";
       const fileExt = file.name.split(".").pop();
       const fileName = `logos/${enterpriseId}-${Date.now()}.${fileExt}`;
-      const { data, error } = await supabase.storage.from("enterprise-images").upload(fileName, file);
+      const { data, error } = await supabase.storage
+        .from("enterprise-images")
+        .upload(fileName, file);
       if (error) throw error;
       // Get public URL
-      const { data: publicUrlData } = supabase.storage.from("enterprise-images").getPublicUrl(fileName);
+      const { data: publicUrlData } = supabase.storage
+        .from("enterprise-images")
+        .getPublicUrl(fileName);
       setValue("logo", publicUrlData.publicUrl, { shouldValidate: true });
     } catch (err) {
       // Optionally show a toast here
@@ -69,106 +77,65 @@ export const EnterpriseForm: React.FC<EnterpriseFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="name">Enterprise Name</Label>
-          <Input
-            readOnly={readOnly}
-            id="name"
-            {...register("name", { required: true })}
-          />
+          <Input readOnly={readOnly} id="name" {...register("name", { required: true })} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="industry">Industry</Label>
-          <Input
-            readOnly={readOnly}
-            id="industry"
-            {...register("industry")}
-          />
+          <Input readOnly={readOnly} id="industry" {...register("industry")} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="founded">Founded</Label>
-          <Input
-            readOnly={readOnly}
-            id="founded"
-            {...register("founded")}
-          />
+          <Input readOnly={readOnly} id="founded" {...register("founded")} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="employees">Number of Employees</Label>
-          <Input
-            readOnly={readOnly}
-            id="employees"
-            {...register("employees")}
-          />
+          <Input readOnly={readOnly} id="employees" {...register("employees")} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="website">Website</Label>
-          <Input
-            readOnly={readOnly}
-            id="website"
-            {...register("website")}
-          />
+          <Input readOnly={readOnly} id="website" {...register("website")} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
-          <Input
-            readOnly={readOnly}
-            id="email"
-            {...register("email")}
-          />
+          <Input readOnly={readOnly} id="email" {...register("email")} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="phone">Phone</Label>
-          <Input
-            readOnly={readOnly}
-            id="phone"
-            {...register("phone")}
-          />
+          <Input readOnly={readOnly} id="phone" {...register("phone")} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="logo">Logo</Label>
           {logoUrl && (
-            <img src={logoUrl} alt="Enterprise Logo" className="h-16 w-16 rounded-md border object-contain mb-2" />
+            <img
+              src={logoUrl}
+              alt="Enterprise Logo"
+              className="mb-2 h-16 w-16 rounded-md border object-contain"
+            />
           )}
           {!readOnly && (
-            <Input type="file" id="logo-upload" accept="image/*" onChange={handleLogoUpload} disabled={uploading} />
+            <Input
+              type="file"
+              id="logo-upload"
+              accept="image/*"
+              onChange={handleLogoUpload}
+              disabled={uploading}
+            />
           )}
-          <Input
-            readOnly={true}
-            id="logo"
-            {...register("logo")}
-          />
+          <Input readOnly={true} id="logo" {...register("logo")} />
         </div>
       </div>
       <div className="space-y-2">
         <Label htmlFor="address">Address</Label>
-        <Input
-          readOnly={readOnly}
-          id="address"
-          {...register("address")}
-        />
+        <Input readOnly={readOnly} id="address" {...register("address")} />
       </div>
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
-        <Textarea
-          readOnly={readOnly}
-          id="description"
-          {...register("description")}
-          rows={4}
-        />
+        <Textarea readOnly={readOnly} id="description" {...register("description")} rows={4} />
       </div>
-      {!readOnly && (
-        <div className="flex gap-2 justify-end">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={loading}>
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
-          </Button>
-        </div>
-      )}
     </form>
   );
 };

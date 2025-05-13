@@ -1,7 +1,7 @@
 "use client";
 
 import { pick } from "lodash";
-import { Asterisk, Edit, Save, X, Loader2 } from "lucide-react";
+import { Asterisk, Edit, Loader2 } from "lucide-react";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import type React from "react";
@@ -9,18 +9,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { EnterpriseForm, EnterpriseFormValues } from "@/modules/enterprise/enterprise.form";
 import useUserStore from "@/stores/use-user-store";
@@ -36,16 +25,6 @@ const EnterprisePage = () => {
   const [enterpriseData, setEnterpriseData] = useState(enterprise);
   const [formData, setFormData] = useState(enterprise);
   const [isSaving, setIsSaving] = useState(false);
-
-  //   const isSuperAdmin = userRole === "superadmin";
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -87,12 +66,15 @@ const EnterprisePage = () => {
       <div className="mx-auto flex flex-col gap-4 p-4">
         <div className="flex flex-row items-start justify-between">
           <div className="flex items-center gap-4">
-            <Asterisk className="h-16 w-16 rounded-md border object-contain p-2" />
-            {/* <img
-                src={enterpriseData.name || "/placeholder.svg"}
+            {enterpriseData.logo ? (
+              <img
+                src={enterpriseData.logo}
                 alt={`${enterpriseData.name} logo`}
                 className="h-16 w-16 rounded-md border object-contain p-2"
-              /> */}
+              />
+            ) : (
+              <Asterisk className="h-16 w-16 rounded-md border object-contain p-2" />
+            )}
             <div>
               <CardTitle>{enterpriseData.name}</CardTitle>
               <CardDescription>{enterpriseData.industry}</CardDescription>
@@ -103,7 +85,7 @@ const EnterprisePage = () => {
               <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
                 {t("General.cancel")}
               </Button>
-              <Button onClick={handleSave} disabled={isSaving}>
+              <Button form="enterprise-form" type="submit" disabled={isSaving}>
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("General.save")}
               </Button>
             </div>
@@ -123,7 +105,9 @@ const EnterprisePage = () => {
                 ...formData,
                 industry: formData.industry ?? undefined,
                 email: formData.email ?? undefined,
+                logo: formData.logo ?? undefined,
               }}
+              formId="enterprise-form"
               readOnly={!isEditing}
               loading={isSaving}
               onSubmit={async (values) => {

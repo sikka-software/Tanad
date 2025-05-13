@@ -48,6 +48,7 @@ interface EnterpriseType {
   email: string | null;
   industry: string | null;
   size: string | null;
+  logo: string | null;
 }
 
 interface MembershipType {
