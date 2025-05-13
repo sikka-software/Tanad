@@ -18,12 +18,6 @@ const useWebsiteColumns = (
       header: t("Websites.form.domain_name.label"),
       validationSchema: z.string().min(1, t("Websites.form.domain_name.required")),
     },
-
-    {
-      accessorKey: "notes",
-      header: t("Websites.form.notes.label"),
-      validationSchema: z.string().nullable(),
-    },
     {
       accessorKey: "created_at",
       header: t("Websites.form.created_at.label"),

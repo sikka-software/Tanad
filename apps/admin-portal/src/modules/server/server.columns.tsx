@@ -35,7 +35,6 @@ const useServerColumns = (
       options: SERVER_OS,
     },
     { accessorKey: "tags", header: t("Servers.form.tags.label") },
-    { accessorKey: "notes", header: t("Servers.form.notes.label") },
     {
       accessorKey: "status",
       maxSize: 80,

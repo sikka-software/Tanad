@@ -50,11 +50,6 @@ const useEmployeeRequestColumns = () => {
       validationSchema: z.string().nullable(),
     },
     {
-      accessorKey: "notes",
-      header: t("EmployeeRequests.form.notes.label"),
-      validationSchema: z.string().nullable(),
-    },
-    {
       accessorKey: "status",
       header: t("EmployeeRequests.form.status.label"),
       cell: ({ row }: { row: { original: EmployeeRequest } }) => {

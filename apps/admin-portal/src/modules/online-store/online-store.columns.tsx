@@ -26,11 +26,6 @@ const useOnlineStoreColumns = (
       options: E_COMMERCE_PLATFORMS,
     },
     {
-      accessorKey: "notes",
-      header: t("OnlineStores.form.notes.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
       accessorKey: "status",
       maxSize: 80,
       header: t("OnlineStores.form.status.label"),
