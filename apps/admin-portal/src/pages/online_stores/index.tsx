@@ -135,7 +135,7 @@ export default function OnlineStoresPage() {
             columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("OnlineStores.title")}
+            title={t("Pages.OnlineStores.title")}
             onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.OnlineStores.add")}
             searchPlaceholder={t("Pages.OnlineStores.search")}

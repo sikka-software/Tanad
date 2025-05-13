@@ -72,9 +72,9 @@ export const useUpdateEmployee = () => {
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: EmployeeUpdateData }) =>
-      updateEmployee(id, updates),
-    onMutate: async ({ id, updates }) => {
+    mutationFn: ({ id, data }: { id: string; data: EmployeeUpdateData }) =>
+      updateEmployee(id, data),
+    onMutate: async ({ id, data }) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: employeeKeys.lists() });
       await queryClient.cancelQueries({ queryKey: employeeKeys.detail(id) });
@@ -84,7 +84,7 @@ export const useUpdateEmployee = () => {
       const previousEmployee = queryClient.getQueryData(employeeKeys.detail(id));
 
       // Prepare updates to apply optimistically
-      const optimisticUpdates = { ...updates };
+      const optimisticUpdates = { ...data };
 
       // Optimistically update the cache
       queryClient.setQueryData(employeeKeys.lists(), (old: Employee[] | undefined) => {

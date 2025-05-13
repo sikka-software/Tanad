@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import NotesSection from "@root/src/components/forms/notes-section";
 import BooleanTabs from "@root/src/components/ui/boolean-tabs";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@root/src/components/ui/tooltip";
 import { getNotesValue } from "@root/src/lib/utils";
 import { PlusCircle, Trash2Icon } from "lucide-react";
@@ -11,7 +12,6 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import CountryInput from "@/ui/country-input";
 import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
@@ -33,7 +33,12 @@ import useDepartmentStore from "@/department/department.store";
 
 import { SALARY_COMPONENT_TYPES } from "@/employee/employee.options";
 import useEmployeeStore from "@/employee/employee.store";
-import type { EmployeeCreateData, EmployeeUpdateData } from "@/employee/employee.types";
+import {
+  EmployeeStatus,
+  EmployeeStatusProps,
+  type EmployeeCreateData,
+  type EmployeeUpdateData,
+} from "@/employee/employee.types";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -127,7 +132,7 @@ export function EmployeeForm({
         required_error: t("Employees.form.hire_date.required"),
       }),
       salary: z.array(salaryComponentSchema).optional(),
-      status: z.enum(["active", "inactive", "on_leave", "terminated"]),
+      status: z.enum(EmployeeStatus),
       nationality: z.string().optional(),
       notes: z.any().optional().nullable(),
     });
@@ -143,11 +148,7 @@ export function EmployeeForm({
       job_id: defaultValues?.job_id || "",
       hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
       salary: defaultValues?.salary as { type: string; amount: number }[] | undefined,
-      status: (["active", "inactive", "on_leave", "terminated"].includes(
-        (defaultValues?.status || "") as string,
-      )
-        ? defaultValues?.status
-        : "active") as "active" | "inactive" | "on_leave" | "terminated",
+      status: (defaultValues?.status as EmployeeStatusProps) || "active",
       notes: getNotesValue(defaultValues) || "",
       nationality: defaultValues?.nationality || "",
     },
@@ -163,7 +164,7 @@ export function EmployeeForm({
         : "active";
       form.reset({
         ...defaultValues,
-        status: mappedStatus as "active" | "inactive" | "on_leave" | "terminated",
+        status: mappedStatus as EmployeeStatusProps,
         hire_date: defaultValues.hire_date ? new Date(defaultValues.hire_date) : undefined,
         job_id: defaultValues.job_id || "",
         phone: defaultValues.phone || "",
@@ -225,7 +226,7 @@ export function EmployeeForm({
       if (editMode) {
         await updateEmployeeMutate({
           id: actualEmployeeId!,
-          updates: { ...finalSubmitData },
+          data: { ...finalSubmitData },
         });
         onSuccess?.();
       } else {
