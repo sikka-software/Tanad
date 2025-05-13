@@ -1,3 +1,4 @@
+import SelectCell from "@root/src/components/tables/select-cell";
 import StatusCell from "@root/src/components/tables/status-cell";
 import { MoneyFormatter } from "@root/src/components/ui/currency-input";
 import { getCurrencySymbol } from "@root/src/lib/currency-utils";
@@ -23,15 +24,21 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
     {
       accessorKey: "type",
       header: t("Jobs.form.type.label"),
-      cellType: "select",
-      options: [
-        { label: t("Jobs.form.type.full_time"), value: "full_time" },
-        { label: t("Jobs.form.type.part_time"), value: "part_time" },
-        { label: t("Jobs.form.type.contract"), value: "contract" },
-        { label: t("Jobs.form.type.internship"), value: "internship" },
-        { label: t("Jobs.form.type.temporary"), value: "temporary" },
-      ],
       validationSchema: z.string().min(1, t("Jobs.form.type.required")),
+      noPadding: true,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "type", value)}
+          cellValue={getValue()}
+          options={[
+            { label: t("Jobs.form.type.full_time"), value: "full_time" },
+            { label: t("Jobs.form.type.part_time"), value: "part_time" },
+            { label: t("Jobs.form.type.contract"), value: "contract" },
+            { label: t("Jobs.form.type.internship"), value: "internship" },
+            { label: t("Jobs.form.type.temporary"), value: "temporary" },
+          ]}
+        />
+      ),
     },
     {
       accessorKey: "department",

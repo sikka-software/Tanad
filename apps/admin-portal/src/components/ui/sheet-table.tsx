@@ -25,8 +25,6 @@ import {
   Row as TanStackRow,
   ColumnSizingState,
   getPaginationRowModel,
-  VisibilityState,
-  SortingState,
   ExpandedState,
   ColumnFiltersState,
   getSortedRowModel,
@@ -37,22 +35,10 @@ import { useLocale, useTranslations } from "next-intl";
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableFooter,
-} from "@/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 
-// ** import lib
 import { cn } from "@/lib/utils";
 
-import CodeInput from "./code-input";
-import { CommandSelect } from "./command-select";
-import { Input } from "./input";
 import RowActionsPopover from "./popovers/row-actions-popover";
 
 export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
@@ -61,7 +47,6 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
 > & {
   id?: string;
   accessorKey?: string;
-  cellType?: "text" | "select";
   options?: Array<{ label: string; value: string | number | boolean }>;
   validationSchema?: ZodType<any, ZodTypeDef, any>;
   className?: string | ((row: TData) => string); // Allows static or dynamic class names
@@ -777,52 +762,6 @@ function SheetTable<
             const rawCellContent = flexRender(cell.column.columnDef.cell, cell.getContext());
 
             let cellContent: React.ReactNode = rawCellContent;
-
-            // if cell type is select, show a select element
-            if (colDef.cellType === "select" && colDef.options) {
-              const cellValue = cell.getValue() as string | number;
-
-              return (
-                <TableCell
-                  key={cell.id}
-                  className={cn(
-                    "force-maxwidth-cell relative overflow-hidden border p-0",
-                    {
-                      "bg-muted": isDisabled,
-                      "bg-destructive/25": errorMsg,
-                    },
-                    typeof colDef.className === "function"
-                      ? colDef.className(rowData)
-                      : colDef.className,
-                  )}
-                  style={{ ...style, overflow: "hidden", minWidth: 0 }}
-                >
-                  <CommandSelect
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                    data={colDef.options}
-                    inCell
-                    isLoading={false}
-                    defaultValue={String(cellValue)}
-                    popoverClassName="w-full max-w-full"
-                    buttonClassName="bg-transparent w-full max-w-full"
-                    valueKey="value"
-                    labelKey="label"
-                    onChange={async (value) => {
-                      if (onEdit) {
-                        onEdit(rowId, colKey as keyof T, value as T[keyof T]);
-                      }
-                    }}
-                    texts={{
-                      placeholder: ". . .",
-                    }}
-                    renderOption={(item) => {
-                      return <div>{item.label}</div>;
-                    }}
-                    ariaInvalid={false}
-                  />
-                </TableCell>
-              );
-            }
 
             return (
               <TableCell

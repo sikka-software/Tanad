@@ -1,3 +1,4 @@
+import SelectCell from "@root/src/components/tables/select-cell";
 import StatusCell from "@root/src/components/tables/status-cell";
 import { E_COMMERCE_PLATFORMS } from "@root/src/lib/constants";
 import { useTranslations } from "next-intl";
@@ -20,10 +21,16 @@ const useOnlineStoreColumns = (
     },
     {
       accessorKey: "platform",
-      cellType: "select",
       header: t("OnlineStores.form.platform.label"),
       validationSchema: z.string().min(1, "Required"),
-      options: E_COMMERCE_PLATFORMS,
+      noPadding: true,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "platform", value)}
+          cellValue={getValue()}
+          options={[E_COMMERCE_PLATFORMS]}
+        />
+      ),
     },
     {
       accessorKey: "status",

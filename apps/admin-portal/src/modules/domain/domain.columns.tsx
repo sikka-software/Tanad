@@ -1,4 +1,5 @@
 import CurrencyCell from "@root/src/components/tables/currency-cell";
+import SelectCell from "@root/src/components/tables/select-cell";
 import StatusCell from "@root/src/components/tables/status-cell";
 import useUserStore from "@root/src/stores/use-user-store";
 import { useTranslations } from "next-intl";
@@ -38,11 +39,17 @@ const useDomainColumns = (
     },
     {
       accessorKey: "payment_cycle",
-      cellType: "select",
-      options: [
-        { label: t("Domains.form.payment_cycle.monthly"), value: "monthly" },
-        { label: t("Domains.form.payment_cycle.annual"), value: "annual" },
-      ],
+      noPadding: true,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "payment_cycle", value)}
+          cellValue={getValue()}
+          options={[
+            { label: t("Domains.form.payment_cycle.monthly"), value: "monthly" },
+            { label: t("Domains.form.payment_cycle.annual"), value: "annual" },
+          ]}
+        />
+      ),
       header: t("Domains.form.payment_cycle.label"),
       validationSchema: z.string().min(1, "Required"),
     },

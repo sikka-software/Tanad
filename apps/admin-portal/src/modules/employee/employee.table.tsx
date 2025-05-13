@@ -28,40 +28,7 @@ const EmployeesTable = ({
 }: ModuleTableProps<Employee>) => {
   const t = useTranslations();
   const { data: departments } = useDepartments();
-
-  const columns = useEmployeeColumns();
-
   const { mutateAsync: updateEmployee } = useUpdateEmployee();
-  const selectedRows = useEmployeeStore((state) => state.selectedRows);
-  const setSelectedRows = useEmployeeStore((state) => state.setSelectedRows);
-
-  const columnVisibility = useEmployeeStore((state) => state.columnVisibility);
-  const setColumnVisibility = useEmployeeStore((state) => state.setColumnVisibility);
-
-  const canEditEmployee = useUserStore((state) => state.hasPermission("employees.update"));
-  const canDuplicateEmployee = useUserStore((state) => state.hasPermission("employees.duplicate"));
-  const canViewEmployee = useUserStore((state) => state.hasPermission("employees.view"));
-  const canArchiveEmployee = useUserStore((state) => state.hasPermission("employees.archive"));
-  const canDeleteEmployee = useUserStore((state) => state.hasPermission("employees.delete"));
-
-  const [currentData, setCurrentData] = useState<Employee[]>(data);
-  const [pendingUpdates, setPendingUpdates] = useState<Record<string, EmployeeUpdateData>>({});
-
-  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  useEffect(() => {
-    setCurrentData(data);
-  }, [data]);
-
-  const handleRowSelectionChange = useCallback(
-    (rows: Employee[]) => {
-      const newSelectedIds = rows.map((row) => row.id);
-      if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-        setSelectedRows(newSelectedIds);
-      }
-    },
-    [selectedRows, setSelectedRows],
-  );
 
   // Create a memoized handleEdit function
   const handleEdit = useCallback(
@@ -119,6 +86,39 @@ const EmployeesTable = ({
       );
     },
     [data, departments, updateEmployee],
+  );
+
+  const columns = useEmployeeColumns(handleEdit);
+
+  const selectedRows = useEmployeeStore((state) => state.selectedRows);
+  const setSelectedRows = useEmployeeStore((state) => state.setSelectedRows);
+
+  const columnVisibility = useEmployeeStore((state) => state.columnVisibility);
+  const setColumnVisibility = useEmployeeStore((state) => state.setColumnVisibility);
+
+  const canEditEmployee = useUserStore((state) => state.hasPermission("employees.update"));
+  const canDuplicateEmployee = useUserStore((state) => state.hasPermission("employees.duplicate"));
+  const canViewEmployee = useUserStore((state) => state.hasPermission("employees.view"));
+  const canArchiveEmployee = useUserStore((state) => state.hasPermission("employees.archive"));
+  const canDeleteEmployee = useUserStore((state) => state.hasPermission("employees.delete"));
+
+  const [currentData, setCurrentData] = useState<Employee[]>(data);
+  const [pendingUpdates, setPendingUpdates] = useState<Record<string, EmployeeUpdateData>>({});
+
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
+
+  useEffect(() => {
+    setCurrentData(data);
+  }, [data]);
+
+  const handleRowSelectionChange = useCallback(
+    (rows: Employee[]) => {
+      const newSelectedIds = rows.map((row) => row.id);
+      if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
+        setSelectedRows(newSelectedIds);
+      }
+    },
+    [selectedRows, setSelectedRows],
   );
 
   if (isLoading) {

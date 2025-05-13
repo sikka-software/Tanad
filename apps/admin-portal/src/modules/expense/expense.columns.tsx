@@ -1,3 +1,4 @@
+import SelectCell from "@root/src/components/tables/select-cell";
 import { MoneyFormatter } from "@root/src/components/ui/currency-input";
 import { getCurrencySymbol } from "@root/src/lib/currency-utils";
 import useUserStore from "@root/src/stores/use-user-store";
@@ -8,7 +9,9 @@ import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { Expense } from "./expense.type";
 
-const useExpenseColumns = () => {
+const useExpenseColumns = (
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
   const currency = useUserStore((state) => state.profile?.user_settings?.currency);
 
@@ -52,13 +55,19 @@ const useExpenseColumns = () => {
       accessorKey: "status",
       header: t("Expenses.form.status.label"),
       validationSchema: z.enum(["paid", "pending", "rejected", "overdue"]),
-      cellType: "select",
-      options: [
-        { label: t("Expenses.form.status.paid"), value: "paid" },
-        { label: t("Expenses.form.status.pending"), value: "pending" },
-        { label: t("Expenses.form.status.rejected"), value: "rejected" },
-        { label: t("Expenses.form.status.overdue"), value: "overdue" },
-      ],
+      noPadding: true,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "status", value)}
+          cellValue={getValue()}
+          options={[
+            { label: t("Expenses.form.status.paid"), value: "paid" },
+            { label: t("Expenses.form.status.pending"), value: "pending" },
+            { label: t("Expenses.form.status.rejected"), value: "rejected" },
+            { label: t("Expenses.form.status.overdue"), value: "overdue" },
+          ]}
+        />
+      ),
     },
   ];
 

@@ -26,24 +26,6 @@ const useOfficeColumns = (
       header: t("Offices.form.name.label"),
       validationSchema: z.string().min(1, t("Offices.form.name.required")),
     },
-    // {
-    //   cellType: "code",
-    //   onSerial: (row, rowIndex) => {
-    //     const paddedNumber = String(rowIndex + 1).padStart(4, "0");
-    //     handleEdit?.(row.id, "code", `OF-${paddedNumber}`);
-    //   },
-    //   onRandom: (row) => {
-    //     const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    //     let randomCode = "";
-    //     for (let i = 0; i < 5; i++) {
-    //       randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
-    //     }
-    //     handleEdit?.(row.id, "code", `OF-${randomCode}`);
-    //   },
-    //   accessorKey: "code",
-    //   header: t("Offices.form.code.label"),
-    //   validationSchema: z.string().min(1, t("Offices.form.code.required")),
-    // },
     {
       noPadding: true,
       accessorKey: "code",

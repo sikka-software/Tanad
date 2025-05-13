@@ -25,7 +25,7 @@ const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps
     await updateCar({ id: rowId, data: { [columnId]: value } });
   };
 
-  const columns = useCarColumns();
+  const columns = useCarColumns(handleEdit);
   const selectedRows = useCarStore((state) => state.selectedRows);
   const setSelectedRows = useCarStore((state) => state.setSelectedRows);
 

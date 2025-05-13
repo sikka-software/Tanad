@@ -1,3 +1,4 @@
+import SelectCell from "@root/src/components/tables/select-cell";
 import StatusCell from "@root/src/components/tables/status-cell";
 import { SERVER_OS, SERVER_PROVIDERS } from "@root/src/lib/constants";
 import { useTranslations } from "next-intl";
@@ -25,14 +26,26 @@ const useServerColumns = (
     {
       accessorKey: "provider",
       header: t("Servers.form.provider.label"),
-      cellType: "select",
-      options: SERVER_PROVIDERS,
+      noPadding: true,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "provider", value)}
+          cellValue={getValue()}
+          options={SERVER_PROVIDERS}
+        />
+      ),
     },
     {
       accessorKey: "os",
       header: t("Servers.form.os.label"),
-      cellType: "select",
-      options: SERVER_OS,
+      noPadding: true,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "os", value)}
+          cellValue={getValue()}
+          options={SERVER_OS}
+        />
+      ),
     },
     { accessorKey: "tags", header: t("Servers.form.tags.label") },
     {

@@ -18,7 +18,6 @@ import useExpenseColumns from "./expense.columns";
 const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Expense>) => {
   const t = useTranslations();
 
-  const columns = useExpenseColumns();
   const { mutate: updateExpense } = useUpdateExpense();
 
   const setData = useExpenseStore((state) => state.setData);
@@ -28,6 +27,8 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
     await updateExpense({ id: rowId, data: { [columnId]: value } });
   };
+
+  const columns = useExpenseColumns(handleEdit);
 
   const selectedRows = useExpenseStore((state) => state.selectedRows);
   const setSelectedRows = useExpenseStore((state) => state.setSelectedRows);
