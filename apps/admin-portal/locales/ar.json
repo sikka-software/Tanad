@@ -1432,7 +1432,6 @@
     "tanad_pro": "تند برو",
     "tanad_business": "تند للأعمال",
     "tanad_enterprise": "تند للمؤسسات",
-
     "manage_billing_description": "إدارة معلومات الفوترة وطرق الدفع",
     "update_plan": "تحديث الخطة",
     "need_custom_solution": "هل تحتاج إلى حل مخصص؟",
@@ -1446,7 +1445,9 @@
       "confirm": "تأكيد",
       "features_end_notice": "ستظل جميع الميزات متاحة حتى نهاية دورة الفوترة الحالية.",
       "cancel_at_period_end": "إلغاء في نهاية دورة الفوترة الحالية",
-      "immediate_cancellation_notice": "سيتم إلغاء اشتراكك على الفور وستفقد الوصول إلى الميزات المتقدمة."
+      "immediate_cancellation_notice": "سيتم إلغاء اشتراكك على الفور وستفقد الوصول إلى الميزات المتقدمة.",
+      "alternative_option": "أو يمكنك إلغاء الاشتراك في التاريخ المحدد.",
+      "immediate_option": "إلغاء على الفور"
     },
     "Invoices": {
       "title": "الفواتير",
@@ -1513,6 +1514,7 @@
     "choose_the_right_plan": "اختر الخطة المناسبة لعملك",
     "tanad_free_description": "الخطة المجانية للاستخدام الشخصي",
     "available_plans": "الخطط المتاحة",
+
     "subscription_status": {
       "active": "مفعل",
       "inactive": "غير مفعل",
@@ -1533,10 +1535,25 @@
       "minutes": "دقائق",
       "seconds": "ثواني",
       "message": "ستظل جميع الميزات متاحة حتى نهاية دورة الفوترة الحالية.",
+      "message_canceling": "ستظل جميع الميزات متاحة حتى نهاية دورة الفوترة الحالية.",
+      "message_expired": "تم إلغاء الاشتراك، وسيتم تحويل الحساب إلى الباقة المجانية في التاريخ المحدد.",
+      "message_pending": "تم إلغاء الاشتراك، وسيتم تحويل الحساب إلى الباقة المجانية في التاريخ المحدد.",
+      "message_failed": "تم إلغاء الاشتراك، وسيتم تحويل الحساب إلى الباقة المجانية في التاريخ المحدد.",
+      "message_refunded": "تم إلغاء الاشتراك، وسيتم تحويل الحساب إلى الباقة المجانية في التاريخ المحدد.",
+
       "message_already_canceled": "تم إلغاء الاشتراك، وسيتم تحويل الحساب إلى الباقة المجانية في التاريخ المحدد."
     },
+
     "most_popular": "أكثر شعبية",
-    "reactivate_subscription": "إعادة تفعيل الاشتراك",
+    "reactivate_subscription": {
+      "title": "إعادة تفعيل الاشتراك",
+      "description": "إعادة تفعيل الاشتراك للحصول على الميزات المتقدمة",
+      "button": "إعادة تفعيل الاشتراك",
+      "confirm": "تأكيد",
+      "cancel": "إلغاء",
+      "message": "تم إعادة تفعيل الاشتراك، وسيتم تحويل الحساب إلى الباقة المجانية في التاريخ المحدد.",
+      "processing": "يتم المعالجة"
+    },
     "payment": {
       "dialog_title": "طريقة الدفع",
       "selected_plan_price": "السعر: {{price}}",
@@ -1568,7 +1585,7 @@
       "processing": "يتم المعالجة",
       "setting_up": "يتم إعداد الدفع"
     },
-
+    "next_billing_date": "التاريخ القادم للفوترة",
     "billing_cycle": "دورة الفوترة",
     "next_billing": {
       "title": "الفوترة القادمة"
@@ -1626,12 +1643,13 @@
       "biomitric_auth": "مصادقة بيومترية",
       "complete_white_label": "علامة بيضاء كاملة",
       "enterprise_integrations": "تكامل المؤسسة",
-
       "invoice_customization": "تخصيص الفواتير",
       "employee_management": "إدارة الموظفين",
       "payroll_processing": "معالجة الرواتب",
       "vendor_management": "إدارة الموردين",
-      "product_management": "إدارة المنتجات"
+      "product_management": "إدارة المنتجات",
+      "multiple_payment_gateways": "أبواب الدفع المتعددة",
+      "biometric_auth": "مصادقة بيومترية"
     },
 
     "selected_plan_button": "اختر الخطة",
