@@ -47,6 +47,9 @@ export const useCreateDepartment = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
+    meta: {
+      toast: { success: "Departments.success.create", error: "Departments.error.create" },
+    },
   });
 };
 
@@ -61,6 +64,9 @@ export const useUpdateDepartment = () => {
       queryClient.invalidateQueries({ queryKey: departmentKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
+    meta: {
+      toast: { success: "Departments.success.update", error: "Departments.error.update" },
+    },
   });
 };
 
@@ -72,6 +78,9 @@ export const useDuplicateDepartment = () => {
     mutationFn: (id: string) => duplicateDepartment(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
+    },
+    meta: {
+      toast: { success: "Departments.success.duplicate", error: "Departments.error.duplicate" },
     },
   });
 };
@@ -86,6 +95,7 @@ export const useDeleteDepartment = () => {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
       queryClient.removeQueries({ queryKey: departmentKeys.detail(variables) });
     },
+    meta: { toast: { success: "Departments.success.delete", error: "Departments.error.delete" } },
   });
 };
 

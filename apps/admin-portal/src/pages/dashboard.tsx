@@ -43,7 +43,7 @@ export default function Dashboard() {
     totalRoles: 0,
     totalJobListings: 0,
     totalEmployeeRequests: 0,
-    totalApplicants: 0,
+    // totalApplicants: 0,
     totalUsers: 0,
     totalDomains: 0,
     totalWebsites: 0,
@@ -77,6 +77,12 @@ export default function Dashboard() {
 
       // --- Fetch Stats --- (extracted logic)
       const fetchStats = async () => {
+        const entUsers = await supabase;
+        //   .from("users")
+        //   .select("id", { count: "exact", head: true })
+        //   .eq("enterprise_id", enterpriseId);
+
+        // console.log("entUsers", entUsers);
         try {
           const fetchCount = async (
             tableName: string,
@@ -109,9 +115,9 @@ export default function Dashboard() {
           };
 
           const [
-            pendingInvoicesCount,
-            totalInvoices,
-            totalRevenue,
+            // pendingInvoicesCount,
+            // totalInvoices,
+            // totalRevenue,
             totalProducts,
             totalEmployees,
             totalDepartments,
@@ -131,16 +137,16 @@ export default function Dashboard() {
             totalRoles,
             totalJobListings,
             totalEmployeeRequests,
-            totalApplicants,
+            // totalApplicants,
             totalUsers,
             totalDomains,
             totalWebsites,
             totalServers,
             totalOnlineStores,
           ] = await Promise.all([
-            fetchSum("invoices", "total"),
-            fetchCount("invoices"),
-            fetchCount("invoices", { status: "pending" }),
+            // fetchSum("invoices", "total"),
+            // fetchCount("invoices"),
+            // fetchCount("invoices", { status: "pending" }),
             fetchCount("products"),
             fetchCount("employees"),
             fetchCount("departments"),
@@ -160,7 +166,7 @@ export default function Dashboard() {
             fetchCount("roles"),
             fetchCount("job_listings"),
             fetchCount("employee_requests"),
-            fetchCount("applicants"),
+            // fetchCount("applicants"),
             fetchCount("users"),
             fetchCount("domains"),
             fetchCount("websites"),
@@ -168,38 +174,36 @@ export default function Dashboard() {
             fetchCount("online_stores"),
           ]);
 
-          if (isMounted) {
-            setStats({
-              totalInvoices,
-              pendingInvoices: pendingInvoicesCount,
-              totalRevenue,
-              totalProducts,
-              totalEmployees,
-              totalDepartments,
-              totalJobs,
-              totalClients,
-              totalCompanies,
-              totalVendors,
-              totalOffices,
-              totalWarehouses,
-              totalBranches,
-              totalCars,
-              totalTrucks,
-              totalExpenses,
-              totalPurchases,
-              totalSalaries,
-              totalQuotes,
-              totalRoles,
-              totalJobListings,
-              totalEmployeeRequests,
-              totalApplicants,
-              totalUsers,
-              totalDomains,
-              totalWebsites,
-              totalServers,
-              totalOnlineStores,
-            });
-          }
+          setStats({
+            // totalInvoices,
+            // pendingInvoices: pendingInvoicesCount,
+            // totalRevenue,
+            totalProducts,
+            totalEmployees,
+            totalDepartments,
+            totalJobs,
+            totalClients,
+            totalCompanies,
+            totalVendors,
+            totalOffices,
+            totalWarehouses,
+            totalBranches,
+            totalCars,
+            totalTrucks,
+            totalExpenses,
+            totalPurchases,
+            totalSalaries,
+            totalQuotes,
+            totalRoles,
+            totalJobListings,
+            totalEmployeeRequests,
+            // totalApplicants,
+            totalUsers,
+            totalDomains,
+            totalWebsites,
+            totalServers,
+            totalOnlineStores,
+          });
         } catch (err) {
           console.error("Error fetching dashboard stats:", err);
           if (isMounted) {
@@ -297,7 +301,7 @@ export default function Dashboard() {
         />
         <div className="flex flex-col items-center justify-center gap-4 p-8">
           <h2 className="text-xl font-semibold">{t("Pages.Dashboard.title")}</h2>
-          <p className="text-muted-foreground">{statsError}</p>
+          <p className="text-muted-foreground">ERROR:{statsError}</p>
         </div>
       </DataPageLayout>
     );

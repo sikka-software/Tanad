@@ -26,7 +26,6 @@ const userKeys = {
 // Hook to fetch all users for an enterprise
 export function useUsers() {
   const { enterprise } = useUserStore();
-
   return useQuery({
     queryKey: userKeys.lists(),
     queryFn: () => {
