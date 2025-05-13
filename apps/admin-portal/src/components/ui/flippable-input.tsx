@@ -67,12 +67,7 @@ function FlippableInput({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.15, delay: 0.3 }}
-            className={cn(
-              "absolute top-0.5 h-10 w-10",
-              getDirectionClasses(),
-              // isFlipped ? "!rtl:-end-1.5 start-0.5" : "!rtl:start-0.5 -end-1.5",
-              // isFlipped ? "-end-1.5" : "start-0.5",
-            )}
+            className={cn("absolute top-0.5 h-10 w-10", getDirectionClasses())}
           >
             <IconButton
               variant="ghost"

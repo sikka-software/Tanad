@@ -128,19 +128,19 @@ const useUserStore = create<UserState>((set, get) => ({
   },
 
   fetchUserAndProfile: async () => {
-    console.log("[UserStore] fetchUserAndProfile called (pre-loading check)");
-    console.trace("[UserStore] fetchUserAndProfile stack trace");
+    // console.log("[UserStore] fetchUserAndProfile called (pre-loading check)");
+    // console.trace("[UserStore] fetchUserAndProfile stack trace");
     // Timeout failsafe: set loading to false after 10s if still loading
     const timeout = setTimeout(() => {
       if (get().loading) {
         set({ loading: false });
-        console.warn("[UserStore] Failsafe: loading still true after 10s, forcing to false");
+        // console.warn("[UserStore] Failsafe: loading still true after 10s, forcing to false");
       }
     }, 10000);
 
     // Skip if window just regained focus and we've fetched recently
     if (window.tanadSubscriptionDataCached) {
-      console.log("[UserStore] Skipping user data fetch - window just regained focus");
+      // console.log("[UserStore] Skipping user data fetch - window just regained focus");
       return;
     }
 
@@ -148,15 +148,17 @@ const useUserStore = create<UserState>((set, get) => ({
     const now = Date.now();
     const lastFetch = get().lastFetchTime;
     if (lastFetch && now - lastFetch < 10000) {
-      console.log("[UserStore] Skipping user data fetch - fetched recently");
+      // console.log("[UserStore] Skipping user data fetch - fetched recently");
       return;
     }
 
     try {
       set({ loading: true, error: null });
-      console.log("[UserStore] Fetching session...");
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log("[UserStore] Session:", session);
+      // console.log("[UserStore] Fetching session...");
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      // console.log("[UserStore] Session:", session);
 
       if (!session) {
         set({
@@ -169,12 +171,12 @@ const useUserStore = create<UserState>((set, get) => ({
           lastFetchTime: now,
         });
         clearTimeout(timeout);
-        console.log("[UserStore] No session found, set loading false");
+        // console.log("[UserStore] No session found, set loading false");
         return;
       }
 
       set({ user: session.user });
-      console.log("[UserStore] Fetching profile for user", session.user.id);
+      // console.log("[UserStore] Fetching profile for user", session.user.id);
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("*")
@@ -183,11 +185,11 @@ const useUserStore = create<UserState>((set, get) => ({
       if (profileError) {
         console.error("[UserStore] Profile fetch error:", profileError);
       }
-      console.log("[UserStore] Profile data:", profileData);
+      // console.log("[UserStore] Profile data:", profileData);
 
       if (profileData) {
         set({ profile: profileData as ProfileType });
-        console.log("[UserStore] Fetching membership for user", session.user.id);
+        // console.log("[UserStore] Fetching membership for user", session.user.id);
         const { data: membershipData, error: membershipError } = await supabase
           .from("memberships")
           .select("*")
@@ -196,10 +198,10 @@ const useUserStore = create<UserState>((set, get) => ({
         if (membershipError) {
           console.error("[UserStore] Membership fetch error:", membershipError);
         }
-        console.log("[UserStore] Membership data:", membershipData);
+        // console.log("[UserStore] Membership data:", membershipData);
         if (membershipData) {
           set({ membership: membershipData as MembershipType });
-          console.log("[UserStore] Fetching enterprise for enterprise_id", membershipData.enterprise_id);
+          // console.log("[UserStore] Fetching enterprise for enterprise_id", membershipData.enterprise_id);
           const { data: enterpriseData, error: enterpriseError } = await supabase
             .from("enterprises")
             .select("*")
@@ -208,11 +210,11 @@ const useUserStore = create<UserState>((set, get) => ({
           if (enterpriseError) {
             console.error("[UserStore] Enterprise fetch error:", enterpriseError);
           }
-          console.log("[UserStore] Enterprise data:", enterpriseData);
+          // console.log("[UserStore] Enterprise data:", enterpriseData);
           if (enterpriseData) {
             set({ enterprise: enterpriseData as EnterpriseType });
           }
-          console.log("[UserStore] Fetching permissions for user and enterprise");
+          // console.log("[UserStore] Fetching permissions for user and enterprise");
           const { data: permissionsData, error: permissionsError } = await supabase
             .from("user_permissions_view")
             .select("permission_name")
@@ -221,7 +223,7 @@ const useUserStore = create<UserState>((set, get) => ({
           if (permissionsError) {
             console.error("[UserStore] Permissions fetch error:", permissionsError);
           }
-          console.log("[UserStore] Permissions data:", permissionsData);
+          // console.log("[UserStore] Permissions data:", permissionsData);
           if (permissionsData) {
             const permissions = permissionsData.map((p) => p.permission_name);
             set({ permissions });
@@ -235,7 +237,7 @@ const useUserStore = create<UserState>((set, get) => ({
     } finally {
       set({ loading: false });
       clearTimeout(timeout);
-      console.log("[UserStore] fetchUserAndProfile finished, loading set to false");
+      // console.log("[UserStore] fetchUserAndProfile finished, loading set to false");
     }
   },
 }));
