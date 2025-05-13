@@ -2290,14 +2290,7 @@
       "delete": "حدث خطأ أثناء حذف الفاتورة",
       "duplicate": "حدث خطأ أثناء تكرار الفاتورة"
     },
-    "status": {
-      "title": "الحالة",
-      "draft": "مسودة",
-      "pending": "قيد الانتظار",
-      "paid": "مدفوعة",
-      "overdue": "متأخرة",
-      "cancelled": "ملغاة"
-    },
+
     "form": {
       "invoice_number": {
         "label": "رقم الفاتورة",
@@ -2335,11 +2328,18 @@
         "label": "الحالة",
         "placeholder": "اختر حالة",
         "draft": "مسودة",
-        "pending": "قيد الانتظار",
+        "pending_approval": "قيد الموافقة",
+        "sent": "تم الإرسال",
+        "partially_paid": "مدفوع جزئيا",
         "paid": "مدفوعة",
         "overdue": "متأخرة",
-        "cancelled": "ملغاة",
-        "partially_paid": "مدفوع جزئيا"
+        "disputed": "متعارضة",
+        "void": "ملغية",
+        "scheduled": "مجدولة",
+        "payment_failed": "فشل الدفع",
+        "refunded": "مسترجع",
+        "written_off": "مكتوب عنه",
+        "archived": "مؤرشف"
       },
       "subtotal": {
         "label": "المجموع الفرعي"
@@ -2462,14 +2462,7 @@
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {عرض سعر} =1 {هذا العرض السعري} other {# عروض سعر}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {عرض سعر} =1 {هذا العرض السعري} other {# عروض سعر}}",
     "tax": "الضريبة",
-    "status": {
-      "title": "الحالة",
-      "draft": "مسودة",
-      "sent": "تم الإرسال",
-      "accepted": "مقبول",
-      "rejected": "مرفوض",
-      "expired": "منتهي الصلاحية"
-    },
+
     "notes": "ملاحظات",
     "enter_notes": "أدخل الملاحظات",
     "form": {
@@ -2486,14 +2479,24 @@
         "placeholder": "اختر تاريخ انتهاء الصلاحية"
       },
       "status": {
-        "title": "الحالة",
         "label": "الحالة",
         "placeholder": "اختر الحالة",
         "draft": "مسودة",
         "sent": "تم الإرسال",
+        "revised": "معدل",
+        "under_review": "قيد المراجعة",
         "accepted": "مقبول",
         "rejected": "مرفوض",
-        "expired": "منتهي الصلاحية"
+        "expired": "منتهي الصلاحية",
+        "converted_to_invoice": "تحويل إلى فاتورة",
+        "negotiating": "قيد المفاوضات",
+        "archived": "مؤرشف"
+      },
+      "tax_rate": {
+        "label": "نسبة الضريبة"
+      },
+      "subtotal": {
+        "label": "المجموع الفرعي"
       },
       "issue_date": {
         "label": "تاريخ الإصدار",
@@ -2611,9 +2614,17 @@
       },
       "status": {
         "label": "الحالة",
-        "pending": "قيد الانتظار",
-        "approved": "تمت الموافقة",
-        "rejected": "مرفوض"
+        "placeholder": "اختر الحالة",
+        "draft": "مسودة",
+        "submitted": "مرفوض",
+        "under_review": "قيد المراجعة",
+        "approved": "موافق",
+        "rejected": "مرفوض",
+        "revoked": "ملغي",
+        "pending_additional_info": "بانتظار معلومات إضافية",
+        "completed": "مكتمل",
+        "escalated": "مرفوض",
+        "archived": "مؤرشف"
       }
     },
     "success": {
@@ -3660,10 +3671,12 @@
       "status": {
         "label": "الحالة",
         "active": "نشط",
-        "inactive": "غير نشط",
-        "on_leave": "في إجازة",
-        "terminated": "مفصول",
-        "resigned": "مستقيل"
+        "onboarding": "قيد التوظيف",
+        "probation": "قيد التجربة",
+        "on_leave": "إجازة",
+        "terminated": "منقطع",
+        "retired": "متقاعد",
+        "suspended": "مجمد"
       },
       "address": {
         "label": "العنوان",

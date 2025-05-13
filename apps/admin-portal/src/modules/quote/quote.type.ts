@@ -1,4 +1,8 @@
+import { Constants } from "@/lib/database.types";
 import type { Database } from "@/lib/database.types";
+
+export const QuoteStatus = Constants.public.Enums.quote_status;
+export type QuoteStatusProps = (typeof QuoteStatus)[number];
 
 // This is the type for an item fetched from the DB, associated with a quote
 export type QuoteItem = Database["public"]["Tables"]["quote_items"]["Row"];

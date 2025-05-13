@@ -1,0 +1,3 @@
+CREATE TYPE "public"."quote_status" AS ENUM('draft', 'sent', 'revised', 'under_review', 'accepted', 'rejected', 'expired', 'converted_to_invoice', 'negotiating', 'archived');--> statement-breakpoint
+DROP TYPE "public"."invoice_status";--> statement-breakpoint
+CREATE TYPE "public"."invoice_status" AS ENUM('draft', 'pending_approval', 'sent', 'partially_paid', 'paid', 'overdue', 'disputed', 'void', 'scheduled', 'payment_failed', 'refunded', 'written_off', 'archived');

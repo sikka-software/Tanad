@@ -25,7 +25,12 @@ import { ModuleFormProps } from "@/types/common.type";
 import { ClientForm } from "@/client/client.form";
 
 import { useInvoices } from "@/modules/invoice/invoice.hooks";
-import { InvoiceUpdateData, InvoiceCreateData, InvoiceItem } from "@/modules/invoice/invoice.type";
+import {
+  InvoiceUpdateData,
+  InvoiceCreateData,
+  InvoiceItem,
+  InvoiceStatus,
+} from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
 import { useClients } from "../client/client.hooks";
@@ -426,17 +431,13 @@ export function InvoiceForm({
                         <SelectValue placeholder={t("Invoices.form.status.placeholder")} />
                       </SelectTrigger>
                     </FormControl>
+
                     <SelectContent>
-                      <SelectItem value="draft">{t("Invoices.form.status.draft")}</SelectItem>
-                      <SelectItem value="sent">{t("Invoices.form.status.pending")}</SelectItem>
-                      <SelectItem value="paid">{t("Invoices.form.status.paid")}</SelectItem>
-                      <SelectItem value="partially_paid">
-                        {t("Invoices.form.status.partially_paid", {
-                          defaultValue: "Partially Paid",
-                        })}
-                      </SelectItem>
-                      <SelectItem value="overdue">{t("Invoices.form.status.overdue")}</SelectItem>
-                      <SelectItem value="void">{t("Invoices.form.status.cancelled")}</SelectItem>
+                      {InvoiceStatus.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {t(`Invoices.form.status.${status}`)}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

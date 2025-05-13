@@ -1,3 +1,4 @@
+import CodeCell from "@root/src/components/tables/code-cell";
 import StatusCell from "@root/src/components/tables/status-cell";
 import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { useLocale, useTranslations } from "next-intl";
@@ -27,10 +28,31 @@ const useWarehouseColumns = (
       validationSchema: z.string().min(1, t("Warehouses.form.name.required")),
     },
     {
+      noPadding: true,
       accessorKey: "code",
       header: t("Warehouses.form.code.label"),
       validationSchema: z.string().min(1, t("Warehouses.form.code.required")),
+      cell: ({ getValue, row }) => (
+        <CodeCell
+          onChange={(e) => handleEdit?.(row.id, "code", e.target.value)}
+          onRandom={() => {
+            const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            let randomCode = "";
+            for (let i = 0; i < 5; i++) {
+              randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+            }
+            handleEdit?.(row.id, "code", `WH-${randomCode}`);
+          }}
+          onSerial={() => {
+            const paddedNumber = String(row.index + 1).padStart(4, "0");
+            handleEdit?.(row.id, "code", `WH-${paddedNumber}`);
+          }}
+          code={getValue() as string}
+          onCodeChange={() => console.log("changing")}
+        />
+      ),
     },
+
     {
       accessorKey: "email",
       header: t("Warehouses.form.email.label"),
@@ -98,7 +120,6 @@ const useWarehouseColumns = (
       accessorKey: "status",
       maxSize: 80,
       header: t("Warehouses.form.status.label"),
-      validationSchema: z.enum(["active", "inactive"]),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {

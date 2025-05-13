@@ -5,7 +5,7 @@ import { z } from "zod";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { useJobs } from "../job/job.hooks";
-import { Employee } from "./employee.types";
+import { Employee, EmployeeStatus } from "./employee.types";
 
 const useCompanyColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
@@ -51,23 +51,21 @@ const useCompanyColumns = (
       maxSize: 100,
       validationSchema: z.string().min(1, t("Employees.form.nationality.required")),
     },
+
     {
       accessorKey: "status",
-      maxSize: 100,
       header: t("Employees.form.status.label"),
-      validationSchema: z.enum(["active", "inactive", "on_leave", "terminated", "resigned"]),
+      validationSchema: z.string().min(1, t("Employees.form.status.required")),
       noPadding: true,
+      enableEditing: false,
       cell: ({ getValue, row }) => (
         <SelectCell
           onChange={(value) => handleEdit?.(row.id, "status", value)}
           cellValue={getValue()}
-          options={[
-            { label: t("Employees.form.status.active"), value: "active" },
-            { label: t("Employees.form.status.inactive"), value: "inactive" },
-            { label: t("Employees.form.status.on_leave"), value: "on_leave" },
-            { label: t("Employees.form.status.terminated"), value: "terminated" },
-            { label: t("Employees.form.status.resigned"), value: "resigned" },
-          ]}
+          options={EmployeeStatus.map((status) => ({
+            label: t(`Employees.form.status.${status}`),
+            value: status,
+          }))}
         />
       ),
     },

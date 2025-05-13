@@ -26,7 +26,7 @@ const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
     await updateQuote({ id: rowId, data: { [columnId]: value } });
   };
-  const columns = useQuoteColumns();
+  const columns = useQuoteColumns(handleEdit);
 
   const setSelectedRows = useQuotesStore((state) => state.setSelectedRows);
   const selectedRows = useQuotesStore((state) => state.selectedRows);

@@ -261,11 +261,69 @@ export const vehicle_status = pgEnum("vehicle_status", [
 ]);
 export const employee_status = pgEnum("employee_status", [
   "active",
-  "inactive",
-  "terminated",
+  "onboarding",
+  "probation",
   "on_leave",
-  "resigned",
+  "terminated",
+  "retired",
+  "suspended",
 ]);
+
+export const invoice_status = pgEnum("invoice_status", [
+  "draft",
+  "pending_approval",
+  "sent",
+  "partially_paid",
+  "paid",
+  "overdue",
+  "disputed",
+  "void",
+  "scheduled",
+  "payment_failed",
+  "refunded",
+  "written_off",
+  "archived",
+]);
+
+export const quote_status = pgEnum("quote_status", [
+  "draft",
+  "sent",
+  "revised",
+  "under_review",
+  "accepted",
+  "rejected",
+  "expired",
+  "converted_to_invoice",
+  "negotiating",
+  "archived",
+]);
+export const employee_request_status = pgEnum("employee_request_status", [
+  "draft",
+  "submitted",
+  "under_review",
+  "approved",
+  "rejected",
+  "revoked",
+  "pending_additional_info",
+  "completed",
+  "escalated",
+  "archived",
+]);
+export const purchase_status = pgEnum("purchase_status", [
+  "draft",
+  "issued",
+  "acknowledged",
+  "partially_fulfilled",
+  "fulfilled",
+  "shipped",
+  "delayed",
+  "received",
+  "invoice_matched",
+  "payment_initiated",
+  "closed",
+  "cancelled",
+]);
+
 export const payment_cycle = pgEnum("payment_cycle", ["monthly", "annual"]);
 
 export const clients = pgTable(

@@ -1,0 +1,1 @@
+CREATE TYPE "public"."employee_request_status" AS ENUM('draft', 'submitted', 'under_review', 'approved', 'rejected', 'revoked', 'pending_additional_info', 'completed', 'escalated', 'archived');

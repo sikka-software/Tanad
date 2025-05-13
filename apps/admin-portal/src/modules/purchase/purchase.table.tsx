@@ -29,7 +29,8 @@ const PurchasesTable = ({
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
     await updatePurchase({ id: rowId, data: { [columnId]: value } });
   };
-  const columns = usePurchaseColumns();
+  const columns = usePurchaseColumns(handleEdit);
+
   const selectedRows = usePurchaseStore((state) => state.selectedRows);
   const setSelectedRows = usePurchaseStore((state) => state.setSelectedRows);
 

@@ -1,3 +1,4 @@
+import CodeCell from "@root/src/components/tables/code-cell";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
@@ -28,10 +29,31 @@ const useBranchColumns = (
       validationSchema: z.string().min(1, t("Branches.form.name.required")),
     },
     {
+      noPadding: true,
       accessorKey: "code",
       header: t("Branches.form.code.label"),
       validationSchema: z.string().min(1, t("Branches.form.code.required")),
+      cell: ({ getValue, row }) => (
+        <CodeCell
+          onChange={(e) => handleEdit?.(row.id, "code", e.target.value)}
+          onRandom={() => {
+            const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            let randomCode = "";
+            for (let i = 0; i < 5; i++) {
+              randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+            }
+            handleEdit?.(row.id, "code", `BR-${randomCode}`);
+          }}
+          onSerial={() => {
+            const paddedNumber = String(row.index + 1).padStart(4, "0");
+            handleEdit?.(row.id, "code", `BR-${paddedNumber}`);
+          }}
+          code={getValue() as string}
+          onCodeChange={() => console.log("changing")}
+        />
+      ),
     },
+
     {
       accessorKey: "email",
       header: t("Branches.form.email.label"),
@@ -94,7 +116,6 @@ const useBranchColumns = (
       accessorKey: "status",
       maxSize: 80,
       header: t("Branches.form.status.label"),
-      validationSchema: z.enum(["active", "inactive"]),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {

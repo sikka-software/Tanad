@@ -56,6 +56,7 @@ const useExpenseColumns = (
       header: t("Expenses.form.status.label"),
       validationSchema: z.enum(["paid", "pending", "rejected", "overdue"]),
       noPadding: true,
+      enableEditing: false,
       cell: ({ getValue, row }) => (
         <SelectCell
           onChange={(value) => handleEdit?.(row.id, "status", value)}

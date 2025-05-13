@@ -40,7 +40,6 @@ const useWebsiteColumns = (
       accessorKey: "status",
       maxSize: 80,
       header: t("Websites.form.status.label"),
-      validationSchema: z.enum(["active", "inactive"]),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {

@@ -1,6 +1,10 @@
 import type { Database } from "@/lib/database.types";
+import { Constants } from "@/lib/database.types";
 
 import type { Client } from "@/modules/client/client.type";
+
+export const InvoiceStatus = Constants.public.Enums.invoice_status;
+export type InvoiceStatusProps = (typeof InvoiceStatus)[number];
 
 export type Invoice = Database["public"]["Tables"]["invoices"]["Row"] & {
   client: Client | null;

@@ -62,6 +62,7 @@ const useCarColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
       accessorKey: "ownership_status",
       header: t("Vehicles.form.ownership_status.label"),
       noPadding: true,
+      enableEditing: false,
       cell: ({ getValue, row }) => (
         <SelectCell
           onChange={(value) => handleEdit?.(row.id, "ownership_status", value)}

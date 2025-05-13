@@ -1,13 +1,16 @@
 import CurrencyCell from "@root/src/components/tables/currency-cell";
+import SelectCell from "@root/src/components/tables/select-cell";
 import useUserStore from "@root/src/stores/use-user-store";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
-import { Purchase } from "./purchase.type";
+import { Purchase, PurchaseStatus } from "./purchase.type";
 
-const usePurchaseColumns = () => {
+const usePurchaseColumns = (
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
   const currency = useUserStore((state) => state.profile?.user_settings?.currency);
 
@@ -41,7 +44,19 @@ const usePurchaseColumns = () => {
     {
       accessorKey: "status",
       header: t("Purchases.form.status.label"),
-      validationSchema: z.string().nullable(),
+      validationSchema: z.enum(PurchaseStatus),
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "status", value)}
+          cellValue={getValue()}
+          options={PurchaseStatus.map((status) => ({
+            label: t(`Purchases.form.status.${status}`),
+            value: status,
+          }))}
+        />
+      ),
     },
   ];
 

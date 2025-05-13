@@ -2616,13 +2616,64 @@ export type Database = {
         | "trucks.duplicate"
       app_role: "superadmin" | "admin" | "accounting" | "hr"
       common_status: "active" | "inactive" | "draft" | "archived"
+      employee_request_status:
+        | "draft"
+        | "submitted"
+        | "under_review"
+        | "approved"
+        | "rejected"
+        | "revoked"
+        | "pending_additional_info"
+        | "completed"
+        | "escalated"
+        | "archived"
       employee_status:
         | "active"
-        | "inactive"
-        | "terminated"
+        | "onboarding"
+        | "probation"
         | "on_leave"
-        | "resigned"
+        | "terminated"
+        | "retired"
+        | "suspended"
+      invoice_status:
+        | "draft"
+        | "pending_approval"
+        | "sent"
+        | "partially_paid"
+        | "paid"
+        | "overdue"
+        | "disputed"
+        | "void"
+        | "scheduled"
+        | "payment_failed"
+        | "refunded"
+        | "written_off"
+        | "archived"
       payment_cycle: "monthly" | "annual"
+      purchase_status:
+        | "draft"
+        | "issued"
+        | "acknowledged"
+        | "partially_fulfilled"
+        | "fulfilled"
+        | "shipped"
+        | "delayed"
+        | "received"
+        | "invoice_matched"
+        | "payment_initiated"
+        | "closed"
+        | "cancelled"
+      quote_status:
+        | "draft"
+        | "sent"
+        | "revised"
+        | "under_review"
+        | "accepted"
+        | "rejected"
+        | "expired"
+        | "converted_to_invoice"
+        | "negotiating"
+        | "archived"
       vehicle_status:
         | "active"
         | "maintenance"
@@ -2957,14 +3008,69 @@ export const Constants = {
       ],
       app_role: ["superadmin", "admin", "accounting", "hr"],
       common_status: ["active", "inactive", "draft", "archived"],
+      employee_request_status: [
+        "draft",
+        "submitted",
+        "under_review",
+        "approved",
+        "rejected",
+        "revoked",
+        "pending_additional_info",
+        "completed",
+        "escalated",
+        "archived",
+      ],
       employee_status: [
         "active",
-        "inactive",
-        "terminated",
+        "onboarding",
+        "probation",
         "on_leave",
-        "resigned",
+        "terminated",
+        "retired",
+        "suspended",
+      ],
+      invoice_status: [
+        "draft",
+        "pending_approval",
+        "sent",
+        "partially_paid",
+        "paid",
+        "overdue",
+        "disputed",
+        "void",
+        "scheduled",
+        "payment_failed",
+        "refunded",
+        "written_off",
+        "archived",
       ],
       payment_cycle: ["monthly", "annual"],
+      purchase_status: [
+        "draft",
+        "issued",
+        "acknowledged",
+        "partially_fulfilled",
+        "fulfilled",
+        "shipped",
+        "delayed",
+        "received",
+        "invoice_matched",
+        "payment_initiated",
+        "closed",
+        "cancelled",
+      ],
+      quote_status: [
+        "draft",
+        "sent",
+        "revised",
+        "under_review",
+        "accepted",
+        "rejected",
+        "expired",
+        "converted_to_invoice",
+        "negotiating",
+        "archived",
+      ],
       vehicle_status: [
         "active",
         "maintenance",

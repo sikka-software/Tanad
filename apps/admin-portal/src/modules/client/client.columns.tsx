@@ -58,7 +58,6 @@ const useCompanyColumns = (
       accessorKey: "status",
       maxSize: 80,
       header: t("Clients.form.status.label"),
-      validationSchema: z.enum(["active", "inactive"]),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {

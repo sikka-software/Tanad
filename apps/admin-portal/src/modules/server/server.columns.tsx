@@ -52,7 +52,6 @@ const useServerColumns = (
       accessorKey: "status",
       maxSize: 80,
       header: t("Servers.form.status.label"),
-      validationSchema: z.enum(["active", "inactive"]),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {

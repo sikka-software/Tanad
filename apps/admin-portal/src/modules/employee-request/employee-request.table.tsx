@@ -32,7 +32,8 @@ const EmployeeRequestsTable = ({
     await updateEmployeeRequest({ id: rowId, data: { [columnId]: value } });
   };
 
-  const columns = useEmployeeRequestColumns();
+  const columns = useEmployeeRequestColumns(handleEdit);
+
   const setSelectedRows = useEmployeeRequestsStore((state) => state.setSelectedRows);
   const selectedRows = useEmployeeRequestsStore((state) => state.selectedRows);
 

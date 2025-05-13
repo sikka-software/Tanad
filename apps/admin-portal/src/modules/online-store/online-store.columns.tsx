@@ -36,7 +36,6 @@ const useOnlineStoreColumns = (
       accessorKey: "status",
       maxSize: 80,
       header: t("OnlineStores.form.status.label"),
-      validationSchema: z.enum(["active", "inactive"]),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {

@@ -1,6 +1,6 @@
 {
   "name": "@tanad/admin",
-  "version": "0.18.7",
+  "version": "0.18.8",
   "license": "Proprietary",
   "author": {
     "name": "Sikka Software",
@@ -25,7 +25,8 @@
     "db:policies": "tsx scripts/apply-policies.ts",
     "db:types": "tsx scripts/apply-types.ts",
     "db:update": "infisical run --env=dev -- tsx scripts/apply-types.ts && infisical run --env=dev -- tsx scripts/apply-rbac.ts && infisical run --env=dev -- tsx scripts/apply-triggers.ts && infisical run --env=dev -- drizzle-kit push && infisical run --env=dev -- tsx scripts/apply-policies.ts",
-    "populate:roles": "infisical run --env=dev -- tsx src/db/seed-system-roles.ts"
+    "populate:roles": "infisical run --env=dev -- tsx src/db/seed-system-roles.ts",
+    "flow:sync": "pnpm db:generate && supabase db push --include-all && supabase gen types typescript --project-id vcbrjspzfsvzgtjndjat --schema public > src/lib/database.types.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
