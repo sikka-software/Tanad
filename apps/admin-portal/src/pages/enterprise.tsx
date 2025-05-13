@@ -45,12 +45,29 @@ const EnterprisePage = () => {
     }));
   };
 
-  const handleSave = () => {
-    setEnterpriseData(formData);
-    setIsEditing(false);
-    toast.success("Enterprise information updated", {
-      description: "The enterprise information has been successfully updated.",
-    });
+  const handleSave = async () => {
+    try {
+      const response = await fetch("/api/enterprise", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, id: enterprise.id }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update enterprise");
+      }
+      const updated = await response.json();
+      setEnterpriseData(updated);
+      setFormData(updated);
+      setIsEditing(false);
+      toast.success("Enterprise information updated", {
+        description: "The enterprise information has been successfully updated.",
+      });
+    } catch (err: any) {
+      toast.error("Failed to update enterprise", {
+        description: err.message,
+      });
+    }
   };
 
   const handleCancel = () => {
