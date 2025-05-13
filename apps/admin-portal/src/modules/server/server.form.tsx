@@ -1,26 +1,34 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import { Combobox } from "@root/src/components/ui/comboboxes/combobox";
-import CountryInput from "@root/src/components/ui/country-input";
-import { countries } from "@root/src/lib/constants/countries";
+import BooleanTabs from "@root/src/components/ui/boolean-tabs";
+import { CurrencyInput } from "@root/src/components/ui/currency-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@root/src/components/ui/select";
 import { getNotesValue } from "@root/src/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { Combobox } from "@/ui/comboboxes/combobox";
+import CountryInput from "@/ui/country-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
+
+import NotesSection from "@/components/forms/notes-section";
 
 import { SERVER_OS, SERVER_PROVIDERS } from "@/lib/constants";
 
 import { ModuleFormProps } from "@/types/common.type";
 
+import { useCreateServer, useUpdateServer } from "@/modules/server/server.hooks";
+import useServerStore from "@/modules/server/server.store";
+import { ServerCreateData, ServerUpdateData } from "@/modules/server/server.type";
 import useUserStore from "@/stores/use-user-store";
-
-import { useCreateServer, useUpdateServer } from "./server.hooks";
-import useServerStore from "./server.store";
-import { ServerCreateData, ServerUpdateData } from "./server.type";
 
 export const createServerSchema = (t: (key: string) => string) =>
   z.object({
@@ -31,6 +39,9 @@ export const createServerSchema = (t: (key: string) => string) =>
     os: z.string().optional().or(z.literal("")),
     status: z.string().optional().or(z.literal("")),
     tags: z.array(z.string()).optional().or(z.literal("")),
+    monthly_cost: z.number().optional().or(z.literal("")),
+    annual_cost: z.number().optional().or(z.literal("")),
+    payment_cycle: z.string().min(1, t("Servers.form.payment_cycle.required")),
     user_id: z.string().optional().or(z.literal("")),
     enterprise_id: z.string().optional().or(z.literal("")),
     notes: z.any().optional().nullable(),
@@ -61,10 +72,13 @@ export function ServerForm({
       location: defaultValues?.location || "",
       provider: defaultValues?.provider || "",
       os: defaultValues?.os || "",
-      status: defaultValues?.status || "",
+      status: defaultValues?.status || "active",
       tags: Array.isArray(defaultValues?.tags)
         ? defaultValues.tags.filter((tag): tag is string => typeof tag === "string")
         : [],
+      monthly_cost: defaultValues?.monthly_cost || 0,
+      annual_cost: defaultValues?.annual_cost || 0,
+      payment_cycle: defaultValues?.payment_cycle || "monthly",
       notes: getNotesValue(defaultValues),
       user_id: defaultValues?.user_id || "",
       enterprise_id: defaultValues?.enterprise_id || "",
@@ -90,6 +104,9 @@ export function ServerForm({
       status: data.status?.trim() || undefined,
       tags: Array.isArray(data.tags) && data.tags.length > 0 ? data.tags : null,
       notes: data.notes,
+      monthly_cost: data.monthly_cost || 0,
+      annual_cost: data.annual_cost || 0,
+      payment_cycle: data.payment_cycle || "monthly",
     };
 
     try {
@@ -97,6 +114,9 @@ export function ServerForm({
         const updateData: ServerUpdateData = {
           ...commonData,
           status: commonData.status as "active" | "inactive" | "draft" | "archived" | null,
+          monthly_cost: commonData.monthly_cost,
+          annual_cost: commonData.annual_cost,
+          payment_cycle: commonData.payment_cycle,
           enterprise_id: data.enterprise_id?.trim() || undefined,
           ip_address: commonData.ip_address as unknown | null,
         };
@@ -135,6 +155,9 @@ export function ServerForm({
           user_id: user.id,
           enterprise_id: enterprise.id,
           ip_address: commonData.ip_address as unknown | null,
+          monthly_cost: commonData.monthly_cost,
+          annual_cost: commonData.annual_cost,
+          payment_cycle: commonData.payment_cycle,
         };
 
         await createServer(createData, {
@@ -278,6 +301,105 @@ export function ServerForm({
                       renderOption={(item) => <div>{item.label}</div>}
                       renderSelected={(item) => <div>{item.label}</div>}
                       onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="payment_cycle"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Domains.form.payment_cycle.label")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isLoading}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("Domains.form.payment_cycle.placeholder")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="monthly">
+                          {t("Domains.form.payment_cycle.monthly")}
+                        </SelectItem>
+                        <SelectItem value="annual">
+                          {t("Domains.form.payment_cycle.annual")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {form.watch("payment_cycle") === "monthly" && (
+              <FormField
+                control={form.control}
+                name="monthly_cost"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Domains.form.monthly_cost.label")}</FormLabel>
+                    <FormControl>
+                      <CurrencyInput
+                        placeholder={t("Domains.form.monthly_cost.placeholder")}
+                        disabled={isLoading}
+                        {...field}
+                        showCommas={true}
+                        value={field.value ? parseFloat(String(field.value)) : undefined}
+                        onChange={(value) => field.onChange(value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            {form.watch("payment_cycle") === "annual" && (
+              <FormField
+                control={form.control}
+                name="annual_cost"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Domains.form.annual_cost.label")}</FormLabel>
+                    <FormControl>
+                      <CurrencyInput
+                        placeholder={t("Domains.form.annual_cost.placeholder")}
+                        disabled={isLoading}
+                        {...field}
+                        showCommas={true}
+                        value={field.value ? parseFloat(String(field.value)) : undefined}
+                        onChange={(value) => field.onChange(value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+          </div>
+          <div className="form-fields-cols-1">
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Domains.form.status.label")}</FormLabel>
+                  <FormControl>
+                    <BooleanTabs
+                      trueText={t("Domains.form.status.active")}
+                      falseText={t("Domains.form.status.inactive")}
+                      value={field.value === "active"}
+                      onValueChange={(newValue) => {
+                        field.onChange(newValue ? "active" : "inactive");
+                      }}
+                      listClassName="w-full"
                     />
                   </FormControl>
                   <FormMessage />

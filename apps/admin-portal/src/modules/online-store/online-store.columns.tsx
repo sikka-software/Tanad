@@ -28,7 +28,7 @@ const useOnlineStoreColumns = (
         <SelectCell
           onChange={(value) => handleEdit?.(row.id, "platform", value)}
           cellValue={getValue()}
-          options={[E_COMMERCE_PLATFORMS]}
+          options={E_COMMERCE_PLATFORMS}
         />
       ),
     },

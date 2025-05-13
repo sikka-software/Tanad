@@ -79,7 +79,10 @@ const RowActionsPopover = ({
 
         {onDuplicate && (
           <Button
-            onClick={onDuplicate}
+            onClick={() => {
+              onDuplicate();
+              setOpen(false);
+            }}
             variant="ghost"
             className={buttonClasses}
             size="default"

@@ -2065,6 +2065,9 @@ export const servers = pgTable(
     os: text(),
     status: common_status().default("active"),
     tags: jsonb().default([]),
+    monthly_cost: numeric({ precision: 10, scale: 2 }),
+    annual_cost: numeric({ precision: 10, scale: 2 }),
+    payment_cycle: payment_cycle(),
     notes: jsonb(),
     created_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
@@ -2074,9 +2077,6 @@ export const servers = pgTable(
       .notNull(),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
-    monthly_cost: numeric({ precision: 10, scale: 2 }),
-    annual_cost: numeric({ precision: 10, scale: 2 }),
-    payment_cycle: payment_cycle(),
   },
   (table) => [
     index("servers_enterprise_id_idx").using(
