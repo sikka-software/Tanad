@@ -195,8 +195,9 @@ export default function QuotesPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
-          title={t("Quotes.confirm_delete_title")}
-          description={t("Quotes.confirm_delete", { count: selectedRows.length })}
+          title={t("Quotes.confirm_delete", { count: selectedRows.length })}
+          description={t("Quotes.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>

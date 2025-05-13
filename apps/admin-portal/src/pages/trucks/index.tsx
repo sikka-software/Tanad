@@ -193,8 +193,9 @@ export default function TrucksPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
-          title={t("Trucks.confirm_delete")}
+          title={t("Trucks.confirm_delete", { count: selectedRows.length })}
           description={t("Trucks.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>

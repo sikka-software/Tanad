@@ -195,8 +195,9 @@ export default function WarehousesPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Warehouses.confirm_delete")}
+          title={t("Warehouses.confirm_delete", { count: selectedRows.length })}
           description={t("Warehouses.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>

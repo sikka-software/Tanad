@@ -193,8 +193,9 @@ export default function VendorsPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
-          title={t("Vendors.confirm_delete_title")}
-          description={t("Vendors.confirm_delete", { count: selectedRows.length })}
+          title={t("Vendors.confirm_delete", { count: selectedRows.length })}
+          description={t("Vendors.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>

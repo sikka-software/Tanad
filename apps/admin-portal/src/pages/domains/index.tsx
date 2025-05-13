@@ -198,8 +198,9 @@ export default function DomainsPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
-          title={t("Domains.confirm_delete")}
+          title={t("Domains.confirm_delete", { count: selectedRows.length })}
           description={t("Domains.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>

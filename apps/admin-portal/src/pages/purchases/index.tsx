@@ -200,8 +200,9 @@ export default function PurchasesPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
-          title={t("Purchases.confirm_delete")}
+          title={t("Purchases.confirm_delete", { count: selectedRows.length })}
           description={t("Purchases.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>

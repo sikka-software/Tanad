@@ -196,8 +196,9 @@ export default function DepartmentsPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Departments.confirm_delete_title")}
-          description={t("Departments.confirm_delete", { count: selectedRows.length })}
+          title={t("Departments.confirm_delete", { count: selectedRows.length })}
+          description={t("Departments.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>

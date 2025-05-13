@@ -182,8 +182,9 @@ export default function UsersPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Users.confirm_delete")}
+          title={t("Users.confirm_delete", { count: selectedRows.length })}
           description={t("Users.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>

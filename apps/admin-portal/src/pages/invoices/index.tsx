@@ -199,8 +199,9 @@ export default function InvoicesPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
-          title={t("Invoices.delete.title")}
-          description={t("Invoices.delete.description", { count: selectedRows.length })}
+          title={t("Invoices.confirm_delete", { count: selectedRows.length })}
+          description={t("Invoices.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>

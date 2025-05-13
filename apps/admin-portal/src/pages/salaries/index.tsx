@@ -196,8 +196,9 @@ export default function SalariesPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
-          title={t("Salaries.delete_salary")}
-          description={t("Salaries.confirm_delete")}
+          title={t("Salaries.confirm_delete", { count: selectedRows.length })}
+          description={t("Salaries.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>
