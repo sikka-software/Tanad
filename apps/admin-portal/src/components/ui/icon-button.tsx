@@ -46,14 +46,16 @@ const IconButton = ({
             <span className="sr-only">{label}</span>
           </Button>
         </TooltipTrigger>
-        <TooltipContent
-          style={{
-            transformOrigin: "var(--radix-tooltip-trigger-width)",
-          }}
-          className={cn(contentClassName)}
-        >
-          {label}
-        </TooltipContent>
+        {label && (
+          <TooltipContent
+            style={{
+              transformOrigin: "var(--radix-tooltip-trigger-width)",
+            }}
+            className={cn(contentClassName)}
+          >
+            {label}
+          </TooltipContent>
+        )}
       </Tooltip>
     </TooltipProvider>
   );

@@ -1,7 +1,8 @@
 "use client";
 
-import { ChevronsUpDown, Plus } from "lucide-react";
+import { ChevronsUpDown, Pen, Plus, Settings } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 import * as React from "react";
 
 import {
@@ -15,6 +16,8 @@ import {
 } from "@/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/ui/sidebar";
 
+import { Button } from "./button";
+import IconButton from "./icon-button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 export function EnterpriseSwitcher({
@@ -67,13 +70,24 @@ export function EnterpriseSwitcher({
               <DropdownMenuItem
                 key={enterprise.name}
                 onClick={() => setActiveEnterprise(enterprise)}
-                className="gap-2 p-2"
+                className="justify-between gap-2 p-2"
               >
-                <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <enterprise.logo className="size-4 shrink-0" />
+                <div className="flex flex-row items-center gap-2">
+                  <div className="flex size-6 items-center justify-center rounded-sm border">
+                    <enterprise.logo className="size-4 shrink-0" />
+                  </div>
+                  <span>{enterprise.name}</span>
                 </div>
-                {enterprise.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                <Link href={`/enterprise`}>
+                  <Button
+                    variant="ghost"
+                    size="icon_sm"
+                    className="ms-auto"
+                    onClick={() => setActiveEnterprise(enterprise)}
+                  >
+                    <Settings className="size-4" />
+                  </Button>
+                </Link>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
