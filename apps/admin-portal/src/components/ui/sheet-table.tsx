@@ -61,7 +61,7 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
 > & {
   id?: string;
   accessorKey?: string;
-  cellType?: "text" | "select" | "code";
+  cellType?: "text" | "select";
   options?: Array<{ label: string; value: string | number | boolean }>;
   validationSchema?: ZodType<any, ZodTypeDef, any>;
   className?: string | ((row: TData) => string); // Allows static or dynamic class names
@@ -738,7 +738,7 @@ function SheetTable<
            * We'll do an approach that overlays them. For clarity, let's keep it simple:
            * we'll just overlay or absolutely position them, or place them in the first cell.
            */}
-          {row.getVisibleCells().map((cell, cellIndex) => {
+          {row.getVisibleCells().map((cell) => {
             const colDef = cell.column.columnDef as ExtendedColumnDef<T>;
             const colKey = getColumnKey(colDef);
             const isDisabled = disabled || disabledColumns.includes(colKey);
@@ -820,71 +820,6 @@ function SheetTable<
                     }}
                     ariaInvalid={false}
                   />
-                </TableCell>
-              );
-            }
-            // if cell type is code, show a code input element
-            if (colDef.cellType === "code") {
-              const cellValue = cell.getValue() as string | undefined;
-              return (
-                <TableCell
-                  key={cell.id}
-                  className={cn(
-                    "relative overflow-hidden border p-0",
-                    {
-                      "bg-muted": isDisabled,
-                      "bg-destructive/25": errorMsg,
-                    },
-                    typeof colDef.className === "function"
-                      ? colDef.className(rowData)
-                      : colDef.className,
-                  )}
-                  style={{ ...style, overflow: "hidden", minWidth: 0 }}
-                >
-                  <CodeInput
-                    inCell
-                    onSerial={() => {
-                      if (colDef.onSerial) {
-                        colDef.onSerial(rowData, rowIndex);
-                      } else if (onEdit) {
-                        const next = (parseInt(cellValue || "0", 10) + 1).toString();
-                        onEdit(rowId, colKey as keyof T, next as T[keyof T]);
-                      }
-                    }}
-                    onRandom={() => {
-                      if (colDef.onRandom) {
-                        colDef.onRandom(rowData, rowIndex);
-                      } else if (onEdit) {
-                        const random = Math.floor(100000 + Math.random() * 900000).toString();
-                        onEdit(rowId, colKey as keyof T, random as T[keyof T]);
-                      }
-                    }}
-                  >
-                    <Input
-                      inCell
-                      value={cellValue || ""}
-                      disabled={isDisabled}
-                      style={{ minHeight: 36 }}
-                      onFocus={(e) => handleCellFocus(e, groupKey, rowData, colDef)}
-                      onKeyDown={(e) => {
-                        if (
-                          (e.ctrlKey || e.metaKey) &&
-                          ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
-                        ) {
-                          return;
-                        }
-                        handleKeyDown(e, colDef);
-                      }}
-                      onPaste={(e) => handlePaste(e, colDef)}
-                      onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
-                      onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
-                      onChange={(e) => {
-                        if (onEdit) {
-                          onEdit(rowId, colKey as keyof T, e.target.value as T[keyof T]);
-                        }
-                      }}
-                    />
-                  </CodeInput>
                 </TableCell>
               );
             }
