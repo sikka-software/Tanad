@@ -5,8 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import type React from "react";
+import { createClient } from "@/utils/supabase/component";
+import { useState } from "react";
 
 export type EnterpriseFormValues = {
+  id?: string;
   name: string;
   industry?: string;
   founded?: string;
@@ -34,9 +37,36 @@ export const EnterpriseForm: React.FC<EnterpriseFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const { register, handleSubmit, formState } = useForm<EnterpriseFormValues>({
+  const { register, handleSubmit, setValue, watch, formState } = useForm<EnterpriseFormValues>({
     defaultValues,
   });
+  const [uploading, setUploading] = useState(false);
+
+  // Watch for logo value to show preview
+  const logoUrl = watch("logo");
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const supabase = createClient();
+      // Use enterprise id if available, fallback to 'unknown'
+      const enterpriseId = defaultValues.id || "unknown";
+      const fileExt = file.name.split(".").pop();
+      const fileName = `logos/${enterpriseId}-${Date.now()}.${fileExt}`;
+      const { data, error } = await supabase.storage.from("enterprise-images").upload(fileName, file);
+      if (error) throw error;
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage.from("enterprise-images").getPublicUrl(fileName);
+      setValue("logo", publicUrlData.publicUrl, { shouldValidate: true });
+    } catch (err) {
+      // Optionally show a toast here
+      alert("Failed to upload logo");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -98,9 +128,15 @@ export const EnterpriseForm: React.FC<EnterpriseFormProps> = ({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="logo">Logo URL</Label>
+          <Label htmlFor="logo">Logo</Label>
+          {logoUrl && (
+            <img src={logoUrl} alt="Enterprise Logo" className="h-16 w-16 rounded-md border object-contain mb-2" />
+          )}
+          {!readOnly && (
+            <Input type="file" id="logo-upload" accept="image/*" onChange={handleLogoUpload} disabled={uploading} />
+          )}
           <Input
-            readOnly={readOnly}
+            readOnly={true}
             id="logo"
             {...register("logo")}
           />
