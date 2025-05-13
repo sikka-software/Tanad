@@ -484,9 +484,10 @@
       "reset_selections": "Reset Selections",
       "discount": "Discount",
       "total_monthly_price": "Total Monthly Price",
-      "billing_cycle": {
-        "monthly": "Monthly",
-        "annually": "Annually"
+
+      "billing_history": {
+        "title": "Billing History",
+        "description": "View your billing history"
       },
       "offices": {
         "title": "Offices",
@@ -1104,7 +1105,12 @@
     "enterprise_plan": "Enterprise Plan",
     "update_plan": "Update Plan",
     "need_custom_solution": "Need a custom solution?",
-
+    "amount": "Amount",
+    "billing_cycle": "Billing Cycle",
+    "next_billing": {
+      "title": "Next Billing",
+      "description": "The date of the next billing cycle"
+    },
     "Invoices": {
       "title": "Invoices",
       "description": "Manage all your invoices"
@@ -1132,7 +1138,8 @@
       "hours": "hours",
       "minutes": "minutes",
       "seconds": "seconds",
-      "message": "All features will remain available until the end of the current billing period."
+      "message": "All features will remain available until the end of the current billing period.",
+      "message_already_canceled": "Your subscription has been canceled, and your account will be converted to the free plan on the specified date."
     },
     "most_popular": "Most Popular",
     "reactivate_subscription": "Reactivate Subscription",
@@ -1203,7 +1210,9 @@
       "description": "Are you sure you want to cancel your subscription?",
       "cancel": "Cancel",
       "confirm": "Confirm",
-      "features_end_notice": "All features will remain available until the end of the current billing period."
+      "features_end_notice": "All features will remain available until the end of the current billing period.",
+      "cancel_at_period_end": "Cancel at the end of the current billing period",
+      "immediate_cancellation_notice": "Your subscription will be canceled immediately and you will lose access to advanced features."
     },
     "manage_description": "Manage your billing information and payment methods",
     "billing_history": {

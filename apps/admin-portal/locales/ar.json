@@ -250,6 +250,16 @@
       "feedback_submitted": "تم إرسال الملاحظات بنجاح",
       "thank_you_feedback": "شكرا لك على مساعدتنا في تحسين خدمتنا",
       "error_submitting_feedback": "فشل إرسال الملاحظات. الرجاء المحاولة مرة أخرى."
+    },
+    "subscription_status": {
+      "active": "مفعل",
+      "inactive": "غير مفعل",
+      "canceling": "قيد الإلغاء",
+      "canceled": "ملغي",
+      "cancelled": "ملغي",
+      "expired": "منتهي",
+      "pending": "قيد الانتظار",
+      "refunded": "مسترجع"
     }
   },
 
@@ -493,77 +503,15 @@
       "search": "بحث عن نطاق",
       "no_domains_found": "لا يوجد نطاقات"
     },
-    "Expenses": {
-      "title": "المصروفات",
-      "singular": "مصروف",
-      "add": "إضافة مصروف جديد",
-      "create": "إنشاء مصروف",
-      "edit": "تعديل المصروف",
-      "search": "بحث عن مصروف",
-      "no_expenses_found": "لا يوجد مصروفات"
-    },
-    "JobListings": {
-      "title": "صفحات التوظيف",
-      "singular": "صفحة توظيف",
-      "add": "إضافة صفحة توظيف جديدة",
-      "create": "إنشاء صفحة توظيف",
-      "edit": "تعديل الصفحة التوظيفية",
-      "search": "بحث عن صفحة توظيف",
-      "no_job_listings_found": "لا يوجد صفحات توظيف"
-    },
-    "OnlineStores": {
-      "title": "المتاجر الإلكترونية",
-      "singular": "متجر إلكتروني",
-      "add": "إضافة متجر إلكتروني جديد",
-      "create": "إنشاء متجر إلكتروني",
-      "edit": "تعديل المتجر الإلكتروني",
-      "search": "بحث عن متجر إلكتروني",
-      "no_online_stores_found": "لا يوجد متاجر إلكترونية"
-    },
-    "Purchases": {
-      "title": "المشتريات",
-      "singular": "مشترية",
-      "add": "إضافة طلب شراء",
-      "create": "إنشاء طلب شراء",
-      "edit": "تعديل طلب الشراء",
-      "search": "بحث عن طلب الشراء",
-      "no_purchases_found": "لا توجد طلبات شراء"
-    },
-    "Salaries": {
-      "title": "الرواتب",
-      "singular": "راتب",
-      "add": "إضافة راتب جديد",
-      "create": "إنشاء راتب",
-      "edit": "تعديل الراتب",
-      "search": "بحث عن راتب",
-      "no_salaries_found": "لا يوجد رواتب"
-    },
-    "Servers": {
-      "title": "الخوادم",
-      "singular": "خادم",
-      "add": "إضافة خادم جديد",
-      "create": "إنشاء خادم",
-      "edit": "تعديل الخادم",
-      "search": "بحث عن خادم",
-      "no_servers_found": "لا يوجد خوادم"
-    },
-    "Trucks": {
-      "title": "الشاحنات",
-      "singular": "شاحنة",
-      "add": "إضافة شاحنة جديدة",
-      "create": "إنشاء شاحنة",
-      "edit": "تعديل الشاحنة",
-      "search": "بحث عن شاحنة",
-      "no_trucks_found": "لا يوجد شاحنات"
-    },
-    "Websites": {
-      "title": "المواقع الإلكترونية",
-      "singular": "موقع إلكتروني",
-      "add": "إضافة موقع إلكتروني جديد",
-      "create": "إنشاء موقع إلكتروني",
-      "edit": "تعديل الموقع الإلكتروني",
-      "search": "بحث عن موقع إلكتروني",
-      "no_websites_found": "لا يوجد مواقع إلكترونية"
+    "subscription_status": {
+      "active": "مفعل",
+      "inactive": "غير مفعل",
+      "canceling": "قيد الإلغاء",
+      "canceled": "ملغي",
+      "cancelled": "ملغي",
+      "expired": "منتهي",
+      "pending": "قيد الانتظار",
+      "refunded": "مسترجع"
     }
   },
   "Flags": {
@@ -825,7 +773,7 @@
       "unlimited_modules": "غير محدود",
       "up_to_modules": "إلى",
       "price_breakdown": "تفصيل السعر",
-      "see_how_your_selected_modules_affect_your_price": "تفاصيل السعر النهائي من الميزات المختارة",
+      "see_how_your_selected_modules_affect_your_price": "تفصيل السعر النهائي من الميزات المختارة",
       "base_price": "السعر الأساسي",
       "need_to_start_over": "تريد إعادة البدء؟",
       "reset_selections": "إعادة البدء",
@@ -1484,6 +1432,7 @@
     "tanad_pro": "تند برو",
     "tanad_business": "تند للأعمال",
     "tanad_enterprise": "تند للمؤسسات",
+
     "manage_billing_description": "إدارة معلومات الفوترة وطرق الدفع",
     "update_plan": "تحديث الخطة",
     "need_custom_solution": "هل تحتاج إلى حل مخصص؟",
@@ -1495,7 +1444,9 @@
       "description": "هل أنت متأكد أنك تريد إلغاء اشتراكك؟",
       "cancel": "إلغاء",
       "confirm": "تأكيد",
-      "features_end_notice": "ستظل جميع الميزات متاحة حتى نهاية دورة الفوترة الحالية."
+      "features_end_notice": "ستظل جميع الميزات متاحة حتى نهاية دورة الفوترة الحالية.",
+      "cancel_at_period_end": "إلغاء في نهاية دورة الفوترة الحالية",
+      "immediate_cancellation_notice": "سيتم إلغاء اشتراكك على الفور وستفقد الوصول إلى الميزات المتقدمة."
     },
     "Invoices": {
       "title": "الفواتير",
@@ -1566,6 +1517,7 @@
       "active": "مفعل",
       "inactive": "غير مفعل",
       "canceling": "قيد الإلغاء",
+      "canceled": "ملغي",
       "cancelled": "ملغي",
       "expired": "منتهي",
       "pending": "قيد الانتظار",
@@ -1580,7 +1532,8 @@
       "hours": "ساعات",
       "minutes": "دقائق",
       "seconds": "ثواني",
-      "message": "ستظل جميع الميزات متاحة حتى نهاية دورة الفوترة الحالية."
+      "message": "ستظل جميع الميزات متاحة حتى نهاية دورة الفوترة الحالية.",
+      "message_already_canceled": "تم إلغاء الاشتراك، وسيتم تحويل الحساب إلى الباقة المجانية في التاريخ المحدد."
     },
     "most_popular": "أكثر شعبية",
     "reactivate_subscription": "إعادة تفعيل الاشتراك",
@@ -2842,63 +2795,6 @@
       "duplicate": "حدث خطأ أثناء تكرار الفرع"
     }
   },
-  "Vendors": {
-    "title": "الموردين",
-    "singular": "مورد",
-    "edit_vendor": "تعديل المورد",
-    "update_vendor": "تحديث المورد",
-    "back_to_list": "الرجوع للقائمة",
-    "vendor_details": "تفاصيل المورد",
-    "no_vendors": "لا يوجد موردين",
-    "search_vendors": "بحث عن موردين...",
-    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {مورد} =1 {هذا المورد} other {# موردين}}؟",
-    "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {مورد} =1 {هذا المورد} other {# موردين}}",
-    "add_first_vendor": "أضف أول مورد",
-    "form": {
-      "name": {
-        "label": "الاسم",
-        "placeholder": "أدخل الاسم",
-        "required": "الاسم مطلوب"
-      },
-      "company": {
-        "label": "الشركة",
-        "placeholder": "أدخل اسم الشركة"
-      },
-      "email": {
-        "label": "البريد الإلكتروني",
-        "placeholder": "أدخل البريد الإلكتروني",
-        "required": "البريد الإلكتروني مطلوب",
-        "invalid": "البريد الإلكتروني غير صالح"
-      },
-      "phone": {
-        "label": "الهاتف",
-        "placeholder": "أدخل رقم الهاتف",
-        "required": "رقم الهاتف مطلوب"
-      },
-      "products": {
-        "label": "المنتجات/الخدمات",
-        "placeholder": "أدخل المنتجات أو الخدمات"
-      }
-    },
-    "success": {
-      "create": "تم إنشاء المورد بنجاح",
-      "update": "تم تحديث المورد بنجاح",
-      "delete": "تم حذف المورد بنجاح",
-      "duplicate": "تم تكرار المورد بنجاح"
-    },
-    "loading": {
-      "create": "جاري إنشاء المورد...",
-      "update": "جاري تحديث المورد...",
-      "delete": "جاري حذف المورد...",
-      "duplicate": "جاري تكرار المورد..."
-    },
-    "error": {
-      "create": "حدث خطأ أثناء إنشاء المورد",
-      "update": "حدث خطأ أثناء تحديث المورد",
-      "delete": "حدث خطأ أثناء حذف المورد",
-      "duplicate": "حدث خطأ أثناء تكرار المورد"
-    }
-  },
   "Attendance": {
     "title": "الحضور",
     "today": "حضور اليوم",
@@ -3284,101 +3180,6 @@
   },
   "SystemAdmin": {
     "title": "إدارة النظام"
-  },
-  "JobListings": {
-    "listing_details": "تفاصيل صفحة التوظيف",
-    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {صفحة توظيف} =1 {هذه الصفحة التوظيفية} other {# صفحات توظيف}}؟",
-    "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {صفحة توظيف} =1 {هذه الصفحة التوظيفية} other {# صفحات توظيف}}",
-    "location_placeholder": "الموقع",
-    "all_locations": "جميع المواقع",
-    "no_jobs_found": "لم يتم العثور على وظائف",
-    "adjust_filters": "حاول تعديل البحث أو الفلاتر",
-    "jobs_section": {
-      "title": "الوظائف",
-      "subtitle": "إختر الوظائف التي تريد نشرها في هذه الصفحة",
-      "add_new": "وظيفة جديدة"
-    },
-    "jobs_count": {
-      "label": "عدد الوظائف"
-    },
-    "options": {
-      "title": "إعدادات صفحة التوظيف",
-      "currencyLabel": "عملة الرواتب",
-      "currencyPlaceholder": "اختر عملة الرواتب",
-      "searchFilteringLabel": "البحث والتصفية",
-      "locationsLabel": "المواقع",
-      "locationsPlaceholder": "اختر المواقع",
-      "departmentsLabel": "الأقسام",
-      "departmentsPlaceholder": "اختر الأقسام",
-      "enableSearchFilteringLabel": "البحث والتصفية",
-      "enableSearchFilteringPlaceholder": "تفعيل البحث والتصفية",
-      "searchFilteringDescription": "يمكنك تفعيل البحث والتصفية لصفحة التوظيف للمستخدمين للبحث عن الوظائف التي يحتاجونها"
-    },
-    "status": {
-      "title": "الحالة",
-      "active": "نشط",
-      "inactive": "غير نشط"
-    },
-    "form": {
-      "title": {
-        "label": "عنوان الصفحة",
-        "placeholder": "أدخل عنوان الصفحة",
-        "required": "عنوان الصفحة مطلوب"
-      },
-      "description": {
-        "label": "الوصف",
-        "placeholder": "أدخل وصف الصفحة"
-      },
-      "jobs": {
-        "label": "الوظائف",
-        "placeholder": "اختر الوظائف",
-        "required": "يجب إختيار وظيفة واحدة على الأقل"
-      },
-      "status": {
-        "label": "الحالة",
-        "placeholder": "اختر الحالة",
-        "active": "نشط",
-        "inactive": "غير نشط",
-        "published": "منشور",
-        "unpublished": "غير منشور"
-      },
-      "created_at": {
-        "label": "تاريخ الإنشاء"
-      },
-      "slug": {
-        "label": "المعرف الفريد للرابط",
-        "placeholder": "أدخل المعرف الفريد للرابط (يستخدم في عنوان URL)"
-      }
-    },
-    "not_found": {
-      "title": "لم يتم العثور على صفحة توظيف",
-      "desc": "لم نستطيع العثور على صفحة الوظائف. قد يكون الإعلان غير موجود أو رمز الإعلان غير صالح",
-      "create_new": "إنشاء صفحة توظيف جديدة",
-      "looking_to_hire": "تبحث عن موظفين؟",
-      "our_platform": "تساعدك منصتنا على إنشاء صفحات توظيف ، إدارة المتقدمين، وتنظيم آلية التوظيف.",
-      "companies_using_platform": "شركات تستخدم منصتنا",
-      "faster_hiring_process": "عملية توظيف أسرع"
-    },
-    "success": {
-      "title": "تم بنجاح",
-      "create": "تم إنشاء الصفحة بنجاح",
-      "update": "تم تحديث الصفحة بنجاح",
-      "delete": "تم حذف الصفحة بنجاح",
-      "duplicate": "تم تكرار الصفحة بنجاح"
-    },
-    "error": {
-      "create": "فشل في إنشاء الصفحة",
-      "load": "فشل في تحميل الصفحات",
-      "update": "فشل في تحديث الصفحة",
-      "delete": "فشل في حذف الصفحة",
-      "duplicate": "فشل في تكرار الصفحة"
-    },
-    "loading": {
-      "create": "جاري إنشاء الصفحة...",
-      "update": "جاري تحديث الصفحة...",
-      "delete": "جاري حذف الصفحة...",
-      "duplicate": "جاري تكرار الصفحة..."
-    }
   },
   "JobCard": {
     "posted": "نشر في {date, date, medium}",
