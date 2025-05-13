@@ -3,6 +3,7 @@ import { LayoutGrid, Loader2, Rows4 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { ThemeProvider, useTheme } from "next-themes";
 import { useRouter } from "next/router";
+import { useEffect, useRef } from "react";
 import { Toaster } from "sonner";
 
 import { AppSidebar } from "@/ui/app-sidebar";
@@ -33,6 +34,14 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const { theme } = useTheme();
   const { loading: isUserDataLoading, user } = useUserStore();
 
+  const mainContentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTop = 0;
+    }
+  }, [router.asPath]);
+
   const setViewMode = useDashboardStore((state) => state.setViewMode);
   const viewMode = useDashboardStore((state) => state.viewMode);
 
@@ -46,68 +55,78 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <ProtectedRoute>
-      <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
-        <SidebarProvider dir={lang === "ar" ? "rtl" : "ltr"} defaultOpen={defaultOpen}>
-          <LoadingBar />
-          <AppSidebar />
-          <CommandMenu dir={lang === "ar" ? "rtl" : "ltr"} />
-          <Toaster
-            theme={theme as "light" | "dark"}
-            richColors
-            position={lang === "ar" ? "bottom-left" : "bottom-right"}
-            dir={lang === "ar" ? "rtl" : "ltr"}
-            style={{ fontFamily: "var(--font-arabic)" }}
-          />
-          <div className="w-full">
-            <div className="flex w-full flex-row justify-between border-b p-2">
-              <div className="flex flex-row items-center gap-0 p-0">
-                <SidebarTrigger />
-                <div className="hidden md:block">
-                  <AppBreadcrumb />
+      <main ref={mainContentRef}>
+        <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
+          <SidebarProvider dir={lang === "ar" ? "rtl" : "ltr"} defaultOpen={defaultOpen}>
+            <LoadingBar />
+            <AppSidebar />
+            <CommandMenu dir={lang === "ar" ? "rtl" : "ltr"} />
+            <Toaster
+              theme={theme as "light" | "dark"}
+              richColors
+              position={lang === "ar" ? "bottom-left" : "bottom-right"}
+              dir={lang === "ar" ? "rtl" : "ltr"}
+              style={{ fontFamily: "var(--font-arabic)" }}
+            />
+            <div className="w-full">
+              <div className="flex w-full flex-row justify-between border-b p-2">
+                <div className="flex flex-row items-center gap-0 p-0">
+                  <SidebarTrigger />
+                  <div className="hidden md:block">
+                    <AppBreadcrumb />
+                  </div>
+                </div>
+                <div className="flex flex-row gap-2">
+                  {router.pathname.includes("dashboard") && (
+                    <IconButton
+                      icon={
+                        viewMode === "horizontal" ? (
+                          <Rows4 className="size-4" />
+                        ) : (
+                          <LayoutGrid className="size-4" />
+                        )
+                      }
+                      label={
+                        viewMode === "horizontal"
+                          ? t("Dashboard.vertical")
+                          : t("Dashboard.horizontal")
+                      }
+                      variant="outline"
+                      size="icon_sm"
+                      className="h-8"
+                      onClick={() =>
+                        setViewMode(viewMode === "vertical" ? "horizontal" : "vertical")
+                      }
+                    />
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 ps-1.5"
+                    onClick={() => setOpenCommandMenu(true)}
+                  >
+                    <kbd className="bg-muted rounded-inner-1 pointer-events-none hidden h-5 items-center gap-1 border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex">
+                      <span className="text-xs">⌘</span>K
+                    </kbd>
+                    <span className="text-muted-foreground text-xs">
+                      {t("General.quick_access")}
+                    </span>
+                  </Button>
+                  <ThemeSwitcher />
+                  <LanguageSwitcher />
+                  <UserDropdown />
                 </div>
               </div>
-              <div className="flex flex-row gap-2">
-                {router.pathname.includes("dashboard") && (
-                  <IconButton
-                    icon={
-                      viewMode === "horizontal" ? (
-                        <Rows4 className="size-4" />
-                      ) : (
-                        <LayoutGrid className="size-4" />
-                      )
-                    }
-                    label={viewMode === "horizontal" ? t("Dashboard.vertical") : t("Dashboard.horizontal")}
-                    variant="outline"
-                    size="icon_sm"
-                    className="h-8"
-                    onClick={() => setViewMode(viewMode === "vertical" ? "horizontal" : "vertical")}
-                  />
-                )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 ps-1.5"
-                  onClick={() => setOpenCommandMenu(true)}
-                >
-                  <kbd className="bg-muted rounded-inner-1 pointer-events-none hidden h-5 items-center gap-1 border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex">
-                    <span className="text-xs">⌘</span>K
-                  </kbd>
-                  <span className="text-muted-foreground text-xs">{t("General.quick_access")}</span>
-                </Button>
-                <ThemeSwitcher />
-                <LanguageSwitcher />
-                <UserDropdown />
+              <div className="relative mx-auto">
+                <div className="block border-b p-2 md:hidden">
+                  <AppBreadcrumb />
+                </div>
+                {children}
               </div>
             </div>
-            <div className="relative mx-auto">
-              <div className="block border-b p-2 md:hidden">
-                <AppBreadcrumb />
-              </div>
-              {children}
-            </div>
-          </div>
-        </SidebarProvider>
-      </ThemeProvider>
+          </SidebarProvider>
+        </ThemeProvider>
+      </main>
     </ProtectedRoute>
   );
 };
