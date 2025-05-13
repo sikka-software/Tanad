@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -8,7 +9,6 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Button } from "@/ui/button";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { CurrencyInput } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
@@ -253,7 +253,7 @@ export function SalaryForm({
             />
 
             {/* Pay Period Dates */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="pay_period_start"
@@ -343,7 +343,7 @@ export function SalaryForm({
             />
 
             {/* Amounts */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="gross_amount"

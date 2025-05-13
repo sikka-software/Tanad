@@ -23,7 +23,7 @@ import NotesSection from "@/components/forms/notes-section";
 
 import { SERVER_OS, SERVER_PROVIDERS } from "@/lib/constants";
 
-import { ModuleFormProps } from "@/types/common.type";
+import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
 import { useCreateServer, useUpdateServer } from "@/modules/server/server.hooks";
 import useServerStore from "@/modules/server/server.store";
@@ -37,7 +37,9 @@ export const createServerSchema = (t: (key: string) => string) =>
     location: z.string().optional().or(z.literal("")),
     provider: z.string().optional().or(z.literal("")),
     os: z.string().optional().or(z.literal("")),
-    status: z.string().optional().or(z.literal("")),
+    status: z.enum(CommonStatus, {
+      message: t("Servers.form.status.required"),
+    }),
     tags: z.array(z.string()).optional().or(z.literal("")),
     monthly_cost: z.number().optional().or(z.literal("")),
     annual_cost: z.number().optional().or(z.literal("")),
@@ -101,7 +103,7 @@ export function ServerForm({
       location: data.location?.trim() || null,
       provider: data.provider?.trim() || null,
       os: data.os?.trim() || null,
-      status: data.status?.trim() || undefined,
+      status: data.status,
       tags: Array.isArray(data.tags) && data.tags.length > 0 ? data.tags : null,
       notes: data.notes,
       monthly_cost: data.monthly_cost || 0,
@@ -113,15 +115,11 @@ export function ServerForm({
       if (editMode) {
         const updateData: ServerUpdateData = {
           ...commonData,
-          status: commonData.status as "active" | "inactive" | "draft" | "archived" | null,
-          monthly_cost: commonData.monthly_cost,
-          annual_cost: commonData.annual_cost,
           payment_cycle:
             commonData.payment_cycle === "monthly" || commonData.payment_cycle === "annual"
               ? commonData.payment_cycle
               : undefined,
           enterprise_id: data.enterprise_id?.trim() || undefined,
-          ip_address: commonData.ip_address as unknown | null,
         };
 
         await updateServer(
@@ -192,7 +190,7 @@ export function ServerForm({
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
         <div className="form-container">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="name"

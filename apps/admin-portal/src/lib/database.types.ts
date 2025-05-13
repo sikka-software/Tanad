@@ -65,7 +65,7 @@ export type Database = {
           name: string
           notes: Json | null
           routing_number: string | null
-          status: string
+          status: Database["public"]["Enums"]["common_status"]
           swift_bic: string | null
           updated_at: string | null
           user_id: string
@@ -81,7 +81,7 @@ export type Database = {
           name: string
           notes?: Json | null
           routing_number?: string | null
-          status: string
+          status: Database["public"]["Enums"]["common_status"]
           swift_bic?: string | null
           updated_at?: string | null
           user_id: string
@@ -97,7 +97,7 @@ export type Database = {
           name?: string
           notes?: Json | null
           routing_number?: string | null
-          status?: string
+          status?: Database["public"]["Enums"]["common_status"]
           swift_bic?: string | null
           updated_at?: string | null
           user_id?: string

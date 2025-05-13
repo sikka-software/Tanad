@@ -46,7 +46,9 @@ const createQuoteFormSchema = (t: (key: string) => string) =>
     quote_number: z.string().min(1, t("Quotes.validation.quote_number_required")),
     issue_date: z.string().min(1, t("Quotes.validation.issue_date_required")),
     expiry_date: z.string().min(1, t("Quotes.validation.expiry_date_required")),
-    status: z.string().min(1, t("Quotes.validation.status_required")),
+    status: z.enum(QuoteStatus, {
+      message: t("Quotes.validation.status_required"),
+    }),
     tax_rate: z.number().min(0, t("Quotes.validation.tax_rate_positive")),
     notes: z.any().optional().nullable(),
     items: z

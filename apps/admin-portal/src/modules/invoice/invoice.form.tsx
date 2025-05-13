@@ -51,7 +51,9 @@ const createInvoiceSchema = (t: (key: string) => string) =>
     due_date: z.date({
       required_error: t("Invoices.form.due_date.required"),
     }),
-    status: z.enum(["draft", "sent", "paid", "partially_paid", "overdue", "void"]),
+    status: z.enum(InvoiceStatus, {
+      message: t("Invoices.form.status.required"),
+    }),
     subtotal: z.number().min(0, t("Invoices.form.subtotal.required")),
     tax_rate: z.number().min(0, t("Invoices.form.tax_rate.required")),
     notes: z.any().optional().nullable(),
@@ -115,14 +117,7 @@ export function InvoiceForm({
     due_date: defaultValues?.due_date
       ? new Date(defaultValues.due_date as string)
       : new Date(new Date().setDate(new Date().getDate() + 30)),
-    status:
-      (defaultValues?.status as
-        | "draft"
-        | "sent"
-        | "paid"
-        | "partially_paid"
-        | "overdue"
-        | "void") || "draft",
+    status: defaultValues?.status || "draft",
     subtotal: defaultValues?.subtotal || 0,
     tax_rate: defaultValues?.tax_rate || 0,
     notes: getNotesValue(defaultValues as any),

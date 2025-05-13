@@ -141,7 +141,7 @@ export function WebsiteForm({
     <div>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-          <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+          <div className="form-container">
             <FormField
               control={form.control}
               name="domain_name"
@@ -159,7 +159,6 @@ export function WebsiteForm({
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="status"

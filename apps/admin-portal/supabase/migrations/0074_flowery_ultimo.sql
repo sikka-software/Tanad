@@ -1,0 +1,1 @@
+ALTER TABLE "bank_accounts" ALTER COLUMN "status" SET DATA TYPE "public"."common_status" USING "status"::"public"."common_status";

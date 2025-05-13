@@ -1,11 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
@@ -257,7 +257,7 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
       {/* Use the correct form ID */}
       <form id={formHtmlId} onSubmit={form.handleSubmit(onSubmit)}>
         <div className="form-container">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="first_name"

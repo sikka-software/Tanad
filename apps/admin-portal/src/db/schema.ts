@@ -1646,7 +1646,7 @@ export const bank_accounts = pgTable(
     iban: text().notNull(),
     swift_bic: text(),
     bank_name: text().notNull(),
-    status: text().notNull(),
+    status: common_status().notNull(),
     notes: jsonb(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),

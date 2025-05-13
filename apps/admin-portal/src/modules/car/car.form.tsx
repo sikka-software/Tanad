@@ -218,9 +218,7 @@ export function CarForm({
                 </FormItem>
               )}
             />
-          </div>
 
-          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="make"
@@ -255,8 +253,7 @@ export function CarForm({
                 </FormItem>
               )}
             />
-          </div>
-          <div className="form-fields-cols-2">
+
             <FormField
               control={form.control}
               name="year"
@@ -335,7 +332,6 @@ export function CarForm({
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="license_plate"
@@ -353,8 +349,6 @@ export function CarForm({
                 </FormItem>
               )}
             />
-          </div>
-          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="ownership_status"

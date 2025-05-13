@@ -19,7 +19,7 @@ import BooleanTabs from "@/components/ui/boolean-tabs";
 import CodeInput from "@/components/ui/code-input";
 import PhoneInput from "@/components/ui/phone-input";
 
-import { ModuleFormProps } from "@/types/common.type";
+import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -45,7 +45,7 @@ const createOfficeSchema = (t: (key: string) => string) => {
       // .uuid({ message: t("Offices.form.manager.invalid_uuid") })
       .optional()
       .nullable(),
-    status: z.enum(["active", "inactive"], {
+    status: z.enum(CommonStatus, {
       message: t("Offices.form.status.required"),
     }),
     notes: z.any().optional().nullable(),
@@ -96,7 +96,7 @@ export function OfficeForm({
       country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
       manager: defaultValues?.manager || "",
-      status: (defaultValues?.status as "active" | "inactive") || "active",
+      status: defaultValues?.status || "active",
       notes: getNotesValue(defaultValues),
     },
   });
@@ -249,8 +249,6 @@ export function OfficeForm({
                   </FormItem>
                 )}
               />
-            </div>
-            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="email"
@@ -270,7 +268,6 @@ export function OfficeForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="phone"
@@ -289,8 +286,6 @@ export function OfficeForm({
                   </FormItem>
                 )}
               />
-            </div>
-            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="email"
@@ -310,7 +305,6 @@ export function OfficeForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="phone"
@@ -329,8 +323,6 @@ export function OfficeForm({
                   </FormItem>
                 )}
               />
-            </div>
-            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="email"
@@ -350,7 +342,6 @@ export function OfficeForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="phone"
@@ -369,9 +360,6 @@ export function OfficeForm({
                   </FormItem>
                 )}
               />
-            </div>
-
-            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="manager"

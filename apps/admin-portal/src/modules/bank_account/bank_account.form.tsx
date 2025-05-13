@@ -15,7 +15,7 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 
-import { ModuleFormProps } from "@/types/common.type";
+import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -45,7 +45,9 @@ export const createBankAccountSchema = (t: (key: string) => string) =>
     iban: z.string().min(1, t("BankAccounts.form.iban.required")),
     swift_bic: z.string().optional().or(z.literal("")),
     bank_name: z.string().min(1, t("BankAccounts.form.bank_name.required")),
-    status: z.string().min(1, t("BankAccounts.form.status.required")),
+    status: z.enum(CommonStatus, {
+      message: t("BankAccounts.form.status.required"),
+    }),
     notes: z.any().optional().nullable(),
   });
 
@@ -87,7 +89,7 @@ export function BankAccountForm({
       iban: defaultValues?.iban || "",
       swift_bic: defaultValues?.swift_bic || "",
       bank_name: defaultValues?.bank_name || "",
-      status: defaultValues?.status || "",
+      status: defaultValues?.status || "draft",
       notes: getNotesValue(defaultValues),
     },
   });
@@ -113,7 +115,7 @@ export function BankAccountForm({
               iban: data.iban.trim(),
               swift_bic: data.swift_bic?.trim() || "",
               bank_name: data.bank_name.trim(),
-              status: data.status.trim(),
+              status: data.status,
               notes: data.notes || "",
             },
           },
@@ -136,7 +138,7 @@ export function BankAccountForm({
             iban: data.iban.trim(),
             swift_bic: data.swift_bic?.trim() || "",
             bank_name: data.bank_name.trim(),
-            status: data.status.trim(),
+            status: data.status,
             notes: data.notes || "",
             user_id: user?.id || "",
             enterprise_id: enterprise?.id || "",
@@ -204,8 +206,6 @@ export function BankAccountForm({
                 </FormItem>
               )}
             />
-          </div>
-          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="account_number"
@@ -258,8 +258,6 @@ export function BankAccountForm({
                 </FormItem>
               )}
             />
-          </div>
-          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="iban"
@@ -294,8 +292,6 @@ export function BankAccountForm({
                 </FormItem>
               )}
             />
-          </div>
-          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="routing_number"

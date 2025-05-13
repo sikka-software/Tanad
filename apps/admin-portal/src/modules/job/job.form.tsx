@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import BooleanTabs from "@root/src/components/ui/boolean-tabs";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import NumberInputWithButtons from "@root/src/components/ui/number-input-buttons";
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2, ShoppingCart, Store, Warehouse } from "lucide-react";
@@ -12,7 +13,6 @@ import * as z from "zod";
 
 import { Badge } from "@/ui/badge";
 import { Card, CardHeader, CardTitle } from "@/ui/card";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { CurrencyInput } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Dialog } from "@/ui/dialog";
@@ -150,7 +150,7 @@ export function JobForm({
               department: data.department?.trim() || null,
               type: data.type.trim(),
               salary: data.salary ? parseFloat(data.salary) : null,
-              status: data.status as "active" | "inactive" | "draft" | "archived" | null,
+              status: data.status,
               start_date: data.start_date?.toISOString() || null,
               end_date: data.end_date?.toISOString() || null,
               total_positions:
@@ -180,7 +180,7 @@ export function JobForm({
             enterprise_id: enterprise?.id || "",
             type: data.type.trim(),
             salary: data.salary ? parseFloat(data.salary) : null,
-            status: data.status as "active" | "inactive" | "draft" | "archived" | null,
+            status: data.status,
             start_date: data.start_date?.toISOString() || null,
             end_date: data.end_date?.toISOString() || null,
             total_positions:

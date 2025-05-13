@@ -165,7 +165,7 @@ export function WarehouseForm({
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
         <div className="form-container">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="name"
@@ -183,7 +183,6 @@ export function WarehouseForm({
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="code"
@@ -219,9 +218,6 @@ export function WarehouseForm({
                 </FormItem>
               )}
             />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="phone"

@@ -176,8 +176,8 @@ export function TruckForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="form-container">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="code"
@@ -212,9 +212,7 @@ export function TruckForm({
                 </FormItem>
               )}
             />
-          </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="make"
@@ -249,8 +247,7 @@ export function TruckForm({
                 </FormItem>
               )}
             />
-          </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+
             <FormField
               control={form.control}
               name="year"
@@ -304,7 +301,7 @@ export function TruckForm({
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="license_country"
@@ -347,8 +344,7 @@ export function TruckForm({
                 </FormItem>
               )}
             />
-          </div>
-          <div className="form-fields-cols-2">
+
             <FormField
               control={form.control}
               name="ownership_status"

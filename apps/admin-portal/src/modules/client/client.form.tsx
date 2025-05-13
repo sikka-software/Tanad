@@ -194,7 +194,7 @@ export function ClientForm({
       <Form {...form}>
         <form id={formHtmlId || "client-form"} onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="form-container">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
+            <div className="form-fields-cols-1">
               <FormField
                 control={form.control}
                 name="name"
@@ -214,7 +214,7 @@ export function ClientForm({
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="email"
@@ -233,7 +233,6 @@ export function ClientForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="phone"
@@ -251,9 +250,6 @@ export function ClientForm({
                   </FormItem>
                 )}
               />
-            </div>
-
-            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="company"
