@@ -26,6 +26,7 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
       header: t("Jobs.form.type.label"),
       validationSchema: z.string().min(1, t("Jobs.form.type.required")),
       noPadding: true,
+      enableEditing: false,
       cell: ({ getValue, row }) => (
         <SelectCell
           onChange={(value) => handleEdit?.(row.id, "type", value)}

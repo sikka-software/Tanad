@@ -445,15 +445,25 @@ export function EmployeeForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("Employees.form.status.label")} *</FormLabel>
-                    <BooleanTabs
-                      trueText={t("Employees.form.status.active")}
-                      falseText={t("Employees.form.status.inactive")}
-                      value={field.value === "active"}
-                      onValueChange={(newValue) => {
-                        field.onChange(newValue ? "active" : "inactive");
-                      }}
-                      listClassName="w-full"
-                    />
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Employees.form.status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        {EmployeeStatus.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`Employees.form.status.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -4777,6 +4777,23 @@
         "active": "نشط",
         "inactive": "غير نشط"
       },
+      "monthly_cost": {
+        "label": "التكلفة الشهرية",
+        "placeholder": "أدخل التكلفة الشهرية",
+        "required": "التكلفة الشهرية مطلوبة"
+      },
+      "annual_cost": {
+        "label": "التكلفة السنوية",
+        "placeholder": "أدخل التكلفة السنوية",
+        "required": "التكلفة السنوية مطلوبة"
+      },
+      "payment_cycle": {
+        "label": "دورة الدفع",
+        "placeholder": "أدخل دورة الدفع",
+        "required": "دورة الدفع مطلوبة",
+        "monthly": "شهري",
+        "annual": "سنوي"
+      },
       "tags": {
         "label": "التصنيفات",
         "placeholder": "أدخل التصنيفات",

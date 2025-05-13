@@ -116,7 +116,10 @@ export function ServerForm({
           status: commonData.status as "active" | "inactive" | "draft" | "archived" | null,
           monthly_cost: commonData.monthly_cost,
           annual_cost: commonData.annual_cost,
-          payment_cycle: commonData.payment_cycle,
+          payment_cycle:
+            commonData.payment_cycle === "monthly" || commonData.payment_cycle === "annual"
+              ? commonData.payment_cycle
+              : undefined,
           enterprise_id: data.enterprise_id?.trim() || undefined,
           ip_address: commonData.ip_address as unknown | null,
         };
@@ -157,7 +160,10 @@ export function ServerForm({
           ip_address: commonData.ip_address as unknown | null,
           monthly_cost: commonData.monthly_cost,
           annual_cost: commonData.annual_cost,
-          payment_cycle: commonData.payment_cycle,
+          payment_cycle:
+            commonData.payment_cycle === "monthly" || commonData.payment_cycle === "annual"
+              ? commonData.payment_cycle
+              : undefined,
         };
 
         await createServer(createData, {
@@ -314,7 +320,7 @@ export function ServerForm({
               name="payment_cycle"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Domains.form.payment_cycle.label")}</FormLabel>
+                  <FormLabel>{t("Servers.form.payment_cycle.label")}</FormLabel>
                   <FormControl>
                     <Select
                       dir={lang === "ar" ? "rtl" : "ltr"}
@@ -323,14 +329,14 @@ export function ServerForm({
                       disabled={isLoading}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder={t("Domains.form.payment_cycle.placeholder")} />
+                        <SelectValue placeholder={t("Servers.form.payment_cycle.placeholder")} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="monthly">
-                          {t("Domains.form.payment_cycle.monthly")}
+                          {t("Servers.form.payment_cycle.monthly")}
                         </SelectItem>
                         <SelectItem value="annual">
-                          {t("Domains.form.payment_cycle.annual")}
+                          {t("Servers.form.payment_cycle.annual")}
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -345,10 +351,10 @@ export function ServerForm({
                 name="monthly_cost"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Domains.form.monthly_cost.label")}</FormLabel>
+                    <FormLabel>{t("Servers.form.monthly_cost.label")}</FormLabel>
                     <FormControl>
                       <CurrencyInput
-                        placeholder={t("Domains.form.monthly_cost.placeholder")}
+                        placeholder={t("Servers.form.monthly_cost.placeholder")}
                         disabled={isLoading}
                         {...field}
                         showCommas={true}
@@ -367,10 +373,10 @@ export function ServerForm({
                 name="annual_cost"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Domains.form.annual_cost.label")}</FormLabel>
+                    <FormLabel>{t("Servers.form.annual_cost.label")}</FormLabel>
                     <FormControl>
                       <CurrencyInput
-                        placeholder={t("Domains.form.annual_cost.placeholder")}
+                        placeholder={t("Servers.form.annual_cost.placeholder")}
                         disabled={isLoading}
                         {...field}
                         showCommas={true}
@@ -390,11 +396,11 @@ export function ServerForm({
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Domains.form.status.label")}</FormLabel>
+                  <FormLabel>{t("Servers.form.status.label")}</FormLabel>
                   <FormControl>
                     <BooleanTabs
-                      trueText={t("Domains.form.status.active")}
-                      falseText={t("Domains.form.status.inactive")}
+                      trueText={t("Servers.form.status.active")}
+                      falseText={t("Servers.form.status.inactive")}
                       value={field.value === "active"}
                       onValueChange={(newValue) => {
                         field.onChange(newValue ? "active" : "inactive");

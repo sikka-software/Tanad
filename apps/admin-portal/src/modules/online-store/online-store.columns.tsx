@@ -24,6 +24,7 @@ const useOnlineStoreColumns = (
       header: t("OnlineStores.form.platform.label"),
       validationSchema: z.string().min(1, "Required"),
       noPadding: true,
+      enableEditing: false,
       cell: ({ getValue, row }) => (
         <SelectCell
           onChange={(value) => handleEdit?.(row.id, "platform", value)}

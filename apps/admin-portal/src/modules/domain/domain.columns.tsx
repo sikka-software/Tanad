@@ -40,6 +40,7 @@ const useDomainColumns = (
     {
       accessorKey: "payment_cycle",
       noPadding: true,
+      enableEditing: false,
       cell: ({ getValue, row }) => (
         <SelectCell
           onChange={(value) => handleEdit?.(row.id, "payment_cycle", value)}

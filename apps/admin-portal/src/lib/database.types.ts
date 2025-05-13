@@ -578,7 +578,7 @@ export type Database = {
           id: string
           notes: Json | null
           start_date: string | null
-          status: string
+          status: Database["public"]["Enums"]["employee_request_status"]
           title: string
           type: string
           updated_at: string
@@ -595,7 +595,7 @@ export type Database = {
           id?: string
           notes?: Json | null
           start_date?: string | null
-          status?: string
+          status?: Database["public"]["Enums"]["employee_request_status"]
           title: string
           type: string
           updated_at?: string
@@ -612,7 +612,7 @@ export type Database = {
           id?: string
           notes?: Json | null
           start_date?: string | null
-          status?: string
+          status?: Database["public"]["Enums"]["employee_request_status"]
           title?: string
           type?: string
           updated_at?: string
@@ -631,17 +631,21 @@ export type Database = {
       employees: {
         Row: {
           additional_number: string | null
+          birth_date: string | null
           building_number: string | null
           city: string | null
           country: string | null
           created_at: string | null
           email: string
+          emergency_contact: Json | null
           enterprise_id: string
+          eqama_id: string | null
           first_name: string
           hire_date: string | null
           id: string
           job_id: string | null
           last_name: string
+          national_id: string | null
           nationality: string | null
           notes: Json | null
           phone: string | null
@@ -657,17 +661,21 @@ export type Database = {
         }
         Insert: {
           additional_number?: string | null
+          birth_date?: string | null
           building_number?: string | null
           city?: string | null
           country?: string | null
           created_at?: string | null
           email: string
+          emergency_contact?: Json | null
           enterprise_id: string
+          eqama_id?: string | null
           first_name: string
           hire_date?: string | null
           id?: string
           job_id?: string | null
           last_name: string
+          national_id?: string | null
           nationality?: string | null
           notes?: Json | null
           phone?: string | null
@@ -683,17 +691,21 @@ export type Database = {
         }
         Update: {
           additional_number?: string | null
+          birth_date?: string | null
           building_number?: string | null
           city?: string | null
           country?: string | null
           created_at?: string | null
           email?: string
+          emergency_contact?: Json | null
           enterprise_id?: string
+          eqama_id?: string | null
           first_name?: string
           hire_date?: string | null
           id?: string
           job_id?: string | null
           last_name?: string
+          national_id?: string | null
           nationality?: string | null
           notes?: Json | null
           phone?: string | null
@@ -758,7 +770,7 @@ export type Database = {
           incurred_at: string | null
           issue_date: string | null
           notes: Json | null
-          status: string
+          status: Database["public"]["Enums"]["expense_status"]
           user_id: string
         }
         Insert: {
@@ -774,7 +786,7 @@ export type Database = {
           incurred_at?: string | null
           issue_date?: string | null
           notes?: Json | null
-          status?: string
+          status?: Database["public"]["Enums"]["expense_status"]
           user_id: string
         }
         Update: {
@@ -790,7 +802,7 @@ export type Database = {
           incurred_at?: string | null
           issue_date?: string | null
           notes?: Json | null
-          status?: string
+          status?: Database["public"]["Enums"]["expense_status"]
           user_id?: string
         }
         Relationships: [
@@ -869,7 +881,7 @@ export type Database = {
           invoice_number: string
           issue_date: string | null
           notes: Json | null
-          status: string
+          status: Database["public"]["Enums"]["invoice_status"]
           subtotal: number
           tax_amount: number | null
           tax_rate: number | null
@@ -886,7 +898,7 @@ export type Database = {
           invoice_number: string
           issue_date?: string | null
           notes?: Json | null
-          status?: string
+          status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
           tax_amount?: number | null
           tax_rate?: number | null
@@ -903,7 +915,7 @@ export type Database = {
           invoice_number?: string
           issue_date?: string | null
           notes?: Json | null
-          status?: string
+          status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
           tax_amount?: number | null
           tax_rate?: number | null
@@ -1416,7 +1428,7 @@ export type Database = {
           issue_date: string | null
           notes: Json | null
           purchase_number: string
-          status: string
+          status: Database["public"]["Enums"]["purchase_status"]
           user_id: string
         }
         Insert: {
@@ -1432,7 +1444,7 @@ export type Database = {
           issue_date?: string | null
           notes?: Json | null
           purchase_number: string
-          status?: string
+          status?: Database["public"]["Enums"]["purchase_status"]
           user_id: string
         }
         Update: {
@@ -1448,7 +1460,7 @@ export type Database = {
           issue_date?: string | null
           notes?: Json | null
           purchase_number?: string
-          status?: string
+          status?: Database["public"]["Enums"]["purchase_status"]
           user_id?: string
         }
         Relationships: [
@@ -1534,7 +1546,7 @@ export type Database = {
           issue_date: string
           notes: Json | null
           quote_number: string
-          status: string
+          status: Database["public"]["Enums"]["quote_status"]
           subtotal: number
           tax_amount: number | null
           tax_rate: number | null
@@ -1551,7 +1563,7 @@ export type Database = {
           issue_date: string
           notes?: Json | null
           quote_number: string
-          status?: string
+          status?: Database["public"]["Enums"]["quote_status"]
           subtotal?: number
           tax_amount?: number | null
           tax_rate?: number | null
@@ -1568,7 +1580,7 @@ export type Database = {
           issue_date?: string
           notes?: Json | null
           quote_number?: string
-          status?: string
+          status?: Database["public"]["Enums"]["quote_status"]
           subtotal?: number
           tax_amount?: number | null
           tax_rate?: number | null
@@ -2635,6 +2647,20 @@ export type Database = {
         | "terminated"
         | "retired"
         | "suspended"
+      expense_status:
+        | "draft"
+        | "submitted"
+        | "under_review"
+        | "pending_verification"
+        | "approved"
+        | "partially_approved"
+        | "rejected"
+        | "pending_payment"
+        | "paid"
+        | "disputed"
+        | "audit_flagged"
+        | "closed"
+        | "archived"
       invoice_status:
         | "draft"
         | "pending_approval"
@@ -3028,6 +3054,21 @@ export const Constants = {
         "terminated",
         "retired",
         "suspended",
+      ],
+      expense_status: [
+        "draft",
+        "submitted",
+        "under_review",
+        "pending_verification",
+        "approved",
+        "partially_approved",
+        "rejected",
+        "pending_payment",
+        "paid",
+        "disputed",
+        "audit_flagged",
+        "closed",
+        "archived",
       ],
       invoice_status: [
         "draft",
