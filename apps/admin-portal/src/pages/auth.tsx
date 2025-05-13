@@ -1,3 +1,4 @@
+import type { Session } from "@supabase/supabase-js";
 import { pick } from "lodash";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { GetServerSideProps } from "next";
@@ -37,15 +38,23 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const user = useUserStore((state) => state.user);
   const loadingUser = useUserStore((state) => state.loading);
+  const [supabaseSession, setSupabaseSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    // Always check session directly from Supabase
+    supabase.auth.getSession().then(({ data }) => {
+      setSupabaseSession(data.session);
+    });
+  }, [user, loadingUser]);
 
   useEffect(() => {
     setIsSignUp(router.asPath.includes("#signup"));
-    if (user && !loadingUser && router.pathname === "/auth") {
+    if (user && !loadingUser && supabaseSession && router.pathname === "/auth") {
       const redirectPath = sessionStorage.getItem("redirectAfterAuth") || "/dashboard";
       sessionStorage.removeItem("redirectAfterAuth");
-      router.push(redirectPath);
+      window.location.href = redirectPath;
     }
-  }, [user, loadingUser, router]);
+  }, [user, loadingUser, supabaseSession, router]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +75,7 @@ export default function Auth() {
       toast.error(translatedError);
     } finally {
       setLoading(false);
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     }
   };
 

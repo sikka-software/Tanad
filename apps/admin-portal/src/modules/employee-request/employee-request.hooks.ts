@@ -56,10 +56,6 @@ export const useCreateEmployeeRequest = () => {
       ]);
 
       queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
-
-      toast.success(t("General.successful_operation"), {
-        description: t("EmployeeRequests.success.create"),
-      });
     },
   });
 };
@@ -153,9 +149,6 @@ export function useUpdateEmployeeRequest() {
 
       // Also update the individual employee query data if it exists
       queryClient.setQueryData(employeeRequestKeys.detail(id), updatedEmployee);
-      toast.success(t("General.successful_operation"), {
-        description: t("EmployeeRequests.success.update"),
-      });
     },
     onError: (err, { id }, context) => {
       // Roll back to the previous values if mutation fails
