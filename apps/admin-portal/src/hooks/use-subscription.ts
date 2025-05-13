@@ -77,9 +77,56 @@ interface CancelSubscriptionResponse {
 const convertTimestampToDate = (timestamp: number | null): string => {
   if (!timestamp) return "-";
   try {
-    return new Date(timestamp * 1000).toLocaleDateString();
+    // Log timestamp for debugging
+    console.log(`Converting timestamp: ${timestamp} to date`, {
+      date: new Date(timestamp * 1000).toISOString(),
+      formatted: new Date(timestamp * 1000).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    });
+
+    // Format the date in a consistent format matching Stripe dashboard
+    return new Date(timestamp * 1000).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   } catch (error) {
     console.error("Error converting timestamp to date:", error);
+    return "-";
+  }
+};
+
+// Calculate the next billing date based on current date
+const calculateNextBillingDate = (): string => {
+  try {
+    // Get current date
+    const currentDate = new Date();
+    // Create a new date for next month (same day)
+    const nextMonth = new Date(currentDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+    // Log the calculated date for debugging
+    console.log("Calculated next billing date:", {
+      currentDate: currentDate.toISOString(),
+      nextMonth: nextMonth.toISOString(),
+      formatted: nextMonth.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    });
+
+    // Return formatted date using same format as convertTimestampToDate
+    return nextMonth.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  } catch (error) {
+    console.error("Error calculating next billing date:", error);
     return "-";
   }
 };
@@ -254,9 +301,11 @@ export function useSubscription() {
             name: getNameFromLookupKey(profile.subscribed_to),
             price: getPriceFromLookupKey(profile.subscribed_to),
             billingCycle: "month",
-            nextBillingDate: "-",
+            nextBillingDate: profile.cancel_at
+              ? convertTimestampToDate(profile.cancel_at)
+              : calculateNextBillingDate(),
             planLookupKey: profile.subscribed_to,
-            status: profile.cancel_at_period_end ? "canceled" : "active",
+            status: profile.cancel_at_period_end ? "canceling" : "active",
             isExpired: false,
             cancelAt: profile.cancel_at,
           });
@@ -390,9 +439,11 @@ export function useSubscription() {
               name: getNameFromLookupKey(subInfo.subscribed_to),
               price: getPriceFromLookupKey(subInfo.subscribed_to),
               billingCycle: "month",
-              nextBillingDate: "-",
+              nextBillingDate: subInfo.cancel_at
+                ? convertTimestampToDate(subInfo.cancel_at)
+                : calculateNextBillingDate(),
               planLookupKey: subInfo.subscribed_to,
-              status: subInfo.cancel_at_period_end ? "canceled" : "active",
+              status: subInfo.cancel_at_period_end ? "canceling" : "active",
               isExpired: false,
               cancelAt: subInfo.cancel_at,
             });
@@ -505,16 +556,18 @@ export function useSubscription() {
             });
           }
         } else {
-          // Use profile data as fallback
+          // Fallback to profile data if available
           if (profile.subscribed_to && profile.subscribed_to !== "tanad_free") {
             setSubscriptionData({
               id: null,
               name: getNameFromLookupKey(profile.subscribed_to),
               price: getPriceFromLookupKey(profile.subscribed_to),
               billingCycle: "month",
-              nextBillingDate: "-",
+              nextBillingDate: profile.cancel_at
+                ? convertTimestampToDate(profile.cancel_at)
+                : calculateNextBillingDate(),
               planLookupKey: profile.subscribed_to,
-              status: profile.cancel_at_period_end ? "canceled" : "active",
+              status: profile.cancel_at_period_end ? "canceling" : "active",
               isExpired: false,
               cancelAt: profile.cancel_at,
             });
@@ -543,9 +596,11 @@ export function useSubscription() {
             name: getNameFromLookupKey(profile.subscribed_to),
             price: getPriceFromLookupKey(profile.subscribed_to),
             billingCycle: "month",
-            nextBillingDate: "-",
+            nextBillingDate: profile.cancel_at
+              ? convertTimestampToDate(profile.cancel_at)
+              : calculateNextBillingDate(),
             planLookupKey: profile.subscribed_to,
-            status: profile.cancel_at_period_end ? "canceled" : "active",
+            status: profile.cancel_at_period_end ? "canceling" : "active",
             isExpired: false,
             cancelAt: profile.cancel_at,
           });
