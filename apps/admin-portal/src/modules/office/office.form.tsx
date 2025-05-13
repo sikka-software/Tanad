@@ -3,6 +3,7 @@ import NotesSection from "@root/src/components/forms/notes-section";
 import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { CommandSelect } from "@root/src/components/ui/command-select";
 import { FormDialog } from "@root/src/components/ui/form-dialog";
+import { createAddressSchema } from "@root/src/lib/schemas/address.schema";
 import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -14,7 +15,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
-import { createAddressSchema } from "@/components/forms/address-schema";
 import BooleanTabs from "@/components/ui/boolean-tabs";
 import CodeInput from "@/components/ui/code-input";
 import PhoneInput from "@/components/ui/phone-input";
@@ -42,7 +42,6 @@ const createOfficeSchema = (t: (key: string) => string) => {
     phone: z.string().optional().or(z.literal("")),
     manager: z
       .string({ invalid_type_error: t("Offices.form.manager.invalid_uuid") })
-      // .uuid({ message: t("Offices.form.manager.invalid_uuid") })
       .optional()
       .nullable(),
     status: z.enum(CommonStatus, {
@@ -52,8 +51,9 @@ const createOfficeSchema = (t: (key: string) => string) => {
   });
 
   const addressSchema = createAddressSchema(t);
+  const mergedSchema = baseOfficeSchema.merge(addressSchema);
 
-  return baseOfficeSchema.merge(addressSchema);
+  return mergedSchema;
 };
 
 export type OfficeFormValues = z.input<ReturnType<typeof createOfficeSchema>>;

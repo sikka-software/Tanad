@@ -12,7 +12,7 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
-import { createAddressSchema } from "@/components/forms/address-schema";
+import { createAddressSchema } from "@root/src/lib/schemas/address.schema";
 import NotesSection from "@/components/forms/notes-section";
 import PhoneInput from "@/components/ui/phone-input";
 

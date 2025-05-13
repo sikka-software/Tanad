@@ -16,7 +16,7 @@ import { Input } from "@/ui/input";
 import PhoneInput from "@/ui/phone-input";
 
 import { AddressFormSection } from "@/forms/address-form-section";
-import { createAddressSchema } from "@/forms/address-schema";
+import { createAddressSchema } from "@root/src/lib/schemas/address.schema";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 

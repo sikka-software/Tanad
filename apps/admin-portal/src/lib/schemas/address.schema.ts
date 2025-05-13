@@ -17,5 +17,15 @@ export const createAddressSchema = (t: (key: string) => string) =>
     additional_number: z.string().optional(),
   });
 
+export const addressSchema = {
+  short_address: z.string().optional(),
+  building_number: z.string().optional(),
+  street_name: z.string().optional(),
+  city: z.string().optional(),
+  region: z.string().optional(),
+  country: z.string().optional(),
+  zip_code: z.string().optional(),
+  additional_number: z.string().optional(),
+};
 // You can also export the inferred type if needed elsewhere
 export type AddressSchemaValues = z.infer<ReturnType<typeof createAddressSchema>>;
