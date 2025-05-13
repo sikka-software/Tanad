@@ -87,7 +87,7 @@ const useUserStore = create<UserState>((set, get) => ({
   enterprise: null,
   membership: null,
   permissions: [],
-  loading: false,
+  loading: true,
   error: null,
   lastFetchTime: null,
 
@@ -128,12 +128,19 @@ const useUserStore = create<UserState>((set, get) => ({
   },
 
   fetchUserAndProfile: async () => {
-    // Skip if already loading
-    if (get().loading) return;
+    console.log("[UserStore] fetchUserAndProfile called (pre-loading check)");
+    console.trace("[UserStore] fetchUserAndProfile stack trace");
+    // Timeout failsafe: set loading to false after 10s if still loading
+    const timeout = setTimeout(() => {
+      if (get().loading) {
+        set({ loading: false });
+        console.warn("[UserStore] Failsafe: loading still true after 10s, forcing to false");
+      }
+    }, 10000);
 
     // Skip if window just regained focus and we've fetched recently
     if (window.tanadSubscriptionDataCached) {
-      console.log("Skipping user data fetch - window just regained focus");
+      console.log("[UserStore] Skipping user data fetch - window just regained focus");
       return;
     }
 
@@ -141,17 +148,15 @@ const useUserStore = create<UserState>((set, get) => ({
     const now = Date.now();
     const lastFetch = get().lastFetchTime;
     if (lastFetch && now - lastFetch < 10000) {
-      console.log("Skipping user data fetch - fetched recently");
+      console.log("[UserStore] Skipping user data fetch - fetched recently");
       return;
     }
 
     try {
       set({ loading: true, error: null });
-
-      // Get the current session
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      console.log("[UserStore] Fetching session...");
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log("[UserStore] Session:", session);
 
       if (!session) {
         set({
@@ -163,76 +168,74 @@ const useUserStore = create<UserState>((set, get) => ({
           loading: false,
           lastFetchTime: now,
         });
+        clearTimeout(timeout);
+        console.log("[UserStore] No session found, set loading false");
         return;
       }
 
-      // Set the user from the session
       set({ user: session.user });
-
-      // Get profile data
-      const { data: profileData } = await supabase
+      console.log("[UserStore] Fetching profile for user", session.user.id);
+      const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", session.user.id)
         .single();
+      if (profileError) {
+        console.error("[UserStore] Profile fetch error:", profileError);
+      }
+      console.log("[UserStore] Profile data:", profileData);
 
       if (profileData) {
-        // Make sure subscribed_to is accessible
-        console.log("Profile data fetched:", {
-          id: profileData.id,
-          subscribed_to: profileData.subscribed_to,
-          price_id: profileData.price_id,
-        });
-
         set({ profile: profileData as ProfileType });
-
-        // Get membership data
-        const { data: membershipData } = await supabase
+        console.log("[UserStore] Fetching membership for user", session.user.id);
+        const { data: membershipData, error: membershipError } = await supabase
           .from("memberships")
           .select("*")
           .eq("profile_id", session.user.id)
           .single();
-
+        if (membershipError) {
+          console.error("[UserStore] Membership fetch error:", membershipError);
+        }
+        console.log("[UserStore] Membership data:", membershipData);
         if (membershipData) {
           set({ membership: membershipData as MembershipType });
-
-          // Get enterprise data
-          const { data: enterpriseData } = await supabase
+          console.log("[UserStore] Fetching enterprise for enterprise_id", membershipData.enterprise_id);
+          const { data: enterpriseData, error: enterpriseError } = await supabase
             .from("enterprises")
             .select("*")
             .eq("id", membershipData.enterprise_id)
             .single();
-
+          if (enterpriseError) {
+            console.error("[UserStore] Enterprise fetch error:", enterpriseError);
+          }
+          console.log("[UserStore] Enterprise data:", enterpriseData);
           if (enterpriseData) {
             set({ enterprise: enterpriseData as EnterpriseType });
           }
-
-          // Get user permissions from the view
-          const { data: permissionsData } = await supabase
+          console.log("[UserStore] Fetching permissions for user and enterprise");
+          const { data: permissionsData, error: permissionsError } = await supabase
             .from("user_permissions_view")
             .select("permission_name")
             .eq("user_id", session.user.id)
             .eq("enterprise_id", membershipData.enterprise_id);
-
+          if (permissionsError) {
+            console.error("[UserStore] Permissions fetch error:", permissionsError);
+          }
+          console.log("[UserStore] Permissions data:", permissionsData);
           if (permissionsData) {
             const permissions = permissionsData.map((p) => p.permission_name);
             set({ permissions });
           }
-          // console.log("user", session.user);
-          // console.log("profile", profileData);
-          // console.log("permissions", permissionsData);
-          // console.log("membership", membershipData);
-          // console.log("enterprise", enterpriseData);
         }
       }
-
-      // Update last fetch time
       set({ lastFetchTime: now });
     } catch (error: any) {
-      console.error("Error fetching user data:", error);
+      console.error("[UserStore] Error fetching user data:", error);
       set({ error: error.message });
     } finally {
       set({ loading: false });
+      clearTimeout(timeout);
+      console.log("[UserStore] fetchUserAndProfile finished, loading set to false");
     }
   },
 }));
@@ -247,7 +250,7 @@ supabase.auth.getSession().then(async ({ data }) => {
 
 // Setup auth state change listener
 supabase.auth.onAuthStateChange((event, _session) => {
-  if (event === "SIGNED_IN" && !session && _session) {
+  if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && _session) {
     useUserStore.getState().fetchUserAndProfile();
   } else if (event === "SIGNED_OUT") {
     useUserStore.setState({

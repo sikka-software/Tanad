@@ -43,7 +43,8 @@ export default function Auth() {
       // Check if there's a redirect path in sessionStorage
       const redirectPath = sessionStorage.getItem("redirectAfterAuth") || "/dashboard";
       sessionStorage.removeItem("redirectAfterAuth");
-      router.replace(redirectPath);
+      // router.replace(redirectPath);
+      router.push("/dashboard");
     }
   }, [user, router]);
 
@@ -59,7 +60,6 @@ export default function Auth() {
 
       if (error) throw error;
       toast.success(t("Auth.logged_in_successfully"));
-      router.push("/dashboard");
     } catch (error: any) {
       // Attempt to translate Supabase auth error codes
       const errorCode = error.code || error.message;
@@ -67,6 +67,7 @@ export default function Auth() {
       toast.error(translatedError);
     } finally {
       setLoading(false);
+      router.push("/dashboard");
     }
   };
 

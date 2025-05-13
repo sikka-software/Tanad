@@ -17,6 +17,7 @@ import { QueryProvider } from "@/providers/QueryProvider";
 import "@/styles/globals.css";
 
 import TopBar from "../components/jobs/top-bar";
+import useUserStore from "@/stores/use-user-store";
 
 const arabicFont = IBM_Plex_Sans_Arabic({
   weight: ["100", "200", "300", "400", "500", "600", "700"],
@@ -49,6 +50,8 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   useEffect(() => {
     setMounted(true);
     document.documentElement.classList.add(arabicFont.className);
+    // Call fetchUserAndProfile only once on mount
+    useUserStore.getState().fetchUserAndProfile();
   }, []);
 
   // Prevent beforeunload confirmation dialog for programmatic navigation
