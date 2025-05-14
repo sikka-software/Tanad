@@ -359,10 +359,10 @@ export function CarForm({
                   <FormLabel>{t("Vehicles.form.ownership_status.label")}</FormLabel>
                   <FormControl>
                     <Select
+                      key={field.value}
+                      value={field.value}
+                      onValueChange={(val) => field.onChange(val)}
                       dir={lang === "ar" ? "rtl" : "ltr"}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={isLoading}
                     >
                       <FormControl>
                         <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
@@ -416,10 +416,10 @@ export function CarForm({
                   <FormLabel>{t("Vehicles.form.status.label")}</FormLabel>
                   <FormControl>
                     <Select
+                      key={field.value}
+                      value={field.value}
+                      onValueChange={(val) => field.onChange(val)}
                       dir={lang === "ar" ? "rtl" : "ltr"}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={isLoading}
                     >
                       <FormControl>
                         <SelectTrigger onClear={() => field.onChange("")} value={field.value}>

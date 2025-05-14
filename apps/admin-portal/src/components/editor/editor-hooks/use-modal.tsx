@@ -8,7 +8,7 @@ export function useEditorModal(): [
   JSX.Element | null,
   (title: string, showModal: (onClose: () => void) => JSX.Element) => void,
 ] {
-  const locale = useLocale();
+  const lang = useLocale();
   const [modalContent, setModalContent] = useState<null | {
     closeOnClickOutside: boolean;
     content: JSX.Element;
@@ -26,7 +26,7 @@ export function useEditorModal(): [
     const { title, content } = modalContent;
     return (
       <Dialog open={true} onOpenChange={onClose}>
-        <DialogContent dir={locale === "ar" ? "rtl" : "ltr"}>
+        <DialogContent dir={lang === "ar" ? "rtl" : "ltr"}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
           </DialogHeader>

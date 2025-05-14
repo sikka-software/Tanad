@@ -124,16 +124,18 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
                         </div>
                         <div className="flex flex-row items-center gap-2">
                           {item.addHref && (
-                            <Link href={item.addHref}>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                className="relative size-7 translate-x-4 cursor-pointer opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
-                                type="button"
-                              >
-                                <Plus className="size-4" />
-                              </Button>
-                            </Link>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="relative size-7 translate-x-4 cursor-pointer opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                runCommand(() => router.push(item.addHref));
+                              }}
+                            >
+                              <Plus className="size-4" />
+                            </Button>
                           )}
                           <CommandShortcut>{item.shortcut}</CommandShortcut>
                         </div>

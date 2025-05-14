@@ -32,30 +32,30 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "border-input bg-background placeholder:text-muted-foreground ring-offset-background focus:ring-ring data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex h-9 w-full items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus:ring-2 focus:ring-offset-2 focus:outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&>span]:line-clamp-1",
+        "border-input bg-background placeholder:text-muted-foreground ring-offset-background focus:ring-ring data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 relative flex h-9 w-full items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none select-none focus:ring-2 focus:ring-offset-2 focus:outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&>span]:line-clamp-1",
         className,
       )}
       {...props}
     >
       {children}
-      <SelectPrimitive.Icon asChild>
-        {onClear && props.value ? (
-          <button
-            autoFocus={false}
-            type="button"
-            className="pointer-events-auto"
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              onClear();
-            }}
-          >
-            <XIcon className="size-4 opacity-50" />
-          </button>
-        ) : (
+      {onClear && props.value ? (
+        <button
+          autoFocus={false}
+          type="button"
+          className="rounded-inner-1 bg--400 pointer-events-auto absolute end-1 z-[51] p-1.5"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onClear();
+          }}
+        >
+          <XIcon className="size-4 opacity-50" />
+        </button>
+      ) : (
+        <SelectPrimitive.Icon asChild>
           <ChevronDownIcon className="size-4 opacity-50" />
-        )}
-      </SelectPrimitive.Icon>
+        </SelectPrimitive.Icon>
+      )}
     </SelectPrimitive.Trigger>
   );
 }

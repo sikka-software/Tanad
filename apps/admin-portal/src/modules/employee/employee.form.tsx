@@ -624,9 +624,7 @@ export function EmployeeForm({
                     <Select
                       key={field.value}
                       value={field.value}
-                      onValueChange={(val) => {
-                        field.onChange(val);
-                      }}
+                      onValueChange={(val) => field.onChange(val)}
                       dir={locale === "ar" ? "rtl" : "ltr"}
                     >
                       <FormControl>
