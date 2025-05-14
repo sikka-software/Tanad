@@ -1,6 +1,6 @@
 "use client";
 
-import { Asterisk, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
