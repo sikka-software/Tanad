@@ -1,8 +1,11 @@
+import { SquareArrowOutUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import StatusCell from "@/components/tables/status-cell";
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import IconButton from "@/ui/icon-button";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
+
+import StatusCell from "@/tables/status-cell";
 
 import { Company } from "./company.type";
 
@@ -38,7 +41,15 @@ const useCompanyColumns = (
     {
       accessorKey: "website",
       header: t("Companies.form.website.label"),
-      validationSchema: z.string().url(t("Companies.form.website.invalid")),
+      endIcon: ({ website }) => (
+        <IconButton
+          size="icon_sm"
+          variant="ghost"
+          className="absolute -end-0.5 -top-1.5 z-10 cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+          onClick={() => window.open(`https://${website}`, "_blank")}
+          icon={<SquareArrowOutUpRight className="size-4" />}
+        />
+      ),
     },
     {
       accessorKey: "address",

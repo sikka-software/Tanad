@@ -1,10 +1,11 @@
+import { SquareArrowOutUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
+import IconButton from "@/ui/icon-button";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
 import CurrencyCell from "@/tables/currency-cell";
-import LinkCell from "@/tables/link-cell";
 import SelectCell from "@/tables/select-cell";
 import StatusCell from "@/tables/status-cell";
 
@@ -21,13 +22,13 @@ const useDomainColumns = (
     {
       accessorKey: "domain_name",
       header: t("Domains.form.domain_name.label"),
-      validationSchema: z.string().min(1, "Required"),
-      noPadding: true,
-      cell: (cell) => (
-        <LinkCell
-          value={cell.getValue() as string}
-          onBlur={(e) => handleEdit?.(cell.row.id, "domain_name", e.target.value)}
-          onClick={() => window.open(`https://${cell.getValue() as string}`, "_blank")}
+      endIcon: ({ domain_name }) => (
+        <IconButton
+          size="icon_sm"
+          variant="ghost"
+          className="absolute -end-0.5 -top-1.5 z-10 cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+          onClick={() => window.open(`https://${domain_name}`, "_blank")}
+          icon={<SquareArrowOutUpRight className="size-4" />}
         />
       ),
     },

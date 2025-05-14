@@ -1,9 +1,10 @@
+import { SquareArrowOutUpRight } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { z } from "zod";
 
+import IconButton from "@/ui/icon-button";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import StatusCell from "@/components/tables/status-cell";
+import StatusCell from "@/tables/status-cell";
 
 import { Website } from "@/website/website.type";
 
@@ -17,7 +18,15 @@ const useWebsiteColumns = (
     {
       accessorKey: "domain_name",
       header: t("Websites.form.domain_name.label"),
-      validationSchema: z.string().min(1, t("Websites.form.domain_name.required")),
+      endIcon: ({ domain_name }) => (
+        <IconButton
+          size="icon_sm"
+          variant="ghost"
+          className="absolute -end-0.5 -top-1.5 z-10 cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+          onClick={() => window.open(`https://${domain_name}`, "_blank")}
+          icon={<SquareArrowOutUpRight className="size-4" />}
+        />
+      ),
     },
     {
       accessorKey: "created_at",

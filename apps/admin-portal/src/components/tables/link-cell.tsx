@@ -1,4 +1,4 @@
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, SquareArrowOutUpRight } from "lucide-react";
 import { ChangeEvent } from "react";
 
 import IconButton from "@/ui/icon-button";
@@ -37,7 +37,7 @@ const CodeCell = ({
           "absolute end-0.5 top-1 cursor-pointer",
         )}
         onClick={onClick}
-        icon={<ExternalLink className="size-4" />}
+        icon={<SquareArrowOutUpRight className="size-4" />}
       />
     </div>
   );

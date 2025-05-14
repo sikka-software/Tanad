@@ -57,6 +57,8 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
 
   onSerial?: (row: TData, rowIndex: number) => void;
   onRandom?: (row: TData, rowIndex: number) => void;
+
+  endIcon?: (row: TData) => React.ReactNode;
 };
 
 /**
@@ -738,7 +740,7 @@ function SheetTable<
               <TableCell
                 key={rowId + colKey + String(cell.getValue() ?? "")}
                 className={cn(
-                  "tiny-scrollbar relative overflow-scroll border",
+                  "tiny-scrollbar relative overflow-scroll border group",
                   {
                     "bg-muted": isDisabled,
                     "bg-destructive/25": errorMsg,
@@ -767,7 +769,10 @@ function SheetTable<
                 onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
                 onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
               >
-                {cellContent}
+                <div className="relative">
+                  {cellContent}
+                  {colDef.endIcon && colDef.endIcon(rowData)}
+                </div>
               </TableCell>
             );
           })}
