@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { Currency } from "lucide-react";
+import { Currency, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -173,7 +173,7 @@ export default function PurchasesPage() {
                   title: t("Purchases.create_first.title"),
                   description: t("Purchases.create_first.description"),
                   add: t("Pages.Purchases.add"),
-                  icons: [Currency, Currency, Currency],
+                  icons: [Currency, Plus, Currency],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(purchase) => <PurchaseCard key={purchase.id} purchase={purchase} />}

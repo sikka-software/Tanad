@@ -167,8 +167,8 @@ export default function BranchesPage() {
                 isLoading={isLoading}
                 error={error}
                 empty={{
-                  title: t("Pages.Branches.create_first.title"),
-                  description: t("Pages.Branches.create_first.description"),
+                  title: t("Branches.create_first.title"),
+                  description: t("Branches.create_first.description"),
                   add: t("Pages.Branches.add"),
                   icons: [Store, Plus, Store],
                   onClick: () => router.push(router.pathname + "/add"),

@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { User } from "lucide-react";
+import { Plus, User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -169,7 +169,7 @@ export default function SalariesPage() {
                   title: t("Salaries.create_first.title"),
                   description: t("Salaries.create_first.description"),
                   add: t("Pages.Salaries.add"),
-                  icons: [User, User, User],
+                  icons: [User, Plus, User],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(salary) => <SalaryCard key={salary.id} salary={salary} />}

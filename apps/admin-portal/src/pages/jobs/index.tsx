@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { Briefcase } from "lucide-react";
+import { Briefcase, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -155,10 +155,10 @@ export default function JobsPage() {
                 isLoading={loadingFetchJobs}
                 error={error}
                 empty={{
-                  title: t("Pages.Jobs.create_first.title"),
-                  description: t("Pages.Jobs.create_first.description"),
-                  add: t("Pages.Jobs.create_first.add"),
-                  icons: [Briefcase, Briefcase, Briefcase],
+                  title: t("Jobs.create_first.title"),
+                  description: t("Jobs.create_first.description"),
+                  add: t("Pages.Jobs.add"),
+                  icons: [Briefcase, Plus, Briefcase],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(job) => <JobCard job={job} />}

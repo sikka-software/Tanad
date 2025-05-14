@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { Briefcase } from "lucide-react";
+import { Briefcase, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -168,10 +168,10 @@ export default function JobListingsPage() {
                 isLoading={isLoading}
                 error={error}
                 empty={{
-                  title: t("Pages.JobListings.create_first.title"),
-                  description: t("Pages.JobListings.create_first.description"),
-                  add: t("Pages.JobListings.create_first.add"),
-                  icons: [Briefcase, Briefcase, Briefcase],
+                  title: t("JobListings.create_first.title"),
+                  description: t("JobListings.create_first.description"),
+                  add: t("Pages.JobListings.add"),
+                  icons: [Briefcase, Plus, Briefcase],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(listing: JobListingWithJobs) => (

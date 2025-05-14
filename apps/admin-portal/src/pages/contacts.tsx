@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { User } from "lucide-react";
+import { Plus, User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -71,7 +71,7 @@ export default function ContactsPage() {
                 title: t("Clients.create_first.title"),
                 description: t("Clients.create_first.description"),
                 add: t("Pages.Clients.add"),
-                icons: [User, User, User],
+                icons: [User, Plus, User],
                 onClick: () => router.push(router.pathname + "/add"),
               }}
               renderItem={(client) => (
@@ -90,7 +90,7 @@ export default function ContactsPage() {
                 title: t("Vendors.create_first.title"),
                 description: t("Vendors.create_first.description"),
                 add: t("Pages.Vendors.add"),
-                icons: [User, User, User],
+                icons: [User, Plus, User],
                 onClick: () => router.push(router.pathname + "/add"),
               }}
               renderItem={(vendor) => (

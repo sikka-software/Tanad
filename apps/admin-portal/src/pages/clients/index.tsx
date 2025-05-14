@@ -172,7 +172,7 @@ export default function ClientsPage() {
                   title: t("Clients.create_first.title"),
                   description: t("Clients.create_first.description"),
                   add: t("Pages.Clients.add"),
-                  icons: [User, User, User],
+                  icons: [User, Plus, User],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(client) => (

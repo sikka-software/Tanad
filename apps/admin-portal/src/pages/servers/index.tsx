@@ -171,8 +171,8 @@ export default function ServersPage() {
                 isLoading={isLoading}
                 error={error}
                 empty={{
-                  title: t("Pages.Servers.create_first.title"),
-                  description: t("Pages.Servers.create_first.description"),
+                  title: t("Servers.create_first.title"),
+                  description: t("Servers.create_first.description"),
                   add: t("Pages.Servers.add"),
                   icons: [Server, Plus, Server],
                   onClick: () => router.push(router.pathname + "/add"),

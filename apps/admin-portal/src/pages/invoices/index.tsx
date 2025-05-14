@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { File } from "lucide-react";
+import { File, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -174,7 +174,7 @@ export default function InvoicesPage() {
                   title: t("Invoices.create_first.title"),
                   description: t("Invoices.create_first.description"),
                   add: t("Pages.Invoices.add"),
-                  icons: [File, File, File],
+                  icons: [File, Plus, File],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(invoice) => <InvoiceCard invoice={invoice} />}

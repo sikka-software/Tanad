@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { Package } from "lucide-react";
+import { Package, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -181,7 +181,7 @@ export default function ProductsPage() {
                   title: t("Products.create_first.title"),
                   description: t("Products.create_first.description"),
                   add: t("Pages.Products.add"),
-                  icons: [Package, Package, Package],
+                  icons: [Package, Plus, Package],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(product) => <ProductCard product={product} />}

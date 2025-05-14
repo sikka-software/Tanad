@@ -168,7 +168,7 @@ export default function DepartmentsPage() {
                   title: t("Departments.create_first.title"),
                   description: t("Departments.create_first.description"),
                   add: t("Pages.Departments.add"),
-                  icons: [Building, Building, Building],
+                  icons: [Building, Plus, Building],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(department) => (

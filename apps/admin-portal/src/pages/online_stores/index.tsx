@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { Store } from "lucide-react";
+import { Plus, Store } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -166,10 +166,10 @@ export default function OnlineStoresPage() {
                 isLoading={loadingFetchOnlineStores}
                 error={error as Error | null}
                 empty={{
-                  title: t("Pages.OnlineStores.create_first.title"),
-                  description: t("Pages.OnlineStores.create_first.description"),
-                  add: t("Pages.OnlineStores.create_first.add"),
-                  icons: [Store, Store, Store],
+                  title: t("OnlineStores.create_first.title"),
+                  description: t("OnlineStores.create_first.description"),
+                  add: t("Pages.OnlineStores.add"),
+                  icons: [Store, Plus, Store],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(onlineStore) => (
