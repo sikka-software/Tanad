@@ -1,18 +1,16 @@
 "use client";
 
-import { format } from "date-fns";
+import { parseDate, getLocalTimeZone } from "@internationalized/date";
 import { CalendarIcon } from "lucide-react";
 import * as React from "react";
+import { Group } from "react-aria-components";
 import { DateRange } from "react-day-picker";
 
 import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
-import { FormControl } from "@/ui/form";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 
-import { cn } from "@/lib/utils";
-
-import { Input } from "./input";
+import { DateField, DateInput } from "@/components/ui/datefield-rac";
 
 interface DatePickerProps {
   date?: Date | DateRange;
@@ -24,7 +22,7 @@ interface DatePickerProps {
   ariaInvalid?: boolean;
 }
 
-export function DateInput({
+export function DateInputField({
   date,
   onSelect,
   placeholder = "Pick a date",
@@ -33,57 +31,69 @@ export function DateInput({
   mode = "single",
   ariaInvalid = false,
 }: DatePickerProps) {
+  const [open, setOpen] = React.useState(false);
+  // Convert JS Date to CalendarDate (react-aria format)
+  const toCalendarDate = (d: Date | undefined) => {
+    if (!d) return undefined;
+    // Convert to yyyy-MM-dd string
+    const iso = d.toISOString().split("T")[0];
+    return parseDate(iso);
+  };
+  // Convert CalendarDate to JS Date
+  const toJSDate = (cd: any) => {
+    if (!cd) return undefined;
+    // cd.toDate(timeZone) returns a JS Date
+    return cd.toDate(getLocalTimeZone());
+  };
+
+  // Only support single date for now
+  const calendarValue = toCalendarDate(date as Date | undefined);
+
+  // Handler for calendar selection
+  const handleCalendarSelect = (selected: Date | undefined) => {
+    if (selected) {
+      onSelect(selected);
+      setOpen(false);
+    }
+  };
+
   return (
-    <Popover>
-      <PopoverTrigger>
-        {isolated ? (
-          <Input
-            className={cn(
-              "w-full justify-start text-left font-normal",
-              !date && "text-muted-foreground",
-              ariaInvalid &&
-                "ring-destructive/20 dark:ring-destructive/40 border-destructive border-e-none",
-            )}
+    <div className="flex w-full items-center gap-1">
+      <DateField
+        value={calendarValue}
+        onChange={(cd) => onSelect(toJSDate(cd))}
+        isDisabled={disabled}
+        aria-invalid={ariaInvalid}
+        className="w-full"
+      >
+        <Group className="w-full">
+          <DateInput />
+        </Group>
+      </DateField>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            className="ms-1 flex !size-9 min-w-9 items-center justify-center p-0 shadow-xs"
+            tabIndex={-1}
+            aria-label="Open calendar"
             disabled={disabled}
-          />
-        ) : (
-          <FormControl>
-            <Input
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !date && "text-muted-foreground",
-                ariaInvalid &&
-                  "ring-destructive/20 dark:ring-destructive/40 border-destructive border-e-none",
-              )}
-            />
-          </FormControl>
-        )}
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        {mode === "range" ? (
-          <Calendar
-            mode="range"
-            selected={date as DateRange | undefined}
-            onSelect={onSelect as (range: DateRange | undefined) => void}
-            initialFocus
-            numberOfMonths={2}
-          />
-        ) : mode === "multiple" ? (
-          <Calendar
-            mode="multiple"
-            selected={date as Date[] | undefined}
-            onSelect={onSelect as (dates: Date[] | undefined) => void}
-            initialFocus
-          />
-        ) : (
+          >
+            <CalendarIcon className="size-4" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
             selected={date as Date | undefined}
-            onSelect={onSelect as (date: Date | undefined) => void}
+            onSelect={handleCalendarSelect}
             initialFocus
           />
-        )}
-      </PopoverContent>
-    </Popover>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }
+
+export { DateInputField as DateInput };
