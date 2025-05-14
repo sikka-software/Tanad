@@ -130,7 +130,6 @@ const modelMap: Record<string, ModelConfig> = {
       },
     },
   },
-
   employees: {
     tableName: "employees",
     customHandlers: {
@@ -208,7 +207,6 @@ const modelMap: Record<string, ModelConfig> = {
       },
     },
   },
-
   invoices: {
     tableName: "invoices",
     customHandlers: {

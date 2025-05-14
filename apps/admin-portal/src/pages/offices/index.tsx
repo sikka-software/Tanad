@@ -1,6 +1,5 @@
-import useOfficeColumns from "@root/src/modules/office/office.columns";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
@@ -12,6 +11,8 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { createModuleStoreHooks } from "@/utils/module-hooks";
+
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
@@ -19,6 +20,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import OfficeCard from "@/office/office.card";
+import useOfficeColumns from "@/office/office.columns";
 import { OfficeForm } from "@/office/office.form";
 import { useOffices, useBulkDeleteOffices, useDuplicateOffice } from "@/office/office.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/office/office.options";
@@ -26,39 +28,43 @@ import useOfficeStore from "@/office/office.store";
 import OfficesTable from "@/office/office.table";
 import { OfficeUpdateData } from "@/office/office.type";
 
-import useUserStore from "@/stores/use-user-store";
-
 export default function OfficesPage() {
   const t = useTranslations();
   const router = useRouter();
 
   const columns = useOfficeColumns();
 
-  const canReadOffices = useUserStore((state) => state.hasPermission("offices.read"));
-  const canCreateOffices = useUserStore((state) => state.hasPermission("offices.create"));
+  const moduleHooks = createModuleStoreHooks(useOfficeStore, "offices");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableOffice, setActionableOffice] = useState<OfficeUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
-  const loadingSaveOffice = useOfficeStore((state) => state.isLoading);
-  const setLoadingSaveOffice = useOfficeStore((state) => state.setIsLoading);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const viewMode = useOfficeStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useOfficeStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useOfficeStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useOfficeStore((state) => state.selectedRows);
-  const setSelectedRows = useOfficeStore((state) => state.setSelectedRows);
-  const clearSelection = useOfficeStore((state) => state.clearSelection);
-  const sortRules = useOfficeStore((state) => state.sortRules);
-  const sortCaseSensitive = useOfficeStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useOfficeStore((state) => state.sortNullsFirst);
-  const searchQuery = useOfficeStore((state) => state.searchQuery);
-  const filterConditions = useOfficeStore((state) => state.filterConditions);
-  const filterCaseSensitive = useOfficeStore((state) => state.filterCaseSensitive);
-  const getFilteredOffices = useOfficeStore((state) => state.getFilteredData);
-  const getSortedOffices = useOfficeStore((state) => state.getSortedData);
-  const columnVisibility = useOfficeStore((state) => state.columnVisibility);
-  const setColumnVisibility = useOfficeStore((state) => state.setColumnVisibility);
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
 
   const { data: offices, isLoading, error } = useOffices();
   const { mutateAsync: deleteOffices, isPending: isDeleting } = useBulkDeleteOffices();
@@ -68,6 +74,7 @@ export default function OfficesPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: offices,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
     setActionableItem: setActionableOffice,
@@ -81,31 +88,29 @@ export default function OfficesPage() {
     error: "Offices.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
 
-  // Get the store's data for instant updates
   const storeData = useOfficeStore((state) => state.data) || [];
   const setData = useOfficeStore((state) => state.setData);
 
-  // When offices data changes (from server), update the store
   useEffect(() => {
     if (offices && setData) {
       setData(offices);
     }
   }, [offices, setData]);
 
-  // Apply filtering and sorting to the store's data
-  const filteredOffices = useMemo(() => {
-    return getFilteredOffices(storeData);
-  }, [storeData, getFilteredOffices, searchQuery, filterConditions, filterCaseSensitive]);
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const sortedOffices = useMemo(() => {
-    return getSortedOffices(filteredOffices);
-  }, [filteredOffices, sortRules, sortCaseSensitive, sortNullsFirst]);
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  if (!canReadOffices) {
+  if (!canRead) {
     return <NoPermission />;
   }
 
@@ -121,7 +126,10 @@ export default function OfficesPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -130,7 +138,7 @@ export default function OfficesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Offices.title")}
-            onAddClick={canCreateOffices ? () => router.push(router.pathname + "/add") : undefined}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Offices.add")}
             searchPlaceholder={t("Pages.Offices.search")}
             hideOptions={offices?.length === 0}
@@ -143,20 +151,20 @@ export default function OfficesPage() {
           />
         )}
 
-        <div>
+        <div className="bg--200">
           {viewMode === "table" ? (
             <OfficesTable
-              data={sortedOffices}
+              data={sortedData}
               isLoading={isLoading}
-              error={error instanceof Error ? error : null}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedOffices}
+                data={sortedData}
                 isLoading={isLoading}
-                error={error instanceof Error ? error : null}
+                error={error}
                 emptyMessage={t("Pages.Offices.no_offices_found")}
                 renderItem={(office) => <OfficeCard office={office} />}
                 gridCols="3"
@@ -170,14 +178,14 @@ export default function OfficesPage() {
           onOpenChange={setIsFormDialogOpen}
           title={actionableOffice ? t("Pages.Offices.edit") : t("Pages.Offices.add")}
           formId="office-form"
-          loadingSave={loadingSaveOffice}
+          loadingSave={loadingSave}
         >
           <OfficeForm
             formHtmlId="office-form"
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableOffice(null);
-              setLoadingSaveOffice(false);
+              setLoadingSave(false);
             }}
             defaultValues={actionableOffice}
             editMode={true}
@@ -188,9 +196,10 @@ export default function OfficesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Offices.confirm_delete_title")}
-          description={t("Offices.confirm_delete", { count: selectedRows.length })}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
+          title={t("Offices.confirm_delete", { count: selectedRows.length })}
+          description={t("Offices.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>
@@ -208,7 +217,7 @@ OfficesPage.messages = [
   "Notes",
 ];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -1,4 +1,6 @@
 import CurrencyCell from "@root/src/components/tables/currency-cell";
+import SelectCell from "@root/src/components/tables/select-cell";
+import StatusCell from "@root/src/components/tables/status-cell";
 import useUserStore from "@root/src/stores/use-user-store";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
@@ -7,10 +9,11 @@ import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { Domain } from "./domain.type";
 
-const useDomainColumns = () => {
+const useDomainColumns = (
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
   const currency = useUserStore((state) => state.profile?.user_settings?.currency);
-
   const columns: ExtendedColumnDef<Domain>[] = [
     {
       accessorKey: "domain_name",
@@ -36,11 +39,18 @@ const useDomainColumns = () => {
     },
     {
       accessorKey: "payment_cycle",
-      cellType: "select",
-      options: [
-        { label: t("Domains.form.payment_cycle.monthly"), value: "monthly" },
-        { label: t("Domains.form.payment_cycle.annual"), value: "annual" },
-      ],
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "payment_cycle", value)}
+          cellValue={getValue()}
+          options={[
+            { label: t("Domains.form.payment_cycle.monthly"), value: "monthly" },
+            { label: t("Domains.form.payment_cycle.annual"), value: "annual" },
+          ]}
+        />
+      ),
       header: t("Domains.form.payment_cycle.label"),
       validationSchema: z.string().min(1, "Required"),
     },
@@ -48,12 +58,22 @@ const useDomainColumns = () => {
       accessorKey: "status",
       maxSize: 80,
       header: t("Domains.form.status.label"),
-      validationSchema: z.enum(["active", "inactive"]),
-      cellType: "status",
-      options: [
-        { label: t("Domains.form.status.active"), value: "active" },
-        { label: t("Domains.form.status.inactive"), value: "inactive" },
-      ],
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("Domains.form.status.active"), value: "active" },
+              { label: t("Domains.form.status.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
   return columns;

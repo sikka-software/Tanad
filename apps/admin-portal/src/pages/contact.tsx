@@ -1,6 +1,6 @@
 import settings from "@root/landing.config";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
 import { useState } from "react";
 
@@ -117,7 +117,7 @@ export default function ContactPage() {
 
 ContactPage.messages = ["Pages", "General", "Contact"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, ContactPage.messages),

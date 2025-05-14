@@ -13,6 +13,7 @@
     "export": "تصدير",
     "cut": "قطع",
     "paste": "لصق",
+    "scroll_to_top": "إلى الأعلى",
     "characters": "الأحرف",
     "clear_editor_description": "هل أنت متأكد أنك تريد مسح المحرر؟",
     "convert_from_markdown": "تحويل إلى Markdown",
@@ -38,6 +39,7 @@
     "updated": "تحديث",
     "deleted": "حذف",
     "duplicated": "تكرار",
+    "duplicating": "جاري التكرار",
     "unknown": "تنفيذ",
     "employee": "موظف",
     "employee_request": "طلب موظف",
@@ -423,6 +425,7 @@
     },
     "Offices": {
       "title": "المكاتب",
+      "description": "إدارة المكاتب",
       "singular": "مكتب",
       "add": "إضافة مكتب جديد",
       "create": "إنشاء مكتب",
@@ -503,15 +506,84 @@
       "search": "بحث عن نطاق",
       "no_domains_found": "لا يوجد نطاقات"
     },
-    "subscription_status": {
-      "active": "مفعل",
-      "inactive": "غير مفعل",
-      "canceling": "قيد الإلغاء",
-      "canceled": "ملغي",
-      "cancelled": "ملغي",
-      "expired": "منتهي",
-      "pending": "قيد الانتظار",
-      "refunded": "مسترجع"
+    "Expenses": {
+      "title": "المصروفات",
+      "singular": "مصروف",
+      "add": "إضافة مصروف جديد",
+      "create": "إنشاء مصروف",
+      "edit": "تعديل المصروف",
+      "search": "بحث عن مصروف",
+      "no_expenses_found": "لا يوجد مصروفات"
+    },
+    "JobListings": {
+      "title": "صفحات التوظيف",
+      "singular": "صفحة توظيف",
+      "add": "إضافة صفحة توظيف جديدة",
+      "create": "إنشاء صفحة توظيف",
+      "edit": "تعديل الصفحة التوظيفية",
+      "search": "بحث عن صفحة توظيف",
+      "no_job_listings_found": "لا يوجد صفحات توظيف"
+    },
+    "OnlineStores": {
+      "title": "المتاجر الإلكترونية",
+      "singular": "متجر إلكتروني",
+      "add": "إضافة متجر إلكتروني جديد",
+      "create": "إنشاء متجر إلكتروني",
+      "edit": "تعديل المتجر الإلكتروني",
+      "search": "بحث عن متجر إلكتروني",
+      "no_online_stores_found": "لا يوجد متاجر إلكترونية"
+    },
+    "Purchases": {
+      "title": "المشتريات",
+      "singular": "مشترية",
+      "add": "إضافة طلب شراء",
+      "create": "إنشاء طلب شراء",
+      "edit": "تعديل طلب الشراء",
+      "search": "بحث عن طلب الشراء",
+      "no_purchases_found": "لا توجد طلبات شراء"
+    },
+    "Salaries": {
+      "title": "الرواتب",
+      "singular": "راتب",
+      "add": "إضافة راتب جديد",
+      "create": "إنشاء راتب",
+      "edit": "تعديل الراتب",
+      "search": "بحث عن راتب",
+      "no_salaries_found": "لا يوجد رواتب"
+    },
+    "Servers": {
+      "title": "الخوادم",
+      "singular": "خادم",
+      "add": "إضافة خادم جديد",
+      "create": "إنشاء خادم",
+      "edit": "تعديل الخادم",
+      "search": "بحث عن خادم",
+      "no_servers_found": "لا يوجد خوادم"
+    },
+    "Trucks": {
+      "title": "الشاحنات",
+      "singular": "شاحنة",
+      "add": "إضافة شاحنة جديدة",
+      "create": "إنشاء شاحنة",
+      "edit": "تعديل الشاحنة",
+      "search": "بحث عن شاحنة",
+      "no_trucks_found": "لا يوجد شاحنات"
+    },
+    "Websites": {
+      "title": "المواقع الإلكترونية",
+      "singular": "موقع إلكتروني",
+      "add": "إضافة موقع إلكتروني جديد",
+      "create": "إنشاء موقع إلكتروني",
+      "edit": "تعديل الموقع الإلكتروني",
+      "search": "بحث عن موقع إلكتروني",
+      "no_websites_found": "لا يوجد مواقع إلكترونية"
+    },
+    "BankAccounts": {
+      "title": "الحسابات البنكية",
+      "singular": "حساب بنكي",
+      "add": "إضافة حساب بنكي جديد",
+      "create": "إنشاء حساب بنكي",
+      "edit": "تعديل الحساب البنكي"
     }
   },
   "Flags": {
@@ -2258,14 +2330,7 @@
       "delete": "حدث خطأ أثناء حذف الفاتورة",
       "duplicate": "حدث خطأ أثناء تكرار الفاتورة"
     },
-    "status": {
-      "title": "الحالة",
-      "draft": "مسودة",
-      "pending": "قيد الانتظار",
-      "paid": "مدفوعة",
-      "overdue": "متأخرة",
-      "cancelled": "ملغاة"
-    },
+
     "form": {
       "invoice_number": {
         "label": "رقم الفاتورة",
@@ -2303,11 +2368,18 @@
         "label": "الحالة",
         "placeholder": "اختر حالة",
         "draft": "مسودة",
-        "pending": "قيد الانتظار",
+        "pending_approval": "قيد الموافقة",
+        "sent": "تم الإرسال",
+        "partially_paid": "مدفوع جزئيا",
         "paid": "مدفوعة",
         "overdue": "متأخرة",
-        "cancelled": "ملغاة",
-        "partially_paid": "مدفوع جزئيا"
+        "disputed": "متعارضة",
+        "void": "ملغية",
+        "scheduled": "مجدولة",
+        "payment_failed": "فشل الدفع",
+        "refunded": "مسترجع",
+        "written_off": "مكتوب عنه",
+        "archived": "مؤرشف"
       },
       "subtotal": {
         "label": "المجموع الفرعي"
@@ -2430,14 +2502,7 @@
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {عرض سعر} =1 {هذا العرض السعري} other {# عروض سعر}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {عرض سعر} =1 {هذا العرض السعري} other {# عروض سعر}}",
     "tax": "الضريبة",
-    "status": {
-      "title": "الحالة",
-      "draft": "مسودة",
-      "sent": "تم الإرسال",
-      "accepted": "مقبول",
-      "rejected": "مرفوض",
-      "expired": "منتهي الصلاحية"
-    },
+
     "notes": "ملاحظات",
     "enter_notes": "أدخل الملاحظات",
     "form": {
@@ -2454,14 +2519,24 @@
         "placeholder": "اختر تاريخ انتهاء الصلاحية"
       },
       "status": {
-        "title": "الحالة",
         "label": "الحالة",
         "placeholder": "اختر الحالة",
         "draft": "مسودة",
         "sent": "تم الإرسال",
+        "revised": "معدل",
+        "under_review": "قيد المراجعة",
         "accepted": "مقبول",
         "rejected": "مرفوض",
-        "expired": "منتهي الصلاحية"
+        "expired": "منتهي الصلاحية",
+        "converted_to_invoice": "تحويل إلى فاتورة",
+        "negotiating": "قيد المفاوضات",
+        "archived": "مؤرشف"
+      },
+      "tax_rate": {
+        "label": "نسبة الضريبة"
+      },
+      "subtotal": {
+        "label": "المجموع الفرعي"
       },
       "issue_date": {
         "label": "تاريخ الإصدار",
@@ -2579,9 +2654,17 @@
       },
       "status": {
         "label": "الحالة",
-        "pending": "قيد الانتظار",
-        "approved": "تمت الموافقة",
-        "rejected": "مرفوض"
+        "placeholder": "اختر الحالة",
+        "draft": "مسودة",
+        "submitted": "مرفوض",
+        "under_review": "قيد المراجعة",
+        "approved": "موافق",
+        "rejected": "مرفوض",
+        "revoked": "ملغي",
+        "pending_additional_info": "بانتظار معلومات إضافية",
+        "completed": "مكتمل",
+        "escalated": "مرفوض",
+        "archived": "مؤرشف"
       }
     },
     "success": {
@@ -2605,14 +2688,7 @@
     }
   },
   "Clients": {
-    "title": "العملاء",
-    "edit_client": "تعديل العميل",
-    "update_client": "تحديث العميل",
-    "create_client": "إضافة عميل",
-    "back_to_list": "الرجوع للقائمة",
     "client_details": "تفاصيل العميل",
-    "search_clients": "بحث عن عملاء...",
-    "no_clients_found": "لا توجد عملاء",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {عميل} =1 {هذا العميل} other {# عملاء}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {عميل} =1 {هذا العميل} other {# عملاء}}",
     "form": {
@@ -2813,6 +2889,57 @@
       "duplicate": "حدث خطأ أثناء تكرار الفرع"
     }
   },
+  "Vendors": {
+    "singular": "مورد",
+    "vendor_details": "تفاصيل المورد",
+    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {مورد} =1 {هذا المورد} other {# موردين}}؟",
+    "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {مورد} =1 {هذا المورد} other {# موردين}}",
+    "add_first_vendor": "أضف أول مورد",
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "placeholder": "أدخل الاسم",
+        "required": "الاسم مطلوب"
+      },
+      "company": {
+        "label": "الشركة",
+        "placeholder": "أدخل اسم الشركة"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل البريد الإلكتروني",
+        "required": "البريد الإلكتروني مطلوب",
+        "invalid": "البريد الإلكتروني غير صالح"
+      },
+      "phone": {
+        "label": "الهاتف",
+        "placeholder": "أدخل رقم الهاتف",
+        "required": "رقم الهاتف مطلوب"
+      },
+      "products": {
+        "label": "المنتجات/الخدمات",
+        "placeholder": "أدخل المنتجات أو الخدمات"
+      }
+    },
+    "success": {
+      "create": "تم إنشاء المورد بنجاح",
+      "update": "تم تحديث المورد بنجاح",
+      "delete": "تم حذف المورد بنجاح",
+      "duplicate": "تم تكرار المورد بنجاح"
+    },
+    "loading": {
+      "create": "جاري إنشاء المورد...",
+      "update": "جاري تحديث المورد...",
+      "delete": "جاري حذف المورد...",
+      "duplicate": "جاري تكرار المورد..."
+    },
+    "error": {
+      "create": "حدث خطأ أثناء إنشاء المورد",
+      "update": "حدث خطأ أثناء تحديث المورد",
+      "delete": "حدث خطأ أثناء حذف المورد",
+      "duplicate": "حدث خطأ أثناء تكرار المورد"
+    }
+  },
   "Attendance": {
     "title": "الحضور",
     "today": "حضور اليوم",
@@ -2991,15 +3118,8 @@
     }
   },
   "Salaries": {
-    "title": "الرواتب",
-    "edit_salary": "تعديل الراتب",
-    "update_salary": "تحديث الراتب",
-    "create_salary": "إضافة راتب",
-    "delete_salary": "حذف الراتب",
-    "search_salaries": "البحث في الرواتب...",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {راتب} =1 {هذا الراتب} other {# رواتب}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {راتب} =1 {هذا الراتب} other {# رواتب}}",
-    "no_salaries_found": "لم يتم العثور على رواتب",
     "salary_details": "تفاصيل الراتب",
     "success": {
       "title": "تم بنجاح",
@@ -3228,12 +3348,7 @@
   },
 
   "Expenses": {
-    "title": "المصروفات",
     "description": "إدارة وتتبع المصروفات",
-    "edit_expense": "تعديل المصروف",
-    "update_expense": "تحديث المصروف",
-    "search_expenses": "البحث في المصروفات",
-    "no_expenses_found": "لم يتم العثور على مصروفات",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {مصروف} =1 {هذا المصروف} other {# مصروفات}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {مصروف} =1 {هذا المصروف} other {# مصروفات}}",
     "success": {
@@ -3301,12 +3416,7 @@
     }
   },
   "Applicants": {
-    "title": "المتقدمين",
-    "edit_applicant": "تعديل المتقدم",
-    "update_applicant": "تحديث المتقدم",
     "applicant_details": "تفاصيل المتقدم",
-    "back_to_list": "العودة إلى القائمة",
-    "no_applicants": "لم يتم العثور على متقدمين",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {متقدم} =1 {هذا المتقدم} other {# متقدمين}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {متقدم} =1 {هذا المتقدم} other {# متقدمين}}",
     "form": {
@@ -3407,14 +3517,6 @@
     "title": "الإجازات"
   },
   "Employees": {
-    "title": "الموظفين",
-    "edit_employee": "تعديل الموظف",
-    "add_employee": "إضافة موظف",
-    "update_employee": "تعديل الموظف",
-    "search_employees": "بحث عن موظفين",
-    "cancel": "إلغاء",
-    "employee_details": "تفاصيل الموظف",
-    "edit": "تعديل الموظف",
     "back_to_list": "الرجوع للقائمة",
     "allEmployees": "جميع الموظفين",
     "salary_section_title": "معلومات الراتب",
@@ -3473,6 +3575,19 @@
         "invalid": "البريد الإلكتروني غير صالح",
         "duplicate": "البريد الإلكتروني مستخدم من قبل موظف آخر"
       },
+      "birth_date": {
+        "label": "تاريخ الميلاد",
+        "placeholder": "أدخل تاريخ الميلاد",
+        "required": "تاريخ الميلاد مطلوب"
+      },
+      "national_id": {
+        "label": "رقم الهوية الوطنية",
+        "required": "رقم الهوية الوطنية مطلوب"
+      },
+      "eqama_id": {
+        "label": "رقم الإقامة",
+        "required": "رقم الإقامة مطلوب"
+      },
       "phone": {
         "label": "رقم الهاتف",
         "placeholder": "أدخل رقم الهاتف",
@@ -3497,7 +3612,6 @@
         "placeholder": "أدخل تاريخ التعيين",
         "required": "تاريخ التعيين مطلوب"
       },
-
       "salary": {
         "label": "الراتب",
         "placeholder": "أدخل الراتب",
@@ -3514,10 +3628,48 @@
       "status": {
         "label": "الحالة",
         "active": "نشط",
-        "inactive": "غير نشط",
-        "on_leave": "في إجازة",
-        "terminated": "مفصول",
-        "resigned": "مستقيل"
+        "onboarding": "قيد التوظيف",
+        "probation": "قيد التجربة",
+        "on_leave": "إجازة",
+        "terminated": "منقطع",
+        "retired": "متقاعد",
+        "suspended": "مجمد"
+      },
+      "gender": {
+        "label": "الجنس",
+        "male": "ذكر",
+        "female": "أنثى"
+      },
+      "marital_status": {
+        "label": "الحالة الإجتماعية",
+        "single": "مطلق",
+        "married": "متزوج",
+        "divorced": "مؤمن",
+        "widowed": "مأمور"
+      },
+      "education_level": {
+        "label": "المستوى التعليمي",
+        "primary": "إبتدائي",
+        "secondary": "ثانوي",
+        "bachelor": "بكالوريوس",
+        "master": "ماجستير",
+        "phd": "دكتوراه"
+      },
+      "employee_number": {
+        "label": "رقم الموظف",
+        "placeholder": "أدخل رقم الموظف"
+      },
+      "onboarding_status": {
+        "label": "حالة إعداد الموظف",
+        "placeholder": "اختر حالة إعداد الموظف",
+        "pending": "قيد الإعداد",
+        "completed": "مكتمل"
+      },
+      "offboarding_status": {
+        "label": "حالة إنهاء الموظف",
+        "placeholder": "اختر حالة إنهاء الموظف",
+        "pending": "قيد الإنهاء",
+        "completed": "منهي"
       },
       "address": {
         "label": "العنوان",
@@ -3599,11 +3751,13 @@
     },
     "region": {
       "label": "المنطقة",
-      "placeholder": "أدخل المنطقة"
+      "placeholder": "أدخل المنطقة",
+      "required": "المنطقة مطلوبة"
     },
     "city": {
       "label": "المدينة",
-      "placeholder": "أدخل المدينة"
+      "placeholder": "أدخل المدينة",
+      "required": "المدينة مطلوبة"
     },
     "country": {
       "label": "الدولة",
@@ -3614,7 +3768,8 @@
 
     "zip_code": {
       "label": "الرمز البريدي",
-      "placeholder": "أدخل الرمز البريدي"
+      "placeholder": "أدخل الرمز البريدي",
+      "required": "الرمز البريدي مطلوب"
     },
     "industry": {
       "label": "المجال",
@@ -3633,7 +3788,9 @@
       "active": "نشط",
       "inactive": "غير نشط",
       "published": "منشور",
-      "unpublished": "غير منشور"
+      "unpublished": "غير منشور",
+      "archived": "مؤرشف",
+      "draft": "مسودة"
     },
     "validation": {
       "name_required": "اسم الشركة مطلوب",
@@ -3890,15 +4047,8 @@
     }
   },
   "Companies": {
-    "title": "الشركات",
-    "update_company": "تحديث الشركة",
     "company_details": "تفاصيل الشركة",
-    "create_company": "إنشاء شركة",
-    "creating_company": "جاري إنشاء الشركة...",
-    "edit_company": "تعديل الشركة",
-    "search_companies": "بحث عن شركات",
     "back_to_list": "العودة للقائمة",
-    "no_companies_found": "لم يتم العثور على شركات",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {شركة} =1 {هذه الشركة} other {# شركات}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {شركة} =1 {هذه الشركة} other {# شركات}}",
     "form": {
@@ -4041,7 +4191,8 @@
         "label": "المدير",
         "placeholder": "اختر المدير",
         "required": "المدير مطلوب",
-        "invalid_uuid": "يجب إختيار مدير من القائمة"
+        "invalid_uuid": "يجب إختيار مدير من القائمة",
+        "no_employees": "لا يوجد موظفين"
       },
 
       "city": {
@@ -4061,7 +4212,8 @@
       },
       "phone": {
         "label": "الهاتف",
-        "placeholder": "أدخل رقم الهاتف"
+        "placeholder": "أدخل رقم الهاتف",
+        "required": "الهاتف مطلوب"
       },
       "email": {
         "label": "البريد الإلكتروني",
@@ -4103,9 +4255,6 @@
   },
   "Departments": {
     "title": "الإدارات",
-    "edit_department": "تعديل الإدارة",
-    "update_department": "تحديث الإدارة",
-    "search_departments": "بحث عن الإدارات",
     "department_details": "تفاصيل الإدارة",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {إدارة} =1 {هذه الإدارة} other {# إدارات}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {إدارة} =1 {هذه الإدارة} other {# إدارات}}",
@@ -4174,12 +4323,7 @@
     "title": "المخزن"
   },
   "Purchases": {
-    "title": "المشتريات",
-    "edit_purchase": "تعديل المشترية",
-    "update_purchase": "تحديث المشترية",
-    "search_purchases": "بحث عن المشتريات",
     "purchase_details": "تفاصيل المشترية",
-    "no_purchases_found": "لم يتم العثور على مشتريات",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {مشترية} =1 {هذه المشترية} other {# مشتريات}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {مشترية} =1 {هذه المشترية} other {# مشتريات}}",
     "form": {
@@ -4254,6 +4398,8 @@
     }
   },
   "Roles": {
+    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {دور} =1 {هذا الدور} other {# دور}}؟",
+    "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {دور} =1 {هذا الدور} other {# دور}}",
     "title": "الأدوار",
     "your_role": "دورك",
     "create_role": "إنشاء دور جديد",
@@ -4578,12 +4724,8 @@
     }
   },
   "Servers": {
-    "title": "الخوادم",
-    "edit_server": "تعديل الخادم",
     "singular": "خادم",
     "server_details": "تفاصيل الخادم",
-    "no_servers_found": "لا توجد خوادم",
-    "search_servers": "بحث عن خوادم...",
     "manager": "المدير",
     "edit": "تعديل الخادم",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {خادم} =1 {هذا الخادم} other {# خوادم}}؟",
@@ -4627,6 +4769,23 @@
         "required": "الحالة مطلوبة",
         "active": "نشط",
         "inactive": "غير نشط"
+      },
+      "monthly_cost": {
+        "label": "التكلفة الشهرية",
+        "placeholder": "أدخل التكلفة الشهرية",
+        "required": "التكلفة الشهرية مطلوبة"
+      },
+      "annual_cost": {
+        "label": "التكلفة السنوية",
+        "placeholder": "أدخل التكلفة السنوية",
+        "required": "التكلفة السنوية مطلوبة"
+      },
+      "payment_cycle": {
+        "label": "دورة الدفع",
+        "placeholder": "أدخل دورة الدفع",
+        "required": "دورة الدفع مطلوبة",
+        "monthly": "شهري",
+        "annual": "سنوي"
       },
       "tags": {
         "label": "التصنيفات",
@@ -4724,8 +4883,8 @@
     "singular": "سيارة",
     "search_cars": "ابحث في السيارات...",
     "no_cars_found": "لم يتم العثور على أي سيارات.",
-    "confirm_delete": "تأكيد حذف السيارات",
-    "delete_description": "هل أنت متأكد أنك تريد حذف {count} سيارة (سيارات)؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {سيارة} =1 {هذه السيارة} other {# سيارات}}؟",
+    "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {سيارة} =1 {هذه السيارة} other {# سيارات}}",
     "make": "الشركة المصنعة",
     "model": "الموديل",
     "year": "سنة الصنع",
@@ -4772,8 +4931,8 @@
     "title": "الشاحنات",
     "description": "إدارة أسطول الشاحنات الخاص بك",
     "no_trucks_found": "لم يتم العثور على شاحنات.",
-    "confirm_delete": "تأكيد الحذف",
-    "delete_description": "هل أنت متأكد أنك تريد حذف {count} شاحنة (شاحنات)؟",
+    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {شاحنة} =1 {هذه الشاحنة} other {# شاحنات}}؟",
+    "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {شاحنة} =1 {هذه الشاحنة} other {# شاحنات}}",
     "form": {
       "name": {
         "label": "إسم الشاحنة",
@@ -4802,6 +4961,77 @@
       "update": "حدث خطأ أثناء تحديث الشاحنة.",
       "delete": "حدث خطأ أثناء حذف الشاحنة (الشاحنات).",
       "duplicate": "حدث خطأ أثناء نسخ الشاحنة."
+    }
+  },
+  "BankAccounts": {
+    "title": "الحسابات البنكية",
+    "description": "إدارة جميع حساباتك البنكية",
+    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {الحساب البنكي المحدد} =1 {هذا الحساب البنكي} other {# من الحسابات البنكية المختارة}}؟",
+    "delete_description": "سيؤدي هذا الإجراء إلى حذف {count, plural, =0 {الحساب البنكي المحدد} =1 {هذا الحساب البنكي} other {# من الحسابات البنكية المختارة}} بشكل دائم.",
+    "form": {
+      "account_name": "اسم الحساب",
+      "name": {
+        "label": "اسم الحساب",
+        "placeholder": "مثال: حساب الشركة الرئيسي",
+        "required": "اسم الحساب مطلوب"
+      },
+      "bank_name": {
+        "label": "اسم البنك",
+        "placeholder": "مثال: بنك الراجحي",
+        "required": "اسم البنك مطلوب"
+      },
+      "account_number": {
+        "label": "رقم الحساب",
+        "placeholder": "أدخل رقم الحساب"
+      },
+      "account_type": {
+        "label": "نوع الحساب",
+        "placeholder": "اختر نوع الحساب",
+        "checking": "جاري",
+        "savings": "ادخار",
+        "business": "أعمال",
+        "other": "آخر"
+      },
+      "iban": {
+        "label": "رقم الآيبان (IBAN)",
+        "placeholder": "أدخل رقم الآيبان الدولي",
+        "required": "رقم الآيبان مطلوب"
+      },
+      "swift_bic": {
+        "label": "رمز سويفت/BIC",
+        "placeholder": "أدخل رمز سويفت أو BIC"
+      },
+      "routing_number": {
+        "label": "رقم التوجيه البنكي",
+        "placeholder": "أدخل رقم التوجيه البنكي (إن وجد)"
+      },
+      "status": {
+        "label": "الحالة",
+        "placeholder": "اختر حالة الحساب",
+        "required": "حالة الحساب مطلوبة",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "pending": "قيد الانتظار"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل أي ملاحظات إضافية هنا"
+      }
+    },
+    "success": {
+      "create": "تم إنشاء الحساب البنكي بنجاح.",
+      "update": "تم تحديث الحساب البنكي بنجاح.",
+      "delete": "تم حذف الحساب (الحسابات) البنكية بنجاح."
+    },
+    "loading": {
+      "create": "جاري إنشاء الحساب البنكي...",
+      "update": "جاري تحديث الحساب البنكي...",
+      "delete": "جاري حذف الحساب (الحسابات) البنكية..."
+    },
+    "error": {
+      "create": "حدث خطأ أثناء إنشاء الحساب البنكي.",
+      "update": "حدث خطأ أثناء تحديث الحساب البنكي.",
+      "delete": "حدث خطأ أثناء حذف الحساب (الحسابات) البنكية."
     }
   }
 }

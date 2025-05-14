@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { format } from "date-fns";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
@@ -7,7 +8,6 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import CodeInput from "@/ui/code-input";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
@@ -35,6 +35,7 @@ import {
   QuoteUpdateData,
   QuoteItem as DbQuoteItem,
   QuoteItemClientData,
+  QuoteStatus,
 } from "@/quote/quote.type";
 
 import useUserStore from "@/stores/use-user-store";
@@ -45,7 +46,9 @@ const createQuoteFormSchema = (t: (key: string) => string) =>
     quote_number: z.string().min(1, t("Quotes.validation.quote_number_required")),
     issue_date: z.string().min(1, t("Quotes.validation.issue_date_required")),
     expiry_date: z.string().min(1, t("Quotes.validation.expiry_date_required")),
-    status: z.string().min(1, t("Quotes.validation.status_required")),
+    status: z.enum(QuoteStatus, {
+      message: t("Quotes.validation.status_required"),
+    }),
     tax_rate: z.number().min(0, t("Quotes.validation.tax_rate_positive")),
     notes: z.any().optional().nullable(),
     items: z
@@ -382,7 +385,7 @@ export function QuoteForm({
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Quotes.form.status.title")} *</FormLabel>
+                  <FormLabel>{t("Quotes.form.status.label")} *</FormLabel>
                   <Select
                     defaultValue={field.value}
                     onValueChange={field.onChange}
@@ -394,11 +397,11 @@ export function QuoteForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="draft">{t("Quotes.form.status.draft")}</SelectItem>
-                      <SelectItem value="sent">{t("Quotes.form.status.sent")}</SelectItem>
-                      <SelectItem value="accepted">{t("Quotes.form.status.accepted")}</SelectItem>
-                      <SelectItem value="rejected">{t("Quotes.form.status.rejected")}</SelectItem>
-                      <SelectItem value="expired">{t("Quotes.form.status.expired")}</SelectItem>
+                      {QuoteStatus.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {t(`Quotes.form.status.${status}`)}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

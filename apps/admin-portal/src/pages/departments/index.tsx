@@ -1,9 +1,9 @@
+import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -29,9 +29,7 @@ import {
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/department/department.options";
 import useDepartmentsStore from "@/department/department.store";
 import DepartmentsTable from "@/department/department.table";
-import { Department } from "@/department/department.type";
-
-import useUserStore from "@/stores/use-user-store";
+import { DepartmentUpdateData } from "@/department/department.type";
 
 export default function DepartmentsPage() {
   const t = useTranslations();
@@ -39,34 +37,40 @@ export default function DepartmentsPage() {
 
   const columns = useDepartmentColumns();
 
-  const canReadDepartments = useUserStore((state) => state.hasPermission("departments.read"));
-  const canCreateDepartments = useUserStore((state) => state.hasPermission("departments.create"));
+  const moduleHooks = createModuleStoreHooks(useDepartmentsStore, "departments");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableDepartment, setActionableDepartment] = useState<Department | null>(null);
+  const [actionableItem, setActionableItem] = useState<DepartmentUpdateData | null>(null);
 
-  const loadingSaveDepartment = useDepartmentsStore((state) => state.isLoading);
-  const setLoadingSaveDepartment = useDepartmentsStore((state) => state.setIsLoading);
-  const viewMode = useDepartmentsStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useDepartmentsStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useDepartmentsStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useDepartmentsStore((state) => state.selectedRows);
-  const setSelectedRows = useDepartmentsStore((state) => state.setSelectedRows);
-  const clearSelection = useDepartmentsStore((state) => state.clearSelection);
-  const sortRules = useDepartmentsStore((state) => state.sortRules);
-  const sortCaseSensitive = useDepartmentsStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useDepartmentsStore((state) => state.sortNullsFirst);
-  const searchQuery = useDepartmentsStore((state) => state.searchQuery);
-  const filterConditions = useDepartmentsStore((state) => state.filterConditions);
-  const filterCaseSensitive = useDepartmentsStore((state) => state.filterCaseSensitive);
-  const getFilteredDepartments = useDepartmentsStore((state) => state.getFilteredData);
-  const getSortedDepartments = useDepartmentsStore((state) => state.getSortedData);
-  const columnVisibility = useDepartmentsStore((state) => state.columnVisibility);
-  const setColumnVisibility = useDepartmentsStore((state) => state.setColumnVisibility);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
+
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
 
   const { data: departments, isLoading, error } = useDepartments();
-  const { mutate: duplicateDepartment } = useDuplicateDepartment();
   const { mutateAsync: deleteDepartments, isPending: isDeleting } = useBulkDeleteDepartments();
+  const { mutate: duplicateDepartment } = useDuplicateDepartment();
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
@@ -74,7 +78,7 @@ export default function DepartmentsPage() {
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableDepartment,
+    setActionableItem,
     duplicateMutation: duplicateDepartment,
     moduleName: "Departments",
   });
@@ -89,15 +93,24 @@ export default function DepartmentsPage() {
     },
   });
 
-  const filteredDepartments = useMemo(() => {
-    return getFilteredDepartments(departments || []);
-  }, [departments, getFilteredDepartments, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useDepartmentsStore((state) => state.data) || [];
+  const setData = useDepartmentsStore((state) => state.setData);
 
-  const sortedDepartments = useMemo(() => {
-    return getSortedDepartments(filteredDepartments);
-  }, [filteredDepartments, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (departments && setData) {
+      setData(departments);
+    }
+  }, [departments, setData]);
 
-  if (!canReadDepartments) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
 
@@ -122,9 +135,7 @@ export default function DepartmentsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Departments.title")}
-            onAddClick={
-              canCreateDepartments ? () => router.push(router.pathname + "/add") : undefined
-            }
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Departments.add")}
             searchPlaceholder={t("Pages.Departments.search")}
             hideOptions={departments?.length === 0}
@@ -140,17 +151,17 @@ export default function DepartmentsPage() {
         <div>
           {viewMode === "table" ? (
             <DepartmentsTable
-              data={sortedDepartments}
+              data={sortedData}
               isLoading={isLoading}
-              error={error instanceof Error ? error : null}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedDepartments}
+                data={sortedData}
                 isLoading={isLoading}
-                error={error instanceof Error ? error : null}
+                error={error}
                 emptyMessage={t("Departments.no_departments_found")}
                 renderItem={(department) => (
                   <DepartmentCard key={department.id} department={department} />
@@ -164,21 +175,18 @@ export default function DepartmentsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableDepartment ? t("Pages.Departments.edit") : t("Pages.Departments.add")}
+          title={actionableItem ? t("Pages.Departments.edit") : t("Pages.Departments.add")}
           formId="department-form"
-          loadingSave={loadingSaveDepartment}
+          loadingSave={loadingSave}
         >
           <DepartmentForm
             formHtmlId="department-form"
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableDepartment(null);
-              setLoadingSaveDepartment(false);
-              toast.success(t("General.successful_operation"), {
-                description: t("Departments.success.update"),
-              });
+              setActionableItem(null);
+              setLoadingSave(false);
             }}
-            defaultValues={actionableDepartment}
+            defaultValues={actionableItem}
             editMode={true}
           />
         </FormDialog>
@@ -188,8 +196,9 @@ export default function DepartmentsPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Departments.confirm_delete_title")}
-          description={t("Departments.confirm_delete", { count: selectedRows.length })}
+          title={t("Departments.confirm_delete", { count: selectedRows.length })}
+          description={t("Departments.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>
@@ -198,7 +207,7 @@ export default function DepartmentsPage() {
 
 DepartmentsPage.messages = ["Notes", "Pages", "Departments", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -1,3 +1,4 @@
+import StatusCell from "@root/src/components/tables/status-cell";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
@@ -5,7 +6,9 @@ import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { JobListingWithJobs } from "./job-listing.type";
 
-const useCompanyColumns = () => {
+const useCompanyColumns = (
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
 
   const columns: ExtendedColumnDef<JobListingWithJobs>[] = [
@@ -35,12 +38,23 @@ const useCompanyColumns = () => {
       accessorKey: "status",
       maxSize: 80,
       header: t("JobListings.form.status.label"),
-      validationSchema: z.boolean(),
-      cellType: "status",
-      options: [
-        { value: "active", label: t("JobListings.form.status.active") },
-        { value: "inactive", label: t("JobListings.form.status.inactive") },
-      ],
+      validationSchema: z.enum(["active", "inactive"]),
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("JobListings.form.status.active"), value: "active" },
+              { label: t("JobListings.form.status.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
 

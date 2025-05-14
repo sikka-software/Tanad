@@ -1,4 +1,5 @@
 import CurrencyCell from "@root/src/components/tables/currency-cell";
+import SelectCell from "@root/src/components/tables/select-cell";
 import useUserStore from "@root/src/stores/use-user-store";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
@@ -7,7 +8,7 @@ import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { Car } from "./car.type";
 
-const useCarColumns = () => {
+const useCarColumns = (handleEdit?: (rowId: string, columnId: string, value: unknown) => void) => {
   const t = useTranslations();
   const currency = useUserStore((state) => state.profile?.user_settings?.currency);
 
@@ -60,13 +61,19 @@ const useCarColumns = () => {
     {
       accessorKey: "ownership_status",
       header: t("Vehicles.form.ownership_status.label"),
-      validationSchema: z.string().min(1, "Required"),
-      cellType: "select",
-      options: [
-        { label: t("Vehicles.form.ownership_status.financed"), value: "financed" },
-        { label: t("Vehicles.form.ownership_status.owned"), value: "owned" },
-        { label: t("Vehicles.form.ownership_status.rented"), value: "rented" },
-      ],
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "ownership_status", value)}
+          cellValue={getValue()}
+          options={[
+            { label: t("Vehicles.form.ownership_status.financed"), value: "financed" },
+            { label: t("Vehicles.form.ownership_status.owned"), value: "owned" },
+            { label: t("Vehicles.form.ownership_status.rented"), value: "rented" },
+          ]}
+        />
+      ),
     },
     {
       accessorKey: "monthly_payment",

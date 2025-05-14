@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -10,7 +11,6 @@ import { z } from "zod";
 
 import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
@@ -31,7 +31,11 @@ import useEmployeeRequestsStore from "@/employee-request/employee-request.store"
 import useUserStore from "@/stores/use-user-store";
 
 import { useCreateEmployeeRequest, useUpdateEmployeeRequest } from "./employee-request.hooks";
-import { EmployeeRequestCreateData, EmployeeRequestUpdateData } from "./employee-request.type";
+import {
+  EmployeeRequestCreateData,
+  EmployeeRequestStatus,
+  EmployeeRequestUpdateData,
+} from "./employee-request.type";
 
 const createRequestSchema = (t: (key: string) => string) =>
   z.object({
@@ -40,7 +44,7 @@ const createRequestSchema = (t: (key: string) => string) =>
       .uuid({ message: t("EmployeeRequests.form.employee.required") })
       .nonempty({ message: t("EmployeeRequests.form.employee.required") }),
     type: z.enum(["leave", "expense", "document", "other"]),
-    status: z.enum(["pending", "approved", "rejected"]).optional(),
+    status: z.enum(EmployeeRequestStatus).optional(),
     title: z.string({ message: t("EmployeeRequests.form.title.required") }).min(1, {
       message: t("EmployeeRequests.form.title.required"),
     }),
@@ -63,15 +67,14 @@ export function EmployeeRequestForm({
 }: ModuleFormProps<EmployeeRequestUpdateData | EmployeeRequestCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
-  const user = useUserStore((state) => state.user);
 
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const setIsLoadingCreateEmployee = useEmployeeStore((state) => state.setIsLoading);
   const isLoadingCreateEmployee = useEmployeeStore((state) => state.isLoading);
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
 
-  const { mutateAsync: createEmployeeRequest, isPending: isCreating } = useCreateEmployeeRequest();
-  const { mutateAsync: updateEmployeeRequest, isPending: isUpdating } = useUpdateEmployeeRequest();
+  const { mutateAsync: createEmployeeRequest } = useCreateEmployeeRequest();
+  const { mutateAsync: updateEmployeeRequest } = useUpdateEmployeeRequest();
 
   const isLoadingSave = useEmployeeRequestsStore((state) => state.isLoading);
   const setIsLoadingSave = useEmployeeRequestsStore((state) => state.setIsLoading);
@@ -79,7 +82,6 @@ export function EmployeeRequestForm({
   // Define literal types here, now that `t` is available
   const concreteSchema = createRequestSchema(t);
   type EmployeeRequestType = z.infer<typeof concreteSchema>["type"];
-  type EmployeeRequestStatus = z.infer<typeof concreteSchema>["status"];
 
   const form = useForm<EmployeeRequestFormValues>({
     resolver: zodResolver(concreteSchema),
@@ -87,7 +89,7 @@ export function EmployeeRequestForm({
     defaultValues: {
       employee_id: defaultValues?.employee_id || "",
       type: (defaultValues?.type || "leave") as EmployeeRequestType,
-      status: (defaultValues?.status || "pending") as EmployeeRequestStatus,
+      status: defaultValues?.status || "draft",
       title: defaultValues?.title || "",
       description: defaultValues?.description || "",
       start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
@@ -134,10 +136,7 @@ export function EmployeeRequestForm({
         // EmployeeRequestUpdateData allows partial updates and matches the zod schema structure
         const updatePayload: EmployeeRequestUpdateData = baseSubmitData;
 
-        await updateEmployeeRequest({
-          id: defaultValues.id,
-          updates: updatePayload,
-        });
+        await updateEmployeeRequest({ id: defaultValues.id, data: updatePayload });
         onSuccess?.();
       } else {
         // For create, prepare data without user_id
@@ -208,54 +207,55 @@ export function EmployeeRequestForm({
                 </FormItem>
               )}
             />
+            <div className="form-fields-cols-2">
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("EmployeeRequests.form.type.label")}</FormLabel>
+                    <FormControl>
+                      <Select
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        disabled={isLoadingSave}
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("EmployeeRequests.form.type.placeholder")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {requestTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("EmployeeRequests.form.type.label")}</FormLabel>
-                  <FormControl>
-                    <Select
-                      dir={locale === "ar" ? "rtl" : "ltr"}
-                      disabled={isLoadingSave}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("EmployeeRequests.form.type.placeholder")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {requestTypes.map((type) => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {type.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("EmployeeRequests.form.title.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder={t("EmployeeRequests.form.title.placeholder")}
-                      disabled={isLoadingSave}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("EmployeeRequests.form.title.label")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder={t("EmployeeRequests.form.title.placeholder")}
+                        disabled={isLoadingSave}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -275,7 +275,7 @@ export function EmployeeRequestForm({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="start_date"

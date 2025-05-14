@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -25,7 +25,7 @@ export default function AddEmployeePage() {
     if (form) {
       form.setValue("first_name", dummyData.first_name);
       form.setValue("last_name", dummyData.last_name);
-      form.setValue("email", dummyData.randomNumber + dummyData.email);
+      form.setValue("email", dummyData.randomNumber(3) + dummyData.email);
       form.setValue("phone", dummyData.phone);
       form.setValue("position", dummyData.employee_position);
       form.setValue("hire_date", dummyData.employee_hire_date);
@@ -71,7 +71,7 @@ AddEmployeePage.messages = [
   "Forms",
 ];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

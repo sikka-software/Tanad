@@ -1,19 +1,21 @@
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import useUserStore from "@root/src/stores/use-user-store";
+import CodeCell from "@root/src/components/tables/code-cell";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
+
+import StatusCell from "@/components/tables/status-cell";
 
 import { useEmployees } from "../employee/employee.hooks";
-import { useUpdateBranch } from "./branch.hooks";
 import { Branch } from "./branch.type";
 
-const useBranchColumns = () => {
+const useBranchColumns = (
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
   const locale = useLocale();
-  const { mutate: updateBranch } = useUpdateBranch();
-  // Employees for manager combobox
+
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const employeeOptions = employees.map((emp) => ({
     label: `${emp.first_name} ${emp.last_name}`,
@@ -27,10 +29,31 @@ const useBranchColumns = () => {
       validationSchema: z.string().min(1, t("Branches.form.name.required")),
     },
     {
+      noPadding: true,
       accessorKey: "code",
       header: t("Branches.form.code.label"),
       validationSchema: z.string().min(1, t("Branches.form.code.required")),
+      cell: ({ getValue, row }) => (
+        <CodeCell
+          onChange={(e) => handleEdit?.(row.id, "code", e.target.value)}
+          onRandom={() => {
+            const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            let randomCode = "";
+            for (let i = 0; i < 5; i++) {
+              randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+            }
+            handleEdit?.(row.id, "code", `BR-${randomCode}`);
+          }}
+          onSerial={() => {
+            const paddedNumber = String(row.index + 1).padStart(4, "0");
+            handleEdit?.(row.id, "code", `BR-${paddedNumber}`);
+          }}
+          code={getValue() as string}
+          onCodeChange={() => console.log("changing")}
+        />
+      ),
     },
+
     {
       accessorKey: "email",
       header: t("Branches.form.email.label"),
@@ -56,17 +79,7 @@ const useBranchColumns = () => {
             isLoading={employeesLoading}
             buttonClassName="bg-transparent"
             defaultValue={branch.manager || ""}
-            onChange={async (value) => {
-              await updateBranch({
-                id: branch.id,
-                data: {
-                  id: branch.id,
-                  name: branch.name,
-                  status: branch.status,
-                  manager: value || null,
-                },
-              });
-            }}
+            onChange={async (value) => handleEdit?.(branch.id, "manager", value)}
             texts={{
               placeholder: ". . .",
               searchPlaceholder: t("Pages.Employees.search"),
@@ -103,12 +116,22 @@ const useBranchColumns = () => {
       accessorKey: "status",
       maxSize: 80,
       header: t("Branches.form.status.label"),
-      validationSchema: z.enum(["active", "inactive"]),
-      cellType: "status",
-      options: [
-        { label: t("Branches.form.status.active"), value: "active" },
-        { label: t("Branches.form.status.inactive"), value: "inactive" },
-      ],
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("Branches.form.status.active"), value: "active" },
+              { label: t("Branches.form.status.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
 

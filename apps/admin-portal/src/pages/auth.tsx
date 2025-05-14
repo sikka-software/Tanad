@@ -1,6 +1,7 @@
+import type { Session } from "@supabase/supabase-js";
 import { pick } from "lodash";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -36,16 +37,24 @@ export default function Auth() {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const user = useUserStore((state) => state.user);
+  const loadingUser = useUserStore((state) => state.loading);
+  const [supabaseSession, setSupabaseSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    // Always check session directly from Supabase
+    supabase.auth.getSession().then(({ data }) => {
+      setSupabaseSession(data.session);
+    });
+  }, [user, loadingUser]);
 
   useEffect(() => {
     setIsSignUp(router.asPath.includes("#signup"));
-    if (user) {
-      // Check if there's a redirect path in sessionStorage
+    if (user && !loadingUser && supabaseSession && router.pathname === "/auth") {
       const redirectPath = sessionStorage.getItem("redirectAfterAuth") || "/dashboard";
       sessionStorage.removeItem("redirectAfterAuth");
-      router.replace(redirectPath);
+      window.location.href = redirectPath;
     }
-  }, [user, router]);
+  }, [user, loadingUser, supabaseSession, router]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +75,7 @@ export default function Auth() {
       toast.error(translatedError);
     } finally {
       setLoading(false);
+      window.location.href = "/dashboard";
     }
   };
 
@@ -390,9 +400,9 @@ export default function Auth() {
   );
 }
 
-Auth.messages = ["Pages", "Auth", "General"];
+Auth.messages = ["Pages", "Auth", "General", "SEO"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Auth.messages),

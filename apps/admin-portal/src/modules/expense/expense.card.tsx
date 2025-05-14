@@ -20,7 +20,7 @@ const ExpenseCard = ({ expense }: { expense: Expense }) => {
             variant={
               expense.status === "paid"
                 ? "default"
-                : expense.status === "overdue"
+                : expense.status === "rejected"
                   ? "destructive"
                   : "secondary"
             }

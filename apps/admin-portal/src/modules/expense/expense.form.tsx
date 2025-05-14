@@ -21,14 +21,19 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useCreateExpense, useUpdateExpense, useExpenses } from "./expense.hooks";
 import useExpenseStore from "./expense.store";
-import { ExpenseCreateData, ExpenseUpdateData } from "./expense.type";
+import {
+  ExpenseCreateData,
+  ExpenseStatus,
+  ExpenseStatusProps,
+  ExpenseUpdateData,
+} from "./expense.type";
 
 export const createExpenseSchema = (t: (key: string) => string) =>
   z.object({
     expense_number: z.string().min(1, t("Expenses.form.expense_number.required")),
     issue_date: z.date({ required_error: t("Expenses.form.issue_date.required") }),
     due_date: z.date({ required_error: t("Expenses.form.due_date.required") }),
-    status: z.enum(["pending", "paid", "overdue"]).default("pending"),
+    status: z.enum(ExpenseStatus).default("draft"),
     amount: z.number().min(0, t("Expenses.form.amount.required")),
     category: z.string().min(1, t("Expenses.form.category.required")),
     notes: z.any().optional().nullable(),
@@ -60,7 +65,7 @@ export function ExpenseForm({
       expense_number: defaultValues?.expense_number || "",
       issue_date: defaultValues?.issue_date ? new Date(defaultValues.issue_date) : undefined,
       due_date: defaultValues?.due_date ? new Date(defaultValues.due_date) : undefined,
-      status: (defaultValues?.status || "pending") as "pending" | "paid" | "overdue",
+      status: (defaultValues?.status || "draft") as ExpenseStatusProps,
       amount: defaultValues?.amount || 0,
       category: defaultValues?.category || "",
       notes: getNotesValue(defaultValues),
@@ -97,7 +102,7 @@ export function ExpenseForm({
             enterprise_id: enterprise?.id || "",
             category: data.category.trim(),
             // ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
-            status: data.status || "pending",
+            status: data.status || "draft",
             notes: data.notes,
             user_id: user?.id,
           },
@@ -126,7 +131,7 @@ export function ExpenseForm({
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
         <div className="form-container">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="expense_number"
@@ -162,7 +167,6 @@ export function ExpenseForm({
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="category"

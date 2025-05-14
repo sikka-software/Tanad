@@ -1,12 +1,20 @@
+import CurrencyCell from "@root/src/components/tables/currency-cell";
+import SelectCell from "@root/src/components/tables/select-cell";
+import StatusCell from "@root/src/components/tables/status-cell";
 import { SERVER_OS, SERVER_PROVIDERS } from "@root/src/lib/constants";
+import useUserStore from "@root/src/stores/use-user-store";
 import { useTranslations } from "next-intl";
+import { z } from "zod";
 
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { Server } from "./server.type";
 
-const useServerColumns = () => {
+const useServerColumns = (
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
+  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
 
   const columns: ExtendedColumnDef<Server>[] = [
     { accessorKey: "name", header: t("Servers.form.name.label") },
@@ -21,26 +29,79 @@ const useServerColumns = () => {
     {
       accessorKey: "provider",
       header: t("Servers.form.provider.label"),
-      cellType: "select",
-      options: SERVER_PROVIDERS,
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "provider", value)}
+          cellValue={getValue()}
+          options={SERVER_PROVIDERS}
+        />
+      ),
     },
     {
       accessorKey: "os",
       header: t("Servers.form.os.label"),
-      cellType: "select",
-      options: SERVER_OS,
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "os", value)}
+          cellValue={getValue()}
+          options={SERVER_OS}
+        />
+      ),
+    },
+    {
+      accessorKey: "monthly_cost",
+      header: t("Servers.form.monthly_cost.label"),
+      validationSchema: z.number().min(0, "Required"),
+      cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
+    },
+    {
+      accessorKey: "annual_cost",
+      header: t("Servers.form.annual_cost.label"),
+      validationSchema: z.number().min(0, "Required"),
+      cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
+    },
+    {
+      accessorKey: "payment_cycle",
+      noPadding: true,
+      enableEditing: false,
+      header: t("Servers.form.payment_cycle.label"),
+      validationSchema: z.string().min(1, "Required"),
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "payment_cycle", value)}
+          cellValue={getValue()}
+          options={[
+            { label: t("Servers.form.payment_cycle.monthly"), value: "monthly" },
+            { label: t("Servers.form.payment_cycle.annual"), value: "annual" },
+          ]}
+        />
+      ),
     },
     { accessorKey: "tags", header: t("Servers.form.tags.label") },
-    { accessorKey: "notes", header: t("Servers.form.notes.label") },
     {
       accessorKey: "status",
       maxSize: 80,
-      cellType: "status",
-      options: [
-        { label: t("Servers.form.status.active"), value: "active" },
-        { label: t("Servers.form.status.inactive"), value: "inactive" },
-      ],
       header: t("Servers.form.status.label"),
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("Servers.form.status.active"), value: "active" },
+              { label: t("Servers.form.status.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
 

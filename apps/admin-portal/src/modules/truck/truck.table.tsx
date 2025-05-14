@@ -16,8 +16,17 @@ import { Truck } from "./truck.type";
 
 const TrucksTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Truck>) => {
   const t = useTranslations();
-  const columns = useTruckColumns();
+
   const { mutate: updateTruck } = useUpdateTruck();
+  const setData = useTruckStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateTruck({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useTruckColumns();
+
   const selectedRows = useTruckStore((state) => state.selectedRows);
   const setSelectedRows = useTruckStore((state) => state.setSelectedRows);
 
@@ -31,11 +40,6 @@ const TrucksTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
   const canDeleteTruck = useUserStore((state) => state.hasPermission("trucks.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    await updateTruck({ id: rowId, data: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: Truck[]) => {

@@ -1,24 +1,49 @@
+import CardActions from "@root/src/components/app/card-actions";
+import { CommonStatus, CommonStatusProps } from "@root/src/types/common.type";
 import { Mail, Phone, Globe, MapPin, Building2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@/ui/badge";
 import { Card, CardContent, CardHeader } from "@/ui/card";
+
+import CardStatusAction from "@/components/app/card-status-action";
 
 import { Company } from "@/company/company.type";
 
-const CompanyCard = ({ company }: { company: Company }) => {
+import { useUpdateCompany } from "./company.hooks";
+
+const CompanyCard = ({
+  company,
+  onActionClicked,
+}: {
+  company: Company;
+  onActionClicked: (action: string, rowId: string) => void;
+}) => {
   const t = useTranslations();
+  const { mutate: updateCompany } = useUpdateCompany();
   return (
     <Card key={company.id} className="transition-shadow hover:shadow-lg">
-      <CardHeader>
-        <div className="flex items-start justify-between">
+      <CardHeader className="bg--300 flex flex-col items-start justify-between px-2 pt-2">
+        <div className="bg--200 flex w-full flex-row items-center justify-end gap-2">
+          <CardStatusAction
+            moduleName="Forms"
+            currentStatus={company.status as CommonStatusProps}
+            statuses={Object.values(CommonStatus) as CommonStatusProps[]}
+            onStatusChange={(status: CommonStatusProps) =>
+              updateCompany({ id: company.id, data: { status } })
+            }
+          />
+          <CardActions
+            onEdit={() => onActionClicked("edit", company.id)}
+            onDelete={() => onActionClicked("delete", company.id)}
+            onPreview={() => onActionClicked("preview", company.id)}
+          />
+        </div>
+
+        <div className="flex items-start justify-between px-4">
           <div>
             <h3 className="text-lg font-semibold">{company.name}</h3>
             {company.industry && <p className="text-sm text-gray-500">{company.industry}</p>}
           </div>
-          <Badge variant={company.status === "active" ? "default" : "secondary"}>
-            {t(`Companies.form.status.${company.status}`)}
-          </Badge>
         </div>
       </CardHeader>
       <CardContent>

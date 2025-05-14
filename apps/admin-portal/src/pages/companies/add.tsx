@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
@@ -31,10 +31,10 @@ export default function AddCompanyPage() {
       form.setValue("city", dummyData.city);
       form.setValue("region", "Eastern");
       form.setValue("zip_code", String(dummyData.zip_code));
-      form.setValue("building_number", String(dummyData.randomNumber));
-      form.setValue("additional_number", String(dummyData.randomNumber));
+      form.setValue("building_number", String(dummyData.randomNumber(5)));
+      form.setValue("additional_number", String(dummyData.randomNumber(5)));
       form.setValue("industry", dummyData.randomString);
-      form.setValue("size", String(dummyData.randomNumber));
+      form.setValue("size", String(dummyData.randomNumber(3)));
     }
   };
 
@@ -68,7 +68,7 @@ export default function AddCompanyPage() {
 
 AddCompanyPage.messages = ["Notes", "Pages", "General", "Companies", "Forms"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

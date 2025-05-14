@@ -43,7 +43,7 @@ interface NewMembershipDetails {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Client for user session/context checks
   const supabaseUserClient = createClient({ req, res, query: {}, resolvedUrl: "" });
-
+  // console.log("supabaseUserClient is ", supabaseUserClient);
   // Client for admin operations (requires service role key)
   const supabaseAdmin = createAdminClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -60,6 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     data: { user },
   } = await supabaseUserClient.auth.getUser();
 
+  console.log("user is ", user);
   if (!user) {
     return res.status(401).json({ error: "Unauthorized" });
   }
@@ -74,6 +75,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .eq("profile_id", user.id)
           .single();
 
+        console.log("userMembership is ", userMembership);
         if (membershipError) {
           console.error("Membership Error:", membershipError);
           if (membershipError.code === "PGRST116") {
@@ -142,6 +144,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           throw fetchError;
         }
         */
+        console.log("users are ", users);
         return res.status(200).json(users);
 
       case "POST":

@@ -24,6 +24,7 @@ import {
   Truck,
   Package,
   LucideIcon,
+  Landmark,
 } from "lucide-react";
 
 const ModulesOptions: Record<
@@ -284,6 +285,13 @@ const ModulesOptions: Record<
     translationKey: "Pages.Recruitment.title",
     url: "/recruitment",
     category: "HumanResources",
+  },
+  bank_accounts: {
+    icon: Landmark,
+    label: "Pages.BankAccounts.title",
+    translationKey: "Pages.BankAccounts.title",
+    url: "/bank_accounts",
+    category: "Finance",
   },
 };
 

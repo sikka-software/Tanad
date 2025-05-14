@@ -2,7 +2,7 @@
 
 import { pick } from "lodash";
 import { Info } from "lucide-react";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -300,7 +300,7 @@ export default function Billing() {
 
 Billing.messages = ["Pages", "Billing", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Billing.messages),

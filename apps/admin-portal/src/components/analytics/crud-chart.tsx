@@ -1,17 +1,8 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -45,7 +36,7 @@ export function CrudChart({
   const t = useTranslations();
 
   if (!chartData || chartData.length === 0) {
-    return <Skeleton className="h-[350px] w-full" />;
+    return <Skeleton className="h-[180px] w-full" />;
   }
 
   return (

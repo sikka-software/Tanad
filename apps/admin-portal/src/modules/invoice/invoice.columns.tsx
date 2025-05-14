@@ -1,3 +1,5 @@
+import CodeCell from "@root/src/components/tables/code-cell";
+import SelectCell from "@root/src/components/tables/select-cell";
 import { MoneyFormatter } from "@root/src/components/ui/currency-input";
 import { getCurrencySymbol } from "@root/src/lib/currency-utils";
 import useUserStore from "@root/src/stores/use-user-store";
@@ -8,16 +10,42 @@ import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { Invoice } from "@/invoice/invoice.type";
 
-const useInvoiceColumns = () => {
+import { InvoiceStatus } from "@/modules/invoice/invoice.type";
+
+const useInvoiceColumns = (
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
   const currency = useUserStore((state) => state.profile?.user_settings?.currency);
 
   const columns: ExtendedColumnDef<Invoice>[] = [
+    //invoice_number
     {
+      noPadding: true,
       accessorKey: "invoice_number",
       header: t("Invoices.form.invoice_number.label"),
       validationSchema: z.string().min(1, t("Invoices.form.invoice_number.required")),
+      cell: ({ getValue, row }) => (
+        <CodeCell
+          onChange={(e) => handleEdit?.(row.id, "invoice_number", e.target.value)}
+          onRandom={() => {
+            const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            let randomCode = "";
+            for (let i = 0; i < 5; i++) {
+              randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+            }
+            handleEdit?.(row.id, "invoice_number", `INV-${randomCode}`);
+          }}
+          onSerial={() => {
+            const paddedNumber = String(row.index + 1).padStart(4, "0");
+            handleEdit?.(row.id, "invoice_number", `INV-${paddedNumber}`);
+          }}
+          code={getValue() as string}
+          onCodeChange={() => console.log("changing")}
+        />
+      ),
     },
+    //client.name
     {
       enableEditing: false,
       accessorKey: "client.name",
@@ -35,6 +63,7 @@ const useInvoiceColumns = () => {
         );
       },
     },
+    //issue_date
     {
       enableEditing: false,
       accessorKey: "issue_date",
@@ -42,12 +71,15 @@ const useInvoiceColumns = () => {
       validationSchema: z.string().min(1, t("Invoices.form.issue_date.required")),
       cell: ({ row }) => row.original.issue_date,
     },
+    //due_date
     {
+      enableEditing: false,
       accessorKey: "due_date",
       header: t("Invoices.form.due_date.label"),
       validationSchema: z.string().min(1, t("Invoices.form.due_date.required")),
       cell: ({ row }) => row.original.due_date,
     },
+    //total
     {
       enableEditing: false,
       accessorKey: "total",
@@ -62,14 +94,23 @@ const useInvoiceColumns = () => {
         );
       },
     },
+    //status
     {
       accessorKey: "status",
       header: t("Invoices.form.status.label"),
       validationSchema: z.string().min(1, t("Invoices.form.status.required")),
-      cell: ({ row }) => {
-        const status = row.original.status;
-        return <div className="text-sm font-medium">{t(`Invoices.form.status.${status}`)}</div>;
-      },
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "status", value)}
+          cellValue={getValue()}
+          options={InvoiceStatus.map((status) => ({
+            label: t(`Invoices.form.status.${status}`),
+            value: status,
+          }))}
+        />
+      ),
     },
   ];
 

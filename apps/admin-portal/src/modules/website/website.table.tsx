@@ -1,9 +1,8 @@
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
-import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
@@ -17,9 +16,16 @@ import { Website } from "./website.type";
 
 const WebsitesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Website>) => {
   const t = useTranslations();
-  const columns = useWebsiteColumns();
 
   const { mutate: updateWebsite } = useUpdateWebsite();
+  const setData = useWebsiteStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateWebsite({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useWebsiteColumns(handleEdit);
   const selectedRows = useWebsiteStore((state: any) => state.selectedRows);
   const setSelectedRows = useWebsiteStore((state: any) => state.setSelectedRows);
 
@@ -33,20 +39,6 @@ const WebsitesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canDeleteWebsite = useUserStore((state) => state.hasPermission("websites.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id: string) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    const website = data.find((w) => w.id === rowId);
-    if (!website) return;
-
-    const updatePayload: Partial<Website> = {
-      [columnId as keyof Website]: value as any,
-    };
-
-    await updateWebsite({
-      id: website.id,
-      data: updatePayload,
-    });
-  };
 
   const handleRowSelectionChange = useCallback(
     (currentlySelectedItems: Website[]) => {

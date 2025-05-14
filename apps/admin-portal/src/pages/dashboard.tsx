@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
@@ -43,7 +43,7 @@ export default function Dashboard() {
     totalRoles: 0,
     totalJobListings: 0,
     totalEmployeeRequests: 0,
-    totalApplicants: 0,
+    // totalApplicants: 0,
     totalUsers: 0,
     totalDomains: 0,
     totalWebsites: 0,
@@ -77,41 +77,56 @@ export default function Dashboard() {
 
       // --- Fetch Stats --- (extracted logic)
       const fetchStats = async () => {
+        const fetchCount = async (
+          tableName: string,
+          additionalFilter?: object,
+        ): Promise<number> => {
+          const query = supabase
+            .from(tableName)
+            .select("id", { count: "exact", head: true })
+            .eq("enterprise_id", enterpriseId);
+
+          if (additionalFilter) {
+            Object.entries(additionalFilter).forEach(([key, value]) => {
+              query.eq(key, value);
+            });
+          }
+
+          const { count, error } = await query;
+          if (error) throw error;
+          return count ?? 0;
+        };
+
+        const fetchSum = async (tableName: string, columnName: string): Promise<number> => {
+          const { data, error } = await supabase
+            .from(tableName)
+            .select(columnName)
+            .eq("enterprise_id", enterpriseId);
+
+          if (error) throw error;
+          return data?.reduce((sum, row) => sum + ((row as any)[columnName] || 0), 0) ?? 0;
+        };
+
+        const fetchUserCount = async (): Promise<number> => {
+          // Count distinct profile_id in memberships for this enterprise
+          const { count, error } = await supabase
+            .from("memberships")
+            .select("profile_id", { count: "exact", head: true })
+            .eq("enterprise_id", enterpriseId);
+          if (error) throw error;
+          return count ?? 0;
+        };
+
+        // const invoices = await supabase
+        //   .from("invoices")
+        //   .select("id", { count: "exact", head: true })
+        //   .eq("enterprise_id", enterpriseId);
+
+        // const totalInvoices = await fetchCount("invoices");
+        // console.log("invoices", totalInvoices);
         try {
-          const fetchCount = async (
-            tableName: string,
-            additionalFilter?: object,
-          ): Promise<number> => {
-            const query = supabase
-              .from(tableName)
-              .select("id", { count: "exact", head: true })
-              .eq("enterprise_id", enterpriseId);
-
-            if (additionalFilter) {
-              Object.entries(additionalFilter).forEach(([key, value]) => {
-                query.eq(key, value);
-              });
-            }
-
-            const { count, error } = await query;
-            if (error) throw error;
-            return count ?? 0;
-          };
-
-          const fetchSum = async (tableName: string, columnName: string): Promise<number> => {
-            const { data, error } = await supabase
-              .from(tableName)
-              .select(columnName)
-              .eq("enterprise_id", enterpriseId);
-
-            if (error) throw error;
-            return data?.reduce((sum, row) => sum + ((row as any)[columnName] || 0), 0) ?? 0;
-          };
-
           const [
-            pendingInvoicesCount,
             totalInvoices,
-            totalRevenue,
             totalProducts,
             totalEmployees,
             totalDepartments,
@@ -131,16 +146,14 @@ export default function Dashboard() {
             totalRoles,
             totalJobListings,
             totalEmployeeRequests,
-            totalApplicants,
+            // totalApplicants,
             totalUsers,
             totalDomains,
             totalWebsites,
             totalServers,
             totalOnlineStores,
           ] = await Promise.all([
-            fetchSum("invoices", "total"),
             fetchCount("invoices"),
-            fetchCount("invoices", { status: "pending" }),
             fetchCount("products"),
             fetchCount("employees"),
             fetchCount("departments"),
@@ -160,46 +173,42 @@ export default function Dashboard() {
             fetchCount("roles"),
             fetchCount("job_listings"),
             fetchCount("employee_requests"),
-            fetchCount("applicants"),
-            fetchCount("users"),
+            // fetchCount("applicants"),
+            fetchUserCount(),
             fetchCount("domains"),
             fetchCount("websites"),
             fetchCount("servers"),
             fetchCount("online_stores"),
           ]);
 
-          if (isMounted) {
-            setStats({
-              totalInvoices,
-              pendingInvoices: pendingInvoicesCount,
-              totalRevenue,
-              totalProducts,
-              totalEmployees,
-              totalDepartments,
-              totalJobs,
-              totalClients,
-              totalCompanies,
-              totalVendors,
-              totalOffices,
-              totalWarehouses,
-              totalBranches,
-              totalCars,
-              totalTrucks,
-              totalExpenses,
-              totalPurchases,
-              totalSalaries,
-              totalQuotes,
-              totalRoles,
-              totalJobListings,
-              totalEmployeeRequests,
-              totalApplicants,
-              totalUsers,
-              totalDomains,
-              totalWebsites,
-              totalServers,
-              totalOnlineStores,
-            });
-          }
+          setStats({
+            totalInvoices,
+            totalProducts,
+            totalEmployees,
+            totalDepartments,
+            totalJobs,
+            totalClients,
+            totalCompanies,
+            totalVendors,
+            totalOffices,
+            totalWarehouses,
+            totalBranches,
+            totalCars,
+            totalTrucks,
+            totalExpenses,
+            totalPurchases,
+            totalSalaries,
+            totalQuotes,
+            totalRoles,
+            totalJobListings,
+            totalEmployeeRequests,
+            // totalApplicants,
+            totalUsers,
+            totalDomains,
+            totalWebsites,
+            totalServers,
+            totalOnlineStores,
+          });
         } catch (err) {
           console.error("Error fetching dashboard stats:", err);
           if (isMounted) {
@@ -297,7 +306,7 @@ export default function Dashboard() {
         />
         <div className="flex flex-col items-center justify-center gap-4 p-8">
           <h2 className="text-xl font-semibold">{t("Pages.Dashboard.title")}</h2>
-          <p className="text-muted-foreground">{statsError}</p>
+          <p className="text-muted-foreground">ERROR:{statsError}</p>
         </div>
       </DataPageLayout>
     );
@@ -318,7 +327,7 @@ export default function Dashboard() {
 
 Dashboard.messages = ["Pages", "General", "Dashboard"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Dashboard.messages),

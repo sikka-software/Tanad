@@ -13,7 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
-import { ModuleFormProps } from "@/types/common.type";
+import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -26,7 +26,9 @@ export const createOnlineStoreSchema = (t: (key: string) => string) => {
     domain_name: z.string().min(1, t("OnlineStores.form.domain_name.required")),
     platform: z.string().min(1, t("OnlineStores.form.platform.required")),
     notes: z.any().optional().nullable(),
-    status: z.string().min(1, t("OnlineStores.form.status.required")),
+    status: z.enum(CommonStatus, {
+      message: t("OnlineStores.form.status.required"),
+    }),
   });
 
   return baseOnlineStoreSchema;
@@ -84,7 +86,7 @@ export function OnlineStoreForm({
             id: defaultValues?.id || "",
             data: {
               domain_name: data.domain_name.trim(),
-              status: data.status?.trim() as "active" | "inactive" | null,
+              status: data.status,
               notes: data.notes,
             },
           },
@@ -100,7 +102,7 @@ export function OnlineStoreForm({
         await createOnlineStore(
           {
             domain_name: data.domain_name.trim(),
-            status: data.status?.trim() as "active" | "inactive" | null,
+            status: data.status,
             notes: data.notes,
             user_id: user?.id,
             updated_at: new Date().toISOString(),

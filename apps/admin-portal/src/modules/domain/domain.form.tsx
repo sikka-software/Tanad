@@ -148,8 +148,8 @@ export function DomainForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="form-container">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="domain_name"
@@ -185,52 +185,7 @@ export function DomainForm({
                 </FormItem>
               )}
             />
-          </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="monthly_cost"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Domains.form.monthly_cost.label")}</FormLabel>
-                  <FormControl>
-                    <CurrencyInput
-                      placeholder={t("Domains.form.monthly_cost.placeholder")}
-                      disabled={isLoading}
-                      {...field}
-                      showCommas={true}
-                      value={field.value ? parseFloat(String(field.value)) : undefined}
-                      onChange={(value) => field.onChange(value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="annual_cost"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Domains.form.annual_cost.label")}</FormLabel>
-                  <FormControl>
-                    <CurrencyInput
-                      placeholder={t("Domains.form.annual_cost.placeholder")}
-                      disabled={isLoading}
-                      {...field}
-                      showCommas={true}
-                      value={field.value ? parseFloat(String(field.value)) : undefined}
-                      onChange={(value) => field.onChange(value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="payment_cycle"
@@ -238,7 +193,12 @@ export function DomainForm({
                 <FormItem>
                   <FormLabel>{t("Domains.form.payment_cycle.label")}</FormLabel>
                   <FormControl>
-                    <Select dir={lang === "ar" ? "rtl" : "ltr"}>
+                    <Select
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isLoading}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder={t("Domains.form.payment_cycle.placeholder")} />
                       </SelectTrigger>
@@ -256,6 +216,53 @@ export function DomainForm({
                 </FormItem>
               )}
             />
+            {form.watch("payment_cycle") === "monthly" && (
+              <FormField
+                control={form.control}
+                name="monthly_cost"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Domains.form.monthly_cost.label")}</FormLabel>
+                    <FormControl>
+                      <CurrencyInput
+                        placeholder={t("Domains.form.monthly_cost.placeholder")}
+                        disabled={isLoading}
+                        {...field}
+                        showCommas={true}
+                        value={field.value ? parseFloat(String(field.value)) : undefined}
+                        onChange={(value) => field.onChange(value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            {form.watch("payment_cycle") === "annual" && (
+              <FormField
+                control={form.control}
+                name="annual_cost"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Domains.form.annual_cost.label")}</FormLabel>
+                    <FormControl>
+                      <CurrencyInput
+                        placeholder={t("Domains.form.annual_cost.placeholder")}
+                        disabled={isLoading}
+                        {...field}
+                        showCommas={true}
+                        value={field.value ? parseFloat(String(field.value)) : undefined}
+                        onChange={(value) => field.onChange(value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+          </div>
+
+          <div className="form-fields-cols-1">
             <FormField
               control={form.control}
               name="status"

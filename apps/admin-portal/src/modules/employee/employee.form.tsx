@@ -2,8 +2,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import NotesSection from "@root/src/components/forms/notes-section";
 import BooleanTabs from "@root/src/components/ui/boolean-tabs";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
+import DigitsInput from "@root/src/components/ui/digits-input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@root/src/components/ui/tooltip";
+import { employees } from "@root/src/db/schema";
 import { getNotesValue } from "@root/src/lib/utils";
+import { createSelectSchema } from "drizzle-zod";
 import { PlusCircle, Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -11,7 +15,6 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import CountryInput from "@/ui/country-input";
 import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
@@ -33,7 +36,12 @@ import useDepartmentStore from "@/department/department.store";
 
 import { SALARY_COMPONENT_TYPES } from "@/employee/employee.options";
 import useEmployeeStore from "@/employee/employee.store";
-import type { EmployeeCreateData, EmployeeUpdateData } from "@/employee/employee.types";
+import {
+  EmployeeStatus,
+  EmployeeStatusProps,
+  type EmployeeCreateData,
+  type EmployeeUpdateData,
+} from "@/employee/employee.types";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -86,8 +94,7 @@ export function EmployeeForm({
 
   const createEmployeeFormSchema = () => {
     const supabase = createClient();
-
-    return z.object({
+    const EmployeeSelectSchema = createSelectSchema(employees, {
       first_name: z.string().min(1, t("Employees.form.first_name.required")),
       last_name: z.string().min(1, t("Employees.form.last_name.required")),
       email: z
@@ -127,10 +134,28 @@ export function EmployeeForm({
         required_error: t("Employees.form.hire_date.required"),
       }),
       salary: z.array(salaryComponentSchema).optional(),
-      status: z.enum(["active", "inactive", "on_leave", "terminated"]),
+      status: z.enum(EmployeeStatus),
       nationality: z.string().optional(),
+      birth_date: z.date().optional(),
+      national_id: z.string().optional(),
+      eqama_id: z.string().optional(),
+      gender: z.string().optional(),
+      marital_status: z.string().optional(),
+      education_level: z.string().optional(),
+      employee_number: z.string().optional(),
+      onboarding_status: z.string().optional(),
+      offboarding_status: z.string().optional(),
+      emergency_contact: z
+        .object({
+          name: z.string().optional(),
+          phone: z.string().optional(),
+          relationship: z.string().optional(),
+        })
+        .optional(),
       notes: z.any().optional().nullable(),
     });
+
+    return EmployeeSelectSchema;
   };
 
   const form = useForm<z.input<ReturnType<typeof createEmployeeFormSchema>>>({
@@ -143,13 +168,18 @@ export function EmployeeForm({
       job_id: defaultValues?.job_id || "",
       hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
       salary: defaultValues?.salary as { type: string; amount: number }[] | undefined,
-      status: (["active", "inactive", "on_leave", "terminated"].includes(
-        (defaultValues?.status || "") as string,
-      )
-        ? defaultValues?.status
-        : "active") as "active" | "inactive" | "on_leave" | "terminated",
+      status: (defaultValues?.status as EmployeeStatusProps) || "active",
       notes: getNotesValue(defaultValues) || "",
       nationality: defaultValues?.nationality || "",
+      birth_date: defaultValues?.birth_date ? new Date(defaultValues.birth_date) : undefined,
+      national_id: defaultValues?.national_id || "",
+      eqama_id: defaultValues?.eqama_id || "",
+      gender: defaultValues?.gender || "male",
+      marital_status: defaultValues?.marital_status || "single",
+      education_level: defaultValues?.education_level || "",
+      employee_number: defaultValues?.employee_number || "",
+      onboarding_status: defaultValues?.onboarding_status || "",
+      offboarding_status: defaultValues?.offboarding_status || "",
     },
   });
 
@@ -163,7 +193,7 @@ export function EmployeeForm({
         : "active";
       form.reset({
         ...defaultValues,
-        status: mappedStatus as "active" | "inactive" | "on_leave" | "terminated",
+        status: mappedStatus as EmployeeStatusProps,
         hire_date: defaultValues.hire_date ? new Date(defaultValues.hire_date) : undefined,
         job_id: defaultValues.job_id || "",
         phone: defaultValues.phone || "",
@@ -171,6 +201,21 @@ export function EmployeeForm({
           (defaultValues.salary as { type: string; amount: number }[] | undefined) || undefined,
         notes: getNotesValue(defaultValues) || "",
         nationality: defaultValues.nationality || "",
+        birth_date: defaultValues.birth_date ? new Date(defaultValues.birth_date) : undefined,
+        national_id: defaultValues.national_id || "",
+        eqama_id: defaultValues.eqama_id || "",
+        gender: defaultValues.gender || "male",
+        marital_status: defaultValues.marital_status || "single",
+        education_level: defaultValues.education_level || "",
+        employee_number: defaultValues.employee_number || "",
+        onboarding_status: defaultValues.onboarding_status || "",
+        offboarding_status: defaultValues.offboarding_status || "",
+        emergency_contact:
+          typeof defaultValues.emergency_contact === "object" &&
+          defaultValues.emergency_contact !== null &&
+          !Array.isArray(defaultValues.emergency_contact)
+            ? defaultValues.emergency_contact
+            : undefined,
       });
     } else {
       // Optionally reset to empty if defaultValues becomes null (e.g., switching modes)
@@ -204,34 +249,41 @@ export function EmployeeForm({
       onSuccess?.();
       return;
     }
-
-    const submitData = {
-      ...data,
-      first_name: data.first_name.trim(),
-      last_name: data.last_name.trim(),
-      email: data.email.trim(),
-      phone: data.phone?.trim() || undefined,
-      hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
-      notes: data.notes,
-      salary: (data.salary || []).map((comp) => ({
-        ...comp,
-        amount: Number(comp.amount) || 0,
-      })),
-    };
-
-    const finalSubmitData = submitData;
-
     try {
       if (editMode) {
         await updateEmployeeMutate({
           id: actualEmployeeId!,
-          updates: { ...finalSubmitData },
+          data: {
+            ...data,
+            first_name: data.first_name.trim(),
+            last_name: data.last_name.trim(),
+            email: data.email.trim(),
+            phone: data.phone?.trim() || undefined,
+            hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
+            birth_date: data.birth_date ? data.birth_date.toISOString().split("T")[0] : undefined,
+            notes: data.notes,
+            salary: (data.salary || []).map((comp) => ({
+              ...comp,
+              amount: Number(comp.amount) || 0,
+            })),
+          },
         });
         onSuccess?.();
       } else {
         const { membership, user } = useUserStore.getState();
         await createEmployeeMutate({
-          ...finalSubmitData,
+          ...data,
+          birth_date: data.birth_date ? data.birth_date.toISOString().split("T")[0] : undefined,
+          first_name: data.first_name.trim(),
+          last_name: data.last_name.trim(),
+          email: data.email.trim(),
+          phone: data.phone?.trim() || undefined,
+          hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
+          notes: data.notes,
+          salary: (data.salary || []).map((comp) => ({
+            ...comp,
+            amount: Number(comp.amount) || 0,
+          })),
           enterprise_id: membership?.enterprise_id || "",
           user_id: user?.id || "",
         });
@@ -270,7 +322,7 @@ export function EmployeeForm({
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="form-container">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="first_name"
@@ -288,7 +340,6 @@ export function EmployeeForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="last_name"
@@ -306,7 +357,6 @@ export function EmployeeForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="email"
@@ -326,7 +376,6 @@ export function EmployeeForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="phone"
@@ -345,7 +394,6 @@ export function EmployeeForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="job_id"
@@ -393,7 +441,6 @@ export function EmployeeForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="hire_date"
@@ -413,7 +460,6 @@ export function EmployeeForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="nationality"
@@ -440,19 +486,176 @@ export function EmployeeForm({
               />
               <FormField
                 control={form.control}
+                name="birth_date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>{t("Employees.form.birth_date.label")} *</FormLabel>
+                    <FormControl>
+                      <DatePicker
+                        placeholder={t("Employees.form.birth_date.placeholder")}
+                        date={field.value}
+                        onSelect={field.onChange}
+                        disabled={isEmployeeSaving}
+                        ariaInvalid={form.formState.errors.birth_date !== undefined}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="status"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("Employees.form.status.label")} *</FormLabel>
-                    <BooleanTabs
-                      trueText={t("Employees.form.status.active")}
-                      falseText={t("Employees.form.status.inactive")}
-                      value={field.value === "active"}
-                      onValueChange={(newValue) => {
-                        field.onChange(newValue ? "active" : "inactive");
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Employees.form.status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        {EmployeeStatus.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`Employees.form.status.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.gender.label")} *</FormLabel>
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Employees.form.gender.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        {["male", "female"].map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`Employees.form.gender.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="onboarding_status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.onboarding_status.label")}</FormLabel>
+                    <Select
+                      key={field.value}
+                      value={field.value}
+                      onValueChange={(val) => {
+                        field.onChange(val);
                       }}
-                      listClassName="w-full"
-                    />
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger onClear={() => field.onChange("")}>
+                          <SelectValue
+                            placeholder={t("Employees.form.onboarding_status.placeholder")}
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        {["pending", "completed"].map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`Employees.form.onboarding_status.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="offboarding_status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.offboarding_status.label")}</FormLabel>
+                    <Select
+                      value={field.value}
+                      onValueChange={(val) => {
+                        if (val === field.value) {
+                          field.onChange("");
+                        } else {
+                          field.onChange(val);
+                        }
+                      }}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={t("Employees.form.offboarding_status.placeholder")}
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        {["pending", "completed"].map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`Employees.form.offboarding_status.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="form-fields-cols-1">
+              <FormField
+                control={form.control}
+                name="national_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.national_id.label")}</FormLabel>
+                    <FormControl>
+                      <DigitsInput maxLength={10} disabled={isEmployeeSaving} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="eqama_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.eqama_id.label")}</FormLabel>
+                    <FormControl>
+                      <DigitsInput maxLength={10} disabled={isEmployeeSaving} {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

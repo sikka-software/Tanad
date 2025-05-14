@@ -2,7 +2,7 @@ import { User } from "@supabase/supabase-js";
 import { pick } from "lodash";
 import { EyeOff } from "lucide-react";
 import { Eye } from "lucide-react";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -301,7 +301,7 @@ export default function Account() {
 
 Account.messages = ["Pages", "Profile", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Account.messages),

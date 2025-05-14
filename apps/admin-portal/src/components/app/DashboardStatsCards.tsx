@@ -71,7 +71,7 @@ const DashboardCards = ({
                       key={module.key}
                       icon={<module.icon className="bg--500 m-0 size-4" />}
                       title={t(module.translationKey)}
-                      value={stats[`total${pascalKey}` as keyof DashboardStats]}
+                      value={stats[`total${pascalKey}` as keyof DashboardStats] ?? 0}
                       loading={loadingStats}
                       link={module.url}
                     />

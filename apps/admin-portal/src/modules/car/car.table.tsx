@@ -16,16 +16,21 @@ import { Car } from "./car.type";
 
 const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Car>) => {
   const t = useTranslations();
-
-  const columns = useCarColumns();
   const { mutate: updateCar } = useUpdateCar();
+  const setData = useCarStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateCar({ id: rowId, data: { [columnId]: value } });
+  };
+
+  const columns = useCarColumns(handleEdit);
   const selectedRows = useCarStore((state) => state.selectedRows);
   const setSelectedRows = useCarStore((state) => state.setSelectedRows);
 
   const columnVisibility = useCarStore((state) => state.columnVisibility);
   const setColumnVisibility = useCarStore((state) => state.setColumnVisibility);
-
-  const setData = useCarStore((state) => state.setData);
 
   const canEditCar = useUserStore((state) => state.hasPermission("cars.update"));
   const canDuplicateCar = useUserStore((state) => state.hasPermission("cars.duplicate"));
@@ -35,12 +40,6 @@ const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateCar({ id: rowId, data: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: Car[]) => {

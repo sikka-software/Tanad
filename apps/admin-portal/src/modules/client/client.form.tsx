@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -6,13 +7,12 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import BooleanTabs from "@/ui/boolean-tabs";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
-import { createAddressSchema } from "@/components/forms/address-schema";
+import { createAddressSchema } from "@root/src/lib/schemas/address.schema";
 import NotesSection from "@/components/forms/notes-section";
 import PhoneInput from "@/components/ui/phone-input";
 
@@ -113,7 +113,7 @@ export function ClientForm({
         await updateClient(
           {
             id: defaultValues.id || "",
-            client: {
+            data: {
               name: data.name.trim(),
               email: data.email.trim(),
               phone: data.phone.trim(),
@@ -194,7 +194,7 @@ export function ClientForm({
       <Form {...form}>
         <form id={formHtmlId || "client-form"} onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="form-container">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
+            <div className="form-fields-cols-1">
               <FormField
                 control={form.control}
                 name="name"
@@ -214,7 +214,7 @@ export function ClientForm({
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="email"
@@ -233,7 +233,6 @@ export function ClientForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="phone"
@@ -251,9 +250,6 @@ export function ClientForm({
                   </FormItem>
                 )}
               />
-            </div>
-
-            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="company"

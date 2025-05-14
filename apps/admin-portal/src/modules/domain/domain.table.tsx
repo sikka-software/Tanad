@@ -1,12 +1,9 @@
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
-import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
-
-import CurrencyCell from "@/components/tables/currency-cell";
 
 import { ModuleTableProps } from "@/types/common.type";
 
@@ -19,9 +16,16 @@ import { Domain } from "./domain.type";
 
 const DomainsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Domain>) => {
   const t = useTranslations();
-  const columns = useDomainColumns();
-
   const { mutate: updateDomain } = useUpdateDomain();
+  const setData = useDomainStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateDomain({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useDomainColumns(handleEdit);
+
   const selectedRows = useDomainStore((state) => state.selectedRows);
   const setSelectedRows = useDomainStore((state) => state.setSelectedRows);
 
@@ -36,11 +40,6 @@ const DomainsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "domain_id") return;
-    await updateDomain({ id: rowId, data: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: Domain[]) => {

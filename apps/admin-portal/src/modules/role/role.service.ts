@@ -75,6 +75,8 @@ export class RoleService {
       .select()
       .single();
 
+    console.log("created", created);
+
     if (error) throw error;
     return created;
   }

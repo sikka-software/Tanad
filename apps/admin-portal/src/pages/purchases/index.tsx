@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
@@ -24,12 +24,11 @@ import {
   usePurchases,
   useBulkDeletePurchases,
   useDuplicatePurchase,
-  useUpdatePurchase,
 } from "@/purchase/purchase.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/purchase/purchase.options";
 import usePurchaseStore from "@/purchase/purchase.store";
 import PurchasesTable from "@/purchase/purchase.table";
-import { Purchase, PurchaseUpdateData } from "@/purchase/purchase.type";
+import { PurchaseUpdateData } from "@/purchase/purchase.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -44,15 +43,21 @@ export default function PurchasesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionablePurchase, setActionablePurchase] = useState<PurchaseUpdateData | null>(null);
-  const [displayData, setDisplayData] = useState<Purchase[]>([]);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   const loadingSavePurchase = usePurchaseStore((state) => state.isLoading);
   const setLoadingSavePurchase = usePurchaseStore((state) => state.setIsLoading);
-  const viewMode = usePurchaseStore((state) => state.viewMode);
+
   const isDeleteDialogOpen = usePurchaseStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = usePurchaseStore((state) => state.setIsDeleteDialogOpen);
+
   const selectedRows = usePurchaseStore((state) => state.selectedRows);
   const setSelectedRows = usePurchaseStore((state) => state.setSelectedRows);
+
+  const columnVisibility = usePurchaseStore((state) => state.columnVisibility);
+  const setColumnVisibility = usePurchaseStore((state) => state.setColumnVisibility);
+
+  const viewMode = usePurchaseStore((state) => state.viewMode);
   const clearSelection = usePurchaseStore((state) => state.clearSelection);
   const sortRules = usePurchaseStore((state) => state.sortRules);
   const sortCaseSensitive = usePurchaseStore((state) => state.sortCaseSensitive);
@@ -62,26 +67,16 @@ export default function PurchasesPage() {
   const filterCaseSensitive = usePurchaseStore((state) => state.filterCaseSensitive);
   const getFilteredPurchases = usePurchaseStore((state) => state.getFilteredData);
   const getSortedPurchases = usePurchaseStore((state) => state.getSortedData);
-  const columnVisibility = usePurchaseStore((state) => state.columnVisibility);
-  const setColumnVisibility = usePurchaseStore((state) => state.setColumnVisibility);
 
   const { data: purchases, isLoading: loadingFetchPurchases, error } = usePurchases();
   const { mutate: duplicatePurchase } = useDuplicatePurchase();
   const { mutateAsync: deletePurchases, isPending: isDeleting } = useBulkDeletePurchases();
-  const { mutate: updatePurchase } = useUpdatePurchase();
   const { createDeleteHandler } = useDeleteHandler();
 
-  useEffect(() => {
-    if (purchases) {
-      setDisplayData(purchases);
-    } else {
-      setDisplayData([]);
-    }
-  }, [purchases]);
-
   const { handleAction: onActionClicked } = useDataTableActions({
-    data: displayData,
+    data: purchases,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
     setActionableItem: setActionablePurchase,
@@ -94,15 +89,24 @@ export default function PurchasesPage() {
     success: "Purchases.success.delete",
     error: "Purchases.error.delete",
     onSuccess: () => {
-      setDisplayData((current) => current.filter((row) => !selectedRows.includes(row.id)));
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
 
+  const storeData = usePurchaseStore((state) => state.data) || [];
+  const setData = usePurchaseStore((state) => state.setData);
+
+  useEffect(() => {
+    if (purchases && setData) {
+      setData(purchases);
+    }
+  }, [purchases, setData]);
+
   const filteredPurchases = useMemo(() => {
-    return getFilteredPurchases(displayData);
-  }, [displayData, getFilteredPurchases, searchQuery, filterConditions, filterCaseSensitive]);
+    return getFilteredPurchases(storeData);
+  }, [storeData, getFilteredPurchases, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedPurchases = useMemo(() => {
     return getSortedPurchases(filteredPurchases);
@@ -123,7 +127,10 @@ export default function PurchasesPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -137,7 +144,7 @@ export default function PurchasesPage() {
             }
             createLabel={t("Pages.Purchases.add")}
             searchPlaceholder={t("Pages.Purchases.search")}
-            hideOptions={displayData?.length === 0}
+            hideOptions={purchases?.length === 0}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={(updater) => {
               setColumnVisibility((prev) =>
@@ -152,7 +159,7 @@ export default function PurchasesPage() {
             <PurchasesTable
               data={sortedPurchases}
               isLoading={loadingFetchPurchases}
-              error={error instanceof Error ? error : null}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : viewMode === "cards" ? (
@@ -160,7 +167,7 @@ export default function PurchasesPage() {
               <DataModelList
                 data={sortedPurchases}
                 isLoading={loadingFetchPurchases}
-                error={error as Error | null}
+                error={error}
                 emptyMessage={t("Purchases.no_purchases_found")}
                 renderItem={(purchase) => <PurchaseCard key={purchase.id} purchase={purchase} />}
                 gridCols="3"
@@ -183,7 +190,7 @@ export default function PurchasesPage() {
               setActionablePurchase(null);
               setLoadingSavePurchase(false);
             }}
-            defaultValues={actionablePurchase as Purchase}
+            defaultValues={actionablePurchase}
             editMode={true}
           />
         </FormDialog>
@@ -192,9 +199,10 @@ export default function PurchasesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Purchases.confirm_delete")}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
+          title={t("Purchases.confirm_delete", { count: selectedRows.length })}
           description={t("Purchases.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>
@@ -203,7 +211,7 @@ export default function PurchasesPage() {
 
 PurchasesPage.messages = ["Notes", "Pages", "Purchases", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -1,16 +1,25 @@
 import { currencies } from "@/lib/constants/currencies";
 import { locales } from "@/lib/constants/locales";
 
-import { Database, Constants } from "../lib/database.types";
+import { Constants } from "../lib/database.types";
 
 export const CommonStatus = Constants.public.Enums.common_status;
+export type CommonStatusProps = (typeof CommonStatus)[number];
+
 export const VehicleStatus = Constants.public.Enums.vehicle_status;
+export type VehicleStatusProps = (typeof VehicleStatus)[number];
 
 export type LanguageProps = (typeof locales)[number];
 export type CurrencyProps = (typeof currencies)[number];
 
 export type ThemeProps = "light" | "dark";
 
+export type ViewMode = "table" | "cards";
+
+export type SortRule = {
+  field: string;
+  direction: "asc" | "desc";
+};
 export type CalendarProps = "gregorian" | "hijri";
 export type MultiLangString = {
   [key: string]: string | undefined;

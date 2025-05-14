@@ -1,6 +1,6 @@
 import useDomainStore from "@root/src/modules/domain/domain.store";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -25,8 +25,8 @@ export default function AddDomainPage() {
     if (form) {
       form.setValue("domain_name", dummyData.first_name.toLowerCase() + ".com");
       form.setValue("registrar", dummyData.email);
-      form.setValue("monthly_cost", dummyData.randomNumber);
-      form.setValue("annual_cost", dummyData.randomNumber);
+      form.setValue("monthly_cost", dummyData.randomNumber(3));
+      form.setValue("annual_cost", dummyData.randomNumber(3));
       form.setValue("payment_cycle", dummyData.randomPicker(["monthly", "annual"]));
       form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
       form.setValue("notes", dummyData.state);
@@ -62,7 +62,7 @@ export default function AddDomainPage() {
 
 AddDomainPage.messages = ["Pages", "Domains", "Notes", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

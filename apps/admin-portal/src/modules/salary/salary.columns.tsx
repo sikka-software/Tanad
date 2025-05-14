@@ -64,16 +64,10 @@ const useSalaryColumns = () => {
       header: t("Salaries.form.gross_amount.label"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
-
     {
       accessorKey: "payment_date",
       header: t("Salaries.form.payment_date.label"),
       cell: ({ getValue }) => getValue() as string,
-    },
-
-    {
-      accessorKey: "notes",
-      header: t("Salaries.form.notes.label"),
     },
   ];
   return columns;

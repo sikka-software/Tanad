@@ -181,17 +181,11 @@ export default function DepartmentForm({
             data: updatePayload as Partial<Department>,
           });
 
-          toast.success(t("General.successful_operation"), {
-            description: t("Departments.success.update"),
-          });
           if (onSuccess) {
             onSuccess();
           }
         } catch (error) {
           console.error("Error updating department:", error);
-          toast.error(t("General.error_occurred"), {
-            description: t("Departments.error.update"),
-          });
         } finally {
           setIsLoading(false);
         }
@@ -214,17 +208,11 @@ export default function DepartmentForm({
 
           await createDepartment(createData);
 
-          toast.success(t("General.successful_operation"), {
-            description: t("Departments.success.create"),
-          });
           if (onSuccess) {
             onSuccess();
           }
         } catch (error) {
           console.error("Error creating department:", error);
-          toast.error(t("General.error_occurred"), {
-            description: t("Departments.error.create"),
-          });
         } finally {
           setIsLoading(false);
         }
@@ -232,9 +220,6 @@ export default function DepartmentForm({
     } catch (error) {
       setIsLoading(false);
       console.error("Failed to save department:", error);
-      toast.error(t("General.error_operation"), {
-        description: editMode ? t("Departments.error.update") : t("Departments.error.create"),
-      });
     }
   };
 
@@ -259,7 +244,6 @@ export default function DepartmentForm({
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="description"
@@ -273,7 +257,6 @@ export default function DepartmentForm({
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="locations"

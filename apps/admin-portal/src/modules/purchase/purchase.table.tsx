@@ -20,8 +20,17 @@ const PurchasesTable = ({
   onActionClicked,
 }: ModuleTableProps<Purchase>) => {
   const t = useTranslations();
-  const columns = usePurchaseColumns();
   const { mutate: updatePurchase } = useUpdatePurchase();
+
+  const setData = usePurchaseStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updatePurchase({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = usePurchaseColumns(handleEdit);
+
   const selectedRows = usePurchaseStore((state) => state.selectedRows);
   const setSelectedRows = usePurchaseStore((state) => state.setSelectedRows);
 
@@ -36,18 +45,6 @@ const PurchasesTable = ({
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    const purchase = data.find((p) => p.id === rowId);
-    if (!purchase) return;
-    await updatePurchase({
-      id: purchase.id,
-      data: {
-        id: purchase.id,
-        [columnId]: value,
-      },
-    });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: Purchase[]) => {

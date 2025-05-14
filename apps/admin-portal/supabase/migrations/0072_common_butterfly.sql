@@ -1,0 +1,1 @@
+CREATE TYPE "public"."purchase_status" AS ENUM('draft', 'issued', 'acknowledged', 'partially_fulfilled', 'fulfilled', 'shipped', 'delayed', 'received', 'invoice_matched', 'payment_initiated', 'closed', 'cancelled');

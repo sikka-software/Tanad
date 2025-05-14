@@ -1,23 +1,21 @@
 import { useTranslations } from "next-intl";
 import React, { useCallback, useEffect, useState } from "react";
-import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
-
-import { useJobs } from "@/job/job.hooks";
 
 import { useDepartments } from "@/department/department.hooks";
 
 import { useUpdateEmployee } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
-import { Employee, EmployeeUpdateData } from "@/employee/employee.types";
+import { Employee, EmployeeStatusProps, EmployeeUpdateData } from "@/employee/employee.types";
 
 import useUserStore from "@/stores/use-user-store";
 
+import useOfficeStore from "../office/office.store";
 import useEmployeeColumns from "./employee.columns";
 
 const EmployeesTable = ({
@@ -27,11 +25,18 @@ const EmployeesTable = ({
   onActionClicked,
 }: ModuleTableProps<Employee>) => {
   const t = useTranslations();
-  const { data: departments } = useDepartments();
-
-  const columns = useEmployeeColumns();
-
   const { mutateAsync: updateEmployee } = useUpdateEmployee();
+
+  const setData = useEmployeeStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateEmployee({ id: rowId, data: { [columnId]: value } });
+  };
+
+  const columns = useEmployeeColumns(handleEdit);
+
   const selectedRows = useEmployeeStore((state) => state.selectedRows);
   const setSelectedRows = useEmployeeStore((state) => state.setSelectedRows);
 
@@ -61,75 +66,6 @@ const EmployeesTable = ({
       }
     },
     [selectedRows, setSelectedRows],
-  );
-
-  // Create a memoized handleEdit function
-  const handleEdit = useCallback(
-    (rowId: string, columnId: string, value: unknown) => {
-      let updates: EmployeeUpdateData = {};
-
-      if (columnId === "department_id") {
-        // Removed department_id update logic
-        // const department_id = value as string;
-        // const department = departments?.find((d) => d.id === department_id);
-        // if (department) {
-        //   updates = {
-        //     department_id: department_id,
-        //   };
-        // } else {
-        //   updates = {
-        //     department_id: null,
-        //   };
-        // }
-      } else if (columnId === "status") {
-        updates.status = value as "active" | "inactive" | "on_leave" | "terminated";
-      } else {
-        // For other fields, directly update
-        updates = { [columnId]: value };
-      }
-
-      // Track this update in our pending updates
-      setPendingUpdates((prev) => ({
-        ...prev,
-        [rowId]: { ...(prev[rowId] || {}), ...updates },
-      }));
-
-      // Immediately apply to our current data view
-      setCurrentData((current) =>
-        current.map((employee) => (employee.id === rowId ? { ...employee, ...updates } : employee)),
-      );
-
-      // Send to the server
-      updateEmployee(
-        { id: rowId, updates },
-        {
-          onSuccess: () => {
-            // On success, clear this item from pending updates
-            setPendingUpdates((prev) => {
-              const { [rowId]: _, ...rest } = prev;
-              return rest;
-            });
-          },
-          onError: () => {
-            // On error, revert this specific update
-            setPendingUpdates((prev) => {
-              const { [rowId]: _, ...rest } = prev;
-              return rest;
-            });
-
-            // Also revert our current data view for this row
-            setCurrentData((current) =>
-              current.map((employee) =>
-                employee.id === rowId
-                  ? data.find((e) => e.id === rowId) || employee // Revert to original
-                  : employee,
-              ),
-            );
-          },
-        },
-      );
-    },
-    [data, departments, updateEmployee],
   );
 
   if (isLoading) {

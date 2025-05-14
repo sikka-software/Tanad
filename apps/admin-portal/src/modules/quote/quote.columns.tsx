@@ -1,3 +1,5 @@
+import SelectCell from "@root/src/components/tables/select-cell";
+import StatusCell from "@root/src/components/tables/status-cell";
 import { CellContext } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
@@ -5,25 +7,26 @@ import { z } from "zod";
 
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
-import { Quote } from "./quote.type";
+import { InvoiceStatus } from "../invoice/invoice.type";
+import { Quote, QuoteStatus } from "./quote.type";
 
-const useQuoteColumns = () => {
+const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string) => void) => {
   const t = useTranslations();
 
   const columns: ExtendedColumnDef<Quote>[] = [
     {
       accessorKey: "quote_number",
-      header: t("Quotes.form.quote_number"),
+      header: t("Quotes.form.quote_number.label"),
       validationSchema: z.string().min(1, t("Quotes.form.quote_number.required")),
     },
     {
       accessorKey: "client_id",
-      header: t("Companies.title"),
+      header: t("Quotes.form.client.label"),
       cell: (props: CellContext<Quote, unknown>) => props.row.original.client?.company || "N/A",
     },
     {
       accessorKey: "issue_date",
-      header: t("Quotes.form.issue_date"),
+      header: t("Quotes.form.issue_date.label"),
       cell: (props: CellContext<Quote, unknown>) => {
         try {
           return format(new Date(props.row.original.issue_date), "MMM dd, yyyy");
@@ -34,7 +37,7 @@ const useQuoteColumns = () => {
     },
     {
       accessorKey: "expiry_date",
-      header: t("Quotes.form.expiry_date"),
+      header: t("Quotes.form.expiry_date.label"),
       cell: (props: CellContext<Quote, unknown>) => {
         try {
           return format(new Date(props.row.original.expiry_date), "MMM dd, yyyy");
@@ -45,21 +48,33 @@ const useQuoteColumns = () => {
     },
     {
       accessorKey: "subtotal",
-      header: t("Quotes.form.subtotal"),
+      header: t("Quotes.form.subtotal.label"),
       validationSchema: z.number().min(0, t("Quotes.form.subtotal.required")),
       cell: (props: CellContext<Quote, unknown>) =>
         `$${Number(props.row.original.subtotal || 0).toFixed(2)}`,
     },
     {
       accessorKey: "tax_rate",
-      header: t("Quotes.form.tax_rate"),
+      header: t("Quotes.form.tax_rate.label"),
       validationSchema: z.number().min(0, t("Quotes.form.tax_rate.required")),
       cell: (props: CellContext<Quote, unknown>) => `${props.row.original.tax_rate || 0}%`,
     },
     {
       accessorKey: "status",
-      header: t("Quotes.form.status.title"),
-      validationSchema: z.enum(["draft", "sent", "accepted", "rejected", "expired"]),
+      header: t("Quotes.form.status.label"),
+      validationSchema: z.enum(QuoteStatus),
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "status", value)}
+          cellValue={getValue()}
+          options={QuoteStatus.map((status) => ({
+            label: t(`Quotes.form.status.${status}`),
+            value: status,
+          }))}
+        />
+      ),
     },
   ];
 

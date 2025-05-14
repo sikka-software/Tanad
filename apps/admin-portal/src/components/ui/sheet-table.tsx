@@ -25,8 +25,6 @@ import {
   Row as TanStackRow,
   ColumnSizingState,
   getPaginationRowModel,
-  VisibilityState,
-  SortingState,
   ExpandedState,
   ColumnFiltersState,
   getSortedRowModel,
@@ -37,22 +35,10 @@ import { useLocale, useTranslations } from "next-intl";
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableFooter,
-} from "@/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 
-// ** import lib
 import { cn } from "@/lib/utils";
 
-import CodeInput from "./code-input";
-import { CommandSelect } from "./command-select";
-import { Input } from "./input";
 import RowActionsPopover from "./popovers/row-actions-popover";
 
 export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
@@ -61,7 +47,6 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
 > & {
   id?: string;
   accessorKey?: string;
-  cellType?: "text" | "select" | "status" | "code";
   options?: Array<{ label: string; value: string | number | boolean }>;
   validationSchema?: ZodType<any, ZodTypeDef, any>;
   className?: string | ((row: TData) => string); // Allows static or dynamic class names
@@ -69,7 +54,7 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   enableEditing?: boolean;
   noPadding?: boolean;
   dir?: "ltr" | "rtl";
-  // For code cellType only:
+
   onSerial?: (row: TData, rowIndex: number) => void;
   onRandom?: (row: TData, rowIndex: number) => void;
 };
@@ -370,25 +355,11 @@ function SheetTable<
     id,
     columnVisibility,
     onColumnVisibilityChange,
+    tableOptions,
   } = props;
 
   const t = useTranslations();
   const locale = useLocale();
-
-  // // Determine which columnVisibility/onColumnVisibilityChange to use
-  // const columnVisibility =
-  //   propColumnVisibility !== undefined ? propColumnVisibility : storeColumnVisibility;
-  // const onColumnVisibilityChange =
-  //   propOnColumnVisibilityChange !== undefined
-  //     ? propOnColumnVisibilityChange
-  //     : (updater: any) => {
-  //         // TanStack Table passes either a new state or an updater function
-  //         const next = typeof updater === "function" ? updater(storeColumnVisibility) : updater;
-  //         // Only update if the value actually changes
-  //         if (JSON.stringify(next) !== JSON.stringify(storeColumnVisibility)) {
-  //           setStoreColumnVisibility(tableId, next);
-  //         }
-  //       };
 
   /**
    * Ensure a minimum of 30 rows are displayed, padding with empty rows if needed.
@@ -413,11 +384,6 @@ function SheetTable<
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
 
   /**
-   * Expanded state for sub-rows. Keyed by row.id in TanStack Table.
-   */
-  // const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-
-  /**
    * Track errors/original content keyed by (groupKey, rowId) for editing.
    */
   const [cellErrors, setCellErrors] = useState<
@@ -436,37 +402,15 @@ function SheetTable<
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [expanded, setExpanded] = React.useState<ExpandedState>({});
 
-  // const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(() => {
-  //   const savedVisibility = localStorage.getItem("column-visibility");
-  //   return savedVisibility ? JSON.parse(savedVisibility) : {};
-  // });
-
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [selectedFilters, setSelectedFilters] = React.useState<string[]>([]);
-
   /**
    * Initialize the table using TanStack Table.
    */
   const table = useReactTable({
     data,
     columns: columns as ColumnDef<T>[],
-    getRowId: (row) => row.id ?? String(Math.random()), // fallback if row.id is missing
     // Provide subRows if you have them:
     getSubRows: (row) => row.subRows ?? undefined,
-    // Add expansions
-    enableExpanding: true,
-    // Add row selection
-    enableRowSelection: true,
-    enableMultiRowSelection: true,
-    // External expanded state
-    state: {
-      columnFilters,
-      columnVisibility,
-      globalFilter,
-      rowSelection,
-      expanded,
-    },
-
+    // enableExpanding: true,
     onExpandedChange: setExpanded,
     getExpandedRowModel: getExpandedRowModel(),
     onGlobalFilterChange: setGlobalFilter,
@@ -476,7 +420,18 @@ function SheetTable<
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: onColumnVisibilityChange,
-    onRowSelectionChange: setRowSelection,
+    ...(tableOptions || {}),
+    state: {
+      ...tableOptions?.state,
+      columnFilters,
+      columnVisibility,
+      globalFilter,
+      expanded,
+      pagination: {
+        pageSize: data.length,
+        pageIndex: 0,
+      },
+    },
   });
 
   // Update parent component when row selection changes
@@ -653,17 +608,6 @@ function SheetTable<
     overscan: 10,
   });
 
-  // rowActions config
-  const addPos = rowActions?.add ?? null; // "left" | "right" | null
-  const removePos = rowActions?.remove ?? null; // "left" | "right" | null
-
-  const rowActionCellStyle: React.CSSProperties = {
-    width: "5px",
-    maxWidth: "5px",
-    outline: "none",
-  };
-  const rowActionCellClassName = "p-0 border-none bg-transparent";
-
   /**
    * Recursively renders a row and its sub-rows, handling:
    * - Row content and cell editing
@@ -686,14 +630,6 @@ function SheetTable<
     // Determine if this row or its group is disabled
     const disabled = isRowDisabled(disabledRows, groupKey, rowIndex);
 
-    // TanStack expansion logic
-    const hasSubRows = row.getCanExpand();
-    const isExpanded = row.getIsExpanded();
-
-    // Determine if we show the rowAction icons on hover
-    const showRowActions = hoveredRowId === rowId; // only for hovered row
-
-    const stickyColumnId = "checkbox";
     return (
       <React.Fragment key={rowId}>
         <TableRow
@@ -758,7 +694,7 @@ function SheetTable<
            * We'll do an approach that overlays them. For clarity, let's keep it simple:
            * we'll just overlay or absolutely position them, or place them in the first cell.
            */}
-          {row.getVisibleCells().map((cell, cellIndex) => {
+          {row.getVisibleCells().map((cell) => {
             const colDef = cell.column.columnDef as ExtendedColumnDef<T>;
             const colKey = getColumnKey(colDef);
             const isDisabled = disabled || disabledColumns.includes(colKey);
@@ -798,186 +734,16 @@ function SheetTable<
 
             let cellContent: React.ReactNode = rawCellContent;
 
-            // if cell type is status, show a status element
-            if (colDef.cellType === "status" && colDef.options) {
-              const cellValue = cell.getValue() as string | number;
-              const selectedOption = colDef.options.find((opt) => opt.value === cellValue);
-
-              return (
-                <TableCell
-                  key={cell.id}
-                  className={cn(
-                    "relative overflow-hidden border p-0",
-                    {
-                      "bg-muted": isDisabled,
-                      "bg-destructive/25": errorMsg,
-                    },
-                    typeof colDef.className === "function"
-                      ? colDef.className(rowData)
-                      : colDef.className,
-                  )}
-                  style={{ ...style, overflow: "hidden", minWidth: 0 }}
-                >
-                  <CommandSelect
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                    data={colDef.options}
-                    inCell
-                    isLoading={false}
-                    defaultValue={String(selectedOption?.value)}
-                    popoverClassName="w-full max-w-full"
-                    buttonClassName="bg-transparent p-0 w-full max-w-full"
-                    placeholderClassName="w-full p-0"
-                    valueKey="value"
-                    labelKey="label"
-                    onChange={async (value) => {
-                      if (onEdit) {
-                        onEdit(rowId, colKey as keyof T, value as T[keyof T]);
-                      }
-                    }}
-                    texts={{ placeholder: ". . ." }}
-                    renderSelected={(item) => {
-                      return (
-                        <div
-                          className={cn(
-                            "flex h-full w-full items-center justify-center bg-green-500 p-0 !px-2 text-center text-xs font-bold",
-                            {
-                              "text-primary bg-green-200 hover:bg-green-200 dark:bg-green-700 dark:hover:bg-green-700":
-                                item.value === "active",
-                              "text-primary bg-red-200 hover:bg-red-200 dark:bg-red-700 dark:hover:bg-red-700":
-                                item.value === "inactive",
-                            },
-                          )}
-                        >
-                          {item.label}
-                        </div>
-                      );
-                    }}
-                    ariaInvalid={false}
-                  />
-                </TableCell>
-              );
-            }
-            // if cell type is select, show a select element
-            if (colDef.cellType === "select" && colDef.options) {
-              const cellValue = cell.getValue() as string | number;
-
-              return (
-                <TableCell
-                  key={cell.id}
-                  className={cn(
-                    "force-maxwidth-cell relative overflow-hidden border p-0",
-                    {
-                      "bg-muted": isDisabled,
-                      "bg-destructive/25": errorMsg,
-                    },
-                    typeof colDef.className === "function"
-                      ? colDef.className(rowData)
-                      : colDef.className,
-                  )}
-                  style={{ ...style, overflow: "hidden", minWidth: 0 }}
-                >
-                  <CommandSelect
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                    data={colDef.options}
-                    inCell
-                    isLoading={false}
-                    defaultValue={String(cellValue)}
-                    popoverClassName="w-full max-w-full"
-                    buttonClassName="bg-transparent w-full max-w-full"
-                    valueKey="value"
-                    labelKey="label"
-                    onChange={async (value) => {
-                      if (onEdit) {
-                        onEdit(rowId, colKey as keyof T, value as T[keyof T]);
-                      }
-                    }}
-                    texts={{
-                      placeholder: ". . .",
-                    }}
-                    renderOption={(item) => {
-                      return <div>{item.label}</div>;
-                    }}
-                    ariaInvalid={false}
-                  />
-                </TableCell>
-              );
-            }
-            // if cell type is code, show a code input element
-            if (colDef.cellType === "code") {
-              const cellValue = cell.getValue() as string | undefined;
-              return (
-                <TableCell
-                  key={cell.id}
-                  className={cn(
-                    "relative overflow-hidden border p-0",
-                    {
-                      "bg-muted": isDisabled,
-                      "bg-destructive/25": errorMsg,
-                    },
-                    typeof colDef.className === "function"
-                      ? colDef.className(rowData)
-                      : colDef.className,
-                  )}
-                  style={{ ...style, overflow: "hidden", minWidth: 0 }}
-                >
-                  <CodeInput
-                    inCell
-                    onSerial={() => {
-                      if (colDef.onSerial) {
-                        colDef.onSerial(rowData, rowIndex);
-                      } else if (onEdit) {
-                        const next = (parseInt(cellValue || "0", 10) + 1).toString();
-                        onEdit(rowId, colKey as keyof T, next as T[keyof T]);
-                      }
-                    }}
-                    onRandom={() => {
-                      if (colDef.onRandom) {
-                        colDef.onRandom(rowData, rowIndex);
-                      } else if (onEdit) {
-                        const random = Math.floor(100000 + Math.random() * 900000).toString();
-                        onEdit(rowId, colKey as keyof T, random as T[keyof T]);
-                      }
-                    }}
-                  >
-                    <Input
-                      inCell
-                      value={cellValue || ""}
-                      disabled={isDisabled}
-                      style={{ minHeight: 36 }}
-                      onFocus={(e) => handleCellFocus(e, groupKey, rowData, colDef)}
-                      onKeyDown={(e) => {
-                        if (
-                          (e.ctrlKey || e.metaKey) &&
-                          ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
-                        ) {
-                          return;
-                        }
-                        handleKeyDown(e, colDef);
-                      }}
-                      onPaste={(e) => handlePaste(e, colDef)}
-                      onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
-                      onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
-                      onChange={(e) => {
-                        if (onEdit) {
-                          onEdit(rowId, colKey as keyof T, e.target.value as T[keyof T]);
-                        }
-                      }}
-                    />
-                  </CodeInput>
-                </TableCell>
-              );
-            }
-
             return (
               <TableCell
                 key={rowId + colKey + String(cell.getValue() ?? "")}
                 className={cn(
-                  "tiny-scrollbar relative overflow-scroll border", // 'relative' for absolute icons if you prefer
+                  "tiny-scrollbar relative overflow-scroll border",
                   {
                     "bg-muted": isDisabled,
                     "bg-destructive/25": errorMsg,
+                    "p-0": colDef.noPadding,
                   },
-                  colDef.noPadding ? "p-0" : "",
                   typeof colDef.className === "function"
                     ? colDef.className(rowData)
                     : colDef.className,
@@ -986,9 +752,6 @@ function SheetTable<
                 style={style}
                 contentEditable={colDef.enableEditing !== false ? !isDisabled : false}
                 suppressContentEditableWarning
-                onFocus={(e) => {
-                  handleCellFocus(e, groupKey, rowData, colDef);
-                }}
                 onKeyDown={(e) => {
                   if (
                     (e.ctrlKey || e.metaKey) &&
@@ -999,17 +762,11 @@ function SheetTable<
                   }
                   handleKeyDown(e, colDef);
                 }}
-                onPaste={(e) => {
-                  handlePaste(e, colDef);
-                }}
-                onInput={(e) => {
-                  handleCellInput(e, groupKey, rowData, colDef);
-                }}
-                onBlur={(e) => {
-                  handleCellBlur(e, groupKey, rowData, colDef);
-                }}
+                onFocus={(e) => handleCellFocus(e, groupKey, rowData, colDef)}
+                onPaste={(e) => handlePaste(e, colDef)}
+                onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
+                onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
               >
-                {/** The actual content */}
                 {cellContent}
               </TableCell>
             );
@@ -1019,7 +776,6 @@ function SheetTable<
     );
   };
 
-  // Memoize renderRow
   const memoizedRenderRow = React.useCallback(
     (row: TanStackRow<T>, groupKey: string, level = 0) => renderRow(row, groupKey, level),
     [renderRow],
@@ -1046,12 +802,9 @@ function SheetTable<
   return (
     <div ref={parentRef} className="relative max-h-[calc(100vh-7.6rem)] overflow-auto p-0 pb-2">
       <Table id={id} style={{ minWidth: totalMinWidth }}>
-        {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
-        {/* Primary header */}
         {showHeader && (
           <TableHeader className="relative">
             <TableRow className="border-none">
-              {/* Selection checkbox header */}
               {enableRowSelection && (
                 <TableHead className="bg-muted sticky start-0 top-0 z-30 w-8 !max-w-8 min-w-8 border-none text-start">
                   <div className="flex h-full items-center justify-center">
@@ -1128,13 +881,11 @@ function SheetTable<
           {/* Virtualized rows */}
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
             const { row, groupKey, level } = flatRows[virtualRow.index];
-            // Render as TableRow, not div
             return React.cloneElement(
               memoizedRenderRow(row, groupKey, level) as React.ReactElement,
               { key: row.id },
             );
           })}
-          {/* Bottom spacer */}
           {rowVirtualizer.getVirtualItems().length > 0 && (
             <tr
               style={{

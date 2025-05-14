@@ -1,22 +1,29 @@
+import CurrencyCell from "@root/src/components/tables/currency-cell";
+import SelectCell from "@root/src/components/tables/select-cell";
 import { Badge } from "@root/src/components/ui/badge";
+import useUserStore from "@root/src/stores/use-user-store";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
-import { EmployeeRequest } from "./employee-request.type";
+import { EmployeeRequest, EmployeeRequestStatus } from "./employee-request.type";
 
-const useEmployeeRequestColumns = () => {
+const useEmployeeRequestColumns = (
+  handleEdit?: (id: string, field: string, value: string) => void,
+) => {
   const t = useTranslations();
+  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
 
   const columns: ExtendedColumnDef<EmployeeRequest>[] = [
     {
       accessorKey: "type",
+      enableEditing: false,
       header: t("EmployeeRequests.form.type.label"),
       cell: ({ row }: { row: { original: EmployeeRequest } }) => (
         <Badge variant="outline" className="capitalize">
-          {row.original.type}
+          {t(`EmployeeRequests.form.type.${row.original.type.toLowerCase()}`)}
         </Badge>
       ),
     },
@@ -41,8 +48,7 @@ const useEmployeeRequestColumns = () => {
     {
       accessorKey: "amount",
       header: t("EmployeeRequests.form.amount.label"),
-      cell: ({ row }: { row: { original: EmployeeRequest } }) =>
-        row.original.amount ? `$${row.original.amount.toFixed(2)}` : "-",
+      cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
     {
       accessorKey: "description",
@@ -50,26 +56,20 @@ const useEmployeeRequestColumns = () => {
       validationSchema: z.string().nullable(),
     },
     {
-      accessorKey: "notes",
-      header: t("EmployeeRequests.form.notes.label"),
-      validationSchema: z.string().nullable(),
-    },
-    {
       accessorKey: "status",
       header: t("EmployeeRequests.form.status.label"),
-      cell: ({ row }: { row: { original: EmployeeRequest } }) => {
-        const variant =
-          row.original.status === "approved"
-            ? "secondary"
-            : row.original.status === "rejected"
-              ? "destructive"
-              : "default";
-        return (
-          <Badge variant={variant} className="capitalize">
-            {row.original.status}
-          </Badge>
-        );
-      },
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "status", value)}
+          cellValue={getValue()}
+          options={EmployeeRequestStatus.map((status) => ({
+            label: t(`EmployeeRequests.form.status.${status}`),
+            value: status,
+          }))}
+        />
+      ),
     },
   ];
 

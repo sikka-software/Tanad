@@ -65,7 +65,7 @@ export type Database = {
           name: string
           notes: Json | null
           routing_number: string | null
-          status: string
+          status: Database["public"]["Enums"]["common_status"]
           swift_bic: string | null
           updated_at: string | null
           user_id: string
@@ -81,7 +81,7 @@ export type Database = {
           name: string
           notes?: Json | null
           routing_number?: string | null
-          status: string
+          status: Database["public"]["Enums"]["common_status"]
           swift_bic?: string | null
           updated_at?: string | null
           user_id: string
@@ -97,7 +97,7 @@ export type Database = {
           name?: string
           notes?: Json | null
           routing_number?: string | null
-          status?: string
+          status?: Database["public"]["Enums"]["common_status"]
           swift_bic?: string | null
           updated_at?: string | null
           user_id?: string
@@ -578,7 +578,7 @@ export type Database = {
           id: string
           notes: Json | null
           start_date: string | null
-          status: string
+          status: Database["public"]["Enums"]["employee_request_status"]
           title: string
           type: string
           updated_at: string
@@ -595,7 +595,7 @@ export type Database = {
           id?: string
           notes?: Json | null
           start_date?: string | null
-          status?: string
+          status?: Database["public"]["Enums"]["employee_request_status"]
           title: string
           type: string
           updated_at?: string
@@ -612,7 +612,7 @@ export type Database = {
           id?: string
           notes?: Json | null
           start_date?: string | null
-          status?: string
+          status?: Database["public"]["Enums"]["employee_request_status"]
           title?: string
           type?: string
           updated_at?: string
@@ -631,19 +631,29 @@ export type Database = {
       employees: {
         Row: {
           additional_number: string | null
+          birth_date: string | null
           building_number: string | null
           city: string | null
           country: string | null
           created_at: string | null
+          education_level: string | null
           email: string
+          emergency_contact: Json | null
+          employee_number: string | null
           enterprise_id: string
+          eqama_id: string | null
           first_name: string
+          gender: string | null
           hire_date: string | null
           id: string
           job_id: string | null
           last_name: string
+          marital_status: string | null
+          national_id: string | null
           nationality: string | null
           notes: Json | null
+          offboarding_status: string | null
+          onboarding_status: string | null
           phone: string | null
           region: string | null
           salary: Json | null
@@ -657,19 +667,29 @@ export type Database = {
         }
         Insert: {
           additional_number?: string | null
+          birth_date?: string | null
           building_number?: string | null
           city?: string | null
           country?: string | null
           created_at?: string | null
+          education_level?: string | null
           email: string
+          emergency_contact?: Json | null
+          employee_number?: string | null
           enterprise_id: string
+          eqama_id?: string | null
           first_name: string
+          gender?: string | null
           hire_date?: string | null
           id?: string
           job_id?: string | null
           last_name: string
+          marital_status?: string | null
+          national_id?: string | null
           nationality?: string | null
           notes?: Json | null
+          offboarding_status?: string | null
+          onboarding_status?: string | null
           phone?: string | null
           region?: string | null
           salary?: Json | null
@@ -683,19 +703,29 @@ export type Database = {
         }
         Update: {
           additional_number?: string | null
+          birth_date?: string | null
           building_number?: string | null
           city?: string | null
           country?: string | null
           created_at?: string | null
+          education_level?: string | null
           email?: string
+          emergency_contact?: Json | null
+          employee_number?: string | null
           enterprise_id?: string
+          eqama_id?: string | null
           first_name?: string
+          gender?: string | null
           hire_date?: string | null
           id?: string
           job_id?: string | null
           last_name?: string
+          marital_status?: string | null
+          national_id?: string | null
           nationality?: string | null
           notes?: Json | null
+          offboarding_status?: string | null
+          onboarding_status?: string | null
           phone?: string | null
           region?: string | null
           salary?: Json | null
@@ -719,26 +749,38 @@ export type Database = {
       }
       enterprises: {
         Row: {
+          address: string | null
           created_at: string | null
+          description: string | null
           email: string | null
+          founded: number | null
           id: string
           industry: string | null
+          logo: string | null
           name: string
           size: string | null
         }
         Insert: {
+          address?: string | null
           created_at?: string | null
+          description?: string | null
           email?: string | null
+          founded?: number | null
           id?: string
           industry?: string | null
+          logo?: string | null
           name: string
           size?: string | null
         }
         Update: {
+          address?: string | null
           created_at?: string | null
+          description?: string | null
           email?: string | null
+          founded?: number | null
           id?: string
           industry?: string | null
+          logo?: string | null
           name?: string
           size?: string | null
         }
@@ -758,7 +800,7 @@ export type Database = {
           incurred_at: string | null
           issue_date: string | null
           notes: Json | null
-          status: string
+          status: Database["public"]["Enums"]["expense_status"]
           user_id: string
         }
         Insert: {
@@ -774,7 +816,7 @@ export type Database = {
           incurred_at?: string | null
           issue_date?: string | null
           notes?: Json | null
-          status?: string
+          status?: Database["public"]["Enums"]["expense_status"]
           user_id: string
         }
         Update: {
@@ -790,7 +832,7 @@ export type Database = {
           incurred_at?: string | null
           issue_date?: string | null
           notes?: Json | null
-          status?: string
+          status?: Database["public"]["Enums"]["expense_status"]
           user_id?: string
         }
         Relationships: [
@@ -869,7 +911,7 @@ export type Database = {
           invoice_number: string
           issue_date: string | null
           notes: Json | null
-          status: string
+          status: Database["public"]["Enums"]["invoice_status"]
           subtotal: number
           tax_amount: number | null
           tax_rate: number | null
@@ -886,7 +928,7 @@ export type Database = {
           invoice_number: string
           issue_date?: string | null
           notes?: Json | null
-          status?: string
+          status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
           tax_amount?: number | null
           tax_rate?: number | null
@@ -903,7 +945,7 @@ export type Database = {
           invoice_number?: string
           issue_date?: string | null
           notes?: Json | null
-          status?: string
+          status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
           tax_amount?: number | null
           tax_rate?: number | null
@@ -1416,7 +1458,7 @@ export type Database = {
           issue_date: string | null
           notes: Json | null
           purchase_number: string
-          status: string
+          status: Database["public"]["Enums"]["purchase_status"]
           user_id: string
         }
         Insert: {
@@ -1432,7 +1474,7 @@ export type Database = {
           issue_date?: string | null
           notes?: Json | null
           purchase_number: string
-          status?: string
+          status?: Database["public"]["Enums"]["purchase_status"]
           user_id: string
         }
         Update: {
@@ -1448,7 +1490,7 @@ export type Database = {
           issue_date?: string | null
           notes?: Json | null
           purchase_number?: string
-          status?: string
+          status?: Database["public"]["Enums"]["purchase_status"]
           user_id?: string
         }
         Relationships: [
@@ -1534,7 +1576,7 @@ export type Database = {
           issue_date: string
           notes: Json | null
           quote_number: string
-          status: string
+          status: Database["public"]["Enums"]["quote_status"]
           subtotal: number
           tax_amount: number | null
           tax_rate: number | null
@@ -1551,7 +1593,7 @@ export type Database = {
           issue_date: string
           notes?: Json | null
           quote_number: string
-          status?: string
+          status?: Database["public"]["Enums"]["quote_status"]
           subtotal?: number
           tax_amount?: number | null
           tax_rate?: number | null
@@ -1568,7 +1610,7 @@ export type Database = {
           issue_date?: string
           notes?: Json | null
           quote_number?: string
-          status?: string
+          status?: Database["public"]["Enums"]["quote_status"]
           subtotal?: number
           tax_amount?: number | null
           tax_rate?: number | null
@@ -2161,6 +2203,10 @@ export type Database = {
       }
     }
     Functions: {
+      check_user_can_create_role_in_enterprise: {
+        Args: { p_enterprise_id: string }
+        Returns: boolean
+      }
       create_enterprise: {
         Args: {
           enterprise_name: string
@@ -2616,13 +2662,78 @@ export type Database = {
         | "trucks.duplicate"
       app_role: "superadmin" | "admin" | "accounting" | "hr"
       common_status: "active" | "inactive" | "draft" | "archived"
+      employee_request_status:
+        | "draft"
+        | "submitted"
+        | "under_review"
+        | "approved"
+        | "rejected"
+        | "revoked"
+        | "pending_additional_info"
+        | "completed"
+        | "escalated"
+        | "archived"
       employee_status:
         | "active"
-        | "inactive"
-        | "terminated"
+        | "onboarding"
+        | "probation"
         | "on_leave"
-        | "resigned"
+        | "terminated"
+        | "retired"
+        | "suspended"
+      expense_status:
+        | "draft"
+        | "submitted"
+        | "under_review"
+        | "pending_verification"
+        | "approved"
+        | "partially_approved"
+        | "rejected"
+        | "pending_payment"
+        | "paid"
+        | "disputed"
+        | "audit_flagged"
+        | "closed"
+        | "archived"
+      invoice_status:
+        | "draft"
+        | "pending_approval"
+        | "sent"
+        | "partially_paid"
+        | "paid"
+        | "overdue"
+        | "disputed"
+        | "void"
+        | "scheduled"
+        | "payment_failed"
+        | "refunded"
+        | "written_off"
+        | "archived"
       payment_cycle: "monthly" | "annual"
+      purchase_status:
+        | "draft"
+        | "issued"
+        | "acknowledged"
+        | "partially_fulfilled"
+        | "fulfilled"
+        | "shipped"
+        | "delayed"
+        | "received"
+        | "invoice_matched"
+        | "payment_initiated"
+        | "closed"
+        | "cancelled"
+      quote_status:
+        | "draft"
+        | "sent"
+        | "revised"
+        | "under_review"
+        | "accepted"
+        | "rejected"
+        | "expired"
+        | "converted_to_invoice"
+        | "negotiating"
+        | "archived"
       vehicle_status:
         | "active"
         | "maintenance"
@@ -2957,14 +3068,84 @@ export const Constants = {
       ],
       app_role: ["superadmin", "admin", "accounting", "hr"],
       common_status: ["active", "inactive", "draft", "archived"],
+      employee_request_status: [
+        "draft",
+        "submitted",
+        "under_review",
+        "approved",
+        "rejected",
+        "revoked",
+        "pending_additional_info",
+        "completed",
+        "escalated",
+        "archived",
+      ],
       employee_status: [
         "active",
-        "inactive",
-        "terminated",
+        "onboarding",
+        "probation",
         "on_leave",
-        "resigned",
+        "terminated",
+        "retired",
+        "suspended",
+      ],
+      expense_status: [
+        "draft",
+        "submitted",
+        "under_review",
+        "pending_verification",
+        "approved",
+        "partially_approved",
+        "rejected",
+        "pending_payment",
+        "paid",
+        "disputed",
+        "audit_flagged",
+        "closed",
+        "archived",
+      ],
+      invoice_status: [
+        "draft",
+        "pending_approval",
+        "sent",
+        "partially_paid",
+        "paid",
+        "overdue",
+        "disputed",
+        "void",
+        "scheduled",
+        "payment_failed",
+        "refunded",
+        "written_off",
+        "archived",
       ],
       payment_cycle: ["monthly", "annual"],
+      purchase_status: [
+        "draft",
+        "issued",
+        "acknowledged",
+        "partially_fulfilled",
+        "fulfilled",
+        "shipped",
+        "delayed",
+        "received",
+        "invoice_matched",
+        "payment_initiated",
+        "closed",
+        "cancelled",
+      ],
+      quote_status: [
+        "draft",
+        "sent",
+        "revised",
+        "under_review",
+        "accepted",
+        "rejected",
+        "expired",
+        "converted_to_invoice",
+        "negotiating",
+        "archived",
+      ],
       vehicle_status: [
         "active",
         "maintenance",

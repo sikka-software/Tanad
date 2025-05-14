@@ -49,8 +49,11 @@ export function useDuplicateInvoice() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: duplicateInvoice,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() }),
+    mutationFn: (id: string) => duplicateInvoice(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: invoiceKeys.detail(data.id) });
+    },
     meta: { toast: { success: "Invoices.success.duplicate", error: "Invoices.error.duplicate" } },
   });
 }

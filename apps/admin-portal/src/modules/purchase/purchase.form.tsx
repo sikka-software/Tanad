@@ -21,7 +21,7 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useCreatePurchase, usePurchases, useUpdatePurchase } from "./purchase.hooks";
 import usePurchaseStore from "./purchase.store";
-import { PurchaseUpdateData, PurchaseCreateData } from "./purchase.type";
+import { PurchaseUpdateData, PurchaseCreateData, PurchaseStatus } from "./purchase.type";
 
 export const createPurchaseSchema = (t: (key: string) => string) => {
   return z.object({
@@ -44,11 +44,8 @@ export const createPurchaseSchema = (t: (key: string) => string) => {
     ),
     category: z.string().min(1, t("Purchases.form.category.required")),
     status: z
-      .enum(["pending", "paid", "overdue", "cancelled"], {
-        // Example statuses
-        required_error: t("Purchases.form.status.required"),
-      })
-      .default("pending"),
+      .enum(PurchaseStatus, { required_error: t("Purchases.form.status.required") })
+      .default("draft"),
     issue_date: z
       .string()
       .refine((val) => !val || !isNaN(Date.parse(val)), {
@@ -107,7 +104,7 @@ export function PurchaseForm({
       description: defaultValues?.description || "",
       amount: defaultValues?.amount || undefined,
       category: defaultValues?.category || "",
-      status: (defaultValues?.status as "pending" | "paid" | "overdue" | "cancelled") || "pending",
+      status: defaultValues?.status || "draft",
       issue_date: defaultValues?.issue_date
         ? new Date(defaultValues.issue_date).toISOString().split("T")[0]
         : new Date().toISOString().split("T")[0],
@@ -163,10 +160,7 @@ export function PurchaseForm({
           throw new Error("Purchase ID is missing for update.");
         }
         await updatePurchase(
-          {
-            id: defaultValues.id,
-            data: payload as PurchaseUpdateData,
-          },
+          { id: defaultValues.id, data: payload },
           {
             onSuccess: () => {
               setIsLoading(false);

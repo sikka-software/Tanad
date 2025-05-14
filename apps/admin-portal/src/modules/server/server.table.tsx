@@ -17,10 +17,19 @@ import { useUpdateServer } from "./server.hooks";
 const ServersTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Server>) => {
   const t = useTranslations();
   const { mutate: updateServer } = useUpdateServer();
+
+  const setData = useServerStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateServer({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useServerColumns(handleEdit);
+
   const selectedRows = useServerStore((state) => state.selectedRows);
   const setSelectedRows = useServerStore((state) => state.setSelectedRows);
 
-  const columns = useServerColumns();
   const columnVisibility = useServerStore((state) => state.columnVisibility);
   const setColumnVisibility = useServerStore((state) => state.setColumnVisibility);
 
@@ -32,11 +41,6 @@ const ServersTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "server_id") return;
-    await updateServer({ id: rowId, data: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: Server[]) => {

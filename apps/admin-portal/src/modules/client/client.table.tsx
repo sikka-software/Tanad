@@ -18,7 +18,16 @@ import useClientColumns from "./client.columns";
 const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Client>) => {
   const t = useTranslations();
 
-  const columns = useClientColumns();
+  const setData = useClientStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateClient({ id: rowId, data: { [columnId]: value } });
+  };
+
+  const columns = useClientColumns(handleEdit);
+
   const { mutate: updateClient } = useUpdateClient();
   const selectedRows = useClientStore((state) => state.selectedRows);
   const setSelectedRows = useClientStore((state) => state.setSelectedRows);
@@ -33,11 +42,6 @@ const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const canDeleteClient = useUserStore((state) => state.hasPermission("clients.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "client_id") return;
-    await updateClient({ id: rowId, client: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = useCallback(
     (rows: Client[]) => {

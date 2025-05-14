@@ -9,7 +9,7 @@ import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateQuote } from "@/quote/quote.hooks";
 import useQuotesStore from "@/quote/quote.store";
-import { Quote, QuoteUpdateData } from "@/quote/quote.type";
+import { Quote } from "@/quote/quote.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -17,8 +17,17 @@ import useQuoteColumns from "./quote.columns";
 
 const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Quote>) => {
   const t = useTranslations();
-  const columns = useQuoteColumns();
   const { mutateAsync: updateQuote } = useUpdateQuote();
+
+  const setData = useQuotesStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateQuote({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useQuoteColumns(handleEdit);
+
   const setSelectedRows = useQuotesStore((state) => state.setSelectedRows);
   const selectedRows = useQuotesStore((state) => state.selectedRows);
 
@@ -32,11 +41,6 @@ const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
   const canDeleteQuote = useUserStore((state) => state.hasPermission("quotes.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "client_id") return;
-    await updateQuote({ id: rowId, data: { [columnId]: value } as QuoteUpdateData });
-  };
 
   const handleRowSelectionChange = (rows: Quote[]) => {
     const newSelectedIds = rows.map((row) => row.id!);

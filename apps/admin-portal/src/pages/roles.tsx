@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
@@ -218,8 +218,9 @@ export default function RolesPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Roles.confirm_delete")}
+          title={t("Roles.confirm_delete", { count: selectedRows.length })}
           description={t("Roles.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>
@@ -228,7 +229,7 @@ export default function RolesPage() {
 
 RolesPage.messages = ["Pages", "Roles", "Notes", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, RolesPage.messages),

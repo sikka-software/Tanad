@@ -9,11 +9,13 @@ import { useEffect, useState } from "react";
 import DebugTools from "@/ui/debug-tools";
 import { LoadingBar } from "@/ui/loading-bar";
 
+import ScrollToTop from "@/components/app/scroll-to-top";
 import AppLayout from "@/components/layouts/app-layout";
 import AuthLayout from "@/components/layouts/auth-layout";
 import LandingLayout from "@/components/layouts/landing-layout";
 
 import { QueryProvider } from "@/providers/QueryProvider";
+import useUserStore from "@/stores/use-user-store";
 import "@/styles/globals.css";
 
 import TopBar from "../components/jobs/top-bar";
@@ -49,6 +51,8 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   useEffect(() => {
     setMounted(true);
     document.documentElement.classList.add(arabicFont.className);
+    // Call fetchUserAndProfile only once on mount
+    useUserStore.getState().fetchUserAndProfile();
   }, []);
 
   // Prevent beforeunload confirmation dialog for programmatic navigation
@@ -152,6 +156,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
       >
         <QueryProvider>
           <AppLayout>
+            <ScrollToTop />
             <Component {...pageProps} />
           </AppLayout>
         </QueryProvider>

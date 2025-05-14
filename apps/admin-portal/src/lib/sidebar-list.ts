@@ -237,6 +237,13 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
         },
       ],
     },
+    {
+      title: ModulesOptions.bank_accounts.label,
+      translationKey: ModulesOptions.bank_accounts.label,
+      url: ModulesOptions.bank_accounts.url,
+      icon: ModulesOptions.bank_accounts.icon,
+      is_active: pathname.startsWith(ModulesOptions.bank_accounts.url),
+    },
   ];
 }
 

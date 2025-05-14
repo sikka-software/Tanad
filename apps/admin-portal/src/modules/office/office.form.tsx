@@ -1,11 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
 import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import { CommandSelect } from "@root/src/components/ui/command-select";
 import { FormDialog } from "@root/src/components/ui/form-dialog";
+import { offices } from "@root/src/db/schema";
 import { getNotesValue } from "@root/src/lib/utils";
+import { createSelectSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -14,12 +14,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
-import { createAddressSchema } from "@/components/forms/address-schema";
 import BooleanTabs from "@/components/ui/boolean-tabs";
 import CodeInput from "@/components/ui/code-input";
 import PhoneInput from "@/components/ui/phone-input";
 
-import { ModuleFormProps } from "@/types/common.type";
+import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -31,7 +30,7 @@ import useOfficeStore from "./office.store";
 import { OfficeCreateData, OfficeUpdateData } from "./office.type";
 
 const createOfficeSchema = (t: (key: string) => string) => {
-  const baseOfficeSchema = z.object({
+  const OfficeSelectSchema = createSelectSchema(offices, {
     name: z.string().min(1, t("Offices.form.name.required")),
     code: z.string().optional().or(z.literal("")),
     email: z
@@ -42,18 +41,14 @@ const createOfficeSchema = (t: (key: string) => string) => {
     phone: z.string().optional().or(z.literal("")),
     manager: z
       .string({ invalid_type_error: t("Offices.form.manager.invalid_uuid") })
-      // .uuid({ message: t("Offices.form.manager.invalid_uuid") })
       .optional()
       .nullable(),
-    status: z.enum(["active", "inactive"], {
+    status: z.enum(CommonStatus, {
       message: t("Offices.form.status.required"),
     }),
     notes: z.any().optional().nullable(),
   });
-
-  const addressSchema = createAddressSchema(t);
-
-  return baseOfficeSchema.merge(addressSchema);
+  return OfficeSelectSchema;
 };
 
 export type OfficeFormValues = z.input<ReturnType<typeof createOfficeSchema>>;
@@ -96,7 +91,7 @@ export function OfficeForm({
       country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
       manager: defaultValues?.manager || "",
-      status: (defaultValues?.status as "active" | "inactive") || "active",
+      status: defaultValues?.status || "active",
       notes: getNotesValue(defaultValues),
     },
   });
@@ -120,7 +115,7 @@ export function OfficeForm({
         await updateOffice(
           {
             id: defaultValues.id,
-            office: {
+            data: {
               name: data.name.trim(),
               code: data.code?.trim() || undefined,
               short_address: data.short_address?.trim() || undefined,
@@ -194,7 +189,7 @@ export function OfficeForm({
     <div>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-          <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+          <div className="form-container">
             <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
@@ -249,8 +244,6 @@ export function OfficeForm({
                   </FormItem>
                 )}
               />
-            </div>
-            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="email"
@@ -270,7 +263,6 @@ export function OfficeForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="phone"
@@ -289,9 +281,7 @@ export function OfficeForm({
                   </FormItem>
                 )}
               />
-            </div>
 
-            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="manager"

@@ -1,8 +1,10 @@
 import Cookies from "js-cookie";
-import { LayoutGrid, Loader2, Rows4 } from "lucide-react";
+import { ArrowUp, LayoutGrid, Loader2, Rows4 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { ThemeProvider, useTheme } from "next-themes";
 import { useRouter } from "next/router";
+import { useEffect, useRef, useState } from "react";
 import { Toaster } from "sonner";
 
 import { AppSidebar } from "@/ui/app-sidebar";
@@ -29,12 +31,28 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const lang = useLocale();
   const router = useRouter();
   const defaultOpen = Cookies.get("sidebar_state") === "true";
-  const { setOpenCommandMenu } = useMainStore();
-  const { theme } = useTheme();
-  const { loading: isUserDataLoading, user } = useUserStore();
+  const theme = useTheme().theme;
+  const setOpenCommandMenu = useMainStore((state) => state.setOpenCommandMenu);
+  const isUserDataLoading = useUserStore((state) => state.loading);
 
   const setViewMode = useDashboardStore((state) => state.setViewMode);
   const viewMode = useDashboardStore((state) => state.viewMode);
+  const mainContentRef = useRef<HTMLDivElement>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0 && router.pathname.includes("/app")) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   if (isUserDataLoading) {
     return (
@@ -76,7 +94,11 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
                         <LayoutGrid className="size-4" />
                       )
                     }
-                    label={viewMode === "horizontal" ? t("Dashboard.vertical") : t("Dashboard.horizontal")}
+                    label={
+                      viewMode === "horizontal"
+                        ? t("Dashboard.vertical")
+                        : t("Dashboard.horizontal")
+                    }
                     variant="outline"
                     size="icon_sm"
                     className="h-8"
@@ -103,7 +125,28 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
               <div className="block border-b p-2 md:hidden">
                 <AppBreadcrumb />
               </div>
-              {children}
+              <div className="relative">
+                <div ref={mainContentRef}>{children}</div>
+                <AnimatePresence mode="wait">
+                  {showScrollTop && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.15, delay: 0.1 }}
+                      className="sticky start-2 bottom-2 z-[40] ms-2"
+                    >
+                      <IconButton
+                        icon={<ArrowUp />}
+                        variant={"outline"}
+                        label={t("General.scroll_to_top")}
+                        size="icon_sm"
+                        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </SidebarProvider>

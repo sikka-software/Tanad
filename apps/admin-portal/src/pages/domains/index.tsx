@@ -1,19 +1,8 @@
-import DomainCard from "@root/src/modules/domain/domain.card";
-import useDomainColumns from "@root/src/modules/domain/domain.columns";
-import { DomainForm } from "@root/src/modules/domain/domain.form";
-import {
-  useDomains,
-  useBulkDeleteDomains,
-  useDuplicateDomain,
-} from "@root/src/modules/domain/domain.hooks";
-import useDomainStore from "@root/src/modules/domain/domain.store";
-import DomainsTable from "@root/src/modules/domain/domain.table";
-import { DomainUpdateData } from "@root/src/modules/domain/domain.type";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -22,14 +11,26 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { createModuleStoreHooks } from "@/utils/module-hooks";
+
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import DomainCard from "@/modules/domain/domain.card";
+import useDomainColumns from "@/modules/domain/domain.columns";
+import { DomainForm } from "@/modules/domain/domain.form";
+import {
+  useDomains,
+  useBulkDeleteDomains,
+  useDuplicateDomain,
+} from "@/modules/domain/domain.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/domain/domain.options";
-import useUserStore from "@/stores/use-user-store";
+import useDomainStore from "@/modules/domain/domain.store";
+import DomainsTable from "@/modules/domain/domain.table";
+import { DomainUpdateData } from "@/modules/domain/domain.type";
 
 export default function DomainsPage() {
   const t = useTranslations();
@@ -37,42 +38,50 @@ export default function DomainsPage() {
 
   const columns = useDomainColumns();
 
-  const canReadDomains = useUserStore((state) => state.hasPermission("domains.read"));
-  const canCreateDomains = useUserStore((state) => state.hasPermission("domains.create"));
+  const moduleHooks = createModuleStoreHooks(useDomainStore, "domains");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableDomain, setActionableDomain] = useState<DomainUpdateData | null>(null);
+  const [actionableItem, setActionableItem] = useState<DomainUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
-  const loadingSaveDomain = useDomainStore((state) => state.isLoading);
-  const setLoadingSaveDomain = useDomainStore((state) => state.setIsLoading);
-  const viewMode = useDomainStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useDomainStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useDomainStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useDomainStore((state) => state.selectedRows);
-  const setSelectedRows = useDomainStore((state) => state.setSelectedRows);
-  const clearSelection = useDomainStore((state) => state.clearSelection);
-  const sortRules = useDomainStore((state) => state.sortRules);
-  const sortCaseSensitive = useDomainStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useDomainStore((state) => state.sortNullsFirst);
-  const searchQuery = useDomainStore((state) => state.searchQuery);
-  const filterConditions = useDomainStore((state) => state.filterConditions);
-  const filterCaseSensitive = useDomainStore((state) => state.filterCaseSensitive);
-  const getFilteredDomains = useDomainStore((state) => state.getFilteredData);
-  const getSortedDomains = useDomainStore((state) => state.getSortedData);
-  const columnVisibility = useDomainStore((state) => state.columnVisibility);
-  const setColumnVisibility = useDomainStore((state) => state.setColumnVisibility);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const { data: domains, isLoading: loadingFetchDomains, error } = useDomains();
-  const { mutate: duplicateDomain } = useDuplicateDomain();
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
+
+  const { data: domains, isLoading, error } = useDomains();
   const { mutateAsync: deleteDomains, isPending: isDeleting } = useBulkDeleteDomains();
+  const { mutate: duplicateDomain } = useDuplicateDomain();
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
     data: domains,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableDomain,
+    setActionableItem,
     duplicateMutation: duplicateDomain,
     moduleName: "Domains",
   });
@@ -83,31 +92,48 @@ export default function DomainsPage() {
     error: "Domains.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
 
-  const filteredDomains = useMemo(() => {
-    return getFilteredDomains(domains || []);
-  }, [domains, getFilteredDomains, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useDomainStore((state) => state.data) || [];
+  const setData = useDomainStore((state) => state.setData);
 
-  const sortedDomains = useMemo(() => {
-    return getSortedDomains(filteredDomains);
-  }, [filteredDomains, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (domains && setData) {
+      setData(domains);
+    }
+  }, [domains, setData]);
 
-  if (!canReadDomains) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
+
   return (
     <div>
-      <CustomPageMeta title={t("Domains.title")} description={t("Domains.description")} />
+      <CustomPageMeta
+        title={t("Pages.Domains.title")}
+        description={t("Pages.Domains.description")}
+      />
       <DataPageLayout count={domains?.length} itemsText={t("Pages.Domains.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -116,7 +142,7 @@ export default function DomainsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Domains.title")}
-            onAddClick={canCreateDomains ? () => router.push(router.pathname + "/add") : undefined}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Domains.add")}
             searchPlaceholder={t("Pages.Domains.search")}
             hideOptions={domains?.length === 0}
@@ -132,17 +158,17 @@ export default function DomainsPage() {
         <div>
           {viewMode === "table" ? (
             <DomainsTable
-              data={sortedDomains}
-              isLoading={loadingFetchDomains}
-              error={error as Error | null}
+              data={sortedData}
+              isLoading={isLoading}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedDomains}
-                isLoading={loadingFetchDomains}
-                error={error as Error | null}
+                data={sortedData}
+                isLoading={isLoading}
+                error={error}
                 emptyMessage={t("Domains.no_domains_found")}
                 renderItem={(domain) => <DomainCard key={domain.id} domain={domain} />}
                 gridCols="3"
@@ -154,18 +180,18 @@ export default function DomainsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableDomain ? t("Pages.Domains.edit") : t("Pages.Domains.add")}
+          title={actionableItem ? t("Pages.Domains.edit") : t("Pages.Domains.add")}
           formId="domain-form"
-          loadingSave={loadingSaveDomain}
+          loadingSave={loadingSave}
         >
           <DomainForm
             formHtmlId={"domain-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableDomain(null);
-              setLoadingSaveDomain(false);
+              setActionableItem(null);
+              setLoadingSave(false);
             }}
-            defaultValues={actionableDomain}
+            defaultValues={actionableItem}
             editMode={true}
           />
         </FormDialog>
@@ -174,9 +200,10 @@ export default function DomainsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Domains.confirm_delete")}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
+          title={t("Domains.confirm_delete", { count: selectedRows.length })}
           description={t("Domains.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>
@@ -185,7 +212,7 @@ export default function DomainsPage() {
 
 DomainsPage.messages = ["Pages", "Domains", "Notes", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

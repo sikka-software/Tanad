@@ -1,8 +1,9 @@
+import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -25,48 +26,52 @@ import {
 } from "@/employee/employee.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/employee/employee.options";
 import useEmployeesStore from "@/employee/employee.store";
+import useEmployeeStore from "@/employee/employee.store";
 import EmployeesTable from "@/employee/employee.table";
 
 import useEmployeeColumns from "@/modules/employee/employee.columns";
 import { EmployeeForm } from "@/modules/employee/employee.form";
-import { Employee } from "@/modules/employee/employee.types";
+import { EmployeeUpdateData } from "@/modules/employee/employee.types";
 import { useJobs } from "@/modules/job/job.hooks";
-import useUserStore from "@/stores/use-user-store";
 
 export default function EmployeesPage() {
   const t = useTranslations();
   const router = useRouter();
-  const columns = useEmployeeColumns();
-
   const { data: jobs } = useJobs();
 
-  const canReadEmployees = useUserStore((state) => state.hasPermission("employees.read"));
-  const canCreateEmployees = useUserStore((state) => state.hasPermission("employees.create"));
+  const columns = useEmployeeColumns();
 
-  const [actionableEmployee, setActionableEmployee] = useState<Employee | null>(null);
+  const moduleHooks = createModuleStoreHooks(useEmployeeStore, "employees");
 
-  const isFormDialogOpen = useEmployeesStore((state) => state.isFormDialogOpen);
-  const setIsFormDialogOpen = useEmployeesStore((state) => state.setIsFormDialogOpen);
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableItem, setActionableItem] = useState<EmployeeUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
-  const loadingSaveEmployee = useEmployeesStore((state) => state.isLoading);
-  const setLoadingSaveEmployee = useEmployeesStore((state) => state.setIsLoading);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const viewMode = useEmployeesStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useEmployeesStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useEmployeesStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useEmployeesStore((state) => state.selectedRows);
-  const setSelectedRows = useEmployeesStore((state) => state.setSelectedRows);
-  const clearSelection = useEmployeesStore((state) => state.clearSelection);
-  const sortRules = useEmployeesStore((state) => state.sortRules);
-  const sortCaseSensitive = useEmployeesStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useEmployeesStore((state) => state.sortNullsFirst);
-  const searchQuery = useEmployeesStore((state) => state.searchQuery);
-  const filterConditions = useEmployeesStore((state) => state.filterConditions);
-  const filterCaseSensitive = useEmployeesStore((state) => state.filterCaseSensitive);
-  const getFilteredEmployees = useEmployeesStore((state) => state.getFilteredData);
-  const getSortedEmployees = useEmployeesStore((state) => state.getSortedData);
-  const columnVisibility = useEmployeesStore((state) => state.columnVisibility);
-  const setColumnVisibility = useEmployeesStore((state) => state.setColumnVisibility);
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
 
   const { data: employees, isLoading, error } = useEmployees();
   const { mutateAsync: deleteEmployees, isPending: isDeleting } = useBulkDeleteEmployees();
@@ -76,9 +81,10 @@ export default function EmployeesPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: employees,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableEmployee,
+    setActionableItem,
     duplicateMutation: duplicateEmployee,
     moduleName: "Employees",
   });
@@ -89,32 +95,48 @@ export default function EmployeesPage() {
     error: "Employees.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
 
-  const filteredEmployees = useMemo(() => {
-    return getFilteredEmployees(employees || []);
-  }, [employees, getFilteredEmployees, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useEmployeeStore((state) => state.data) || [];
+  const setData = useEmployeeStore((state) => state.setData);
 
-  const sortedEmployees = useMemo(() => {
-    return getSortedEmployees(filteredEmployees);
-  }, [filteredEmployees, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (employees && setData) {
+      setData(employees);
+    }
+  }, [employees, setData]);
 
-  if (!canReadEmployees) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
 
   return (
     <div>
-      <CustomPageMeta title={t("Employees.title")} description={t("Employees.description")} />
+      <CustomPageMeta
+        title={t("Pages.Employees.title")}
+        description={t("Pages.Employees.description")}
+      />
       <DataPageLayout count={employees?.length} itemsText={t("Pages.Employees.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -123,9 +145,7 @@ export default function EmployeesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Employees.title")}
-            onAddClick={
-              canCreateEmployees ? () => router.push(router.pathname + "/add") : undefined
-            }
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Employees.add")}
             searchPlaceholder={t("Pages.Employees.search")}
             hideOptions={employees?.length === 0}
@@ -140,17 +160,17 @@ export default function EmployeesPage() {
         <div>
           {viewMode === "table" ? (
             <EmployeesTable
-              data={sortedEmployees}
+              data={sortedData}
               isLoading={isLoading}
-              error={error instanceof Error ? error : null}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedEmployees}
+                data={sortedData}
                 isLoading={isLoading}
-                error={error instanceof Error ? error : null}
+                error={error}
                 emptyMessage={t("Pages.Employees.no_employees_found")}
                 renderItem={(employee) => (
                   <EmployeeCard
@@ -169,15 +189,16 @@ export default function EmployeesPage() {
           onOpenChange={setIsFormDialogOpen}
           title={t("Pages.Employees.edit")}
           formId="employee-form"
-          loadingSave={loadingSaveEmployee}
+          loadingSave={loadingSave}
         >
           <EmployeeForm
             formHtmlId={"employee-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableEmployee(null);
+              setLoadingSave(false);
+              setActionableItem(null);
             }}
-            defaultValues={actionableEmployee}
+            defaultValues={actionableItem}
             editMode={true}
           />
         </FormSheet>
@@ -186,9 +207,10 @@ export default function EmployeesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Employees.confirm_delete_title")}
-          description={t("Employees.confirm_delete", { count: selectedRows.length })}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
+          title={t("Employees.confirm_delete", { count: selectedRows.length })}
+          description={t("Employees.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>
@@ -206,7 +228,7 @@ EmployeesPage.messages = [
   "General",
 ];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

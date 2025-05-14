@@ -1,9 +1,9 @@
-import useExpenseColumns from "@root/src/modules/expense/expense.columns";
+import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -20,6 +20,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import ExpenseCard from "@/expense/expense.card";
+import useExpenseColumns from "@/expense/expense.columns";
 import { ExpenseForm } from "@/expense/expense.form";
 import { useExpenses, useBulkDeleteExpenses, useDuplicateExpense } from "@/expense/expense.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/expense/expense.options";
@@ -27,40 +28,45 @@ import useExpenseStore from "@/expense/expense.store";
 import ExpensesTable from "@/expense/expense.table";
 import { ExpenseUpdateData } from "@/expense/expense.type";
 
-import useUserStore from "@/stores/use-user-store";
-
 export default function ExpensesPage() {
   const t = useTranslations();
   const router = useRouter();
 
   const columns = useExpenseColumns();
 
-  const canReadExpenses = useUserStore((state) => state.hasPermission("expenses.read"));
-  const canCreateExpenses = useUserStore((state) => state.hasPermission("expenses.create"));
+  const moduleHooks = createModuleStoreHooks(useExpenseStore, "expenses");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableExpense, setActionableExpense] = useState<ExpenseUpdateData | null>(null);
+  const [actionableItem, setActionableItem] = useState<ExpenseUpdateData | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
-  const loadingSaveExpense = useExpenseStore((state) => state.isLoading);
-  const setLoadingSaveExpense = useExpenseStore((state) => state.setIsLoading);
-  const viewMode = useExpenseStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useExpenseStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useExpenseStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useExpenseStore((state) => state.selectedRows);
-  const setSelectedRows = useExpenseStore((state) => state.setSelectedRows);
-  const clearSelection = useExpenseStore((state) => state.clearSelection);
-  const sortRules = useExpenseStore((state) => state.sortRules);
-  const sortCaseSensitive = useExpenseStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useExpenseStore((state) => state.sortNullsFirst);
-  const searchQuery = useExpenseStore((state) => state.searchQuery);
-  const filterConditions = useExpenseStore((state) => state.filterConditions);
-  const filterCaseSensitive = useExpenseStore((state) => state.filterCaseSensitive);
-  const getFilteredExpenses = useExpenseStore((state) => state.getFilteredData);
-  const getSortedExpenses = useExpenseStore((state) => state.getSortedData);
-  const columnVisibility = useExpenseStore((state) => state.columnVisibility);
-  const setColumnVisibility = useExpenseStore((state) => state.setColumnVisibility);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const { data: expenses, isLoading: loadingFetchExpenses, error } = useExpenses();
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
+
+  const { data: expenses, isLoading, error } = useExpenses();
   const { mutateAsync: deleteExpenses, isPending: isDeleting } = useBulkDeleteExpenses();
   const { mutate: duplicateExpense } = useDuplicateExpense();
   const { createDeleteHandler } = useDeleteHandler();
@@ -68,10 +74,14 @@ export default function ExpensesPage() {
   const { handleAction: onActionClicked } = useDataTableActions({
     data: expenses,
     setSelectedRows,
+    setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableExpense,
+    setActionableItem,
     duplicateMutation: duplicateExpense,
+    previewAction: (id: string) => {
+      window.open(`/pay/${id}`, "_blank");
+    },
     moduleName: "Expenses",
   });
 
@@ -81,32 +91,47 @@ export default function ExpensesPage() {
     error: "Expenses.error.delete",
     onSuccess: () => {
       clearSelection();
+      setPendingDeleteIds([]);
       setIsDeleteDialogOpen(false);
     },
   });
 
-  const filteredExpenses = useMemo(() => {
-    return getFilteredExpenses(expenses || []);
-  }, [expenses, getFilteredExpenses, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useExpenseStore((state) => state.data) || [];
+  const setData = useExpenseStore((state) => state.setData);
 
-  const sortedExpenses = useMemo(() => {
-    return getSortedExpenses(filteredExpenses);
-  }, [filteredExpenses, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (expenses && setData) {
+      setData(expenses);
+    }
+  }, [expenses, setData]);
 
-  if (!canReadExpenses) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
-
   return (
     <div>
-      <CustomPageMeta title={t("Expenses.title")} description={t("Expenses.description")} />
+      <CustomPageMeta
+        title={t("Pages.Expenses.title")}
+        description={t("Pages.Expenses.description")}
+      />
       <DataPageLayout count={expenses?.length} itemsText={t("Pages.Expenses.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            setIsDeleteDialogOpen={(open) => {
+              if (open) setPendingDeleteIds(selectedRows);
+              setIsDeleteDialogOpen(open);
+            }}
           />
         ) : (
           <PageSearchAndFilter
@@ -115,7 +140,7 @@ export default function ExpensesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Expenses.title")}
-            onAddClick={canCreateExpenses ? () => router.push(router.pathname + "/add") : undefined}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Expenses.add")}
             searchPlaceholder={t("Pages.Expenses.search")}
             hideOptions={expenses?.length === 0}
@@ -131,17 +156,17 @@ export default function ExpensesPage() {
         <div>
           {viewMode === "table" ? (
             <ExpensesTable
-              data={sortedExpenses}
-              isLoading={loadingFetchExpenses}
-              error={error instanceof Error ? error : null}
+              data={sortedData}
+              isLoading={isLoading}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedExpenses}
-                isLoading={loadingFetchExpenses}
-                error={error instanceof Error ? error : null}
+                data={sortedData}
+                isLoading={isLoading}
+                error={error}
                 emptyMessage={t("Pages.Expenses.no_expenses_found")}
                 renderItem={(expense) => <ExpenseCard expense={expense} />}
                 gridCols="3"
@@ -153,21 +178,21 @@ export default function ExpensesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableExpense ? t("Pages.Expenses.edit") : t("Pages.Expenses.add")}
+          title={actionableItem ? t("Pages.Expenses.edit") : t("Pages.Expenses.add")}
           formId="expense-form"
-          loadingSave={loadingSaveExpense}
+          loadingSave={loadingSave}
         >
           <ExpenseForm
             formHtmlId={"expense-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableExpense(null);
-              setLoadingSaveExpense(false);
+              setActionableItem(null);
+              setLoadingSave(false);
               toast.success(t("General.successful_operation"), {
                 description: t("Expenses.success.update"),
               });
             }}
-            defaultValues={actionableExpense}
+            defaultValues={actionableItem}
             editMode={true}
           />
         </FormDialog>
@@ -176,9 +201,10 @@ export default function ExpensesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Expenses.confirm_delete_title")}
-          description={t("Expenses.confirm_delete", { count: selectedRows.length })}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
+          title={t("Expenses.confirm_delete", { count: selectedRows.length })}
+          description={t("Expenses.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>
@@ -186,7 +212,7 @@ export default function ExpensesPage() {
 }
 
 ExpensesPage.messages = ["Notes", "Pages", "Expenses", "Forms", "General"];
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

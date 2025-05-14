@@ -6,6 +6,7 @@ import { toast } from "sonner";
 const UPDATE_TOAST_ID = "global-update-toast";
 const CREATE_TOAST_ID = "global-create-toast";
 const DELETE_TOAST_ID = "global-delete-toast";
+const DUPLICATE_TOAST_ID = "global-duplicate-toast";
 
 const QueryGlobalToast = () => {
   const queryClient = useQueryClient();
@@ -72,6 +73,38 @@ const QueryGlobalToast = () => {
                   ? { description: t((event.mutation.meta.toast as any).error) }
                   : {}),
                 id: UPDATE_TOAST_ID,
+                duration: 2000,
+              });
+            }
+          }
+        }
+
+        // Duplicate Mutation
+        if (mutationFnName.startsWith("useDuplicate")) {
+          const status = event.mutation.state.status;
+          if (status === "pending") {
+            toast.loading(t("General.duplicating"), { id: DUPLICATE_TOAST_ID, description: "" });
+          } else if (status === "success" || status === "error") {
+            if (status === "success") {
+              toast.success(t("General.successful_operation"), {
+                ...(event.mutation.meta &&
+                typeof event.mutation.meta.toast === "object" &&
+                event.mutation.meta.toast !== null &&
+                typeof (event.mutation.meta.toast as any).success === "string"
+                  ? { description: t((event.mutation.meta.toast as any).success) }
+                  : {}),
+                id: DUPLICATE_TOAST_ID,
+                duration: 1500,
+              });
+            } else {
+              toast.error(t("General.error_operation"), {
+                ...(event.mutation.meta &&
+                typeof event.mutation.meta.toast === "object" &&
+                event.mutation.meta.toast !== null &&
+                typeof (event.mutation.meta.toast as any).error === "string"
+                  ? { description: t((event.mutation.meta.toast as any).error) }
+                  : {}),
+                id: DUPLICATE_TOAST_ID,
                 duration: 2000,
               });
             }

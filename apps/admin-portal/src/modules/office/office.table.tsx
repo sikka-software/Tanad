@@ -1,10 +1,8 @@
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
-import { z } from "zod";
 
-import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import ErrorComponent from "@/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
@@ -12,8 +10,6 @@ import { ModuleTableProps } from "@/types/common.type";
 import { useUpdateOffice } from "@/office/office.hooks";
 import useOfficeStore from "@/office/office.store";
 import { Office } from "@/office/office.type";
-
-import { useEmployees } from "@/employee/employee.hooks";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -25,6 +21,14 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const { mutate: updateOffice } = useUpdateOffice();
 
   const setData = useOfficeStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateOffice({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useOfficeColumns(handleEdit);
+
   const selectedRows = useOfficeStore((state) => state.selectedRows);
   const setSelectedRows = useOfficeStore((state) => state.setSelectedRows);
 
@@ -37,15 +41,7 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const canArchiveOffice = useUserStore((state) => state.hasPermission("offices.archive"));
   const canDeleteOffice = useUserStore((state) => state.hasPermission("offices.delete"));
 
-  // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "office_id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    updateOffice({ id: rowId, office: { [columnId]: value } });
-  };
-  const columns = useOfficeColumns(handleEdit);
 
   const handleRowSelectionChange = useCallback(
     (rows: Office[]) => {
@@ -69,9 +65,7 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   }
 
   const officeTableOptions = {
-    state: {
-      rowSelection,
-    },
+    state: { rowSelection },
     enableRowSelection: true,
     enableMultiRowSelection: true,
     getRowId: (row: Office) => row.id!,

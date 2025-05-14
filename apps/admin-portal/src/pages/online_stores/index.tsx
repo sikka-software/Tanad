@@ -1,8 +1,9 @@
+import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -29,41 +30,45 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/online-store/onli
 import useOnlineStoreStore from "@/modules/online-store/online-store.store";
 import OnlineStoresTable from "@/modules/online-store/online-store.table";
 import { OnlineStore, OnlineStoreUpdateData } from "@/modules/online-store/online-store.type";
-import useUserStore from "@/stores/use-user-store";
 
 export default function OnlineStoresPage() {
   const t = useTranslations();
   const router = useRouter();
-  const columns = useOnlineStoreColumns();
 
-  const canReadOnlineStores = useUserStore((state) => state.hasPermission("online_stores.read"));
-  const canCreateOnlineStores = useUserStore((state) =>
-    state.hasPermission("online_stores.create"),
-  );
+  const columns = useOnlineStoreColumns();
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableOnlineStore, setActionableOnlineStore] = useState<OnlineStoreUpdateData | null>(
     null,
   );
 
-  const loadingSaveOnlineStore = useOnlineStoreStore((state) => state.isLoading);
-  const setLoadingSaveOnlineStore = useOnlineStoreStore((state) => state.setIsLoading);
-  const viewMode = useOnlineStoreStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useOnlineStoreStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useOnlineStoreStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useOnlineStoreStore((state) => state.selectedRows);
-  const setSelectedRows = useOnlineStoreStore((state) => state.setSelectedRows);
-  const clearSelection = useOnlineStoreStore((state) => state.clearSelection);
-  const sortRules = useOnlineStoreStore((state) => state.sortRules);
-  const sortCaseSensitive = useOnlineStoreStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useOnlineStoreStore((state) => state.sortNullsFirst);
-  const searchQuery = useOnlineStoreStore((state) => state.searchQuery);
-  const filterConditions = useOnlineStoreStore((state) => state.filterConditions);
-  const filterCaseSensitive = useOnlineStoreStore((state) => state.filterCaseSensitive);
-  const getFilteredOnlineStores = useOnlineStoreStore((state) => state.getFilteredData);
-  const getSortedOnlineStores = useOnlineStoreStore((state) => state.getSortedData);
-  const columnVisibility = useOnlineStoreStore((state) => state.columnVisibility);
-  const setColumnVisibility = useOnlineStoreStore((state) => state.setColumnVisibility);
+  const moduleHooks = createModuleStoreHooks(useOnlineStoreStore, "online_stores");
+
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
+
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
 
   const { data: onlineStores, isLoading: loadingFetchOnlineStores, error } = useOnlineStores();
   const { mutate: duplicateOnlineStore } = useDuplicateOnlineStore();
@@ -90,20 +95,32 @@ export default function OnlineStoresPage() {
     },
   });
 
-  const filteredOnlineStores = useMemo(() => {
-    return getFilteredOnlineStores(onlineStores || []);
-  }, [onlineStores, getFilteredOnlineStores, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useOnlineStoreStore((state) => state.data) || [];
+  const setData = useOnlineStoreStore((state) => state.setData);
 
-  const sortedOnlineStores = useMemo(() => {
-    return getSortedOnlineStores(filteredOnlineStores);
-  }, [filteredOnlineStores, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (onlineStores && setData) {
+      setData(onlineStores);
+    }
+  }, [onlineStores, setData]);
 
-  if (!canReadOnlineStores) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
   return (
     <div>
-      <CustomPageMeta title={t("OnlineStores.title")} description={t("OnlineStores.description")} />
+      <CustomPageMeta
+        title={t("Pages.OnlineStores.title")}
+        description={t("Pages.OnlineStores.description")}
+      />
       <DataPageLayout count={onlineStores?.length} itemsText={t("Pages.OnlineStores.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -118,10 +135,8 @@ export default function OnlineStoresPage() {
             columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("OnlineStores.title")}
-            onAddClick={
-              canCreateOnlineStores ? () => router.push(router.pathname + "/add") : undefined
-            }
+            title={t("Pages.OnlineStores.title")}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.OnlineStores.add")}
             searchPlaceholder={t("Pages.OnlineStores.search")}
             hideOptions={onlineStores?.length === 0}
@@ -137,7 +152,7 @@ export default function OnlineStoresPage() {
         <div>
           {viewMode === "table" ? (
             <OnlineStoresTable
-              data={sortedOnlineStores}
+              data={sortedData}
               isLoading={loadingFetchOnlineStores}
               error={error as Error | null}
               onActionClicked={onActionClicked}
@@ -145,7 +160,7 @@ export default function OnlineStoresPage() {
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedOnlineStores}
+                data={sortedData}
                 isLoading={loadingFetchOnlineStores}
                 error={error as Error | null}
                 emptyMessage={t("Pages.OnlineStores.no_online_stores_found")}
@@ -163,14 +178,14 @@ export default function OnlineStoresPage() {
           onOpenChange={setIsFormDialogOpen}
           title={actionableOnlineStore ? t("Pages.OnlineStores.edit") : t("Pages.OnlineStores.add")}
           formId="online-store-form"
-          loadingSave={loadingSaveOnlineStore}
+          loadingSave={loadingSave}
         >
           <OnlineStoreForm
             formHtmlId={"online-store-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableOnlineStore(null);
-              setLoadingSaveOnlineStore(false);
+              setLoadingSave(false);
             }}
             defaultValues={actionableOnlineStore as OnlineStore}
             editMode={true}
@@ -182,8 +197,9 @@ export default function OnlineStoresPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("OnlineStores.confirm_delete")}
+          title={t("OnlineStores.confirm_delete", { count: selectedRows.length })}
           description={t("OnlineStores.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>
@@ -192,7 +208,7 @@ export default function OnlineStoresPage() {
 
 OnlineStoresPage.messages = ["Notes", "Pages", "OnlineStores", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

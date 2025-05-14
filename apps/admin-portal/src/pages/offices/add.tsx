@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -22,7 +22,7 @@ export default function AddOfficePage() {
     const dummyData = generateDummyData();
     const form = (window as any).officeForm;
     if (form) {
-      form.setValue("name", "Office " + dummyData.randomNumber);
+      form.setValue("name", "Office " + dummyData.randomNumber(5));
       form.setValue("email", dummyData.email);
       form.setValue("phone", dummyData.phone);
       form.setValue("building_number", String(dummyData.address));
@@ -72,7 +72,7 @@ AddOfficePage.messages = [
   "Forms",
 ];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

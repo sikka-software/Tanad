@@ -1,17 +1,18 @@
+import CodeCell from "@root/src/components/tables/code-cell";
+import StatusCell from "@root/src/components/tables/status-cell";
 import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import useUserStore from "@root/src/stores/use-user-store";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { useEmployees } from "../employee/employee.hooks";
-import { useUpdateOffice } from "./office.hooks";
 import { Office } from "./office.type";
 
-const useOfficeColumns = (handleEdit?: (id: string, field: string, value: string) => void) => {
+const useOfficeColumns = (
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
-  const { mutate: updateOffice } = useUpdateOffice();
   const locale = useLocale();
   // Employees for manager combobox
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
@@ -26,22 +27,29 @@ const useOfficeColumns = (handleEdit?: (id: string, field: string, value: string
       validationSchema: z.string().min(1, t("Offices.form.name.required")),
     },
     {
-      cellType: "code",
-      onSerial: (row, rowIndex) => {
-        const paddedNumber = String(rowIndex + 1).padStart(4, "0");
-        handleEdit?.(row.id, "code", `OF-${paddedNumber}`);
-      },
-      onRandom: (row) => {
-        const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        let randomCode = "";
-        for (let i = 0; i < 5; i++) {
-          randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
-        }
-        handleEdit?.(row.id, "code", `OF-${randomCode}`);
-      },
+      noPadding: true,
       accessorKey: "code",
       header: t("Offices.form.code.label"),
       validationSchema: z.string().min(1, t("Offices.form.code.required")),
+      cell: ({ getValue, row }) => (
+        <CodeCell
+          onChange={(e) => handleEdit?.(row.id, "code", e.target.value)}
+          onRandom={() => {
+            const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            let randomCode = "";
+            for (let i = 0; i < 5; i++) {
+              randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+            }
+            handleEdit?.(row.id, "code", `OF-${randomCode}`);
+          }}
+          onSerial={() => {
+            const paddedNumber = String(row.index + 1).padStart(4, "0");
+            handleEdit?.(row.id, "code", `OF-${paddedNumber}`);
+          }}
+          code={getValue() as string}
+          onCodeChange={() => console.log("changing")}
+        />
+      ),
     },
 
     {
@@ -71,12 +79,7 @@ const useOfficeColumns = (handleEdit?: (id: string, field: string, value: string
             buttonClassName="bg-transparent"
             defaultValue={office.manager || ""}
             onChange={async (value) => {
-              await updateOffice({
-                id: office.id,
-                office: {
-                  manager: value || null,
-                },
-              });
+              handleEdit?.(office.id, "manager", value);
             }}
             texts={{
               placeholder: ". . .",
@@ -111,11 +114,22 @@ const useOfficeColumns = (handleEdit?: (id: string, field: string, value: string
       maxSize: 80,
       header: t("Offices.form.status.label"),
       validationSchema: z.enum(["active", "inactive"]),
-      cellType: "status",
-      options: [
-        { label: t("Offices.form.status.active"), value: "active" },
-        { label: t("Offices.form.status.inactive"), value: "inactive" },
-      ],
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("Offices.form.status.active"), value: "active" },
+              { label: t("Offices.form.status.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
 

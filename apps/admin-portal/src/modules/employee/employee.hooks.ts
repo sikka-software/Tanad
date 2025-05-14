@@ -53,12 +53,7 @@ export const useCreateEmployee = () => {
         ...(Array.isArray(previousEmployees) ? previousEmployees : []),
         newEmployee,
       ]);
-
       queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
-
-      toast.success(t("General.successful_operation"), {
-        description: t("Employees.success.create"),
-      });
     },
   });
 };
@@ -77,9 +72,9 @@ export const useUpdateEmployee = () => {
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: EmployeeUpdateData }) =>
-      updateEmployee(id, updates),
-    onMutate: async ({ id, updates }) => {
+    mutationFn: ({ id, data }: { id: string; data: EmployeeUpdateData }) =>
+      updateEmployee(id, data),
+    onMutate: async ({ id, data }) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: employeeKeys.lists() });
       await queryClient.cancelQueries({ queryKey: employeeKeys.detail(id) });
@@ -89,7 +84,7 @@ export const useUpdateEmployee = () => {
       const previousEmployee = queryClient.getQueryData(employeeKeys.detail(id));
 
       // Prepare updates to apply optimistically
-      const optimisticUpdates = { ...updates };
+      const optimisticUpdates = { ...data };
 
       // Optimistically update the cache
       queryClient.setQueryData(employeeKeys.lists(), (old: Employee[] | undefined) => {
@@ -113,21 +108,14 @@ export const useUpdateEmployee = () => {
       return { previousEmployees, previousEmployee };
     },
     onSuccess: (updatedEmployee, { id }) => {
-      // Manually update the cache with the new data instead of invalidating
       queryClient.setQueryData(employeeKeys.lists(), (old: Employee[] | undefined) => {
         if (!old) return [updatedEmployee];
 
         return old.map((employee) => (employee.id === id ? updatedEmployee : employee));
       });
-
-      // Also update the individual employee query data if it exists
       queryClient.setQueryData(employeeKeys.detail(id), updatedEmployee);
-      toast.success(t("General.successful_operation"), {
-        description: t("Employees.success.update"),
-      });
     },
     onError: (err, { id }, context) => {
-      // Roll back to the previous values if mutation fails
       if (context?.previousEmployees) {
         queryClient.setQueryData(employeeKeys.lists(), context.previousEmployees);
       }
@@ -135,7 +123,6 @@ export const useUpdateEmployee = () => {
         queryClient.setQueryData(employeeKeys.detail(id), context.previousEmployee);
       }
     },
-    // Don't invalidate queries on settle - we're manually updating the cache
   });
 };
 

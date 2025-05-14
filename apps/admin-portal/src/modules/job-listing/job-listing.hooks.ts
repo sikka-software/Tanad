@@ -71,8 +71,8 @@ export function useUpdateJobListing() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, jobListing }: { id: string; jobListing: JobListingUpdateData }) =>
-      updateJobListing(id, jobListing),
+    mutationFn: ({ id, data }: { id: string; data: JobListingUpdateData }) =>
+      updateJobListing(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: jobListingKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() });

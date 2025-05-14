@@ -22,9 +22,17 @@ const WarehouseTable = ({
   onActionClicked,
 }: ModuleTableProps<Warehouse>) => {
   const t = useTranslations();
-  const columns = useWarehouseColumns();
 
-  const { mutateAsync: updateWarehouse } = useUpdateWarehouse();
+  const { mutate: updateWarehouse } = useUpdateWarehouse();
+  const setData = useWarehouseStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "domain_id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateWarehouse({ id: rowId, data: { [columnId]: value } });
+  };
+  const columns = useWarehouseColumns(handleEdit);
+
   const selectedRows = useWarehouseStore((state) => state.selectedRows);
   const setSelectedRows = useWarehouseStore((state) => state.setSelectedRows);
 
@@ -40,10 +48,6 @@ const WarehouseTable = ({
   const canDeleteWarehouse = useUserStore((state) => state.hasPermission("warehouses.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateWarehouse({ id: rowId, data: { [columnId]: value } });
-  };
 
   const handleRowSelectionChange = (rows: Warehouse[]) => {
     const newSelectedIds = rows.map((row) => row.id!);

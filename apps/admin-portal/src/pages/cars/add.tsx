@@ -1,6 +1,6 @@
 import useCarStore from "@root/src/modules/car/car.store";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -26,12 +26,12 @@ export default function AddCarPage() {
       form.setValue("name", dummyData.first_name);
       form.setValue("make", dummyData.last_name);
       form.setValue("model", dummyData.email);
-      form.setValue("year", dummyData.randomNumber);
+      form.setValue("year", dummyData.randomNumber(4));
       form.setValue("color", dummyData.randomString);
-      form.setValue("vin", dummyData.randomNumber);
-      form.setValue("code", dummyData.randomNumber);
-      form.setValue("license_country", dummyData.randomNumber);
-      form.setValue("license_plate", dummyData.randomNumber);
+      form.setValue("vin", dummyData.randomNumber(17));
+      form.setValue("code", dummyData.randomNumber(3));
+      form.setValue("license_country", dummyData.randomString);
+      form.setValue("license_plate", dummyData.randomString);
       form.setValue("notes", dummyData.state);
     }
   };
@@ -65,7 +65,7 @@ export default function AddCarPage() {
 
 AddCarPage.messages = ["Pages", "Cars", "Vehicles", "Notes", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

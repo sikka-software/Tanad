@@ -261,10 +261,80 @@ export const vehicle_status = pgEnum("vehicle_status", [
 ]);
 export const employee_status = pgEnum("employee_status", [
   "active",
-  "inactive",
-  "terminated",
+  "onboarding",
+  "probation",
   "on_leave",
-  "resigned",
+  "terminated",
+  "retired",
+  "suspended",
+]);
+export const expense_status = pgEnum("expense_status", [
+  "draft",
+  "submitted",
+  "under_review",
+  "pending_verification",
+  "approved",
+  "partially_approved",
+  "rejected",
+  "pending_payment",
+  "paid",
+  "disputed",
+  "audit_flagged",
+  "closed",
+  "archived",
+]);
+export const invoice_status = pgEnum("invoice_status", [
+  "draft",
+  "pending_approval",
+  "sent",
+  "partially_paid",
+  "paid",
+  "overdue",
+  "disputed",
+  "void",
+  "scheduled",
+  "payment_failed",
+  "refunded",
+  "written_off",
+  "archived",
+]);
+export const quote_status = pgEnum("quote_status", [
+  "draft",
+  "sent",
+  "revised",
+  "under_review",
+  "accepted",
+  "rejected",
+  "expired",
+  "converted_to_invoice",
+  "negotiating",
+  "archived",
+]);
+export const employee_request_status = pgEnum("employee_request_status", [
+  "draft",
+  "submitted",
+  "under_review",
+  "approved",
+  "rejected",
+  "revoked",
+  "pending_additional_info",
+  "completed",
+  "escalated",
+  "archived",
+]);
+export const purchase_status = pgEnum("purchase_status", [
+  "draft",
+  "issued",
+  "acknowledged",
+  "partially_fulfilled",
+  "fulfilled",
+  "shipped",
+  "delayed",
+  "received",
+  "invoice_matched",
+  "payment_initiated",
+  "closed",
+  "cancelled",
 ]);
 export const payment_cycle = pgEnum("payment_cycle", ["monthly", "annual"]);
 
@@ -486,7 +556,11 @@ export const enterprises = pgTable(
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
     email: text(),
     industry: text(),
+    founded: smallint(),
     size: text(),
+    logo: text(),
+    address: text(),
+    description: text(),
   },
   (table) => [
     index("enterprises_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
@@ -1139,10 +1213,6 @@ export const documents = pgTable(
       table.entity_type.asc().nullsLast().op("text_ops"),
     ),
     index("documents_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    check(
-      "documents_entity_type_check",
-      sql`entity_type = ANY (ARRAY['company'::text, 'expense'::text])`,
-    ),
   ],
 );
 
@@ -1184,7 +1254,7 @@ export const employee_requests = pgTable(
     id: uuid().defaultRandom().primaryKey().notNull(),
     employee_id: uuid().notNull(),
     type: text().notNull(),
-    status: text().default("pending").notNull(),
+    status: employee_request_status().default("draft").notNull(),
     title: text().notNull(),
     description: text(),
     start_date: date(),
@@ -1450,7 +1520,7 @@ export const expenses = pgTable(
     issue_date: date().default(sql`CURRENT_DATE`),
     notes: jsonb(),
     expense_number: text().notNull(),
-    status: text().default("pending").notNull(),
+    status: expense_status().default("draft").notNull(),
     user_id: uuid().notNull(),
   },
   (table) => [
@@ -1479,11 +1549,6 @@ export const employees = pgTable(
     email: text().notNull(),
     phone: text(),
     hire_date: date(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
-    user_id: uuid().notNull(),
-    enterprise_id: uuid().notNull(),
     short_address: text(),
     additional_number: text(),
     building_number: text(),
@@ -1496,9 +1561,24 @@ export const employees = pgTable(
     job_id: uuid(),
     salary: jsonb().default([]),
     notes: jsonb(),
+    gender: text().default("male"),
+    marital_status: text().default("single"),
+    education_level: text().default(""),
+    employee_number: text().default(""),
+    onboarding_status: text().default(""),
+    offboarding_status: text().default(""),
     status: employee_status().default("active"),
-    updated_at: timestamp({ withTimezone: true, mode: "string" }),
     nationality: text(),
+    birth_date: date(),
+    national_id: text(),
+    eqama_id: text(),
+    emergency_contact: jsonb(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
+      sql`timezone('utc'::text, now())`,
+    ),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
   },
   (table) => [
     index("employees_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
@@ -1576,7 +1656,7 @@ export const bank_accounts = pgTable(
     iban: text().notNull(),
     swift_bic: text(),
     bank_name: text().notNull(),
-    status: text().notNull(),
+    status: common_status().notNull(),
     notes: jsonb(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
@@ -1661,7 +1741,7 @@ export const invoices = pgTable(
     invoice_number: text().notNull(),
     issue_date: date().default(sql`CURRENT_DATE`),
     due_date: date(),
-    status: text().default("draft").notNull(),
+    status: invoice_status().default("draft").notNull(),
     subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
     tax_rate: numeric({ precision: 5, scale: 2 }).default("0"),
     tax_amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
@@ -1709,10 +1789,6 @@ END`),
       foreignColumns: [enterprises.id],
       name: "invoices_enterprise_id_fkey",
     }).onDelete("cascade"),
-    check(
-      "invoices_status_check",
-      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'partially_paid'::text, 'overdue'::text, 'void'::text])`,
-    ),
   ],
 );
 
@@ -1885,7 +1961,7 @@ export const quotes = pgTable(
     quote_number: text().notNull(),
     issue_date: date().notNull(),
     expiry_date: date().notNull(),
-    status: text().default("draft").notNull(),
+    status: quote_status().default("draft").notNull(),
     subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
     tax_rate: numeric({ precision: 5, scale: 2 }).default("0"),
     notes: jsonb(),
@@ -1918,10 +1994,6 @@ END`),
       foreignColumns: [profiles.id],
       name: "quotes_created_by_fkey",
     }),
-    check(
-      "quotes_status_check",
-      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'accepted'::text, 'rejected'::text, 'expired'::text])`,
-    ),
   ],
 );
 
@@ -1940,7 +2012,7 @@ export const purchases = pgTable(
     issue_date: date().default(sql`CURRENT_DATE`),
     notes: jsonb(),
     purchase_number: text().notNull(),
-    status: text().default("pending").notNull(),
+    status: purchase_status().default("draft").notNull(),
     user_id: uuid().notNull(),
   },
   (table) => [
@@ -2007,6 +2079,9 @@ export const servers = pgTable(
     os: text(),
     status: common_status().default("active"),
     tags: jsonb().default([]),
+    monthly_cost: numeric({ precision: 10, scale: 2 }),
+    annual_cost: numeric({ precision: 10, scale: 2 }),
+    payment_cycle: payment_cycle(),
     notes: jsonb(),
     created_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
@@ -2016,9 +2091,6 @@ export const servers = pgTable(
       .notNull(),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
-    monthly_cost: numeric({ precision: 10, scale: 2 }),
-    annual_cost: numeric({ precision: 10, scale: 2 }),
-    payment_cycle: payment_cycle(),
   },
   (table) => [
     index("servers_enterprise_id_idx").using(

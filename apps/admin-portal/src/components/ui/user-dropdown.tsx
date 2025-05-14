@@ -28,7 +28,6 @@ export function UserDropdown() {
 
   const handleSignOut = async () => {
     try {
-      console.log("logggin out  ");
       await signOut();
       toast.success(t("Auth.signed_out_successfully"));
       router.push("/auth");

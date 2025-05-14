@@ -16,7 +16,7 @@ import { Input } from "@/ui/input";
 import PhoneInput from "@/ui/phone-input";
 
 import { AddressFormSection } from "@/forms/address-form-section";
-import { createAddressSchema } from "@/forms/address-schema";
+import { createAddressSchema } from "@root/src/lib/schemas/address.schema";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
@@ -201,7 +201,7 @@ export function BranchForm({
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="form-container">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="name"
@@ -219,7 +219,6 @@ export function BranchForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="code"
@@ -255,9 +254,6 @@ export function BranchForm({
                   </FormItem>
                 )}
               />
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="phone"
@@ -275,7 +271,6 @@ export function BranchForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="email"
@@ -295,8 +290,6 @@ export function BranchForm({
                   </FormItem>
                 )}
               />
-            </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="manager"

@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -25,7 +25,7 @@ export default function AddPurchasePage() {
     if (form) {
       form.setValue("purchase_number", dummyData.randomString);
       form.setValue("description", dummyData.randomString);
-      form.setValue("amount", dummyData.randomNumber);
+      form.setValue("amount", dummyData.randomNumber(4));
       form.setValue("category", dummyData.randomString);
       form.setValue("status", dummyData.randomPicker(["pending", "paid", "overdue", "cancelled"]));
       form.setValue("issue_date", String(dummyData.randomDate));
@@ -63,7 +63,7 @@ export default function AddPurchasePage() {
 
 AddPurchasePage.messages = ["Notes", "Pages", "Purchases", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

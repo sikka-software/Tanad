@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
+import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { getNotesValue } from "@root/src/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/router";
@@ -8,7 +9,6 @@ import { useForm, useFieldArray, FieldValues, FieldError } from "react-hook-form
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
@@ -25,7 +25,12 @@ import { ModuleFormProps } from "@/types/common.type";
 import { ClientForm } from "@/client/client.form";
 
 import { useInvoices } from "@/modules/invoice/invoice.hooks";
-import { InvoiceUpdateData, InvoiceCreateData, InvoiceItem } from "@/modules/invoice/invoice.type";
+import {
+  InvoiceUpdateData,
+  InvoiceCreateData,
+  InvoiceItem,
+  InvoiceStatus,
+} from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
 import { useClients } from "../client/client.hooks";
@@ -46,7 +51,9 @@ const createInvoiceSchema = (t: (key: string) => string) =>
     due_date: z.date({
       required_error: t("Invoices.form.due_date.required"),
     }),
-    status: z.enum(["draft", "sent", "paid", "partially_paid", "overdue", "void"]),
+    status: z.enum(InvoiceStatus, {
+      message: t("Invoices.form.status.required"),
+    }),
     subtotal: z.number().min(0, t("Invoices.form.subtotal.required")),
     tax_rate: z.number().min(0, t("Invoices.form.tax_rate.required")),
     notes: z.any().optional().nullable(),
@@ -110,14 +117,7 @@ export function InvoiceForm({
     due_date: defaultValues?.due_date
       ? new Date(defaultValues.due_date as string)
       : new Date(new Date().setDate(new Date().getDate() + 30)),
-    status:
-      (defaultValues?.status as
-        | "draft"
-        | "sent"
-        | "paid"
-        | "partially_paid"
-        | "overdue"
-        | "void") || "draft",
+    status: defaultValues?.status || "draft",
     subtotal: defaultValues?.subtotal || 0,
     tax_rate: defaultValues?.tax_rate || 0,
     notes: getNotesValue(defaultValues as any),
@@ -186,7 +186,7 @@ export function InvoiceForm({
 
     try {
       if (editMode && defaultValues?.id) {
-        const invoiceDataForUpdate: InvoiceUpdateData = {
+        const invoiceDataForUpdate = {
           id: defaultValues.id as string,
           client_id: data.client_id,
           invoice_number: data.invoice_number,
@@ -259,7 +259,7 @@ export function InvoiceForm({
       <Form {...form}>
         <form id={formHtmlId || "invoice-form"} onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="form-container">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="client_id"
@@ -286,7 +286,6 @@ export function InvoiceForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="invoice_number"
@@ -426,17 +425,13 @@ export function InvoiceForm({
                         <SelectValue placeholder={t("Invoices.form.status.placeholder")} />
                       </SelectTrigger>
                     </FormControl>
+
                     <SelectContent>
-                      <SelectItem value="draft">{t("Invoices.form.status.draft")}</SelectItem>
-                      <SelectItem value="sent">{t("Invoices.form.status.pending")}</SelectItem>
-                      <SelectItem value="paid">{t("Invoices.form.status.paid")}</SelectItem>
-                      <SelectItem value="partially_paid">
-                        {t("Invoices.form.status.partially_paid", {
-                          defaultValue: "Partially Paid",
-                        })}
-                      </SelectItem>
-                      <SelectItem value="overdue">{t("Invoices.form.status.overdue")}</SelectItem>
-                      <SelectItem value="void">{t("Invoices.form.status.cancelled")}</SelectItem>
+                      {InvoiceStatus.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {t(`Invoices.form.status.${status}`)}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

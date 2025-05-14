@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
@@ -26,7 +26,7 @@ export default function AddExpensePage() {
       form.setValue("expense_number", dummyData.stringNumber);
       form.setValue("issue_date", dummyData.randomDate);
       form.setValue("due_date", dummyData.randomDate);
-      form.setValue("amount", dummyData.randomNumber);
+      form.setValue("amount", dummyData.randomNumber(4));
       form.setValue("category", dummyData.expense_category);
       form.setValue("notes", dummyData.randomString);
       form.setValue("status", dummyData.pick(["pending", "paid", "overdue"]));
@@ -64,7 +64,7 @@ export default function AddExpensePage() {
 
 AddExpensePage.messages = ["Notes", "Pages", "Expenses", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

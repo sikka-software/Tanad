@@ -1,6 +1,6 @@
 import settings from "@root/landing.config";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
 import { useState } from "react";
 
@@ -324,7 +324,7 @@ export default function PricingPage() {
 
 PricingPage.messages = ["Pages", "General", "Pricing"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   const billingCurrencies = ["sar", "usd"];
 
   const billingCycles = ["monthly", "yearly"];

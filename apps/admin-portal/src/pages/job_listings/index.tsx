@@ -1,8 +1,9 @@
+import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -27,11 +28,10 @@ import {
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/job-listing/job-listing.options";
 import useJobListingsStore from "@/job-listing/job-listing.store";
 import JobListingsTable from "@/job-listing/job-listing.table";
-import { JobListingWithJobs } from "@/job-listing/job-listing.type";
+import { JobListingUpdateData, JobListingWithJobs } from "@/job-listing/job-listing.type";
 
 import useJobListingColumns from "@/modules/job-listing/job-listing.columns";
 import { JobListingForm } from "@/modules/job-listing/job-listing.form";
-import useUserStore from "@/stores/use-user-store";
 
 export default function JobListingsPage() {
   const t = useTranslations();
@@ -39,43 +39,48 @@ export default function JobListingsPage() {
 
   const columns = useJobListingColumns();
 
-  const canReadJobListings = useUserStore((state) => state.hasPermission("job_listings.read"));
-  const canCreateJobListings = useUserStore((state) => state.hasPermission("job_listings.create"));
+  const moduleHooks = createModuleStoreHooks(useJobListingsStore, "job_listings");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableJobListing, setActionableJobListing] = useState<JobListingWithJobs | null>(null);
+  const [actionableItem, setActionableItem] = useState<JobListingUpdateData | null>(null);
 
-  const loadingSaveJobListing = useJobListingsStore((state) => state.isLoading);
-  const setLoadingSaveJobListing = useJobListingsStore((state) => state.setIsLoading);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const viewMode = useJobListingsStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useJobListingsStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useJobListingsStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useJobListingsStore((state) => state.selectedRows);
-  const setSelectedRows = useJobListingsStore((state) => state.setSelectedRows);
-  const clearSelection = useJobListingsStore((state) => state.clearSelection);
-  const sortRules = useJobListingsStore((state) => state.sortRules);
-  const sortCaseSensitive = useJobListingsStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useJobListingsStore((state) => state.sortNullsFirst);
-  const searchQuery = useJobListingsStore((state) => state.searchQuery);
-  const filterConditions = useJobListingsStore((state) => state.filterConditions);
-  const filterCaseSensitive = useJobListingsStore((state) => state.filterCaseSensitive);
-  const getFilteredJobListings = useJobListingsStore((state) => state.getFilteredData);
-  const getSortedJobListings = useJobListingsStore((state) => state.getSortedData);
-  const columnVisibility = useJobListingsStore((state) => state.columnVisibility);
-  const setColumnVisibility = useJobListingsStore((state) => state.setColumnVisibility);
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
 
-  const { data: jobListings = [], isLoading, error } = useJobListings();
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
+  const viewMode = moduleHooks.useViewMode();
+  const clearSelection = moduleHooks.useClearSelection();
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const searchQuery = moduleHooks.useSearchQuery();
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
+
+  const { data: jobListings, isLoading, error } = useJobListings();
   const { mutateAsync: deleteJobListings, isPending: isDeleting } = useBulkDeleteJobListings();
-  const { createDeleteHandler } = useDeleteHandler();
   const { mutate: duplicateJobListing } = useDuplicateJobListing();
+  const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
-    data: jobListings as JobListingWithJobs[],
+    data: jobListings,
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableJobListing,
+    setActionableItem,
     duplicateMutation: duplicateJobListing,
     previewAction: (id: string) => {
       window.open(`/job_listings/preview/${id}`, "_blank");
@@ -93,18 +98,26 @@ export default function JobListingsPage() {
     },
   });
 
-  const filteredListings = useMemo(() => {
-    return getFilteredJobListings(jobListings || []);
-  }, [jobListings, getFilteredJobListings, searchQuery, filterConditions, filterCaseSensitive]);
+  const storeData = useJobListingsStore((state) => state.data) || [];
+  const setData = useJobListingsStore((state) => state.setData);
 
-  const sortedListings = useMemo(() => {
-    return getSortedJobListings(filteredListings);
-  }, [filteredListings, sortRules, sortCaseSensitive, sortNullsFirst]);
+  useEffect(() => {
+    if (jobListings && setData) {
+      setData(jobListings);
+    }
+  }, [jobListings, setData]);
 
-  if (!canReadJobListings) {
+  const filteredData = useMemo(() => {
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedData = useMemo(() => {
+    return getSortedData(filteredData);
+  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canRead) {
     return <NoPermission />;
   }
-
   return (
     <div>
       <CustomPageMeta
@@ -126,9 +139,7 @@ export default function JobListingsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.JobListings.title")}
-            onAddClick={
-              canCreateJobListings ? () => router.push(router.pathname + "/add") : undefined
-            }
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.JobListings.add")}
             searchPlaceholder={t("Pages.JobListings.search")}
             hideOptions={jobListings?.length === 0}
@@ -144,17 +155,17 @@ export default function JobListingsPage() {
         <div>
           {viewMode === "table" ? (
             <JobListingsTable
-              data={sortedListings as JobListingWithJobs[]}
+              data={sortedData}
               isLoading={isLoading}
-              error={error instanceof Error ? error : null}
+              error={error}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedListings as JobListingWithJobs[]}
+                data={sortedData}
                 isLoading={isLoading}
-                error={error instanceof Error ? error : null}
+                error={error}
                 emptyMessage={t("Pages.JobListings.no_listings_found")}
                 renderItem={(listing: JobListingWithJobs) => (
                   <JobListingCard key={listing.id} jobListing={listing} />
@@ -168,21 +179,21 @@ export default function JobListingsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableJobListing ? t("Pages.JobListings.edit") : t("Pages.JobListings.add")}
+          title={actionableItem ? t("Pages.JobListings.edit") : t("Pages.JobListings.add")}
           formId="job-listing-form"
-          loadingSave={loadingSaveJobListing}
+          loadingSave={loadingSave}
         >
           <JobListingForm
             formHtmlId={"job-listing-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableJobListing(null);
-              setLoadingSaveJobListing(false);
+              setActionableItem(null);
+              setLoadingSave(false);
               toast.success(t("General.successful_operation"), {
                 description: t("JobListings.success.update"),
               });
             }}
-            defaultValues={actionableJobListing}
+            defaultValues={actionableItem}
             editMode={true}
           />
         </FormDialog>
@@ -192,8 +203,9 @@ export default function JobListingsPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("JobListings.confirm_delete")}
+          title={t("JobListings.confirm_delete", { count: selectedRows.length })}
           description={t("JobListings.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>
@@ -202,7 +214,7 @@ export default function JobListingsPage() {
 
 JobListingsPage.messages = ["Notes", "Pages", "JobListings", "Settings", "Jobs", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

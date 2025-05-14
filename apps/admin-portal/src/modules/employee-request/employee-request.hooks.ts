@@ -56,10 +56,6 @@ export const useCreateEmployeeRequest = () => {
       ]);
 
       queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
-
-      toast.success(t("General.successful_operation"), {
-        description: t("EmployeeRequests.success.create"),
-      });
     },
   });
 };
@@ -78,9 +74,9 @@ export function useUpdateEmployeeRequest() {
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: EmployeeRequestUpdateData }) =>
-      updateEmployeeRequest(id, updates),
-    onMutate: async ({ id, updates }) => {
+    mutationFn: ({ id, data }: { id: string; data: EmployeeRequestUpdateData }) =>
+      updateEmployeeRequest(id, data),
+    onMutate: async ({ id, data }) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: employeeRequestKeys.lists() });
       await queryClient.cancelQueries({ queryKey: employeeRequestKeys.detail(id) });
@@ -90,17 +86,17 @@ export function useUpdateEmployeeRequest() {
       const previousEmployeeRequest = queryClient.getQueryData(employeeRequestKeys.detail(id));
 
       // Prepare updates to apply optimistically
-      const optimisticUpdates = { ...updates };
+      const optimisticUpdates = { ...data };
 
       // Handle department_id changes to also update the department name for UI
-      if (updates.employee_id !== undefined) {
+      if (data.employee_id !== undefined) {
         try {
           // Get the current departments from the cache
           const employees: any = queryClient.getQueryData(employeeRequestKeys.lists());
 
           if (employees && Array.isArray(employees)) {
             // Find the department with the matching ID
-            const employee = employees.find((e: any) => e.id === updates.employee_id);
+            const employee = employees.find((e: any) => e.id === data.employee_id);
 
             if (employee) {
               optimisticUpdates.employee_id = employee.id;
@@ -153,9 +149,6 @@ export function useUpdateEmployeeRequest() {
 
       // Also update the individual employee query data if it exists
       queryClient.setQueryData(employeeRequestKeys.detail(id), updatedEmployee);
-      toast.success(t("General.successful_operation"), {
-        description: t("EmployeeRequests.success.update"),
-      });
     },
     onError: (err, { id }, context) => {
       // Roll back to the previous values if mutation fails
