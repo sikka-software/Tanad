@@ -10,9 +10,10 @@ import DebugTools from "@/ui/debug-tools";
 import { LoadingBar } from "@/ui/loading-bar";
 
 import ScrollToTop from "@/components/app/scroll-to-top";
+import SoonPage from "@/components/landing/soon-page";
 import AppLayout from "@/components/layouts/app-layout";
 import AuthLayout from "@/components/layouts/auth-layout";
-import LandingLayout from "@/components/layouts/landing-layout";
+// import LandingLayout from "@/components/layouts/landing-layout";
 
 import { QueryProvider } from "@/providers/QueryProvider";
 import { SupabaseProvider } from "@/providers/SupabaseProvider";
@@ -110,7 +111,8 @@ function AppContent({ Component, pageProps, router }: AppProps) {
           timeZone="Asia/Riyadh"
           now={new Date()}
         >
-          <LandingLayout>{<Component {...pageProps} />}</LandingLayout>
+          <SoonPage />
+          {/* <LandingLayout>{<Component {...pageProps} />}</LandingLayout> */}
         </NextIntlClientProvider>
       </div>
     );
