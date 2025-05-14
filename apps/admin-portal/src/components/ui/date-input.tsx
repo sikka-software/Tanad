@@ -15,8 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { DateField, DateInput } from "@/components/ui/datefield-rac";
 
 interface DatePickerProps {
-  date?: Date | DateRange;
-  onSelect: (date: Date | DateRange | undefined) => void;
+  onSelect?: (date: Date | DateRange | undefined) => void;
   placeholder?: string;
   disabled?: boolean;
   isolated?: boolean;
@@ -27,7 +26,6 @@ interface DatePickerProps {
 }
 
 export function DateInputField({
-  date,
   onSelect,
   placeholder = "Pick a date",
   disabled = false,
@@ -55,39 +53,47 @@ export function DateInputField({
     return cd.toDate(getLocalTimeZone());
   };
 
-  // Only support single date for now
-  // const calendarValue = toCalendarDate(date as Date | undefined);
-
   // Handler for calendar selection
   const handleCalendarSelect = (selected: Date | undefined) => {
     if (selected) {
-      onSelect(selected);
+      // Convert JS Date to CalendarDate using parseDate
+      const iso = selected.toISOString().split("T")[0];
+      const calendarDate = parseDate(iso);
+      if (onChange) onChange(calendarDate);
       setOpen(false);
     }
   };
 
+  // Helper to check if value is a CalendarDate
+  const isCalendarDate = (val: any): val is CalendarDate => val && typeof val.toDate === 'function';
+
   // Use en-GB for dd/mm/yyyy if locale is en, otherwise use detected locale
   const dateFieldLocale = locale === "en" ? "en-GB" : locale;
+
+  // Format the selected date for preview
+  let formattedDate = '';
+  if (isCalendarDate(value)) {
+    const jsDate = value.toDate(getLocalTimeZone());
+    formattedDate = dateFormatter.format(jsDate);
+  }
 
   return (
     <div className="flex w-full items-center gap-1">
       <I18nProvider locale={dateFieldLocale}>
         <DateField
           value={value}
-          // onChange={(cd) => onSelect(toJSDate(cd))}
           isDisabled={disabled}
           aria-invalid={ariaInvalid}
           className="w-full"
           onChange={onChange}
-          // {...props}
         >
           <Group className="w-full">
             <DateInput />
           </Group>
         </DateField>
         {/* Show formatted date preview if a date is selected */}
-        {date && date instanceof Date && (
-          <div className="text-muted-foreground mt-1 text-xs">{dateFormatter.format(date)}</div>
+        {formattedDate && (
+          <div className="text-muted-foreground mt-1 text-xs">{formattedDate}</div>
         )}
       </I18nProvider>
       <Popover open={open} onOpenChange={setOpen}>
@@ -106,7 +112,7 @@ export function DateInputField({
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
-            selected={date as Date | undefined}
+            selected={isCalendarDate(value) ? value.toDate(getLocalTimeZone()) : undefined}
             onSelect={handleCalendarSelect}
             initialFocus
           />

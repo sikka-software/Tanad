@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { parseDate, getLocalTimeZone } from "@internationalized/date";
 import { createSelectSchema } from "drizzle-zod";
 import { Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -54,7 +55,6 @@ import {
 
 import { employees } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
-import { parseDate, getLocalTimeZone } from "@internationalized/date";
 
 const salaryComponentSchema = z.object({
   type: z.string().min(1, "Type is required"),
@@ -255,9 +255,10 @@ export function EmployeeForm({
             email: data.email.trim(),
             phone: data.phone?.trim() || undefined,
             hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
-            birth_date: data.birth_date && typeof data.birth_date.toString === "function"
-              ? data.birth_date.toString()
-              : undefined,
+            birth_date:
+              data.birth_date && typeof data.birth_date.toString === "function"
+                ? data.birth_date.toString()
+                : undefined,
             notes: data.notes,
             salary: (data.salary || []).map((comp) => ({
               ...comp,
@@ -273,9 +274,10 @@ export function EmployeeForm({
           termination_date: data.termination_date
             ? data.termination_date.toISOString().split("T")[0]
             : undefined,
-          birth_date: data.birth_date && typeof data.birth_date.toString === "function"
-            ? data.birth_date.toString()
-            : undefined,
+          birth_date:
+            data.birth_date && typeof data.birth_date.toString === "function"
+              ? data.birth_date.toString()
+              : undefined,
           first_name: data.first_name.trim(),
           last_name: data.last_name.trim(),
           email: data.email.trim(),
@@ -506,7 +508,7 @@ export function EmployeeForm({
                         placeholder={t("Employees.form.birth_date.placeholder")}
                         value={field.value ?? null}
                         onChange={field.onChange}
-                        onSelect={() => {}}
+                        onSelect={(e) => field.onChange(e)}
                         disabled={isEmployeeSaving}
                         ariaInvalid={form.formState.errors.birth_date !== undefined}
                       />
