@@ -54,6 +54,7 @@ import {
 
 import { employees } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
+import { parseDate, getLocalTimeZone } from "@internationalized/date";
 
 const salaryComponentSchema = z.object({
   type: z.string().min(1, "Type is required"),
@@ -142,7 +143,7 @@ export function EmployeeForm({
       salary: z.array(salaryComponentSchema).optional(),
       status: z.enum(EmployeeStatus),
       nationality: z.string().optional(),
-      birth_date: z.date().optional(),
+      birth_date: z.any().optional(),
       national_id: z.string().optional(),
       eqama_id: z.string().optional(),
       gender: z.string().optional(),
@@ -254,7 +255,9 @@ export function EmployeeForm({
             email: data.email.trim(),
             phone: data.phone?.trim() || undefined,
             hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
-            birth_date: data.birth_date ? formatter.format(data.birth_date) : undefined,
+            birth_date: data.birth_date && typeof data.birth_date.toString === "function"
+              ? data.birth_date.toString()
+              : undefined,
             notes: data.notes,
             salary: (data.salary || []).map((comp) => ({
               ...comp,
@@ -270,7 +273,9 @@ export function EmployeeForm({
           termination_date: data.termination_date
             ? data.termination_date.toISOString().split("T")[0]
             : undefined,
-          birth_date: data.birth_date ? data.birth_date.toISOString().split("T")[0] : undefined,
+          birth_date: data.birth_date && typeof data.birth_date.toString === "function"
+            ? data.birth_date.toString()
+            : undefined,
           first_name: data.first_name.trim(),
           last_name: data.last_name.trim(),
           email: data.email.trim(),
@@ -499,14 +504,11 @@ export function EmployeeForm({
                     <FormControl>
                       <DateInput
                         placeholder={t("Employees.form.birth_date.placeholder")}
-                        date={field.value}
-                        onSelect={field.onChange}
+                        value={field.value ?? null}
+                        onChange={field.onChange}
+                        onSelect={() => {}}
                         disabled={isEmployeeSaving}
                         ariaInvalid={form.formState.errors.birth_date !== undefined}
-                        onChange={(date) => {
-                          console.log("date", date);
-                          field.onChange(date);
-                        }}
                       />
                     </FormControl>
                     <FormMessage />
