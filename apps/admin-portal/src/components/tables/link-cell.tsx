@@ -9,10 +9,12 @@ import { cn } from "@/lib/utils";
 const CodeCell = ({
   value,
   onChange,
+  onBlur,
   onClick,
 }: {
   value: string;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  onBlur: (e: ChangeEvent<HTMLInputElement>) => void;
   onClick: () => void;
 }) => {
   const cellValue = value;
@@ -21,9 +23,11 @@ const CodeCell = ({
       <Input
         className="!bg-transparent"
         inCell
-        value={cellValue || ""}
+        defaultValue={cellValue}
+        // value={cellValue || ""}
         style={{ minHeight: 36 }}
-        onChange={onChange}
+        // onChange={onChange}
+        onBlur={onBlur}
       />
       <IconButton
         size="icon_sm"

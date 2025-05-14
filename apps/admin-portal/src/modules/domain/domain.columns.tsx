@@ -23,12 +23,11 @@ const useDomainColumns = (
       header: t("Domains.form.domain_name.label"),
       validationSchema: z.string().min(1, "Required"),
       noPadding: true,
-      cell: ({ getValue, row }) => (
+      cell: (cell) => (
         <LinkCell
-          value={getValue() as string}
-          onChange={(e) => handleEdit?.(row.id, "domain_name", e.target.value)}
-          // TODO: add a parser so that https:// isn't duplicated 
-          onClick={() => window.open(`https://${getValue() as string}`, "_blank")}
+          value={cell.getValue() as string}
+          onBlur={(e) => handleEdit?.(cell.row.id, "domain_name", e.target.value)}
+          onClick={() => window.open(`https://${cell.getValue() as string}`, "_blank")}
         />
       ),
     },
