@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { parseDate, getLocalTimeZone } from "@internationalized/date";
+import { parseDate } from "@internationalized/date";
 import { createSelectSchema } from "drizzle-zod";
 import { Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -32,6 +32,7 @@ import { DateInput } from "@/components/ui/date-input";
 import { addressSchema } from "@/lib/schemas/address.schema";
 import { metadataSchema } from "@/lib/schemas/metadata.schema";
 import { getNotesValue } from "@/lib/utils";
+import { validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -141,33 +142,22 @@ export function EmployeeForm({
       email: z.string().email(t("Employees.form.email.invalid")),
       phone: z.string().optional(),
       job_id: z.string().min(1, t("Employees.form.job.required")),
-      hire_date: z.date({
-        required_error: t("Employees.form.hire_date.required"),
-      }),
+
       salary: z.array(salaryComponentSchema).optional(),
       status: z.enum(EmployeeStatus),
       nationality: z.string().optional(),
+      hire_date: z
+        .any()
+        .optional()
+        .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.hire_date.invalid")),
       birth_date: z
         .any()
         .optional()
-        .superRefine((val, ctx) => {
-          if (val === undefined || val === null) return;
-          if (typeof val === "object" && typeof val.toDate === "function") {
-            // Check for reasonable year range
-            const year = val.year;
-            if (year < 1800 || year > 2200) {
-              ctx.addIssue({
-                code: "custom",
-                message: t("Employees.form.birth_date.invalid"),
-              });
-            }
-            return;
-          }
-          ctx.addIssue({
-            code: "custom",
-            message: t("Employees.form.birth_date.invalid"),
-          });
-        }),
+        .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.birth_date.invalid")),
+      termination_date: z
+        .any()
+        .optional()
+        .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.termination_date.invalid")),
       national_id: z.string().optional(),
       eqama_id: z.string().optional(),
       gender: z.string().optional(),
@@ -176,7 +166,6 @@ export function EmployeeForm({
       employee_number: z.string().optional(),
       onboarding_status: z.string().optional(),
       offboarding_status: z.string().optional(),
-      termination_date: z.date().optional(),
       emergency_contact: z
         .object({
           name: z.string().optional(),
@@ -205,14 +194,17 @@ export function EmployeeForm({
       enterprise_id: defaultValues?.enterprise_id || undefined,
       id: defaultValues?.id || undefined,
       status: defaultValues?.status || "active",
-      hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
       job_id: defaultValues?.job_id || "",
       phone: defaultValues?.phone || "",
       salary:
         (defaultValues?.salary as { type: string; amount: number }[] | undefined) || undefined,
       notes: getNotesValue(defaultValues) || "",
       nationality: defaultValues?.nationality || "",
+      hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
       birth_date: defaultValues?.birth_date ? new Date(defaultValues.birth_date) : undefined,
+      termination_date: defaultValues?.termination_date
+        ? new Date(defaultValues.termination_date)
+        : undefined,
       national_id: defaultValues?.national_id || "",
       eqama_id: defaultValues?.eqama_id || "",
       gender: defaultValues?.gender || "male",
@@ -272,17 +264,17 @@ export function EmployeeForm({
           id: actualEmployeeId!,
           data: {
             ...data,
-            termination_date:
-              data.termination_date && typeof data.termination_date.toISOString === "function"
-                ? data.termination_date.toISOString().split("T")[0]
-                : undefined,
             first_name: data.first_name.trim(),
             last_name: data.last_name.trim(),
             email: data.email.trim(),
             phone: data.phone?.trim() || undefined,
+            termination_date:
+              data.termination_date && typeof data.termination_date.toString === "function"
+                ? data.termination_date.toString()
+                : undefined,
             hire_date:
-              data.hire_date && typeof data.hire_date.toISOString === "function"
-                ? data.hire_date.toISOString().split("T")[0]
+              data.hire_date && typeof data.hire_date.toString === "function"
+                ? data.hire_date.toString()
                 : undefined,
             birth_date:
               data.birth_date && typeof data.birth_date.toString === "function"
@@ -301,21 +293,21 @@ export function EmployeeForm({
         await createEmployeeMutate({
           ...data,
           termination_date:
-            data.termination_date && typeof data.termination_date.toISOString === "function"
-              ? data.termination_date.toISOString().split("T")[0]
+            data.termination_date && typeof data.termination_date.toString === "function"
+              ? data.termination_date.toString()
               : undefined,
           birth_date:
             data.birth_date && typeof data.birth_date.toString === "function"
               ? data.birth_date.toString()
               : undefined,
+          hire_date:
+            data.hire_date && typeof data.hire_date.toString === "function"
+              ? data.hire_date.toString()
+              : undefined,
           first_name: data.first_name.trim(),
           last_name: data.last_name.trim(),
           email: data.email.trim(),
           phone: data.phone?.trim() || undefined,
-          hire_date:
-            data.hire_date && typeof data.hire_date.toISOString === "function"
-              ? data.hire_date.toISOString().split("T")[0]
-              : undefined,
           notes: data.notes,
           salary: (data.salary || []).map((comp) => ({
             ...comp,
@@ -503,10 +495,15 @@ export function EmployeeForm({
                   <FormItem className="flex flex-col">
                     <FormLabel>{t("Employees.form.hire_date.label")} *</FormLabel>
                     <FormControl>
-                      <DatePicker
+                      <DateInput
                         placeholder={t("Employees.form.hire_date.placeholder")}
-                        date={field.value}
-                        onSelect={field.onChange}
+                        value={
+                          typeof field.value === "string"
+                            ? parseDate(field.value)
+                            : (field.value ?? null)
+                        }
+                        onChange={field.onChange}
+                        onSelect={(e) => field.onChange(e)}
                         disabled={isEmployeeSaving}
                         ariaInvalid={form.formState.errors.hire_date !== undefined}
                       />

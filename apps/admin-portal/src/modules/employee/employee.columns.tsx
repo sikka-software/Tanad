@@ -42,10 +42,11 @@ const useCompanyColumns = (
       accessorKey: "birth_date",
       header: t("Employees.form.birth_date.label"),
       validationSchema: z.string().optional(),
-      // cell: ({ getValue }) => {
-      //   const birthDate = getValue();
-      //   return <DateInputField date={birthDate} />;
-      // },
+    },
+    {
+      accessorKey: "hire_date",
+      header: t("Employees.form.hire_date.label"),
+      validationSchema: z.string().optional(),
     },
     {
       accessorKey: "job_id",
