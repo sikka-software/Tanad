@@ -24,6 +24,7 @@ import { createClient } from "@/utils/supabase/component";
 
 import FormSectionHeader from "@/components/forms/form-section-header";
 import NotesSection from "@/components/forms/notes-section";
+import DateInput from "@/components/ui/date-input";
 
 import { metadataSchema } from "@/lib/schemas/metadata.schema";
 import { getNotesValue } from "@/lib/utils";

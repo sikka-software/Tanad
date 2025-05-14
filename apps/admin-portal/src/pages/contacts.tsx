@@ -74,7 +74,9 @@ export default function ContactsPage() {
                 icons: [User, User, User],
                 onClick: () => router.push(router.pathname + "/add"),
               }}
-              renderItem={(client) => <ClientCard client={client} />}
+              renderItem={(client) => (
+                <ClientCard client={client} onActionClicked={() => console.log("TODO")} />
+              )}
               gridCols="3"
             />
           </TabsContent>
@@ -91,7 +93,9 @@ export default function ContactsPage() {
                 icons: [User, User, User],
                 onClick: () => router.push(router.pathname + "/add"),
               }}
-              renderItem={(vendor) => <VendorCard vendor={vendor} />}
+              renderItem={(vendor) => (
+                <VendorCard vendor={vendor} onActionClicked={() => console.log("TODO")} />
+              )}
               gridCols="3"
             />
           </TabsContent>

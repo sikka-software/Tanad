@@ -1,4 +1,4 @@
-import { ModulesOptions } from "@tanad.config";
+import { ModulesOptions, TanadModules } from "@tanad.config";
 import { Plus } from "lucide-react";
 import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
@@ -41,7 +41,7 @@ const DashboardStatsVertical = ({
               acc[category].push({ ...module, key });
               return acc;
             },
-            {} as Record<string, Array<(typeof ModulesOptions)[string] & { key: string }>>,
+            {} as Record<string, Array<(typeof ModulesOptions)[TanadModules] & { key: string }>>,
           ),
         )
           .reduce((acc, [categoryName, modulesInCategory], index) => {

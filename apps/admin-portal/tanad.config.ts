@@ -27,7 +27,7 @@ import {
   Landmark,
 } from "lucide-react";
 
-type TanadModules =
+export type TanadModules =
   | "users"
   | "roles"
   | "dashboard"

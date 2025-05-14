@@ -1,7 +1,5 @@
 import { Mail, Phone, MapPin } from "lucide-react";
 
-import { Card, CardContent, CardHeader } from "@/ui/card";
-
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus } from "@/types/common.type";
@@ -9,9 +7,6 @@ import { CommonStatusProps } from "@/types/common.type";
 
 import { Vendor } from "@/vendor/vendor.type";
 
-import { useUpdateCompany } from "../company/company.hooks";
-import useCompanyStore from "../company/company.store";
-import { Company } from "../company/company.type";
 import { useUpdateVendor } from "./vendor.hooks";
 import useVendorStore from "./vendor.store";
 
