@@ -1,14 +1,15 @@
-import { cn } from "@root/src/lib/utils";
 import { DiamondPlus, Hash, Shuffle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/ui/dropdown-menu";
+
+import { cn } from "@/lib/utils";
 
 type CodeInputProps = {
   children: React.ReactNode;

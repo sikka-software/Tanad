@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
+import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 import { format } from "date-fns";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";

@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import AdjustableDialog from "@root/src/components/ui/dialogs/adjustable-dialog";
 import { Sparkles, Loader2, Trash, ArrowDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -10,13 +9,12 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
-// UI
 import { Button } from "@/ui/button";
+import AdjustableDialog from "@/ui/dialogs/adjustable-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-// import { checkExistingSlug } from "@/lib/operations";
 import { createClient } from "@/utils/supabase/component";
 
 import { useMainStore } from "@/hooks/main.store";

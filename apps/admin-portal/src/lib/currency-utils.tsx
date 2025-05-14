@@ -1,4 +1,4 @@
-import { currencies } from "@root/tanad.config";
+import { currencies } from "@tanad.config";
 import { DollarSign, Euro, PoundSterling, JapaneseYen } from "lucide-react";
 
 import { SARSymbol } from "@/components/ui/sar-symbol";

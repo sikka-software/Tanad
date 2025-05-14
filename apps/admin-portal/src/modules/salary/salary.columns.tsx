@@ -1,6 +1,6 @@
-import CurrencyCell from "@root/src/components/tables/currency-cell";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import useUserStore from "@root/src/stores/use-user-store";
+import CurrencyCell from "@/components/tables/currency-cell";
+import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
+import useUserStore from "@/stores/use-user-store";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 

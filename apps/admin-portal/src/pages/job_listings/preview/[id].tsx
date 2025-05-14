@@ -1,7 +1,7 @@
-import { JobListingNotFound } from "@root/src/components/app/job-listing-not-found";
-import JobCard from "@root/src/components/jobs/job-card";
-import JobDetailsModal from "@root/src/components/jobs/job-details-dialog";
-import CustomPageMeta from "@root/src/components/landing/CustomPageMeta";
+import { JobListingNotFound } from "@/components/app/job-listing-not-found";
+import JobCard from "@/components/jobs/job-card";
+import JobDetailsModal from "@/components/jobs/job-details-dialog";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";

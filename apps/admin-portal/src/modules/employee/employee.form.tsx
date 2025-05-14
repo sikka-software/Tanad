@@ -1,41 +1,45 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import FormSectionHeader from "@root/src/components/forms/form-section-header";
-import NotesSection from "@root/src/components/forms/notes-section";
-import BooleanTabs from "@root/src/components/ui/boolean-tabs";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import DigitsInput from "@root/src/components/ui/digits-input";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@root/src/components/ui/tooltip";
-import { employees } from "@root/src/db/schema";
-import { addressSchema } from "@root/src/lib/schemas/address.schema";
-import { metadataSchema } from "@root/src/lib/schemas/metadata.schema";
-import { getNotesValue } from "@root/src/lib/utils";
 import { createSelectSchema } from "drizzle-zod";
-import { PlusCircle, Trash2Icon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { Button } from "@/ui/button";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import CountryInput from "@/ui/country-input";
 import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
+import DigitsInput from "@/ui/digits-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
+import PhoneInput from "@/ui/phone-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 import { createClient } from "@/utils/supabase/component";
 
-import { Button } from "@/components/ui/button";
-import PhoneInput from "@/components/ui/phone-input";
+import FormSectionHeader from "@/components/forms/form-section-header";
+import NotesSection from "@/components/forms/notes-section";
+
+import { metadataSchema } from "@/lib/schemas/metadata.schema";
+import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
+
+import JobForm from "@/job/job.form";
+import { useJobs } from "@/job/job.hooks";
+import useJobStore from "@/job/job.store";
 
 import DepartmentForm from "@/department/department.form";
 import { useDepartments } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";
 
+import { useCreateEmployee } from "@/employee/employee.hooks";
+import { useUpdateEmployee } from "@/employee/employee.hooks";
 import { SALARY_COMPONENT_TYPES } from "@/employee/employee.options";
 import useEmployeeStore from "@/employee/employee.store";
 import {
@@ -45,13 +49,8 @@ import {
   type EmployeeUpdateData,
 } from "@/employee/employee.types";
 
+import { employees } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
-
-import { JobForm } from "../job/job.form";
-import { useJobs } from "../job/job.hooks";
-import useJobStore from "../job/job.store";
-import { useCreateEmployee } from "./employee.hooks";
-import { useUpdateEmployee } from "./employee.hooks";
 
 const salaryComponentSchema = z.object({
   type: z.string().min(1, "Type is required"),
@@ -475,7 +474,7 @@ export function EmployeeForm({
                 name="nationality"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Employees.form.nationality.label")} *</FormLabel>
+                    <FormLabel>{t("Employees.form.nationality.label")}</FormLabel>
                     <FormControl>
                       <CountryInput
                         value={field.value ?? ""}
@@ -499,7 +498,7 @@ export function EmployeeForm({
                 name="birth_date"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>{t("Employees.form.birth_date.label")} *</FormLabel>
+                    <FormLabel>{t("Employees.form.birth_date.label")}</FormLabel>
                     <FormControl>
                       <DatePicker
                         placeholder={t("Employees.form.birth_date.placeholder")}
@@ -547,7 +546,7 @@ export function EmployeeForm({
                 name="gender"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Employees.form.gender.label")} *</FormLabel>
+                    <FormLabel>{t("Employees.form.gender.label")}</FormLabel>
                     <Select
                       defaultValue={field.value}
                       onValueChange={field.onChange}

@@ -1,4 +1,4 @@
-import CustomPageMeta from "@root/src/components/landing/CustomPageMeta";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";

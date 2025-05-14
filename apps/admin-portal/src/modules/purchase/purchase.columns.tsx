@@ -1,12 +1,13 @@
-import CurrencyCell from "@root/src/components/tables/currency-cell";
-import SelectCell from "@root/src/components/tables/select-cell";
-import useUserStore from "@root/src/stores/use-user-store";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
+import CurrencyCell from "@/components/tables/currency-cell";
+import SelectCell from "@/components/tables/select-cell";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
-import { Purchase, PurchaseStatus } from "./purchase.type";
+import { Purchase, PurchaseStatus } from "@/types/purchase.type";
+
+import useUserStore from "@/stores/use-user-store";
 
 const usePurchaseColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,

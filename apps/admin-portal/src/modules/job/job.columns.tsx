@@ -1,8 +1,8 @@
-import SelectCell from "@root/src/components/tables/select-cell";
-import StatusCell from "@root/src/components/tables/status-cell";
-import { MoneyFormatter } from "@root/src/components/ui/currency-input";
-import { getCurrencySymbol } from "@root/src/lib/currency-utils";
-import useUserStore from "@root/src/stores/use-user-store";
+import SelectCell from "@/components/tables/select-cell";
+import StatusCell from "@/components/tables/status-cell";
+import { MoneyFormatter } from "@/components/ui/currency-input";
+import { getCurrencySymbol } from "@/lib/currency-utils";
+import useUserStore from "@/stores/use-user-store";
 import { CellContext } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import { z } from "zod";

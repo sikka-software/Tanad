@@ -1,4 +1,4 @@
-import SheetTable from "@root/src/components/ui/sheet-table";
+import SheetTable from "@/components/ui/sheet-table";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 

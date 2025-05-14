@@ -1,9 +1,10 @@
-import { cn } from "@root/src/lib/utils";
 import { PlusCircle } from "lucide-react";
 import { FieldError } from "react-hook-form";
 
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
+import { Badge } from "@/ui/badge";
+import { Button } from "@/ui/button";
+
+import { cn } from "@/lib/utils";
 
 const FormSectionHeader = ({
   title,

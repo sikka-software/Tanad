@@ -1,6 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import FormSectionHeader from "@root/src/components/forms/form-section-header";
-import { FormDialog } from "@root/src/components/ui/form-dialog";
 import { useTranslations } from "next-intl";
 import { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -8,6 +6,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
@@ -16,9 +15,15 @@ import JobListingOptionsSection from "@/components/forms/job-listing-options-sec
 
 import { ModuleFormProps } from "@/types/common.type";
 
+import JobForm from "@/job/job.form";
 import { useJobs } from "@/job/job.hooks";
+import useJobStore from "@/job/job.store";
 
 import { useCreateJobListing, useUpdateJobListing } from "@/job-listing/job-listing.hooks";
+import {
+  bulkAssociateJobsWithListing,
+  updateListingJobAssociations,
+} from "@/job-listing/job-listing.service";
 import useJobListingsStore from "@/job-listing/job-listing.store";
 import { JobListingUpdateData, JobListingCreateData } from "@/job-listing/job-listing.type";
 
@@ -27,10 +32,6 @@ import { useDepartments } from "@/modules/department/department.hooks";
 import { useOffices } from "@/modules/office/office.hooks";
 import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import useUserStore from "@/stores/use-user-store";
-
-import { JobForm } from "../job/job.form";
-import useJobStore from "../job/job.store";
-import { bulkAssociateJobsWithListing, updateListingJobAssociations } from "./job-listing.service";
 
 export const createJobListingFormSchema = (t: (key: string) => string) =>
   z.object({

@@ -1,4 +1,4 @@
-import { Database } from "@root/src/lib/database.types";
+import { Database } from "@/lib/database.types";
 
 import { PRODUCT_CATEGORIES, PRODUCT_STATUSES } from "@/lib/constants/product-consts";
 

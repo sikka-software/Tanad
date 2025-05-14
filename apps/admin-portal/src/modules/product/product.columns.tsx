@@ -1,6 +1,6 @@
-import { MoneyFormatter } from "@root/src/components/ui/currency-input";
-import { getCurrencySymbol } from "@root/src/lib/currency-utils";
-import useUserStore from "@root/src/stores/use-user-store";
+import { MoneyFormatter } from "@/components/ui/currency-input";
+import { getCurrencySymbol } from "@/lib/currency-utils";
+import useUserStore from "@/stores/use-user-store";
 import { CellContext } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import { z } from "zod";

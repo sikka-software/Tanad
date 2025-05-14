@@ -1,4 +1,4 @@
-import CodeCell from "@root/src/components/tables/code-cell";
+import CodeCell from "@/components/tables/code-cell";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 

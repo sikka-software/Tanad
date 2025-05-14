@@ -1,10 +1,10 @@
-import { CommonStatus, CommonStatusProps } from "@root/src/types/common.type";
 import { Check } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { Button } from "@/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { CommonStatusProps } from "@/types/common.type";
 
 const CardStatusAction = ({
   currentStatus,

@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
+import NotesSection from "@/components/forms/notes-section";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";

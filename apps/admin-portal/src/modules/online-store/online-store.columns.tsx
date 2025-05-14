@@ -1,6 +1,6 @@
-import SelectCell from "@root/src/components/tables/select-cell";
-import StatusCell from "@root/src/components/tables/status-cell";
-import { E_COMMERCE_PLATFORMS } from "@root/src/lib/constants";
+import SelectCell from "@/components/tables/select-cell";
+import StatusCell from "@/components/tables/status-cell";
+import { E_COMMERCE_PLATFORMS } from "@/lib/constants";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 

@@ -1,5 +1,3 @@
-import { SERVER_OS } from "@root/src/lib/constants";
-import { SERVER_PROVIDERS } from "@root/src/lib/constants";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -9,10 +7,12 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
+import { SERVER_OS } from "@/lib/constants";
+import { SERVER_PROVIDERS } from "@/lib/constants";
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { ServerForm } from "@/modules/server/server.form";
-import useServerStore from "@/modules/server/server.store";
+import { ServerForm } from "@/server/server.form";
+import useServerStore from "@/server/server.store";
 
 export default function AddServerPage() {
   const router = useRouter();
@@ -63,7 +63,7 @@ export default function AddServerPage() {
 
 AddServerPage.messages = ["Notes", "Forms", "Pages", "Servers", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

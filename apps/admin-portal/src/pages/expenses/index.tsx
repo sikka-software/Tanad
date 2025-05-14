@@ -1,4 +1,4 @@
-import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";

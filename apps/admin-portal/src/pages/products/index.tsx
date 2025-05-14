@@ -1,4 +1,4 @@
-import useProductColumns from "@root/src/modules/product/product.columns";
+import useProductColumns from "@/modules/product/product.columns";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";

@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@root/src/components/ui/button";
-import IconButton from "@root/src/components/ui/icon-button";
+import { Button } from "@/components/ui/button";
+import IconButton from "@/components/ui/icon-button";
 import { PencilIcon } from "lucide-react";
 import { TrashIcon } from "lucide-react";
 import { useTranslations } from "next-intl";

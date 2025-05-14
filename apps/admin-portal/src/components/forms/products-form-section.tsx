@@ -11,7 +11,7 @@ import type {
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { Button } from "@/ui/button";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
 import { FormField, FormItem, FormControl, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";

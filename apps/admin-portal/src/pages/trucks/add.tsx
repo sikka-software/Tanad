@@ -1,4 +1,3 @@
-import useTruckStore from "@root/src/modules/truck/truck.store";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -10,7 +9,8 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { TruckForm } from "@/modules/truck/truck.form";
+import { TruckForm } from "@/truck/truck.form";
+import useTruckStore from "@/truck/truck.store";
 
 export default function AddTruckPage() {
   const router = useRouter();
@@ -65,7 +65,7 @@ export default function AddTruckPage() {
 
 AddTruckPage.messages = ["Pages", "Trucks", "Vehicles", "Notes", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

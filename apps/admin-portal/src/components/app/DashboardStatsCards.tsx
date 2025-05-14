@@ -1,7 +1,7 @@
-import { ModulesOptions } from "@root/tanad.config";
+import { ModulesOptions } from "@tanad.config";
 import { useTranslations } from "next-intl";
 
-import { StatCard } from "@/components/ui/stat-card";
+import { StatCard } from "@/ui/stat-card";
 
 import { convertToPascalCase } from "@/lib/utils";
 

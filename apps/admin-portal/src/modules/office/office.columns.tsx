@@ -1,6 +1,6 @@
-import CodeCell from "@root/src/components/tables/code-cell";
-import StatusCell from "@root/src/components/tables/status-cell";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
+import CodeCell from "@/components/tables/code-cell";
+import StatusCell from "@/components/tables/status-cell";
+import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 

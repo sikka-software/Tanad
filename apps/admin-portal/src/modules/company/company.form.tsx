@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import { getNotesValue } from "@root/src/lib/utils";
+import NotesSection from "@/components/forms/notes-section";
+import { getNotesValue } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -14,7 +14,7 @@ import { Input } from "@/ui/input";
 import PhoneInput from "@/ui/phone-input";
 
 import { AddressFormSection } from "@/forms/address-form-section";
-import { createAddressSchema } from "@root/src/lib/schemas/address.schema";
+import { createAddressSchema } from "@/lib/schemas/address.schema";
 
 import { uploadDocument } from "@/services/documents";
 

@@ -1,6 +1,3 @@
-import { FormDialog } from "@root/src/components/ui/form-dialog";
-import { WarehouseForm } from "@root/src/modules/warehouse/warehouse.form";
-import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -9,9 +6,12 @@ import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import { FormDialog } from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
+
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
@@ -21,6 +21,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import WarehouseCard from "@/warehouse/warehouse.card";
 import useWarehouseColumns from "@/warehouse/warehouse.columns";
+import { WarehouseForm } from "@/warehouse/warehouse.form";
 import {
   useBulkDeleteWarehouses,
   useWarehouses,
@@ -29,8 +30,7 @@ import {
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/warehouse/warehouse.options";
 import useWarehouseStore from "@/warehouse/warehouse.store";
 import WarehouseTable from "@/warehouse/warehouse.table";
-
-import { WarehouseUpdateData } from "@/modules/warehouse/warehouse.type";
+import { WarehouseUpdateData } from "@/warehouse/warehouse.type";
 
 export default function WarehousesPage() {
   const t = useTranslations();
@@ -206,7 +206,7 @@ export default function WarehousesPage() {
 
 WarehousesPage.messages = ["Notes", "Pages", "Warehouses", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

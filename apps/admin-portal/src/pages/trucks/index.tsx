@@ -1,5 +1,3 @@
-import useTruckColumns from "@root/src/modules/truck/truck.columns";
-import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -13,19 +11,22 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { createModuleStoreHooks } from "@/utils/module-hooks";
+
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import TruckCard from "@/modules/truck/truck.card";
-import { TruckForm } from "@/modules/truck/truck.form";
-import { useTrucks, useBulkDeleteTrucks, useDuplicateTruck } from "@/modules/truck/truck.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/truck/truck.options";
-import useTruckStore from "@/modules/truck/truck.store";
-import TrucksTable from "@/modules/truck/truck.table";
-import { TruckUpdateData } from "@/modules/truck/truck.type";
+import TruckCard from "@/truck/truck.card";
+import useTruckColumns from "@/truck/truck.columns";
+import { TruckForm } from "@/truck/truck.form";
+import { useTrucks, useBulkDeleteTrucks, useDuplicateTruck } from "@/truck/truck.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/truck/truck.options";
+import useTruckStore from "@/truck/truck.store";
+import TrucksTable from "@/truck/truck.table";
+import { TruckUpdateData } from "@/truck/truck.type";
 
 export default function TrucksPage() {
   const t = useTranslations();
@@ -204,7 +205,7 @@ export default function TrucksPage() {
 
 TrucksPage.messages = ["Pages", "Trucks", "Vehicles", "Notes", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

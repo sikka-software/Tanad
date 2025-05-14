@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import BooleanTabs from "@root/src/components/ui/boolean-tabs";
+import NotesSection from "@/components/forms/notes-section";
+import BooleanTabs from "@/components/ui/boolean-tabs";
 import { useTranslations, useLocale } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";

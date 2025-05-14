@@ -1,19 +1,15 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { toast } from "sonner";
 
-import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { JobForm } from "@/job/job.form";
+import JobForm from "@/job/job.form";
 import useJobStore from "@/job/job.store";
 
 export default function AddJobPage() {
@@ -82,7 +78,7 @@ AddJobPage.messages = [
   "Departments",
   "General",
 ];
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

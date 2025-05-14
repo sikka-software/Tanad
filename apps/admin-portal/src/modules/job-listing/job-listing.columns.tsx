@@ -1,4 +1,4 @@
-import StatusCell from "@root/src/components/tables/status-cell";
+import StatusCell from "@/components/tables/status-cell";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 

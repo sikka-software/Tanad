@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
+import NotesSection from "@/components/forms/notes-section";
+import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 import { Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";

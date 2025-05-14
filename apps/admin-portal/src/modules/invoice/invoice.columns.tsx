@@ -1,8 +1,8 @@
-import CodeCell from "@root/src/components/tables/code-cell";
-import SelectCell from "@root/src/components/tables/select-cell";
-import { MoneyFormatter } from "@root/src/components/ui/currency-input";
-import { getCurrencySymbol } from "@root/src/lib/currency-utils";
-import useUserStore from "@root/src/stores/use-user-store";
+import CodeCell from "@/components/tables/code-cell";
+import SelectCell from "@/components/tables/select-cell";
+import { MoneyFormatter } from "@/components/ui/currency-input";
+import { getCurrencySymbol } from "@/lib/currency-utils";
+import useUserStore from "@/stores/use-user-store";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 

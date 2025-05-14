@@ -1,9 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import BooleanTabs from "@root/src/components/ui/boolean-tabs";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import { CommandSelect } from "@root/src/components/ui/command-select";
-import { FormDialog } from "@root/src/components/ui/form-dialog";
+import NotesSection from "@/components/forms/notes-section";
+import BooleanTabs from "@/components/ui/boolean-tabs";
+import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
+import { CommandSelect } from "@/components/ui/command-select";
+import { FormDialog } from "@/components/ui/form-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -16,7 +16,7 @@ import { Input } from "@/ui/input";
 import PhoneInput from "@/ui/phone-input";
 
 import { AddressFormSection } from "@/forms/address-form-section";
-import { createAddressSchema } from "@root/src/lib/schemas/address.schema";
+import { createAddressSchema } from "@/lib/schemas/address.schema";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 

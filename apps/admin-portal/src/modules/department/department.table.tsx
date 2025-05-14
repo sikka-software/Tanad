@@ -1,4 +1,4 @@
-import { ModuleTableProps } from "@root/src/types/common.type";
+import { ModuleTableProps } from "@/types/common.type";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 

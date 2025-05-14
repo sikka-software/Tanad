@@ -1,5 +1,4 @@
-import { getCurrencySymbol } from "@root/src/lib/currency-utils";
-import { currencies } from "@root/tanad.config";
+import { currencies } from "@tanad.config";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -11,21 +10,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+} from "@/ui/form";
+import { MultiSelect } from "@/ui/multi-select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Switch } from "@/ui/switch";
 
-import { Skeleton } from "../ui/skeleton";
-// Assuming you have a multi-select component or will use checkboxes
-// import MultiSelect from "@/components/ui/multi-select";
-// import { Checkbox } from "@/components/ui/checkbox";
+import { getCurrencySymbol } from "@/lib/currency-utils";
 
 import FormSectionHeader from "./form-section-header";
 

@@ -1,7 +1,7 @@
-import CurrencyCell from "@root/src/components/tables/currency-cell";
-import SelectCell from "@root/src/components/tables/select-cell";
-import { Badge } from "@root/src/components/ui/badge";
-import useUserStore from "@root/src/stores/use-user-store";
+import CurrencyCell from "@/components/tables/currency-cell";
+import SelectCell from "@/components/tables/select-cell";
+import { Badge } from "@/components/ui/badge";
+import useUserStore from "@/stores/use-user-store";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { z } from "zod";

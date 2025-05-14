@@ -1,8 +1,9 @@
 "use client";
 
-import { CopyButton } from "@root/src/components/ui/copy-button";
 import { useTheme } from "next-themes";
 import * as React from "react";
+
+import { CopyButton } from "@/ui/copy-button";
 
 import {
   Tabs,

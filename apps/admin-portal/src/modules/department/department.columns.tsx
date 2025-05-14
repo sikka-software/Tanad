@@ -1,4 +1,4 @@
-import useUserStore from "@root/src/stores/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { Row } from "@tanstack/react-table";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";

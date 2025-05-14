@@ -1,5 +1,5 @@
-import useCarColumns from "@root/src/modules/car/car.columns";
-import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
+import useCarColumns from "@/modules/car/car.columns";
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";

@@ -1,5 +1,5 @@
-import { currencies } from "@root/tanad.config";
 import { Session, User } from "@supabase/supabase-js";
+import { currencies } from "@tanad.config";
 import { create } from "zustand";
 
 import { createClient } from "@/utils/supabase/component";

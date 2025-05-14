@@ -1,6 +1,7 @@
-import { getCurrencySymbol } from "@root/src/lib/currency-utils";
-import { currencies } from "@root/tanad.config";
+import { currencies } from "@tanad.config";
 import React from "react";
+
+import { getCurrencySymbol } from "@/lib/currency-utils";
 
 import { MoneyFormatter } from "../ui/currency-input";
 

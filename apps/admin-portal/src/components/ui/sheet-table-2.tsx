@@ -1,4 +1,3 @@
-import { cn } from "@root/src/lib/utils";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -16,14 +15,10 @@ import {
 } from "@tanstack/react-table";
 import * as React from "react";
 
+import { cn } from "@/lib/utils";
+
 import { Button } from "./button";
 import { Checkbox } from "./checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "./dropdown-menu";
 import { Input } from "./input";
 import { Skeleton } from "./skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table";

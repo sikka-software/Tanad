@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { convertToPascalCase } from "@root/src/lib/utils";
+import { convertToPascalCase } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";

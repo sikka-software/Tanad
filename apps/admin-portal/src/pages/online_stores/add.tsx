@@ -1,4 +1,4 @@
-import { E_COMMERCE_PLATFORMS } from "@root/src/lib/constants";
+import { E_COMMERCE_PLATFORMS } from "@/lib/constants";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";

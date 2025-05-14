@@ -1,5 +1,5 @@
-import SelectCell from "@root/src/components/tables/select-cell";
-import StatusCell from "@root/src/components/tables/status-cell";
+import SelectCell from "@/components/tables/select-cell";
+import StatusCell from "@/components/tables/status-cell";
 import { CellContext } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";

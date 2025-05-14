@@ -1,6 +1,6 @@
-import useInvoiceColumns from "@root/src/modules/invoice/invoice.columns";
-import { InvoiceForm } from "@root/src/modules/invoice/invoice.form";
-import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
+import useInvoiceColumns from "@/modules/invoice/invoice.columns";
+import { InvoiceForm } from "@/modules/invoice/invoice.form";
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";

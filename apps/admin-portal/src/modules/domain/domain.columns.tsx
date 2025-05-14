@@ -1,7 +1,7 @@
-import CurrencyCell from "@root/src/components/tables/currency-cell";
-import SelectCell from "@root/src/components/tables/select-cell";
-import StatusCell from "@root/src/components/tables/status-cell";
-import useUserStore from "@root/src/stores/use-user-store";
+import CurrencyCell from "@/components/tables/currency-cell";
+import SelectCell from "@/components/tables/select-cell";
+import StatusCell from "@/components/tables/status-cell";
+import useUserStore from "@/stores/use-user-store";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 

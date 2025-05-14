@@ -1,25 +1,21 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { currencies } from "@root/tanad.config";
-import { DollarSign, Euro, PoundSterling, SaudiRiyal, JapaneseYen, Flag } from "lucide-react";
+import { currencies } from "@tanad.config";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
+import BetaFlag from "@/ui/beta-flag";
 import { Card, CardTitle, CardHeader, CardDescription, CardContent } from "@/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Separator } from "@/ui/separator";
 import { Skeleton } from "@/ui/skeleton";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
 
 import { getCurrencySymbol } from "@/lib/currency-utils";
 
 import useUserStore from "@/stores/use-user-store";
-
-import BetaFlag from "../ui/beta-flag";
 
 const formSchema = z.object({
   currency: z.string(),

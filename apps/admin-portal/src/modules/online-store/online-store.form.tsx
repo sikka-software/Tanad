@@ -1,9 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import BooleanTabs from "@root/src/components/ui/boolean-tabs";
-import { Combobox } from "@root/src/components/ui/comboboxes/combobox";
-import { E_COMMERCE_PLATFORMS } from "@root/src/lib/constants";
-import { getNotesValue } from "@root/src/lib/utils";
+import NotesSection from "@/components/forms/notes-section";
+import BooleanTabs from "@/components/ui/boolean-tabs";
+import { Combobox } from "@/components/ui/comboboxes/combobox";
+import { E_COMMERCE_PLATFORMS } from "@/lib/constants";
+import { getNotesValue } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";

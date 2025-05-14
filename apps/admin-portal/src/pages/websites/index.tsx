@@ -1,5 +1,3 @@
-import useWebsiteColumns from "@root/src/modules/website/website.columns";
-import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -13,23 +11,22 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { createModuleStoreHooks } from "@/utils/module-hooks";
+
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import WebsiteCard from "@/modules/website/website.card";
-import { WebsiteForm } from "@/modules/website/website.form";
-import {
-  useWebsites,
-  useBulkDeleteWebsites,
-  useDuplicateWebsite,
-} from "@/modules/website/website.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/website/website.options";
-import useWebsiteStore from "@/modules/website/website.store";
-import WebsitesTable from "@/modules/website/website.table";
-import { WebsiteUpdateData } from "@/modules/website/website.type";
+import WebsiteCard from "@/website/website.card";
+import useWebsiteColumns from "@/website/website.columns";
+import { WebsiteForm } from "@/website/website.form";
+import { useWebsites, useBulkDeleteWebsites, useDuplicateWebsite } from "@/website/website.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/website/website.options";
+import useWebsiteStore from "@/website/website.store";
+import WebsitesTable from "@/website/website.table";
+import { WebsiteUpdateData } from "@/website/website.type";
 
 export default function WebsitesPage() {
   const t = useTranslations();
@@ -211,7 +208,7 @@ export default function WebsitesPage() {
 
 WebsitesPage.messages = ["Notes", "Pages", "Websites", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

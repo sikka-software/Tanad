@@ -4415,10 +4415,18 @@
         "label": "الحالة",
         "placeholder": "اختر الحالة",
         "required": "الحالة مطلوبة",
-        "pending": "قيد الانتظار",
-        "paid": "مدفوع",
-        "overdue": "متأخر",
-        "cancelled": "ملغى"
+        "draft": "مسودة",
+        "issued": "مصدرة",
+        "acknowledged": "معترف بها",
+        "partially_fulfilled": "مستلمة جزئيا",
+        "fulfilled": "مستلمة بالكامل",
+        "shipped": "مسلمة",
+        "delayed": "مؤجلة",
+        "received": "مستلمة",
+        "invoice_matched": "مطابقة الفاتورة",
+        "payment_initiated": "تم استدعاء الدفع",
+        "closed": "مغلقة",
+        "cancelled": "ملغية"
       },
       "issue_date": {
         "label": "تاريخ الإصدار",

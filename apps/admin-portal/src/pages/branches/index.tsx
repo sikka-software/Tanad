@@ -1,5 +1,5 @@
-import { FormSheet } from "@root/src/components/ui/form-sheet";
-import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
+import { FormSheet } from "@/components/ui/form-sheet";
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";

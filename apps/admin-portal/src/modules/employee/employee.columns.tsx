@@ -1,4 +1,4 @@
-import SelectCell from "@root/src/components/tables/select-cell";
+import SelectCell from "@/components/tables/select-cell";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 

@@ -1,6 +1,6 @@
-import { FormSheet } from "@root/src/components/ui/form-sheet";
-import { SalaryForm } from "@root/src/modules/salary/salary.form";
-import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
+import { FormSheet } from "@/components/ui/form-sheet";
+import { SalaryForm } from "@/modules/salary/salary.form";
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";

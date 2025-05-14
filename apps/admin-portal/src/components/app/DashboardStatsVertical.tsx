@@ -1,22 +1,19 @@
-import { ModulesOptions } from "@root/tanad.config";
-import { MoveVerticalIcon, Plus } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { ModulesOptions } from "@tanad.config";
+import { Plus } from "lucide-react";
+import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import React, { useState } from "react";
 
-import { StatCard } from "@/components/ui/stat-card";
+import { Button } from "@/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import { Separator } from "@/ui/separator";
 
 import { convertToPascalCase } from "@/lib/utils";
 
 import { DashboardStats } from "@/types/dashboard.types";
 
 import useUserStore from "@/stores/use-user-store";
-
-import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import IconButton from "../ui/icon-button";
-import { Separator } from "../ui/separator";
 
 const DashboardStatsVertical = ({
   stats,

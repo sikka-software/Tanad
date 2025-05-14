@@ -14,13 +14,14 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@root/*": ["./*"],
       "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"],
-      "@hooks/*": ["./src/hooks/*"],
-      "@lib/*": ["./src/lib/*"],
-      "@pages/*": ["./src/pages/*"],
-      "@utils/*": ["./src/utils/*"],
+      "@tanad.config": ["./tanad.config.ts"],
+      "@/components/*": ["./src/components/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/pages/*": ["./src/pages/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/types/*": ["./src/types/*"],
       "@/forms/*": ["./src/components/forms/*"],
       "@/tables/*": ["./src/components/tables/*"],
       "@/ui/*": ["./src/components/ui/*"],
@@ -48,7 +49,10 @@
       "@/vendor/*": ["./src/modules/vendor/*"],
       "@/warehouse/*": ["./src/modules/warehouse/*"],
       "@/domain/*": ["./src/modules/domain/*"],
-      "@/website/*": ["./src/modules/website/*"]
+      "@/website/*": ["./src/modules/website/*"],
+      "@/server/*": ["./src/modules/server/*"],
+      "@/truck/*": ["./src/modules/truck/*"],
+      "@/car/*": ["./src/modules/car/*"]
     },
     "plugins": [
       {

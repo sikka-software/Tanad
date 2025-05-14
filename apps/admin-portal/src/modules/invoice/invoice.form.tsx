@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import { getNotesValue } from "@root/src/lib/utils";
+import NotesSection from "@/components/forms/notes-section";
+import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
+import { getNotesValue } from "@/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";

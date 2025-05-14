@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
+import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -12,7 +12,7 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
-import { createAddressSchema } from "@root/src/lib/schemas/address.schema";
+import { createAddressSchema } from "@/lib/schemas/address.schema";
 import NotesSection from "@/components/forms/notes-section";
 import PhoneInput from "@/components/ui/phone-input";
 

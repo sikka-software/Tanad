@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import { convertToPascalCase } from "@root/src/lib/utils";
+import NotesSection from "@/components/forms/notes-section";
+import { convertToPascalCase } from "@/lib/utils";
 import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";

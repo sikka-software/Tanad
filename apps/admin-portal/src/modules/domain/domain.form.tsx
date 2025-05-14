@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import BooleanTabs from "@root/src/components/ui/boolean-tabs";
-import { CurrencyInput } from "@root/src/components/ui/currency-input";
-import { getNotesValue } from "@root/src/lib/utils";
+import BooleanTabs from "@/components/ui/boolean-tabs";
+import { CurrencyInput } from "@/components/ui/currency-input";
+import { getNotesValue } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";

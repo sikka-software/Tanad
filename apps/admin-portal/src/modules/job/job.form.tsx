@@ -1,7 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import BooleanTabs from "@root/src/components/ui/boolean-tabs";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import NumberInputWithButtons from "@root/src/components/ui/number-input-buttons";
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2, ShoppingCart, Store, Warehouse } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -11,8 +8,9 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { Badge } from "@/ui/badge";
+import BooleanTabs from "@/ui/boolean-tabs";
 import { Card, CardHeader, CardTitle } from "@/ui/card";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { CurrencyInput } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Dialog } from "@/ui/dialog";
@@ -20,8 +18,8 @@ import { DialogContent } from "@/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
+import NumberInputWithButtons from "@/ui/number-input-buttons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Switch } from "@/ui/switch";
 import { Textarea } from "@/ui/textarea";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
@@ -40,9 +38,8 @@ import useDepartmentStore from "@/department/department.store";
 
 import { WarehouseForm } from "@/warehouse/warehouse.form";
 
+import { OnlineStoreForm } from "@/modules/online-store/online-store.form";
 import useUserStore from "@/stores/use-user-store";
-
-import { OnlineStoreForm } from "../online-store/online-store.form";
 
 const createJobFormSchema = (t: (key: string) => string) =>
   z.object({
@@ -69,9 +66,9 @@ const createJobFormSchema = (t: (key: string) => string) =>
     total_positions: z.string().optional(),
   });
 
-export type JobFormValues = z.input<ReturnType<typeof createJobFormSchema>>;
+type JobFormValues = z.input<ReturnType<typeof createJobFormSchema>>;
 
-export function JobForm({
+function JobForm({
   formHtmlId,
   defaultValues,
   editMode = false,
@@ -623,3 +620,5 @@ export function JobForm({
     </Form>
   );
 }
+
+export default JobForm;

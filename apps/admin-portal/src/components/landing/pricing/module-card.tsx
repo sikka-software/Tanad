@@ -1,17 +1,17 @@
-import { cn } from "@root/src/lib/utils";
 import { DollarSign } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useId } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
+import { Button } from "@/ui/button";
+import { Checkbox } from "@/ui/checkbox";
+import { Label } from "@/ui/label";
+import { SARSymbol } from "@/ui/sar-symbol";
+import { Slider } from "@/ui/slider";
+
+import { cn } from "@/lib/utils";
 
 import { getIconComponent, useLandingPricingStore } from "@/stores/landing-pricing-store";
 import { Module, allModules } from "@/stores/landing-pricing-store";
-
-import { Checkbox } from "../../ui/checkbox";
-import { Label } from "../../ui/label";
-import { SARSymbol } from "../../ui/sar-symbol";
 
 interface ModuleCardProps {
   module: Module;
@@ -173,7 +173,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
                       onClick={(e) => e.stopPropagation()}
                     >
                       <span className="text-xs">{t(integration.label)}</span>
-                      <div className="flex flex-row text-nowrap items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                      <div className="flex flex-row items-center gap-1 text-xs text-nowrap text-blue-600 dark:text-blue-400">
                         <span>{priceLabel}</span>
                         <span>{currencySymbol}</span>
                         <span>

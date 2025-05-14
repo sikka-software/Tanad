@@ -1,35 +1,37 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import { FormDialog } from "@root/src/components/ui/form-dialog";
-import { offices } from "@root/src/db/schema";
-import { addressSchema } from "@root/src/lib/schemas/address.schema";
-import { metadataSchema } from "@root/src/lib/schemas/metadata.schema";
-import { getNotesValue } from "@root/src/lib/utils";
 import { createSelectSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import BooleanTabs from "@/ui/boolean-tabs";
+import CodeInput from "@/ui/code-input";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
+import PhoneInput from "@/ui/phone-input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
-import BooleanTabs from "@/components/ui/boolean-tabs";
-import CodeInput from "@/components/ui/code-input";
-import PhoneInput from "@/components/ui/phone-input";
+import NotesSection from "@/components/forms/notes-section";
+
+import { addressSchema } from "@/lib/schemas/address.schema";
+import { metadataSchema } from "@/lib/schemas/metadata.schema";
+import { getNotesValue } from "@/lib/utils";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
-import useUserStore from "@/stores/use-user-store";
+import { useCreateOffice, useOffices, useUpdateOffice } from "@/office/office.hooks";
+import useOfficeStore from "@/office/office.store";
+import { OfficeCreateData, OfficeUpdateData } from "@/office/office.type";
 
-import { EmployeeForm } from "../employee/employee.form";
-import { useEmployees } from "../employee/employee.hooks";
-import useEmployeeStore from "../employee/employee.store";
-import { useCreateOffice, useOffices, useUpdateOffice } from "./office.hooks";
-import useOfficeStore from "./office.store";
-import { OfficeCreateData, OfficeUpdateData } from "./office.type";
+import { EmployeeForm } from "@/employee/employee.form";
+import { useEmployees } from "@/employee/employee.hooks";
+import useEmployeeStore from "@/employee/employee.store";
+
+import { offices } from "@/db/schema";
+import useUserStore from "@/stores/use-user-store";
 
 const createOfficeSchema = (t: (key: string) => string) => {
   const OfficeSelectSchema = createSelectSchema(offices, {

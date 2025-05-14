@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import { getNotesValue } from "@root/src/lib/utils";
+import NotesSection from "@/components/forms/notes-section";
+import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
+import { getNotesValue } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,7 +13,7 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
-import { createAddressSchema } from "@root/src/lib/schemas/address.schema";
+import { createAddressSchema } from "@/lib/schemas/address.schema";
 import PhoneInput from "@/components/ui/phone-input";
 
 import { ModuleFormProps } from "@/types/common.type";

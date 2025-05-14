@@ -1,4 +1,4 @@
-import { ModulesOptions } from "@root/tanad.config";
+import { ModulesOptions } from "@tanad.config";
 import {
   Users,
   LucideIcon,

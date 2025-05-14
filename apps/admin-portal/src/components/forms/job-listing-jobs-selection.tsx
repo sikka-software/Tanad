@@ -1,19 +1,20 @@
-import { getCurrencySymbol } from "@root/src/lib/currency-utils";
-import { cn } from "@root/src/lib/utils";
-import useUserStore from "@root/src/stores/use-user-store";
 import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useMemo } from "react";
 import { FieldError, UseFormReturn } from "react-hook-form";
 
-import FormSectionHeader from "@/components/forms/form-section-header";
-import { FormField, FormItem } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { MoneyFormatter } from "@/ui/currency-input";
+import { FormField, FormItem } from "@/ui/form";
+import { Input } from "@/ui/input";
 
-import { JobListingFormValues } from "@/modules/job-listing/job-listing.form";
-import { Job } from "@/modules/job/job.type";
+import FormSectionHeader from "@/forms/form-section-header";
 
-import { MoneyFormatter } from "../ui/currency-input";
+import { getCurrencySymbol } from "@/lib/currency-utils";
+import { cn } from "@/lib/utils";
+
+import { Job } from "@/job/job.type";
+
+import { JobListingFormValues } from "@/job-listing/job-listing.form";
 
 interface JobListingJobsSelectionProps {
   editMode?: boolean;
@@ -93,7 +94,7 @@ const JobListingJobsSelection = ({
                       }`}
                       onClick={() => handleJobSelect(job.id)}
                     >
-                      <div className="flex flex-row justify-between mb-2">
+                      <div className="mb-2 flex flex-row justify-between">
                         <span className="text-sm text-gray-500">0/10</span>
                         {selectedJobs.includes(job.id) && (
                           <div className="bg-primary size-3 rounded-full" />

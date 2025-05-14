@@ -6,13 +6,13 @@ import {
   Transformer,
 } from "@lexical/markdown";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import IconButton from "@root/src/components/ui/icon-button";
 import { $createTextNode } from "lexical";
 import { $getRoot } from "lexical";
 import { FileTextIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback } from "react";
 
+import IconButton from "@/ui/icon-button";
 
 export function MarkdownTogglePlugin({
   shouldPreserveNewLinesInMarkdown,

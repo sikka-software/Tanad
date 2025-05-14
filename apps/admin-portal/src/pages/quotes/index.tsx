@@ -1,4 +1,4 @@
-import useOfficeStore from "@root/src/modules/office/office.store";
+import useOfficeStore from "@/modules/office/office.store";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";

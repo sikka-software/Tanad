@@ -1,4 +1,4 @@
-import { convertToPascalCase } from "@root/src/lib/utils";
+import { convertToPascalCase } from "@/lib/utils";
 import { MoreHorizontal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
