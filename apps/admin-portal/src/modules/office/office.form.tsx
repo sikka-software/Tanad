@@ -3,6 +3,8 @@ import NotesSection from "@root/src/components/forms/notes-section";
 import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { FormDialog } from "@root/src/components/ui/form-dialog";
 import { offices } from "@root/src/db/schema";
+import { addressSchema } from "@root/src/lib/schemas/address.schema";
+import { metadataSchema } from "@root/src/lib/schemas/metadata.schema";
 import { getNotesValue } from "@root/src/lib/utils";
 import { createSelectSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
@@ -47,6 +49,8 @@ const createOfficeSchema = (t: (key: string) => string) => {
       message: t("Offices.form.status.required"),
     }),
     notes: z.any().optional().nullable(),
+    ...addressSchema,
+    ...metadataSchema,
   });
   return OfficeSelectSchema;
 };

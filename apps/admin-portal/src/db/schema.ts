@@ -1799,9 +1799,6 @@ export const offices = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
     name: text().notNull(),
     short_address: text(),
     additional_number: text(),
@@ -1819,6 +1816,10 @@ export const offices = pgTable(
     enterprise_id: uuid().notNull(),
     code: text(),
     manager: uuid(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
+      sql`timezone('utc'::text, now())`,
+    ),
   },
   (table) => [
     index("idx_offices_enterprise_id").using(

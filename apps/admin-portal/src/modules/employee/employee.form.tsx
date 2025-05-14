@@ -6,6 +6,8 @@ import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import DigitsInput from "@root/src/components/ui/digits-input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@root/src/components/ui/tooltip";
 import { employees } from "@root/src/db/schema";
+import { addressSchema } from "@root/src/lib/schemas/address.schema";
+import { metadataSchema } from "@root/src/lib/schemas/metadata.schema";
 import { getNotesValue } from "@root/src/lib/utils";
 import { createSelectSchema } from "drizzle-zod";
 import { PlusCircle, Trash2Icon } from "lucide-react";
@@ -153,6 +155,8 @@ export function EmployeeForm({
         })
         .optional(),
       notes: z.any().optional().nullable(),
+      // ...addressSchema,
+      ...metadataSchema,
     });
 
     return EmployeeSelectSchema;
@@ -193,6 +197,11 @@ export function EmployeeForm({
         : "active";
       form.reset({
         ...defaultValues,
+        created_at: defaultValues.created_at || undefined,
+        updated_at: defaultValues.updated_at || undefined,
+        user_id: defaultValues.user_id || undefined,
+        enterprise_id: defaultValues.enterprise_id || undefined,
+        id: defaultValues.id || undefined,
         status: mappedStatus as EmployeeStatusProps,
         hire_date: defaultValues.hire_date ? new Date(defaultValues.hire_date) : undefined,
         job_id: defaultValues.job_id || "",

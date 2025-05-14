@@ -4,17 +4,12 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-import { Button } from "./button";
-
 function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
   return (
     <SelectPrimitive.Root
       data-slot="select"
       {...props}
       onOpenChange={(e) => {
-        console.log("onOpenChange", e);
-        console.log("val is ", props.value);
-        console.log("defaultval is ", props.defaultValue);
         if (e && props.value === props.defaultValue) {
           props.onValueChange?.("");
         }
