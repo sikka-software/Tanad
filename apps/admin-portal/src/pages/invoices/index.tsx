@@ -2,7 +2,7 @@ import useInvoiceColumns from "@root/src/modules/invoice/invoice.columns";
 import { InvoiceForm } from "@root/src/modules/invoice/invoice.form";
 import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
@@ -222,7 +222,7 @@ InvoicesPage.messages = [
   "Products",
   "ProductsFormSection",
 ];
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

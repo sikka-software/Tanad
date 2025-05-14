@@ -1,7 +1,7 @@
 import useCarColumns from "@root/src/modules/car/car.columns";
 import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
@@ -204,7 +204,7 @@ export default function CarsPage() {
 
 CarsPage.messages = ["Pages", "Cars", "Vehicles", "Notes", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../../locales/${locale}.json`)).default, CarsPage.messages),

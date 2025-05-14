@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
 
 import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
@@ -20,7 +20,7 @@ export default function SupportPage() {
 
 SupportPage.messages = ["Pages", "Support", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, SupportPage.messages),

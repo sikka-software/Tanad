@@ -1,6 +1,6 @@
 import useTruckStore from "@root/src/modules/truck/truck.store";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -65,7 +65,7 @@ export default function AddTruckPage() {
 
 AddTruckPage.messages = ["Pages", "Trucks", "Vehicles", "Notes", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

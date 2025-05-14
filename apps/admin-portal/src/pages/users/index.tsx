@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -191,7 +191,7 @@ export default function UsersPage() {
 
 UsersPage.messages = ["Notes", "Pages", "Users", "Roles", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../../locales/${locale}.json`)).default, UsersPage.messages),

@@ -3,7 +3,7 @@
 import { pick } from "lodash";
 import { Loader2 } from "lucide-react";
 import { Eye, EyeOff } from "lucide-react";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -175,7 +175,7 @@ export default ResetPassword;
 
 ResetPassword.messages = ["Pages", "Auth", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

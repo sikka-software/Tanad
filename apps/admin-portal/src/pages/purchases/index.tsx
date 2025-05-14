@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
@@ -211,7 +211,7 @@ export default function PurchasesPage() {
 
 PurchasesPage.messages = ["Notes", "Pages", "Purchases", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -1,7 +1,7 @@
 import type { Session } from "@supabase/supabase-js";
 import { pick } from "lodash";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -402,7 +402,7 @@ export default function Auth() {
 
 Auth.messages = ["Pages", "Auth", "General", "SEO"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Auth.messages),

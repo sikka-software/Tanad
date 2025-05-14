@@ -2,7 +2,7 @@ import { FormSheet } from "@root/src/components/ui/form-sheet";
 import { SalaryForm } from "@root/src/modules/salary/salary.form";
 import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
@@ -207,7 +207,7 @@ export default function SalariesPage() {
 
 SalariesPage.messages = ["Notes", "Pages", "Salaries", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

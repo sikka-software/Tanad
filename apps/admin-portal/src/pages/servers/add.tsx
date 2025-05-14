@@ -1,7 +1,7 @@
 import { SERVER_OS } from "@root/src/lib/constants";
 import { SERVER_PROVIDERS } from "@root/src/lib/constants";
 import { pick } from "lodash";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -63,7 +63,7 @@ export default function AddServerPage() {
 
 AddServerPage.messages = ["Notes", "Forms", "Pages", "Servers", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(

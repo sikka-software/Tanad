@@ -2,7 +2,7 @@
 
 import { pick } from "lodash";
 import { Asterisk, Edit, Loader2 } from "lucide-react";
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import React from "react";
 import { useState } from "react";
@@ -152,7 +152,7 @@ export default EnterprisePage;
 
 EnterprisePage.messages = ["Pages", "General", "Enterprise"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps  = async ({ locale }) => {
   return {
     props: {
       messages: pick(
