@@ -198,9 +198,6 @@ export default function ExpensesPage() {
               setIsFormDialogOpen(false);
               setActionableItem(null);
               setLoadingSave(false);
-              toast.success(t("General.successful_operation"), {
-                description: t("Expenses.success.update"),
-              });
             }}
             defaultValues={actionableItem}
             editMode={true}

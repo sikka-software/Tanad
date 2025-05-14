@@ -34,8 +34,8 @@ export default function AddJobPage() {
       );
       form.setValue("salary", dummyData.job_salary);
       form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
-      form.setValue("start_date", dummyData.job_start_date);
-      form.setValue("end_date", dummyData.job_end_date);
+      // form.setValue("start_date", dummyData.job_start_date);
+      // form.setValue("end_date", dummyData.job_end_date);
     }
   };
 

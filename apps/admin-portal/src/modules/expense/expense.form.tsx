@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { CurrencyInput } from "@/ui/currency-input";
-import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
@@ -35,33 +34,24 @@ import {
 } from "./expense.type";
 
 export const createExpenseSchema = (t: (key: string) => string) => {
-  let ExpenseSelectSchema = createSelectSchema(expenses, {
-    expense_number: z.string().min(1, t("Expenses.form.expense_number.required")),
-    issue_date: z
-      .any()
-      .optional()
-      .superRefine(validateYearRange(t, 1800, 2200, "Expenses.form.issue_date.invalid")),
+  const ExpenseSelectSchema = createSelectSchema(expenses, {
+    description: z.string().optional(),
+    amount: z.coerce.number().min(0, t("Expenses.form.amount.required")),
+    incurred_at: z.any().optional(),
+    created_by: z.string().optional(),
+    category: z.string().min(1, t("Expenses.form.category.required")),
     due_date: z
       .any()
       .optional()
       .superRefine(validateYearRange(t, 1800, 2200, "Expenses.form.due_date.invalid")),
-
-    status: z.enum(ExpenseStatus).default("draft"),
-    amount: z.number().min(0, t("Expenses.form.amount.required")),
-    category: z.string().min(1, t("Expenses.form.category.required")),
+    issue_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Expenses.form.issue_date.invalid")),
     notes: z.any().optional().nullable(),
-    client_id: z.string().optional(),
-    created_by: z.string().optional(),
-    updated_by: z.string().optional(),
-    description: z.string().optional(),
-    incurred_at: z.string().optional(),
-
-    id: z.string().optional(),
-    created_at: z.string().optional(),
-    updated_at: z.string().optional(),
-    user_id: z.string().optional(),
-    enterprise_id: z.string().optional(),
-    // ...metadataSchema,
+    expense_number: z.string().min(1, t("Expenses.form.expense_number.required")),
+    status: z.enum(ExpenseStatus).default("draft"),
+    ...metadataSchema,
   });
 
   return ExpenseSelectSchema;
@@ -269,13 +259,6 @@ export function ExpenseForm({
                       disabled={isLoading}
                       ariaInvalid={form.formState.errors.due_date !== undefined}
                     />
-
-                    {/* <DatePicker
-                      date={field.value ? new Date(field.value) : undefined}
-                      onSelect={field.onChange}
-                      placeholder={t("Expenses.form.due_date.placeholder")}
-                      ariaInvalid={form.formState.errors.due_date !== undefined}
-                    /> */}
                   </FormControl>
                   <FormMessage />
                 </FormItem>

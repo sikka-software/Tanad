@@ -136,7 +136,7 @@ export function EmployeeForm({
   }, [debouncedEmail, actualEmployeeId, initialEmail, user?.id]);
 
   const createEmployeeFormSchema = () => {
-    let EmployeeSelectSchema = createSelectSchema(employees, {
+    const EmployeeSelectSchema = createSelectSchema(employees, {
       first_name: z.string().min(1, t("Employees.form.first_name.required")),
       last_name: z.string().min(1, t("Employees.form.last_name.required")),
       email: z.string().email(t("Employees.form.email.invalid")),
@@ -272,10 +272,7 @@ export function EmployeeForm({
               data.termination_date && typeof data.termination_date.toString === "function"
                 ? data.termination_date.toString()
                 : undefined,
-            hire_date:
-              data.hire_date && typeof data.hire_date.toString === "function"
-                ? data.hire_date.toString()
-                : undefined,
+            hire_date: data.hire_date.toString(),
             birth_date:
               data.birth_date && typeof data.birth_date.toString === "function"
                 ? data.birth_date.toString()

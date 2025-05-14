@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { parseDate } from "@internationalized/date";
 import { useQueryClient } from "@tanstack/react-query";
+import { createSelectSchema } from "drizzle-zod";
 import { Building2, ShoppingCart, Store, Warehouse } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
@@ -12,6 +14,7 @@ import BooleanTabs from "@/ui/boolean-tabs";
 import { Card, CardHeader, CardTitle } from "@/ui/card";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { CurrencyInput } from "@/ui/currency-input";
+import { DateInput } from "@/ui/date-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Dialog } from "@/ui/dialog";
 import { DialogContent } from "@/ui/dialog";
@@ -21,6 +24,9 @@ import { Input } from "@/ui/input";
 import NumberInputWithButtons from "@/ui/number-input-buttons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
+
+import { metadataSchema } from "@/lib/schemas/metadata.schema";
+import { validateYearRange } from "@/lib/utils";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
@@ -38,11 +44,12 @@ import useDepartmentStore from "@/department/department.store";
 
 import { WarehouseForm } from "@/warehouse/warehouse.form";
 
+import { jobs } from "@/db/schema";
 import { OnlineStoreForm } from "@/modules/online-store/online-store.form";
 import useUserStore from "@/stores/use-user-store";
 
-const createJobFormSchema = (t: (key: string) => string) =>
-  z.object({
+const createJobFormSchema = (t: (key: string) => string) => {
+  const JobSelectSchema = createSelectSchema(jobs, {
     title: z.string().min(1, t("Jobs.form.title.required")),
     description: z.string().optional(),
     requirements: z.string().optional(),
@@ -58,13 +65,26 @@ const createJobFormSchema = (t: (key: string) => string) =>
         (val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0),
         t("Jobs.form.salary.invalid"),
       ),
-    start_date: z.date().optional(),
-    end_date: z.date().optional(),
+
+    start_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Jobs.form.start_date.invalid")),
+    end_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Jobs.form.end_date.invalid")),
+
     status: z.enum(CommonStatus, {
       invalid_type_error: t("Jobs.form.status.required"),
     }),
     total_positions: z.string().optional(),
+    occupied_positions: z.string().optional(),
+    ...metadataSchema,
   });
+
+  return JobSelectSchema;
+};
 
 type JobFormValues = z.input<ReturnType<typeof createJobFormSchema>>;
 
@@ -148,8 +168,8 @@ function JobForm({
               type: data.type.trim(),
               salary: data.salary ? parseFloat(data.salary) : null,
               status: data.status,
-              start_date: data.start_date?.toISOString() || null,
-              end_date: data.end_date?.toISOString() || null,
+              start_date: data.start_date?.toString() || null,
+              end_date: data.end_date?.toString() || null,
               total_positions:
                 data.total_positions && data.total_positions.trim() !== ""
                   ? Number(data.total_positions)
@@ -178,8 +198,8 @@ function JobForm({
             type: data.type.trim(),
             salary: data.salary ? parseFloat(data.salary) : null,
             status: data.status,
-            start_date: data.start_date?.toISOString() || null,
-            end_date: data.end_date?.toISOString() || null,
+            start_date: data.start_date?.toString() || null,
+            end_date: data.end_date?.toString() || null,
             total_positions:
               data.total_positions && data.total_positions.trim() !== ""
                 ? Number(data.total_positions)
@@ -211,7 +231,15 @@ function JobForm({
 
   return (
     <Form {...form}>
-      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form
+        id={formHtmlId}
+        onSubmit={(e) => {
+          e.preventDefault();
+          console.log("form errors are", form.formState.errors);
+          form.handleSubmit(handleSubmit)(e);
+        }}
+        className="space-y-4"
+      >
         <div className="form-container">
           <div className="form-fields-cols-2">
             <FormField
@@ -323,14 +351,20 @@ function JobForm({
             <FormField
               control={form.control}
               name="start_date"
-              render={({ field: { value, onChange, ...field } }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("Jobs.form.start_date.label")}</FormLabel>
                   <FormControl>
-                    <DatePicker
-                      date={value}
-                      onSelect={onChange}
+                    <DateInput
                       placeholder={t("Jobs.form.start_date.placeholder")}
+                      value={
+                        typeof field.value === "string"
+                          ? parseDate(field.value)
+                          : (field.value ?? null)
+                      }
+                      onChange={field.onChange}
+                      onSelect={(e) => field.onChange(e)}
+                      disabled={isLoading}
                       ariaInvalid={form.formState.errors.start_date !== undefined}
                     />
                   </FormControl>
@@ -342,14 +376,20 @@ function JobForm({
             <FormField
               control={form.control}
               name="end_date"
-              render={({ field: { value, onChange, ...field } }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("Jobs.form.end_date.label")}</FormLabel>
                   <FormControl>
-                    <DatePicker
-                      date={value}
-                      onSelect={onChange}
+                    <DateInput
                       placeholder={t("Jobs.form.end_date.placeholder")}
+                      value={
+                        typeof field.value === "string"
+                          ? parseDate(field.value)
+                          : (field.value ?? null)
+                      }
+                      onChange={field.onChange}
+                      onSelect={(e) => field.onChange(e)}
+                      disabled={isLoading}
                       ariaInvalid={form.formState.errors.end_date !== undefined}
                     />
                   </FormControl>

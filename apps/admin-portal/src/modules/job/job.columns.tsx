@@ -92,6 +92,16 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
       },
     },
     {
+      accessorKey: "start_date",
+      header: t("Jobs.form.start_date.label"),
+      validationSchema: z.string().min(1, t("Jobs.form.start_date.required")),
+    },
+    {
+      accessorKey: "end_date",
+      header: t("Jobs.form.end_date.label"),
+      validationSchema: z.string().min(1, t("Jobs.form.end_date.required")),
+    },
+    {
       accessorKey: "status",
       maxSize: 80,
       header: t("Jobs.form.status.label"),
