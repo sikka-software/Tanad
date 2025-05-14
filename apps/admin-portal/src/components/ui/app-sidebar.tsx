@@ -205,6 +205,9 @@ export function AppSidebar() {
       Accounting: filterGroup(items.Accounting),
       HumanResources: filterGroup(items.HumanResources),
       Settings: filterGroup(items.Settings),
+      Internet: filterGroup(items.Internet),
+      Fleet: filterGroup(items.Fleet),
+      SystemAdmin: filterGroup(items.SystemAdmin),
     };
   };
 

@@ -39,6 +39,8 @@ const useServerColumns = (
           onChange={(value) => handleEdit?.(row.id, "provider", value)}
           cellValue={getValue()}
           options={SERVER_PROVIDERS}
+          renderSelected={(item) => <div>{t(item.label)}</div>}
+          renderOption={(item) => <div>{t(item.label)}</div>}
         />
       ),
     },

@@ -31,6 +31,8 @@ const useOnlineStoreColumns = (
           onChange={(value) => handleEdit?.(row.id, "platform", value)}
           cellValue={getValue()}
           options={E_COMMERCE_PLATFORMS}
+          renderSelected={(item) => <div>{t(item.label)}</div>}
+          renderOption={(item) => <div>{t(item.label)}</div>}
         />
       ),
     },

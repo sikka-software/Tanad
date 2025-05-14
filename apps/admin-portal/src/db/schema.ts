@@ -1811,15 +1811,18 @@ export const offices = pgTable(
     phone: text(),
     email: text(),
     status: common_status().default("active"),
-    user_id: uuid().notNull(),
+    capacity: numeric({ precision: 10, scale: 2 }),
+    working_hours: jsonb(),
     notes: jsonb(),
-    enterprise_id: uuid().notNull(),
     code: text(),
     manager: uuid(),
+
     updated_at: timestamp({ withTimezone: true, mode: "string" }),
     created_at: timestamp({ withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
   },
   (table) => [
     index("idx_offices_enterprise_id").using(
@@ -2178,6 +2181,7 @@ export const vendors = pgTable(
     email: text().notNull(),
     phone: text().notNull(),
     company: text(),
+
     short_address: text(),
     additional_number: text(),
     building_number: text(),
@@ -2186,6 +2190,7 @@ export const vendors = pgTable(
     region: text(),
     country: text(),
     zip_code: text(),
+
     notes: jsonb(),
     user_id: uuid().notNull(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }).default(
@@ -2216,6 +2221,15 @@ export const warehouses = pgTable(
     ),
     name: text().notNull(),
     code: text(),
+    capacity: numeric({ precision: 10, scale: 2 }),
+    status: common_status().default("active"),
+    phone: text(),
+    manager: uuid(),
+    temperature_control: boolean().default(false),
+    operating_hours: jsonb(),
+    warehouse_type: text().default("general"),
+    safety_compliance: jsonb(),
+
     short_address: text(),
     additional_number: text(),
     building_number: text(),
@@ -2224,13 +2238,11 @@ export const warehouses = pgTable(
     region: text(),
     country: text(),
     zip_code: text(),
-    capacity: numeric({ precision: 10, scale: 2 }),
-    status: common_status().default("active"),
+
     notes: jsonb(),
+
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
-    phone: text(),
-    manager: uuid(),
   },
   (table) => [
     index("idx_warehouses_enterprise_id").using(
@@ -2257,7 +2269,12 @@ export const websites = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
+    website_name: text(),
     domain_name: text().notNull(),
+    description: text(),
+    privacy_policy_url: text(),
+    terms_of_service_url: text(),
+    tags: jsonb().default([]),
     created_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
       .notNull(),

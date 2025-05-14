@@ -12,7 +12,7 @@ const WebsiteCard = ({ website }: { website: Website }) => {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold">{website.domain_name}</h3>
+            <h3 className="text-lg font-semibold">{website.domain_name}</h3>  
             <p className="text-sm text-gray-500">Code: {website.domain_name}</p>
           </div>
           <Badge variant={website.status ? "default" : "secondary"}>
