@@ -188,6 +188,7 @@ export type Database = {
       }
       cars: {
         Row: {
+          annual_payment: number | null
           code: string | null
           color: string | null
           created_at: string
@@ -201,6 +202,9 @@ export type Database = {
           name: string
           notes: Json | null
           ownership_status: string | null
+          payment_cycle: Database["public"]["Enums"]["payment_cycle"] | null
+          purchase_date: string | null
+          purchase_price: number | null
           status: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at: string
           user_id: string
@@ -208,6 +212,7 @@ export type Database = {
           year: number
         }
         Insert: {
+          annual_payment?: number | null
           code?: string | null
           color?: string | null
           created_at?: string
@@ -221,6 +226,9 @@ export type Database = {
           name: string
           notes?: Json | null
           ownership_status?: string | null
+          payment_cycle?: Database["public"]["Enums"]["payment_cycle"] | null
+          purchase_date?: string | null
+          purchase_price?: number | null
           status?: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at?: string
           user_id: string
@@ -228,6 +236,7 @@ export type Database = {
           year: number
         }
         Update: {
+          annual_payment?: number | null
           code?: string | null
           color?: string | null
           created_at?: string
@@ -241,6 +250,9 @@ export type Database = {
           name?: string
           notes?: Json | null
           ownership_status?: string | null
+          payment_cycle?: Database["public"]["Enums"]["payment_cycle"] | null
+          purchase_date?: string | null
+          purchase_price?: number | null
           status?: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at?: string
           user_id?: string
@@ -914,12 +926,15 @@ export type Database = {
           invoice_number: string
           issue_date: string | null
           notes: Json | null
+          seller_name: string | null
           status: Database["public"]["Enums"]["invoice_status"]
           subtotal: number
           tax_amount: number | null
           tax_rate: number | null
           total: number | null
           user_id: string | null
+          vat_number: string | null
+          zatca_enabled: boolean | null
         }
         Insert: {
           client_id: string
@@ -931,12 +946,15 @@ export type Database = {
           invoice_number: string
           issue_date?: string | null
           notes?: Json | null
+          seller_name?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
           tax_amount?: number | null
           tax_rate?: number | null
           total?: number | null
           user_id?: string | null
+          vat_number?: string | null
+          zatca_enabled?: boolean | null
         }
         Update: {
           client_id?: string
@@ -948,12 +966,15 @@ export type Database = {
           invoice_number?: string
           issue_date?: string | null
           notes?: Json | null
+          seller_name?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
           tax_amount?: number | null
           tax_rate?: number | null
           total?: number | null
           user_id?: string | null
+          vat_number?: string | null
+          zatca_enabled?: boolean | null
         }
         Relationships: [
           {

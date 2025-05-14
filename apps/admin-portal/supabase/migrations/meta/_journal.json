@@ -561,6 +561,13 @@
       "when": 1747228690370,
       "tag": "0079_clammy_lord_hawal",
       "breakpoints": true
+    },
+    {
+      "idx": 80,
+      "version": "7",
+      "when": 1747257748314,
+      "tag": "0080_smart_thunderball",
+      "breakpoints": true
     }
   ]
 }

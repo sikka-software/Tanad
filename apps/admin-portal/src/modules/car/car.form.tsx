@@ -188,6 +188,39 @@ export function CarForm({
           <div className="form-fields-cols-2">
             <FormField
               control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.status.label")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      key={field.value}
+                      value={field.value}
+                      onValueChange={(val) => field.onChange(val)}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
+                          <SelectValue placeholder={t("Vehicles.form.status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(VehicleStatus).map((typeOpt) => (
+                          <SelectItem key={typeOpt} value={typeOpt}>
+                            {t(`Vehicles.form.status.${typeOpt}`, {
+                              defaultValue: typeOpt,
+                            })}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="code"
               render={({ field }) => (
                 <FormItem>
@@ -408,39 +441,6 @@ export function CarForm({
                 )}
               />
             )}
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.status.label")}</FormLabel>
-                  <FormControl>
-                    <Select
-                      key={field.value}
-                      value={field.value}
-                      onValueChange={(val) => field.onChange(val)}
-                      dir={lang === "ar" ? "rtl" : "ltr"}
-                    >
-                      <FormControl>
-                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
-                          <SelectValue placeholder={t("Vehicles.form.status.placeholder")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.values(VehicleStatus).map((typeOpt) => (
-                          <SelectItem key={typeOpt} value={typeOpt}>
-                            {t(`Vehicles.form.status.${typeOpt}`, {
-                              defaultValue: typeOpt,
-                            })}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
         </div>
       </form>

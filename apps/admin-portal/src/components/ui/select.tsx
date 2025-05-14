@@ -27,8 +27,11 @@ function SelectTrigger({
   onClear?: () => void;
   value?: string;
 }) {
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+
   return (
     <SelectPrimitive.Trigger
+      ref={triggerRef}
       data-slot="select-trigger"
       data-size={size}
       className={cn(
@@ -46,6 +49,7 @@ function SelectTrigger({
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
+            triggerRef.current?.blur();
             onClear();
           }}
         >

@@ -1614,6 +1614,10 @@ export const cars = pgTable(
     ownership_status: text(),
     status: vehicle_status().default("active"),
     monthly_payment: numeric({ precision: 10, scale: 2 }),
+    annual_payment: numeric({ precision: 10, scale: 2 }),
+    payment_cycle: payment_cycle(),
+    purchase_date: date(),
+    purchase_price: numeric({ precision: 10, scale: 2 }),
     created_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
       .notNull(),
