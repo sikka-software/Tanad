@@ -24,8 +24,9 @@ import { createClient } from "@/utils/supabase/component";
 
 import FormSectionHeader from "@/components/forms/form-section-header";
 import NotesSection from "@/components/forms/notes-section";
-import DateInput from "@/components/ui/date-input";
+import { DateInput } from "@/components/ui/date-input";
 
+import { addressSchema } from "@/lib/schemas/address.schema";
 import { metadataSchema } from "@/lib/schemas/metadata.schema";
 import { getNotesValue } from "@/lib/utils";
 
@@ -147,6 +148,7 @@ export function EmployeeForm({
       employee_number: z.string().optional(),
       onboarding_status: z.string().optional(),
       offboarding_status: z.string().optional(),
+      termination_date: z.date().optional(),
       emergency_contact: z
         .object({
           name: z.string().optional(),
@@ -155,7 +157,7 @@ export function EmployeeForm({
         })
         .optional(),
       notes: z.any().optional().nullable(),
-      // ...addressSchema,
+      ...addressSchema,
       ...metadataSchema,
     });
 
@@ -168,69 +170,44 @@ export function EmployeeForm({
       first_name: defaultValues?.first_name || "",
       last_name: defaultValues?.last_name || "",
       email: defaultValues?.email || "",
-      phone: defaultValues?.phone ?? "",
-      job_id: defaultValues?.job_id || "",
+      created_at: defaultValues?.created_at || undefined,
+      updated_at: defaultValues?.updated_at || undefined,
+      user_id: defaultValues?.user_id || undefined,
+      enterprise_id: defaultValues?.enterprise_id || undefined,
+      id: defaultValues?.id || undefined,
+      status: defaultValues?.status || "active",
       hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
-      salary: defaultValues?.salary as { type: string; amount: number }[] | undefined,
-      status: (defaultValues?.status as EmployeeStatusProps) || "active",
+      job_id: defaultValues?.job_id || "",
+      phone: defaultValues?.phone || "",
+      salary:
+        (defaultValues?.salary as { type: string; amount: number }[] | undefined) || undefined,
       notes: getNotesValue(defaultValues) || "",
       nationality: defaultValues?.nationality || "",
       birth_date: defaultValues?.birth_date ? new Date(defaultValues.birth_date) : undefined,
       national_id: defaultValues?.national_id || "",
       eqama_id: defaultValues?.eqama_id || "",
       gender: defaultValues?.gender || "male",
+      short_address: defaultValues?.short_address || "",
+      additional_number: defaultValues?.additional_number || "",
+      street_name: defaultValues?.street_name || "",
+      building_number: defaultValues?.building_number || "",
+      city: defaultValues?.city || "",
+      region: defaultValues?.region || "",
+      country: defaultValues?.country || "",
+      zip_code: defaultValues?.zip_code || "",
       marital_status: defaultValues?.marital_status || "single",
       education_level: defaultValues?.education_level || "",
       employee_number: defaultValues?.employee_number || "",
       onboarding_status: defaultValues?.onboarding_status || "",
       offboarding_status: defaultValues?.offboarding_status || "",
+      emergency_contact:
+        typeof defaultValues?.emergency_contact === "object" &&
+        defaultValues?.emergency_contact !== null &&
+        !Array.isArray(defaultValues?.emergency_contact)
+          ? defaultValues.emergency_contact
+          : undefined,
     },
   });
-
-  useEffect(() => {
-    if (defaultValues) {
-      // Map status to allowed union type for reset
-      const mappedStatus = ["active", "inactive", "on_leave", "terminated"].includes(
-        (defaultValues.status || "") as string,
-      )
-        ? defaultValues.status
-        : "active";
-      form.reset({
-        ...defaultValues,
-        created_at: defaultValues.created_at || undefined,
-        updated_at: defaultValues.updated_at || undefined,
-        user_id: defaultValues.user_id || undefined,
-        enterprise_id: defaultValues.enterprise_id || undefined,
-        id: defaultValues.id || undefined,
-        status: mappedStatus as EmployeeStatusProps,
-        hire_date: defaultValues.hire_date ? new Date(defaultValues.hire_date) : undefined,
-        job_id: defaultValues.job_id || "",
-        phone: defaultValues.phone || "",
-        salary:
-          (defaultValues.salary as { type: string; amount: number }[] | undefined) || undefined,
-        notes: getNotesValue(defaultValues) || "",
-        nationality: defaultValues.nationality || "",
-        birth_date: defaultValues.birth_date ? new Date(defaultValues.birth_date) : undefined,
-        national_id: defaultValues.national_id || "",
-        eqama_id: defaultValues.eqama_id || "",
-        gender: defaultValues.gender || "male",
-        marital_status: defaultValues.marital_status || "single",
-        education_level: defaultValues.education_level || "",
-        employee_number: defaultValues.employee_number || "",
-        onboarding_status: defaultValues.onboarding_status || "",
-        offboarding_status: defaultValues.offboarding_status || "",
-        emergency_contact:
-          typeof defaultValues.emergency_contact === "object" &&
-          defaultValues.emergency_contact !== null &&
-          !Array.isArray(defaultValues.emergency_contact)
-            ? defaultValues.emergency_contact
-            : undefined,
-      });
-    } else {
-      // Optionally reset to empty if defaultValues becomes null (e.g., switching modes)
-      // form.reset(mapDataToFormDefaults(null));
-    }
-  }, [defaultValues, form.reset]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -264,6 +241,9 @@ export function EmployeeForm({
           id: actualEmployeeId!,
           data: {
             ...data,
+            termination_date: data.termination_date
+              ? data.termination_date.toISOString().split("T")[0]
+              : undefined,
             first_name: data.first_name.trim(),
             last_name: data.last_name.trim(),
             email: data.email.trim(),
@@ -282,6 +262,9 @@ export function EmployeeForm({
         const { membership, user } = useUserStore.getState();
         await createEmployeeMutate({
           ...data,
+          termination_date: data.termination_date
+            ? data.termination_date.toISOString().split("T")[0]
+            : undefined,
           birth_date: data.birth_date ? data.birth_date.toISOString().split("T")[0] : undefined,
           first_name: data.first_name.trim(),
           last_name: data.last_name.trim(),
@@ -329,7 +312,15 @@ export function EmployeeForm({
   return (
     <>
       <Form {...form}>
-        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <form
+          id={formHtmlId}
+          onSubmit={(e) => {
+            e.preventDefault();
+            console.log("TODO");
+            console.log("form erros ", form.formState.errors);
+            form.handleSubmit(handleSubmit)(e);
+          }}
+        >
           <div className="form-container">
             <div className="form-fields-cols-2">
               <FormField
@@ -501,7 +492,7 @@ export function EmployeeForm({
                   <FormItem className="flex flex-col">
                     <FormLabel>{t("Employees.form.birth_date.label")}</FormLabel>
                     <FormControl>
-                      <DatePicker
+                      <DateInput
                         placeholder={t("Employees.form.birth_date.placeholder")}
                         date={field.value}
                         onSelect={field.onChange}

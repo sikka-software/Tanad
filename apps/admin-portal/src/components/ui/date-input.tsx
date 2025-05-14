@@ -1,30 +1,89 @@
 "use client";
 
+import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { Button, DatePicker, Dialog, Group, Popover } from "react-aria-components";
+import * as React from "react";
+import { DateRange } from "react-day-picker";
 
-import { Calendar } from "@/components/ui/calendar-rac";
-import { DateInput as AriaDateInput } from "@/components/ui/datefield-rac";
+import { Button } from "@/ui/button";
+import { Calendar } from "@/ui/calendar";
+import { FormControl } from "@/ui/form";
+import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 
-export default function DateInput() {
+import { cn } from "@/lib/utils";
+
+import { Input } from "./input";
+
+interface DatePickerProps {
+  date?: Date | DateRange;
+  onSelect: (date: Date | DateRange | undefined) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  isolated?: boolean;
+  mode?: "default" | "multiple" | "range" | "single";
+  ariaInvalid?: boolean;
+}
+
+export function DateInput({
+  date,
+  onSelect,
+  placeholder = "Pick a date",
+  disabled = false,
+  isolated = false,
+  mode = "single",
+  ariaInvalid = false,
+}: DatePickerProps) {
   return (
-    <DatePicker className="*:not-first:mt-2">
-      <div className="flex">
-        <Group className="w-full">
-          <AriaDateInput className="pe-9" />
-        </Group>
-        <Button className="text-muted-foreground/80 hover:text-foreground data-focus-visible:border-ring data-focus-visible:ring-ring/50 z-10 -ms-9 -me-px flex w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none data-focus-visible:ring-[3px]">
-          <CalendarIcon size={16} />
-        </Button>
-      </div>
-      <Popover
-        className="bg-background text-popover-foreground data-entering:animate-in data-exiting:animate-out data-[entering]:fade-in-0 data-[exiting]:fade-out-0 data-[entering]:zoom-in-95 data-[exiting]:zoom-out-95 data-[placement=bottom]:slide-in-from-top-2 data-[placement=left]:slide-in-from-right-2 data-[placement=right]:slide-in-from-left-2 data-[placement=top]:slide-in-from-bottom-2 z-50 rounded-md border shadow-lg outline-hidden"
-        offset={4}
-      >
-        <Dialog className="max-h-[inherit] overflow-auto p-2">
-          <Calendar />
-        </Dialog>
-      </Popover>
-    </DatePicker>
+    <Popover>
+      <PopoverTrigger>
+        {isolated ? (
+          <Input
+            className={cn(
+              "w-full justify-start text-left font-normal",
+              !date && "text-muted-foreground",
+              ariaInvalid &&
+                "ring-destructive/20 dark:ring-destructive/40 border-destructive border-e-none",
+            )}
+            disabled={disabled}
+          />
+        ) : (
+          <FormControl>
+            <Input
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !date && "text-muted-foreground",
+                ariaInvalid &&
+                  "ring-destructive/20 dark:ring-destructive/40 border-destructive border-e-none",
+              )}
+            />
+          </FormControl>
+        )}
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        {mode === "range" ? (
+          <Calendar
+            mode="range"
+            selected={date as DateRange | undefined}
+            onSelect={onSelect as (range: DateRange | undefined) => void}
+            initialFocus
+            numberOfMonths={2}
+          />
+        ) : mode === "multiple" ? (
+          <Calendar
+            mode="multiple"
+            selected={date as Date[] | undefined}
+            onSelect={onSelect as (dates: Date[] | undefined) => void}
+            initialFocus
+          />
+        ) : (
+          <Calendar
+            mode="single"
+            selected={date as Date | undefined}
+            onSelect={onSelect as (date: Date | undefined) => void}
+            initialFocus
+          />
+        )}
+      </PopoverContent>
+    </Popover>
   );
 }
