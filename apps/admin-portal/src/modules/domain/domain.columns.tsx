@@ -1,10 +1,12 @@
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import CurrencyCell from "@/components/tables/currency-cell";
-import SelectCell from "@/components/tables/select-cell";
-import StatusCell from "@/components/tables/status-cell";
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
+
+import CurrencyCell from "@/tables/currency-cell";
+import LinkCell from "@/tables/link-cell";
+import SelectCell from "@/tables/select-cell";
+import StatusCell from "@/tables/status-cell";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -20,6 +22,15 @@ const useDomainColumns = (
       accessorKey: "domain_name",
       header: t("Domains.form.domain_name.label"),
       validationSchema: z.string().min(1, "Required"),
+      noPadding: true,
+      cell: ({ getValue, row }) => (
+        <LinkCell
+          value={getValue() as string}
+          onChange={(e) => handleEdit?.(row.id, "domain_name", e.target.value)}
+          // TODO: add a parser so that https:// isn't duplicated 
+          onClick={() => window.open(`https://${getValue() as string}`, "_blank")}
+        />
+      ),
     },
     {
       accessorKey: "registrar",
