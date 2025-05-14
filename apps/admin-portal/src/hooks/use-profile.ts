@@ -76,6 +76,7 @@ export function useProfile(profile_id: string) {
       return fetchProfile(profile_id);
     },
     enabled: !!profile_id,
+    refetchOnWindowFocus: false,
     staleTime: 60 * 1000, // Consider data fresh for 1 minute
     retry: (failureCount, error) => {
       // Don't retry if the error is due to missing profile_id

@@ -1,4 +1,3 @@
-import { useProfile } from "@root/src/hooks/use-profile";
 import { getCurrencySymbol } from "@root/src/lib/currency-utils";
 import { currencies } from "@root/tanad.config";
 import { useLocale, useTranslations } from "next-intl";

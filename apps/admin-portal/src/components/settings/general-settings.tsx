@@ -55,6 +55,7 @@ const GeneralSettings = ({
   const profile_id = user?.id || "";
 
   // Use the profile hook to fetch data
+  // TODO: use the profile from the store for optimsitc updates
   const { data: profile, isLoading: isLoadingProfile } = useProfile(profile_id);
 
   // Initialize the update mutation
