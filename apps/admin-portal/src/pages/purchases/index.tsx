@@ -172,7 +172,7 @@ export default function PurchasesPage() {
                 empty={{
                   title: t("Purchases.create_first.title"),
                   description: t("Purchases.create_first.description"),
-                  add: t("Purchases.create_first.add"),
+                  add: t("Pages.Purchases.add"),
                   icons: [Currency, Currency, Currency],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}

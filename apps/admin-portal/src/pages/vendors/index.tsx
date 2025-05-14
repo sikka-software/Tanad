@@ -169,7 +169,7 @@ export default function VendorsPage() {
               empty={{
                 title: t("Vendors.create_first.title"),
                 description: t("Vendors.create_first.description"),
-                add: t("Vendors.create_first.add"),
+                add: t("Pages.Vendors.add"),
                 icons: [UserPlus, Plus, UserPlus],
                 onClick: () => router.push(router.pathname + "/add"),
               }}

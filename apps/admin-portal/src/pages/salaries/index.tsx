@@ -168,7 +168,7 @@ export default function SalariesPage() {
                 empty={{
                   title: t("Salaries.create_first.title"),
                   description: t("Salaries.create_first.description"),
-                  add: t("Salaries.create_first.add"),
+                  add: t("Pages.Salaries.add"),
                   icons: [User, User, User],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}

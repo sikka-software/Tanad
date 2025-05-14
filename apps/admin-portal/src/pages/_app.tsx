@@ -15,6 +15,7 @@ import AuthLayout from "@/components/layouts/auth-layout";
 import LandingLayout from "@/components/layouts/landing-layout";
 
 import { QueryProvider } from "@/providers/QueryProvider";
+import { SupabaseProvider } from "@/providers/SupabaseProvider";
 import useUserStore from "@/stores/use-user-store";
 import "@/styles/globals.css";
 
@@ -154,12 +155,14 @@ function AppContent({ Component, pageProps, router }: AppProps) {
         timeZone="Asia/Riyadh"
         now={new Date()}
       >
-        <QueryProvider>
-          <AppLayout>
-            <ScrollToTop />
-            <Component {...pageProps} />
-          </AppLayout>
-        </QueryProvider>
+        <SupabaseProvider>
+          <QueryProvider>
+            <AppLayout>
+              <ScrollToTop />
+              <Component {...pageProps} />
+            </AppLayout>
+          </QueryProvider>
+        </SupabaseProvider>
       </NextIntlClientProvider>
     </div>
   );

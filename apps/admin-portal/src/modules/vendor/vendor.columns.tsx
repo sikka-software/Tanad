@@ -11,28 +11,26 @@ const useVendorColumns = () => {
   const columns: ExtendedColumnDef<Vendor>[] = [
     {
       accessorKey: "name",
-      header: t("form.name.label"),
-      validationSchema: z.string().min(1, t("form.name.required")),
+      header: t("Vendors.form.name.label"),
+      validationSchema: z.string().min(1, t("Vendors.form.name.required")),
     },
     {
       accessorKey: "company",
-      header: t("form.company.label"),
+      header: t("Vendors.form.company.label"),
       validationSchema: z.string().optional(),
     },
     {
       accessorKey: "email",
-      header: t("form.email.label"),
-      validationSchema: z.string().email(t("form.email.invalid")).min(1, t("form.email.required")),
+      header: t("Vendors.form.email.label"),
+      validationSchema: z
+        .string()
+        .email(t("Vendors.form.email.invalid"))
+        .min(1, t("Vendors.form.email.required")),
     },
     {
       accessorKey: "phone",
-      header: t("form.phone.label"),
+      header: t("Vendors.form.phone.label"),
       validationSchema: z.string().optional(),
-    },
-    {
-      accessorKey: "address",
-      header: t("Forms.address.label"),
-      validationSchema: z.string().min(1, t("Forms.address.required")),
     },
     {
       accessorKey: "city",
@@ -51,7 +49,7 @@ const useVendorColumns = () => {
     },
     {
       accessorKey: "products",
-      header: t("form.products.label"),
+      header: t("Vendors.form.products.label"),
       validationSchema: z.string().optional(),
     },
   ];

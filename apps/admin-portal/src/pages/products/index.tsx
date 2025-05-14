@@ -180,7 +180,7 @@ export default function ProductsPage() {
                 empty={{
                   title: t("Products.create_first.title"),
                   description: t("Products.create_first.description"),
-                  add: t("Products.create_first.add"),
+                  add: t("Pages.Products.add"),
                   icons: [Package, Package, Package],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}

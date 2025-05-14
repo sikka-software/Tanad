@@ -169,7 +169,7 @@ export default function WebsitesPage() {
                 empty={{
                   title: t("Websites.create_first.title"),
                   description: t("Websites.create_first.description"),
-                  add: t("Websites.create_first.add"),
+                  add: t("Pages.Websites.add"),
                   icons: [Globe, Plus, Link],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}

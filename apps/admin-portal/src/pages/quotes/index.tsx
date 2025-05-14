@@ -165,7 +165,7 @@ export default function QuotesPage() {
                 empty={{
                   title: t("Quotes.create_first.title"),
                   description: t("Quotes.create_first.description"),
-                  add: t("Quotes.create_first.add"),
+                  add: t("Pages.Quotes.add"),
                   icons: [Quote, Quote, Quote],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}

@@ -167,7 +167,7 @@ export default function WarehousesPage() {
                 empty={{
                   title: t("Warehouses.create_first.title"),
                   description: t("Warehouses.create_first.description"),
-                  add: t("Warehouses.create_first.add"),
+                  add: t("Pages.Warehouses.add"),
                   icons: [Warehouse, Plus, Warehouse],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}

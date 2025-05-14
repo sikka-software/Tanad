@@ -173,7 +173,7 @@ export default function InvoicesPage() {
                 empty={{
                   title: t("Invoices.create_first.title"),
                   description: t("Invoices.create_first.description"),
-                  add: t("Invoices.create_first.add"),
+                  add: t("Pages.Invoices.add"),
                   icons: [File, File, File],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}

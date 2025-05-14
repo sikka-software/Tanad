@@ -249,30 +249,32 @@ const useUserStore = create<UserState>((set, get) => ({
   },
 }));
 
-let session: Session | null = null;
+// let session: Session | null = null;
 
-supabase.auth.getSession().then(async ({ data }) => {
-  if (data.session) {
-    session = data.session;
-  }
-});
+// supabase.auth.getSession().then(async ({ data }) => {
+//   if (data.session) {
+//     session = data.session;
+//   }
+// });
 
-// Setup auth state change listener
-supabase.auth.onAuthStateChange((event, _session) => {
-  if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && _session) {
-    useUserStore.getState().fetchUserAndProfile();
-  } else if (event === "SIGNED_OUT") {
-    useUserStore.setState({
-      user: null,
-      profile: null,
-      enterprise: null,
-      membership: null,
-      permissions: [],
-      loading: false,
-      error: null,
-      lastFetchTime: null,
-    });
-  }
-});
+// // Setup auth state change listener
+// supabase.auth.onAuthStateChange((event, _session) => {
+//   switch (event) {
+//     case "SIGNED_IN":
+//       useUserStore.getState().fetchUserAndProfile();
+//       break;
+//     case "SIGNED_OUT":
+//       useUserStore.setState({
+//         user: null,
+//         profile: null,
+//         enterprise: null,
+//         membership: null,
+//         permissions: [],
+//         loading: false,
+//         error: null,
+//         lastFetchTime: null,
+//       });
+//   }
+// });
 
 export default useUserStore;

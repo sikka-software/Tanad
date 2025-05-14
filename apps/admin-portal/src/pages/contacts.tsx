@@ -70,7 +70,7 @@ export default function ContactsPage() {
               empty={{
                 title: t("Clients.create_first.title"),
                 description: t("Clients.create_first.description"),
-                add: t("Clients.create_first.add"),
+                add: t("Pages.Clients.add"),
                 icons: [User, User, User],
                 onClick: () => router.push(router.pathname + "/add"),
               }}
@@ -89,7 +89,7 @@ export default function ContactsPage() {
               empty={{
                 title: t("Vendors.create_first.title"),
                 description: t("Vendors.create_first.description"),
-                add: t("Vendors.create_first.add"),
+                add: t("Pages.Vendors.add"),
                 icons: [User, User, User],
                 onClick: () => router.push(router.pathname + "/add"),
               }}
