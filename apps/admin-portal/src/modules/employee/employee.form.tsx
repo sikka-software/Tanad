@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useDateFormatter } from "react-aria";
 import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
+import { useDebounce } from "use-debounce";
 import * as z from "zod";
 
 import { Button } from "@/ui/button";
@@ -96,45 +97,48 @@ export function EmployeeForm({
 
   const setIsFormDialogOpen = useEmployeeStore((state) => state.setIsFormDialogOpen);
 
+  const [email, setEmail] = useState(defaultValues?.email || "");
+  const [debouncedEmail] = useDebounce(email, 500);
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isEmailLoading, setIsEmailLoading] = useState(false);
+  const { user } = useUserStore.getState();
   const actualEmployeeId = editMode ? defaultValues?.id : undefined;
   const initialEmail = editMode ? defaultValues?.email : undefined;
 
-  const createEmployeeFormSchema = () => {
+  useEffect(() => {
+    if (!debouncedEmail) {
+      setIsEmailValid(true);
+      setIsEmailLoading(false);
+      return;
+    }
+    if (actualEmployeeId && debouncedEmail === initialEmail) {
+      setIsEmailValid(true);
+      setIsEmailLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setIsEmailLoading(true);
     const supabase = createClient();
+    supabase
+      .from("employees")
+      .select("id", { count: "exact" })
+      .eq("email", debouncedEmail)
+      .then(({ error, count }) => {
+        if (!cancelled) {
+          setIsEmailValid(!error && count === 0);
+          setIsEmailLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedEmail, actualEmployeeId, initialEmail, user?.id]);
+
+  const createEmployeeFormSchema = () => {
     let EmployeeSelectSchema = createSelectSchema(employees, {
       first_name: z.string().min(1, t("Employees.form.first_name.required")),
       last_name: z.string().min(1, t("Employees.form.last_name.required")),
-      email: z
-        .string()
-        .email(t("Employees.form.email.invalid"))
-        .refine(async (email) => {
-          if (actualEmployeeId && email === initialEmail) {
-            return true;
-          }
-          setIsEmployeeSaving(true);
-
-          const { user } = useUserStore.getState();
-          if (!user?.id) return true;
-          const query = supabase
-            .from("employees")
-            .select("id", { count: "exact" })
-            .eq("email", email)
-            .eq("user_id", user.id);
-
-          if (actualEmployeeId) {
-            query.neq("id", actualEmployeeId);
-          }
-
-          const { error, count } = await query;
-
-          if (error) {
-            console.error("Email validation error:", error);
-            return false;
-          }
-
-          setIsEmployeeSaving(false);
-          return count === 0;
-        }, t("Employees.form.email.duplicate")),
+      email: z.string().email(t("Employees.form.email.invalid")),
       phone: z.string().optional(),
       job_id: z.string().min(1, t("Employees.form.job.required")),
       hire_date: z.date({
@@ -190,6 +194,7 @@ export function EmployeeForm({
 
   const form = useForm<z.input<ReturnType<typeof createEmployeeFormSchema>>>({
     resolver: zodResolver(createEmployeeFormSchema()),
+    mode: "onChange",
     defaultValues: {
       first_name: defaultValues?.first_name || "",
       last_name: defaultValues?.last_name || "",
@@ -356,8 +361,6 @@ export function EmployeeForm({
           id={formHtmlId}
           onSubmit={(e) => {
             e.preventDefault();
-            console.log("TODO");
-            console.log("form erros ", form.formState.errors);
             form.handleSubmit(handleSubmit)(e);
           }}
         >
@@ -410,8 +413,19 @@ export function EmployeeForm({
                         type="email"
                         dir="ltr"
                         {...field}
+                        value={email}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          setEmail(e.target.value);
+                        }}
                       />
                     </FormControl>
+                    {!isEmailValid && (
+                      <FormMessage>{t("Employees.form.email.duplicate")}</FormMessage>
+                    )}
+                    {isEmailLoading && (
+                      <div className="text-xs text-gray-500">{t("General.loading")}</div>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -819,6 +833,7 @@ export function EmployeeForm({
         <JobForm
           formHtmlId="job-form"
           onSuccess={() => {
+            setIsJobSaving(false);
             setIsJobDialogOpen(false);
           }}
         />
@@ -836,6 +851,7 @@ export function EmployeeForm({
           formHtmlId="department-form"
           onSuccess={() => {
             setIsDepartmentDialogOpen(false);
+            setIsDepartmentSaving(false);
           }}
         />
       </FormDialog>
