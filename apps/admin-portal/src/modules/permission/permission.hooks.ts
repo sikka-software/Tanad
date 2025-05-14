@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { app_permission } from "@/db/schema";
 
 export interface Permission {
@@ -13,20 +14,20 @@ const PERMISSIONS_QUERY_KEY = "permissions";
 
 // Helper function to format permission name
 function formatPermissionName(permission: string): string {
-  const [category, action] = permission.split('.');
+  const [category, action] = permission.split(".");
   return `${action.charAt(0).toUpperCase() + action.slice(1)} ${category}`;
 }
 
 // Helper function to get permission description
 function getPermissionDescription(permission: string): string {
-  const [category, action] = permission.split('.');
+  const [category, action] = permission.split(".");
   return `Permission to ${action} ${category}`;
 }
 
 // Helper function to structure permissions
 function structurePermissions(): Permission[] {
   return app_permission.enumValues.map((permission) => {
-    const [category] = permission.split('.');
+    const [category] = permission.split(".");
     return {
       id: permission,
       name: formatPermissionName(permission),
@@ -41,4 +42,4 @@ export function usePermissions() {
     queryKey: [PERMISSIONS_QUERY_KEY],
     queryFn: () => structurePermissions(),
   });
-} 
+}

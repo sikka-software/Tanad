@@ -1,11 +1,13 @@
-import { MoneyFormatter } from "@/components/ui/currency-input";
-import { getCurrencySymbol } from "@/lib/currency-utils";
-import useUserStore from "@/stores/use-user-store";
 import { CellContext } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { MoneyFormatter } from "@/ui/currency-input";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
+
+import { getCurrencySymbol } from "@/lib/currency-utils";
+
+import useUserStore from "@/stores/use-user-store";
 
 import { Product } from "./product.type";
 

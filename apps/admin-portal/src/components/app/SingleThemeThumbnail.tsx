@@ -1,9 +1,9 @@
-import React from "react";
-import { useTranslations } from "next-intl";
 import { Lock } from "lucide-react";
+import { useTranslations } from "next-intl";
+import React from "react";
 
-import { cn } from "@/lib/utils";
 import { PuklaThemeProps } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 interface SingleThemeThumbnailProps {
   colors: PuklaThemeProps;
@@ -26,9 +26,9 @@ export function SingleThemeThumbnail({
     <button
       onClick={onSelect}
       className={cn(
-        "group relative w-full rounded-lg border-2 transition-all duration-200 overflow-hidden",
+        "group relative w-full overflow-hidden rounded-lg border-2 transition-all duration-200",
         isSelected
-          ? "ring-2 ring-primary border-transparent"
+          ? "ring-primary border-transparent ring-2"
           : "hover:border-primary/50 border-transparent",
         locked ? "opacity-80" : "cursor-pointer",
       )}
@@ -39,17 +39,14 @@ export function SingleThemeThumbnail({
         </div>
       )}
       <div
-        className={cn(
-          "p-4 space-y-3 transition-transform",
-          isSelected && "scale-[0.95] ",
-        )}
+        className={cn("space-y-3 p-4 transition-transform", isSelected && "scale-[0.95]")}
         style={{
           backgroundColor: colors.background_color,
         }}
       >
-        <div className="w-12 h-12 mx-auto rounded-full bg-gray-300" />
+        <div className="mx-auto h-12 w-12 rounded-full bg-gray-300" />
         <div
-          className="text-sm font-medium text-center truncate"
+          className="truncate text-center text-sm font-medium"
           style={{ color: colors.text_color }}
         >
           {sample_text}
@@ -58,7 +55,7 @@ export function SingleThemeThumbnail({
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-8 rounded-md w-full transition-colors"
+              className="h-8 w-full rounded-md transition-colors"
               style={{
                 backgroundColor: colors.button_color,
                 border: `1px solid ${colors.button_border_color || colors.button_color}`,

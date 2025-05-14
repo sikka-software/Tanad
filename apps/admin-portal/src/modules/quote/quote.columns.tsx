@@ -1,13 +1,11 @@
-import SelectCell from "@/components/tables/select-cell";
-import StatusCell from "@/components/tables/status-cell";
 import { CellContext } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
+import SelectCell from "@/components/tables/select-cell";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
-import { InvoiceStatus } from "../invoice/invoice.type";
 import { Quote, QuoteStatus } from "./quote.type";
 
 const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string) => void) => {

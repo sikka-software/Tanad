@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { convertToPascalCase } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -11,6 +10,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { ScrollArea } from "@/ui/scroll-area";
 import { Textarea } from "@/ui/textarea";
+
+import { convertToPascalCase } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 

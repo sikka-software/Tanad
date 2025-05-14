@@ -1,10 +1,11 @@
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
 import PageTitle from "@/ui/page-title";
+
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { JobListingForm } from "@/job-listing/job-listing.form";
 import useJobListingsStore from "@/job-listing/job-listing.store";
@@ -44,7 +45,7 @@ export default function AddJobListingPage() {
 
 AddJobListingPage.messages = ["Notes", "Pages", "JobListings", "Settings", "Jobs", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

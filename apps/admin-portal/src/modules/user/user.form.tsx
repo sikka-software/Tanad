@@ -1,37 +1,30 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
-
-import PasswordInput from "@/components/ui/password-input";
+import PasswordInput from "@/ui/password-input";
 
 import { ModuleFormProps } from "@/types/common.type";
 
+import { RoleForm } from "@/role/role.form";
+import { useCustomRoles, useSystemRoles } from "@/role/role.hooks";
+import { predefinedRoles } from "@/role/role.options";
+import useRoleStore from "@/role/role.store";
+import type { Role } from "@/role/role.type";
+
+import { useCreateUser, useUpdateUser } from "@/user/user.hooks";
+import useEnterpriseUsersStore from "@/user/user.store";
+import type { UserCreateData, UserUpdateData, UserType } from "@/user/user.type";
+
 import useUserStore from "@/stores/use-user-store";
 
-import { RoleForm } from "../role/role.form";
-// Import store for loading state
-
-import { useCustomRoles, useSystemRoles } from "../role/role.hooks";
-import { predefinedRoles } from "../role/role.options";
-import useRoleStore from "../role/role.store";
-import type { Role } from "../role/role.type";
-// Import hooks for create/update
-import { useCreateUser, useUpdateUser } from "./user.hooks";
-import useEnterpriseUsersStore from "./user.store";
-// Add User type
-import type { UserCreateData, UserUpdateData, UserType } from "./user.type";
-
-// Import RoleForm
-
-// Adjust schema: make password optional for updates
 const baseUserFormSchema = z.object({
   first_name: z.string().min(1, { message: "First name is required." }),
   last_name: z.string().min(1, { message: "Last name is required." }),

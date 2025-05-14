@@ -1,4 +1,3 @@
-import settings from "@root/landing.config";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
@@ -19,6 +18,8 @@ import { ContactForm } from "@/components/landing/ContactForm";
 import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import SocialIcons from "@/components/landing/SocialIcons";
+
+import settings from "../../landing.config";
 
 export default function ContactPage() {
   const t = useTranslations();
@@ -117,7 +118,7 @@ export default function ContactPage() {
 
 ContactPage.messages = ["Pages", "General", "Contact"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, ContactPage.messages),

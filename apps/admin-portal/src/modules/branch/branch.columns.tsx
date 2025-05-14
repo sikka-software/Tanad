@@ -1,10 +1,10 @@
-import CodeCell from "@/components/tables/code-cell";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
+import CodeCell from "@/components/tables/code-cell";
 import StatusCell from "@/components/tables/status-cell";
 
 import { useEmployees } from "../employee/employee.hooks";

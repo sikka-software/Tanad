@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/ui/form";
 import { Switch } from "@/ui/switch";
 
 import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
+
 import useUserStore from "@/stores/use-user-store";
 
 const formSchema = z.object({

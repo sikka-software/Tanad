@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 import { format } from "date-fns";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
@@ -8,14 +7,15 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import CodeInput from "@/ui/code-input";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
-import NotesSection from "@/components/forms/notes-section";
-import { ProductsFormSection } from "@/components/forms/products-form-section";
+import NotesSection from "@/forms/notes-section";
+import { ProductsFormSection } from "@/forms/products-form-section";
 
 import { getNotesValue } from "@/lib/utils";
 

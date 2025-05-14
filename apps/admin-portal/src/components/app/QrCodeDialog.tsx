@@ -1,31 +1,15 @@
-import React from "react";
+import { Download } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
-import { Download } from "lucide-react";
+import React from "react";
+
+import { Button } from "@/ui/button";
+// UI
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/ui/sheet";
 
 import { useBreakpoint } from "@/hooks/use-breakpoint";
-
-// UI
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/ui/dialog";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/ui/sheet";
-import { Button } from "@/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/ui/select";
 
 type QrCodeDialogProps = {
   slug?: string;
@@ -33,11 +17,7 @@ type QrCodeDialogProps = {
   setOpenDialog: (open: boolean) => void;
 };
 
-export const QrCodeDialog: React.FC<QrCodeDialogProps> = ({
-  slug,
-  openDialog,
-  setOpenDialog,
-}) => {
+export const QrCodeDialog: React.FC<QrCodeDialogProps> = ({ slug, openDialog, setOpenDialog }) => {
   const t = useTranslations();
   const lang = useLocale();
   const size = useBreakpoint();
@@ -133,13 +113,11 @@ export const QrCodeDialog: React.FC<QrCodeDialogProps> = ({
         dir={lang === "ar" ? "rtl" : "ltr"}
       >
         <DialogHeaderComponent className={size <= 600 ? "mb-4" : ""}>
-          <DialogTitleComponent>
-            {t("General.generate_qr_code")}
-          </DialogTitleComponent>
+          <DialogTitleComponent>{t("General.generate_qr_code")}</DialogTitleComponent>
         </DialogHeaderComponent>
 
         <div className="flex flex-col items-center gap-6 py-0">
-          <div ref={qrRef} className="bg-white p-4 rounded-lg">
+          <div ref={qrRef} className="rounded-lg bg-white p-4">
             <QRCodeSVG
               value={puklaUrl}
               size={200}
@@ -155,12 +133,12 @@ export const QrCodeDialog: React.FC<QrCodeDialogProps> = ({
             />
           </div>
 
-          <div className="flex flex-row items-center gap-2 w-full max-w-[230px]">
+          <div className="flex w-full max-w-[230px] flex-row items-center gap-2">
             <Select
               value={downloadType}
               onValueChange={(value: "svg" | "png") => setDownloadType(value)}
             >
-              <SelectTrigger className="min-w-[80px] w-full">
+              <SelectTrigger className="w-full min-w-[80px]">
                 <SelectValue placeholder="Format" />
               </SelectTrigger>
               <SelectContent>

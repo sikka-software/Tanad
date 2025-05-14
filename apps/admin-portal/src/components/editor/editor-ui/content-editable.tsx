@@ -14,7 +14,6 @@ export function ContentEditable({
 }: Props): JSX.Element {
   return (
     <LexicalContentEditable
-  
       className={
         className ??
         `ContentEditable__root relative block min-h-72 overflow-auto px-8 py-4 focus:outline-none`

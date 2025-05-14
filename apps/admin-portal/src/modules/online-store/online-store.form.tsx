@@ -1,17 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@/components/forms/notes-section";
-import BooleanTabs from "@/components/ui/boolean-tabs";
-import { Combobox } from "@/components/ui/comboboxes/combobox";
-import { E_COMMERCE_PLATFORMS } from "@/lib/constants";
-import { getNotesValue } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import BooleanTabs from "@/ui/boolean-tabs";
+import { Combobox } from "@/ui/comboboxes/combobox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+
+import NotesSection from "@/forms/notes-section";
+
+import { E_COMMERCE_PLATFORMS } from "@/lib/constants";
+import { getNotesValue } from "@/lib/utils";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 

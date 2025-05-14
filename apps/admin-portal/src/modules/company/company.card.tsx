@@ -1,11 +1,12 @@
-import CardActions from "@/components/app/card-actions";
-import { CommonStatus, CommonStatusProps } from "@/types/common.type";
 import { Mail, Phone, Globe, MapPin, Building2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader } from "@/ui/card";
 
+import CardActions from "@/components/app/card-actions";
 import CardStatusAction from "@/components/app/card-status-action";
+
+import { CommonStatus, CommonStatusProps } from "@/types/common.type";
 
 import { Company } from "@/company/company.type";
 

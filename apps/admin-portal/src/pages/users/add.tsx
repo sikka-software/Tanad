@@ -57,7 +57,7 @@ export default function AddUserPage() {
 
 AddUserPage.messages = ["Notes", "Pages", "Users", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

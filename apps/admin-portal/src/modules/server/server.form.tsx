@@ -1,33 +1,27 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import BooleanTabs from "@/components/ui/boolean-tabs";
-import { CurrencyInput } from "@/components/ui/currency-input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { getNotesValue } from "@/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import BooleanTabs from "@/ui/boolean-tabs";
 import { Combobox } from "@/ui/comboboxes/combobox";
 import CountryInput from "@/ui/country-input";
+import { CurrencyInput } from "@/ui/currency-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
-import NotesSection from "@/components/forms/notes-section";
+import NotesSection from "@/forms/notes-section";
 
 import { SERVER_OS, SERVER_PROVIDERS } from "@/lib/constants";
+import { getNotesValue } from "@/lib/utils";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
-import { useCreateServer, useUpdateServer } from "@/modules/server/server.hooks";
-import useServerStore from "@/modules/server/server.store";
-import { ServerCreateData, ServerUpdateData } from "@/modules/server/server.type";
+import { useCreateServer, useUpdateServer } from "@/server/server.hooks";
+import useServerStore from "@/server/server.store";
+import { ServerCreateData, ServerUpdateData } from "@/server/server.type";
 import useUserStore from "@/stores/use-user-store";
 
 export const createServerSchema = (t: (key: string) => string) =>

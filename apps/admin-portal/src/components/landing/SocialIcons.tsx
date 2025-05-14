@@ -1,7 +1,9 @@
 import React from "react";
+
 // UI
 import { Button } from "@/ui/button";
 import { Logos } from "@/ui/logos";
+
 // Components
 import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
 

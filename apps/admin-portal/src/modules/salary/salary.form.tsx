@@ -1,6 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@/components/forms/notes-section";
-import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 import { Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -9,11 +7,14 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Button } from "@/ui/button";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { CurrencyInput } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+
+import NotesSection from "@/forms/notes-section";
 
 import { generateDummyEmployee } from "@/lib/dummy-factory";
 
@@ -25,10 +26,9 @@ import useEmployeeStore from "@/employee/employee.store";
 import { Employee } from "@/employee/employee.types";
 
 import { useCreateSalary, useUpdateSalary } from "@/salary/salary.hooks";
+import { DEDUCTION_TYPES } from "@/salary/salary.options";
 import useSalaryStore from "@/salary/salary.store";
-
-import { DEDUCTION_TYPES } from "./salary.options";
-import { SalaryCreateData, SalaryUpdateData } from "./salary.type";
+import { SalaryCreateData, SalaryUpdateData } from "@/salary/salary.type";
 
 const createDeductionSchema = (t: (key: string) => string) =>
   z

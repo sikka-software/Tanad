@@ -4,7 +4,10 @@
  * @param headers Array of { label: string, key: string } objects for CSV headers.
  * @returns The CSV string.
  */
-function convertToCSV(data: Record<string, any>[], headers: { label: string; key: string }[]): string {
+function convertToCSV(
+  data: Record<string, any>[],
+  headers: { label: string; key: string }[],
+): string {
   const headerRow = headers.map((header) => `"${header.label.replace(/"/g, '""')}"`).join(",");
   const dataRows = data.map((row) => {
     return headers
@@ -15,7 +18,7 @@ function convertToCSV(data: Record<string, any>[], headers: { label: string; key
           value = "";
         }
         // Handle objects/arrays (e.g., JSON details)
-        else if (typeof value === 'object') {
+        else if (typeof value === "object") {
           value = JSON.stringify(value);
         }
         // Escape double quotes within values
@@ -65,4 +68,4 @@ export function downloadCSV(
 ): void {
   const csvString = convertToCSV(data, headers);
   triggerDownload(csvString, filename);
-} 
+}

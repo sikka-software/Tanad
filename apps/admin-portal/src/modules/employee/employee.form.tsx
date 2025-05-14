@@ -14,7 +14,7 @@ import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import DigitsInput from "@/ui/digits-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import PhoneInput from "@/ui/phone-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";

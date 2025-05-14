@@ -1,5 +1,3 @@
-import { FormSheet } from "@/components/ui/form-sheet";
-import { createModuleStoreHooks } from "@/utils/module-hooks";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -8,9 +6,12 @@ import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import FormSheet from "@/ui/form-sheet";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
+
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
@@ -216,7 +217,7 @@ BranchesPage.messages = [
   "Forms",
 ];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

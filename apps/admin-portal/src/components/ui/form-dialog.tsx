@@ -18,7 +18,7 @@ interface FormDialogProps {
   dummyData?: () => void;
 }
 
-export function FormDialog({
+function FormDialog({
   open,
   onOpenChange,
   title,
@@ -66,3 +66,5 @@ export function FormDialog({
     </Dialog>
   );
 }
+
+export default FormDialog;

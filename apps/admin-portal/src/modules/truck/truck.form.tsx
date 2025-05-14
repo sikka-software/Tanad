@@ -1,26 +1,27 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import CountryInput from "@/components/ui/country-input";
-import { CurrencyInput } from "@/components/ui/currency-input";
-import { getNotesValue } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import CountryInput from "@/ui/country-input";
+import { CurrencyInput } from "@/ui/currency-input";
 import DigitsInput from "@/ui/digits-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import NumberInput from "@/ui/number-input";
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/ui/select";
 
+import { getNotesValue } from "@/lib/utils";
+
 import { ModuleFormProps, VehicleStatus } from "@/types/common.type";
 
-import useUserStore from "@/stores/use-user-store";
+import { VEHICLE_OWNERSHIP_STATUSES } from "@/employee/employee.options";
 
-import { VEHICLE_OWNERSHIP_STATUSES } from "../employee/employee.options";
-import { useCreateTruck, useUpdateTruck } from "./truck.hooks";
-import useTruckStore from "./truck.store";
-import { TruckUpdateData, TruckCreateData } from "./truck.type";
+import useUserStore from "@/stores/use-user-store";
+import { useCreateTruck, useUpdateTruck } from "@/truck/truck.hooks";
+import useTruckStore from "@/truck/truck.store";
+import { TruckUpdateData, TruckCreateData } from "@/truck/truck.type";
 
 export const createTruckSchema = (t: (key: string) => string) => {
   const baseTruckSchema = z.object({

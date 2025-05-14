@@ -1,4 +1,3 @@
-import useCarStore from "@/modules/car/car.store";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -10,7 +9,8 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { CarForm } from "@/modules/car/car.form";
+import { CarForm } from "@/car/car.form";
+import useCarStore from "@/car/car.store";
 
 export default function AddCarPage() {
   const router = useRouter();
@@ -65,7 +65,7 @@ export default function AddCarPage() {
 
 AddCarPage.messages = ["Pages", "Cars", "Vehicles", "Notes", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

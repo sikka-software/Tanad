@@ -52,7 +52,7 @@ export default function LandingPage() {
 
 LandingPage.messages = ["Pages", "General", "Landing", "SEO"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, LandingPage.messages),

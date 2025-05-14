@@ -1,4 +1,3 @@
-import { E_COMMERCE_PLATFORMS } from "@/lib/constants";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -8,6 +7,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
+import { E_COMMERCE_PLATFORMS } from "@/lib/constants";
 import { generateDummyData } from "@/lib/dummy-generator";
 
 import { OnlineStoreForm } from "@/modules/online-store/online-store.form";
@@ -61,7 +61,7 @@ export default function AddOnlineStorePage() {
 
 AddOnlineStorePage.messages = ["Notes", "Pages", "OnlineStores", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

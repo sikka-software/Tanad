@@ -55,7 +55,9 @@ export const EnterpriseForm: React.FC<EnterpriseFormProps> = ({
     async function getSignedUrl() {
       if (logoPath) {
         const supabase = createClient();
-        const { data, error } = await supabase.storage.from("enterprise-images").createSignedUrl(logoPath, 60 * 60); // 1 hour
+        const { data, error } = await supabase.storage
+          .from("enterprise-images")
+          .createSignedUrl(logoPath, 60 * 60); // 1 hour
         if (data?.signedUrl) {
           setLogoPreviewUrl(data.signedUrl);
         } else {
@@ -78,7 +80,9 @@ export const EnterpriseForm: React.FC<EnterpriseFormProps> = ({
       const enterpriseId = defaultValues.id || "unknown";
       const fileExt = file.name.split(".").pop();
       const fileName = `logos/${enterpriseId}-${Date.now()}.${fileExt}`;
-      const { data, error } = await supabase.storage.from("enterprise-images").upload(fileName, file);
+      const { data, error } = await supabase.storage
+        .from("enterprise-images")
+        .upload(fileName, file);
       if (error) throw error;
       // Store only the file path
       setValue("logo", fileName, { shouldValidate: true });
@@ -123,17 +127,22 @@ export const EnterpriseForm: React.FC<EnterpriseFormProps> = ({
         <div className="space-y-2">
           <Label htmlFor="logo">Logo</Label>
           {logoPreviewUrl && (
-            <img src={logoPreviewUrl} alt="Enterprise Logo" className="h-16 w-16 rounded-md border object-contain mb-2" />
+            <img
+              src={logoPreviewUrl}
+              alt="Enterprise Logo"
+              className="mb-2 h-16 w-16 rounded-md border object-contain"
+            />
           )}
           {!readOnly && (
-            <Input type="file" id="logo-upload" accept="image/*" onChange={handleLogoUpload} disabled={uploading} />
+            <Input
+              type="file"
+              id="logo-upload"
+              accept="image/*"
+              onChange={handleLogoUpload}
+              disabled={uploading}
+            />
           )}
-          <Input
-            readOnly={true}
-            id="logo"
-            value={logoPath || ''}
-            {...register("logo")}
-          />
+          <Input readOnly={true} id="logo" value={logoPath || ""} {...register("logo")} />
         </div>
       </div>
       <div className="space-y-2">

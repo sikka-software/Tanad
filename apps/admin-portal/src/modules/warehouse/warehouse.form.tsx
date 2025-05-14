@@ -1,26 +1,27 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@/components/forms/notes-section";
-import { getNotesValue } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import CodeInput from "@/ui/code-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
+import PhoneInput from "@/ui/phone-input";
 
-import { AddressFormSection } from "@/components/forms/address-form-section";
+import { AddressFormSection } from "@/forms/address-form-section";
+import NotesSection from "@/forms/notes-section";
+
 import { createAddressSchema } from "@/lib/schemas/address.schema";
-import CodeInput from "@/components/ui/code-input";
-import PhoneInput from "@/components/ui/phone-input";
+import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
-import useUserStore from "@/stores/use-user-store";
+import { useCreateWarehouse, useUpdateWarehouse, useWarehouses } from "@/warehouse/warehouse.hooks";
+import useWarehouseStore from "@/warehouse/warehouse.store";
+import { WarehouseCreateData, WarehouseUpdateData } from "@/warehouse/warehouse.type";
 
-import { useCreateWarehouse, useUpdateWarehouse, useWarehouses } from "./warehouse.hooks";
-import useWarehouseStore from "./warehouse.store";
-import { WarehouseCreateData, WarehouseUpdateData } from "./warehouse.type";
+import useUserStore from "@/stores/use-user-store";
 
 export const createWarehouseFormSchema = (t: (key: string) => string) => {
   const baseWarehouseFormSchema = z.object({

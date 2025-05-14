@@ -1,20 +1,21 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@/components/forms/notes-section";
-import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
-import { getNotesValue } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
+import PhoneInput from "@/ui/phone-input";
 
-import { AddressFormSection } from "@/components/forms/address-form-section";
+import { AddressFormSection } from "@/forms/address-form-section";
+import NotesSection from "@/forms/notes-section";
+
 import { createAddressSchema } from "@/lib/schemas/address.schema";
-import PhoneInput from "@/components/ui/phone-input";
+import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 

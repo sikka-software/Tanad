@@ -1,7 +1,3 @@
-import { JobListingNotFound } from "@/components/app/job-listing-not-found";
-import JobCard from "@/components/jobs/job-card";
-import JobDetailsModal from "@/components/jobs/job-details-dialog";
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -9,17 +5,15 @@ import { useState } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/ui/alert";
 import { Badge } from "@/ui/badge";
+import { Input } from "@/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import { createClient } from "@/utils/supabase/server-props";
 
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { JobListingNotFound } from "@/components/app/job-listing-not-found";
+import JobCard from "@/components/jobs/job-card";
+import JobDetailsModal from "@/components/jobs/job-details-dialog";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 // Assuming server client path
 import { Job } from "@/job/job.type";

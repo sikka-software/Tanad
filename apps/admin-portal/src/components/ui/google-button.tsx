@@ -1,31 +1,28 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
+
 import { Button } from "./button";
 
-const GoogleButton = (props: {
-  text: string;
-  onClick: () => void;
-  loading: boolean;
-}) => {
+const GoogleButton = (props: { text: string; onClick: () => void; loading: boolean }) => {
   return (
     <Button
       type="button"
       aria-label={props.text}
       onClick={props.onClick}
       variant="outline"
-      className="flex items-center w-full border justify-center rounded-md  "
+      className="flex w-full items-center justify-center rounded-md border"
       disabled={props.loading}
     >
       {props.loading ? (
         <Loader2 className="me-2 h-4 w-4 animate-spin" />
       ) : (
         <div className="flex flex-row items-center gap-2">
-          <div className="flex items-center justify-center text-primary">
+          <div className="text-primary flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
-              className="w-5 h-5"
+              className="h-5 w-5"
               fill="currentColor"
             >
               <title>{props.text}</title>
@@ -48,7 +45,7 @@ const GoogleButton = (props: {
               ></path>
             </svg>
           </div>
-          <span className="text-primary ">{props.text}</span>
+          <span className="text-primary">{props.text}</span>
         </div>
       )}
     </Button>

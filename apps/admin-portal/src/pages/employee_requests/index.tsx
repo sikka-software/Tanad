@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
-import { FormSheet } from "@/ui/form-sheet";
+import FormSheet from "@/ui/form-sheet";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
@@ -210,7 +210,7 @@ export default function EmployeeRequestsPage() {
 }
 
 EmployeeRequestsPage.messages = ["Notes", "Pages", "EmployeeRequests", "General"];
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

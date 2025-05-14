@@ -1,6 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@/components/forms/notes-section";
-import { convertToPascalCase } from "@/lib/utils";
 import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -12,6 +10,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
+
+import NotesSection from "@/components/forms/notes-section";
+
+import { convertToPascalCase } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 

@@ -1,13 +1,15 @@
-import CodeCell from "@/components/tables/code-cell";
-import StatusCell from "@/components/tables/status-cell";
-import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { useEmployees } from "../employee/employee.hooks";
-import { Office } from "./office.type";
+import CodeCell from "@/components/tables/code-cell";
+import StatusCell from "@/components/tables/status-cell";
+
+import { Office } from "@/office/office.type";
+
+import { useEmployees } from "@/employee/employee.hooks";
 
 const useOfficeColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,

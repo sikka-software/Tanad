@@ -47,7 +47,7 @@ export default function AddSalaryPage() {
 
 AddSalaryPage.messages = ["Notes", "Pages", "Salaries", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

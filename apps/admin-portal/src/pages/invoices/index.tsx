@@ -1,6 +1,3 @@
-import useInvoiceColumns from "@/modules/invoice/invoice.columns";
-import { InvoiceForm } from "@/modules/invoice/invoice.form";
-import { createModuleStoreHooks } from "@/utils/module-hooks";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -9,24 +6,27 @@ import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import FormDialog from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
+
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { FormDialog } from "@/components/ui/form-dialog";
 
 import InvoiceCard from "@/invoice/invoice.card";
+import useInvoiceColumns from "@/invoice/invoice.columns";
+import { InvoiceForm } from "@/invoice/invoice.form";
 import { useInvoices, useBulkDeleteInvoices, useDuplicateInvoice } from "@/invoice/invoice.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/invoice/invoice.options";
 import useInvoiceStore from "@/invoice/invoice.store";
 import InvoicesTable from "@/invoice/invoice.table";
-
-import { InvoiceUpdateData } from "@/modules/invoice/invoice.type";
+import { InvoiceUpdateData } from "@/invoice/invoice.type";
 
 export default function InvoicesPage() {
   const t = useTranslations();
@@ -222,7 +222,7 @@ InvoicesPage.messages = [
   "Products",
   "ProductsFormSection",
 ];
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -1,4 +1,5 @@
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
+
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 const FloatingPuklas = () => {
@@ -11,38 +12,18 @@ const FloatingPuklas = () => {
   });
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const centerYPosition = useTransform(
-    scrollMotionSpring,
-    [0, 1],
-    [isDesktop ? 100 : -100, -300],
-  );
-  const innerYPosition = useTransform(
-    scrollMotionSpring,
-    [0, 1],
-    [isDesktop ? 100 : -100, 300],
-  );
-  const outerYPosition = useTransform(
-    scrollMotionSpring,
-    [0, 1],
-    [isDesktop ? 100 : -100, 500],
-  );
+  const centerYPosition = useTransform(scrollMotionSpring, [0, 1], [isDesktop ? 100 : -100, -300]);
+  const innerYPosition = useTransform(scrollMotionSpring, [0, 1], [isDesktop ? 100 : -100, 300]);
+  const outerYPosition = useTransform(scrollMotionSpring, [0, 1], [isDesktop ? 100 : -100, 500]);
 
   // Different X positions for mobile and desktop
-  const leftInnerXPosition = useTransform(
-    scrollMotionSpring,
-    [0, 1],
-    [0, isDesktop ? -900 : -500],
-  );
+  const leftInnerXPosition = useTransform(scrollMotionSpring, [0, 1], [0, isDesktop ? -900 : -500]);
   const leftOuterXPosition = useTransform(
     scrollMotionSpring,
     [0, 1],
     [0, isDesktop ? -1800 : -1000],
   );
-  const rightInnerXPosition = useTransform(
-    scrollMotionSpring,
-    [0, 1],
-    [0, isDesktop ? 900 : 500],
-  );
+  const rightInnerXPosition = useTransform(scrollMotionSpring, [0, 1], [0, isDesktop ? 900 : 500]);
   const rightOuterXPosition = useTransform(
     scrollMotionSpring,
     [0, 1],
@@ -52,37 +33,20 @@ const FloatingPuklas = () => {
   const boxWidth = isDesktop ? 400 : 200;
   const boxHeight = isDesktop ? 800 : 400;
 
-  const floatingImageClassName =
-    "absolute drop-shadow-2xl object-cover rounded-xl";
+  const floatingImageClassName = "absolute drop-shadow-2xl object-cover rounded-xl";
 
   // Add rotation transforms
-  const leftOuterRotation = useTransform(
-    scrollMotionSpring,
-    [0, 1],
-    [0, isDesktop ? -30 : -20],
-  );
-  const leftInnerRotation = useTransform(
-    scrollMotionSpring,
-    [0, 1],
-    [0, isDesktop ? -15 : -10],
-  );
-  const rightInnerRotation = useTransform(
-    scrollMotionSpring,
-    [0, 1],
-    [0, isDesktop ? 15 : 10],
-  );
-  const rightOuterRotation = useTransform(
-    scrollMotionSpring,
-    [0, 1],
-    [0, isDesktop ? 30 : 20],
-  );
+  const leftOuterRotation = useTransform(scrollMotionSpring, [0, 1], [0, isDesktop ? -30 : -20]);
+  const leftInnerRotation = useTransform(scrollMotionSpring, [0, 1], [0, isDesktop ? -15 : -10]);
+  const rightInnerRotation = useTransform(scrollMotionSpring, [0, 1], [0, isDesktop ? 15 : 10]);
+  const rightOuterRotation = useTransform(scrollMotionSpring, [0, 1], [0, isDesktop ? 30 : 20]);
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5, delay: 0.5 }}
-      className="w-full h-full relative flex justify-center items-center min-h-[800px] overflow-hidden"
+      className="relative flex h-full min-h-[800px] w-full items-center justify-center overflow-hidden"
     >
       {/* Left outer box */}
       <motion.img
@@ -166,11 +130,11 @@ const FloatingPuklas = () => {
           height: boxHeight,
         }}
       />
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.5 }}
-        className="absolute top-0 bottom-0 w-full h-full bg-background [mask-image:linear-gradient(to_bottom,transparent_10%,#000_100%)]"
+        className="bg-background absolute top-0 bottom-0 h-full w-full [mask-image:linear-gradient(to_bottom,transparent_10%,#000_100%)]"
       />
     </motion.div>
   );

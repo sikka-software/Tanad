@@ -1,10 +1,11 @@
-import SelectCell from "@/components/tables/select-cell";
-import StatusCell from "@/components/tables/status-cell";
-import { E_COMMERCE_PLATFORMS } from "@/lib/constants";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
+import SelectCell from "@/components/tables/select-cell";
+import StatusCell from "@/components/tables/status-cell";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+
+import { E_COMMERCE_PLATFORMS } from "@/lib/constants";
 
 import { OnlineStore } from "./online-store.type";
 

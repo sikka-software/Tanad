@@ -402,7 +402,7 @@ export default function Auth() {
 
 Auth.messages = ["Pages", "Auth", "General", "SEO"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Auth.messages),

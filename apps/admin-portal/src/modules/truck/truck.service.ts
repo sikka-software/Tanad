@@ -89,6 +89,6 @@ export async function bulkDeleteTrucks(ids: string[]): Promise<void> {
   });
 
   if (!response.ok) {
-      throw new Error("Failed to delete trucks");
+    throw new Error("Failed to delete trucks");
   }
 }

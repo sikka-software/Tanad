@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
 import { motion, useInView, MotionProps } from "motion/react";
+import React, { useEffect, useRef, useState } from "react";
 
 type CustomMotionDivProps = MotionProps &
   React.HTMLAttributes<HTMLDivElement> & {
@@ -28,7 +28,7 @@ const CustomMotionDiv: React.FC<CustomMotionDivProps> = ({
       transition={{
         delay,
         ease: [0.22, 0.61, 0.36, 1],
-        ...props.transition
+        ...props.transition,
       }}
       className={props.className}
     >

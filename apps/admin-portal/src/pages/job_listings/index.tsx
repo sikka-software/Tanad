@@ -1,4 +1,3 @@
-import { createModuleStoreHooks } from "@/utils/module-hooks";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -8,18 +7,22 @@ import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import FormDialog from "@/ui/form-dialog";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
+
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { FormDialog } from "@/components/ui/form-dialog";
-import NoPermission from "@/components/ui/no-permission";
 
 import JobListingCard from "@/job-listing/job-listing.card";
+import useJobListingColumns from "@/job-listing/job-listing.columns";
+import { JobListingForm } from "@/job-listing/job-listing.form";
 import {
   useJobListings,
   useBulkDeleteJobListings,
@@ -29,9 +32,6 @@ import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/job-listing/job-listing.o
 import useJobListingsStore from "@/job-listing/job-listing.store";
 import JobListingsTable from "@/job-listing/job-listing.table";
 import { JobListingUpdateData, JobListingWithJobs } from "@/job-listing/job-listing.type";
-
-import useJobListingColumns from "@/modules/job-listing/job-listing.columns";
-import { JobListingForm } from "@/modules/job-listing/job-listing.form";
 
 export default function JobListingsPage() {
   const t = useTranslations();
@@ -214,7 +214,7 @@ export default function JobListingsPage() {
 
 JobListingsPage.messages = ["Notes", "Pages", "JobListings", "Settings", "Jobs", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -1,9 +1,10 @@
+import { useTranslations } from "next-intl";
 import React, { FC, InputHTMLAttributes, useId } from "react";
-// UI
-import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
+
 import { PricingCard } from "@/ui/pricing-card";
 import { PricingCardProps } from "@/ui/pricing-card";
-import { useTranslations } from "next-intl";
+// UI
+import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
 
 type PricingPlansTypes = {
   loadingCards?: boolean;
@@ -31,7 +32,7 @@ export const PricingPlans: FC<PricingPlansTypes> = ({
   return (
     <div {...mainContainerProps}>
       <div className="mb-2 flex w-full justify-between">
-        <div className="inline-flex h-9 rounded-lg bg-input/50 p-0.5">
+        <div className="bg-input/50 inline-flex h-9 rounded-lg p-0.5">
           <RadioGroup
             value={props.currentCycle}
             onValueChange={(e: any) => {
@@ -39,29 +40,21 @@ export const PricingPlans: FC<PricingPlansTypes> = ({
                 props.onCycleChange(e);
               }
             }}
-            className="group relative inline-grid grid-cols-[1fr_1fr] items-center gap-0 text-sm font-medium after:absolute after:inset-y-0 after:w-1/2 after:rounded-md after:bg-background after:shadow-sm after:shadow-black/5 after:outline-offset-2 after:transition-transform after:duration-300 after:[transition-timing-function:cubic-bezier(0.16,1,0.3,1)] has-[:focus-visible]:after:outline has-[:focus-visible]:after:outline-2 has-[:focus-visible]:after:outline-ring/70 data-[state=monthly]:after:translate-x-0 data-[state=annually]:after:translate-x-full"
+            className="group after:bg-background has-[:focus-visible]:after:outline-ring/70 relative inline-grid grid-cols-[1fr_1fr] items-center gap-0 text-sm font-medium after:absolute after:inset-y-0 after:w-1/2 after:rounded-md after:shadow-sm after:shadow-black/5 after:outline-offset-2 after:transition-transform after:duration-300 after:[transition-timing-function:cubic-bezier(0.16,1,0.3,1)] has-[:focus-visible]:after:outline has-[:focus-visible]:after:outline-2 data-[state=annually]:after:translate-x-full data-[state=monthly]:after:translate-x-0"
             data-state={props.currentCycle}
           >
-            <label className="relative z-10 inline-flex h-full min-w-8 cursor-pointer select-none items-center justify-center whitespace-nowrap px-4 transition-colors group-data-[state=annually]:text-muted-foreground/70">
+            <label className="group-data-[state=annually]:text-muted-foreground/70 relative z-10 inline-flex h-full min-w-8 cursor-pointer items-center justify-center px-4 whitespace-nowrap transition-colors select-none">
               {t(`billing-cycle.monthly`)}
-              <RadioGroupItem
-                id={`${id}-0`}
-                value={"monthly"}
-                className="sr-only"
-              />
+              <RadioGroupItem id={`${id}-0`} value={"monthly"} className="sr-only" />
             </label>
-            <label className="relative z-10 inline-flex h-full min-w-8 cursor-pointer select-none items-center justify-center whitespace-nowrap px-4 transition-colors group-data-[state=monthly]:text-muted-foreground/70">
+            <label className="group-data-[state=monthly]:text-muted-foreground/70 relative z-10 inline-flex h-full min-w-8 cursor-pointer items-center justify-center px-4 whitespace-nowrap transition-colors select-none">
               {t(`billing-cycle.annually`)}
-              <RadioGroupItem
-                id={`${id}-1`}
-                value={"annually"}
-                className="sr-only"
-              />
+              <RadioGroupItem id={`${id}-1`} value={"annually"} className="sr-only" />
             </label>
           </RadioGroup>
         </div>
 
-        <div className="inline-flex h-9 rounded-lg bg-input/50 p-0.5">
+        <div className="bg-input/50 inline-flex h-9 rounded-lg p-0.5">
           <RadioGroup
             value={props.currentCurrency}
             onValueChange={(e: any) => {
@@ -69,24 +62,16 @@ export const PricingPlans: FC<PricingPlansTypes> = ({
                 props.onCurrencyChange(e);
               }
             }}
-            className="group relative inline-grid grid-cols-[1fr_1fr] items-center gap-0 text-sm font-medium after:absolute after:inset-y-0 after:w-1/2 after:rounded-md after:bg-background after:shadow-sm after:shadow-black/5 after:outline-offset-2 after:transition-transform after:duration-300 after:[transition-timing-function:cubic-bezier(0.16,1,0.3,1)] has-[:focus-visible]:after:outline has-[:focus-visible]:after:outline-2 has-[:focus-visible]:after:outline-ring/70 data-[state=sar]:after:translate-x-0 data-[state=usd]:after:translate-x-full"
+            className="group after:bg-background has-[:focus-visible]:after:outline-ring/70 relative inline-grid grid-cols-[1fr_1fr] items-center gap-0 text-sm font-medium after:absolute after:inset-y-0 after:w-1/2 after:rounded-md after:shadow-sm after:shadow-black/5 after:outline-offset-2 after:transition-transform after:duration-300 after:[transition-timing-function:cubic-bezier(0.16,1,0.3,1)] has-[:focus-visible]:after:outline has-[:focus-visible]:after:outline-2 data-[state=sar]:after:translate-x-0 data-[state=usd]:after:translate-x-full"
             data-state={props.currentCurrency}
           >
-            <label className="relative z-10 inline-flex h-full min-w-8 cursor-pointer select-none items-center justify-center whitespace-nowrap px-4 transition-colors group-data-[state=usd]:text-muted-foreground/70">
+            <label className="group-data-[state=usd]:text-muted-foreground/70 relative z-10 inline-flex h-full min-w-8 cursor-pointer items-center justify-center px-4 whitespace-nowrap transition-colors select-none">
               {t(`billing-currency.sar`)}
-              <RadioGroupItem
-                id={`${id}-0`}
-                value={"sar"}
-                className="sr-only"
-              />
+              <RadioGroupItem id={`${id}-0`} value={"sar"} className="sr-only" />
             </label>
-            <label className="relative z-10 inline-flex h-full min-w-8 cursor-pointer select-none items-center justify-center whitespace-nowrap px-4 transition-colors group-data-[state=sar]:text-muted-foreground/70">
+            <label className="group-data-[state=sar]:text-muted-foreground/70 relative z-10 inline-flex h-full min-w-8 cursor-pointer items-center justify-center px-4 whitespace-nowrap transition-colors select-none">
               {t(`billing-currency.usd`)}
-              <RadioGroupItem
-                id={`${id}-1`}
-                value={"usd"}
-                className="sr-only"
-              />
+              <RadioGroupItem id={`${id}-1`} value={"usd"} className="sr-only" />
             </label>
           </RadioGroup>
         </div>

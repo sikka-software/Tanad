@@ -1,4 +1,3 @@
-import useDomainStore from "@/modules/domain/domain.store";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -10,7 +9,8 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { DomainForm } from "@/modules/domain/domain.form";
+import { DomainForm } from "@/domain/domain.form";
+import useDomainStore from "@/domain/domain.store";
 
 export default function AddDomainPage() {
   const router = useRouter();
@@ -62,7 +62,7 @@ export default function AddDomainPage() {
 
 AddDomainPage.messages = ["Pages", "Domains", "Notes", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

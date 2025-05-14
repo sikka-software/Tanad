@@ -88,7 +88,7 @@ export default function ContactsPage() {
 
 ContactsPage.messages = ["Pages", "General", "Contacts"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, ContactsPage.messages),

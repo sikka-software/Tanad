@@ -1,4 +1,3 @@
-import useUserStore from "@/stores/use-user-store";
 import { Row } from "@tanstack/react-table";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -13,6 +12,8 @@ import {
 } from "@/ui/dropdown-menu";
 
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+
+import useUserStore from "@/stores/use-user-store";
 
 import { useBranches } from "../branch/branch.hooks";
 import { useOffices } from "../office/office.hooks";

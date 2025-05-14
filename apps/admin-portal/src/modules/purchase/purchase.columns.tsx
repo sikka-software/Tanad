@@ -5,7 +5,7 @@ import CurrencyCell from "@/components/tables/currency-cell";
 import SelectCell from "@/components/tables/select-cell";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
-import { Purchase, PurchaseStatus } from "@/types/purchase.type";
+import { Purchase, PurchaseStatus } from "@/purchase/purchase.type";
 
 import useUserStore from "@/stores/use-user-store";
 

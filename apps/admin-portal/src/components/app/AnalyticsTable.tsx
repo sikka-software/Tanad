@@ -1,7 +1,3 @@
-import { useId, useState } from "react";
-
-import { useTranslations } from "next-intl";
-
 import {
   ColumnDef,
   PaginationState,
@@ -20,25 +16,15 @@ import {
   ChevronRight,
   ChevronUp,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useId, useState } from "react";
 
 import { Button } from "@/ui/button";
 import { Label } from "@/ui/label";
 import { Pagination, PaginationContent, PaginationItem } from "@/ui/pagination";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
+
 import { cn } from "@/lib/utils";
 
 interface AnalyticsData {

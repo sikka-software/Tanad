@@ -175,7 +175,7 @@ export default ResetPassword;
 
 ResetPassword.messages = ["Pages", "Auth", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

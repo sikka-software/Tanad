@@ -1,14 +1,17 @@
-import CurrencyCell from "@/components/tables/currency-cell";
-import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
-import useUserStore from "@/stores/use-user-store";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { useEmployees } from "../employee/employee.hooks";
-import { useUpdateSalary } from "./salary.hooks";
-import { Salary } from "./salary.type";
+import CurrencyCell from "@/components/tables/currency-cell";
+
+import { useEmployees } from "@/employee/employee.hooks";
+
+import { useUpdateSalary } from "@/salary/salary.hooks";
+import { Salary } from "@/salary/salary.type";
+
+import useUserStore from "@/stores/use-user-store";
 
 const useSalaryColumns = () => {
   const t = useTranslations();

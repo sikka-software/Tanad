@@ -1,5 +1,3 @@
-import useCarColumns from "@/modules/car/car.columns";
-import { createModuleStoreHooks } from "@/utils/module-hooks";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -8,10 +6,12 @@ import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
+
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
@@ -19,13 +19,14 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import CarCard from "@/modules/car/car.card";
-import { CarForm } from "@/modules/car/car.form";
-import { useCars, useBulkDeleteCars, useDuplicateCar } from "@/modules/car/car.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/car/car.options";
-import useCarStore from "@/modules/car/car.store";
-import CarsTable from "@/modules/car/car.table";
-import { CarUpdateData } from "@/modules/car/car.type";
+import CarCard from "@/car/car.card";
+import useCarColumns from "@/car/car.columns";
+import { CarForm } from "@/car/car.form";
+import { useCars, useBulkDeleteCars, useDuplicateCar } from "@/car/car.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/car/car.options";
+import useCarStore from "@/car/car.store";
+import CarsTable from "@/car/car.table";
+import { CarUpdateData } from "@/car/car.type";
 
 export default function CarsPage() {
   const t = useTranslations();
@@ -204,7 +205,7 @@ export default function CarsPage() {
 
 CarsPage.messages = ["Pages", "Cars", "Vehicles", "Notes", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../../locales/${locale}.json`)).default, CarsPage.messages),

@@ -4,13 +4,12 @@ import { InsertEquationDialog } from "@/components/editor/plugins/equations-plug
 import { ComponentPickerOption } from "@/components/editor/plugins/picker/component-picker-option";
 
 export function EquationPickerPlugin() {
-
-  return new ComponentPickerOption('Equation', {
+  return new ComponentPickerOption("Equation", {
     icon: <DiffIcon className="size-4" />,
-    keywords: ['equation', 'latex', 'math'],
+    keywords: ["equation", "latex", "math"],
     onSelect: (_, editor, showModal) =>
-      showModal('Insert Equation', (onClose) => (
+      showModal("Insert Equation", (onClose) => (
         <InsertEquationDialog activeEditor={editor} onClose={onClose} />
       )),
-  })
+  });
 }

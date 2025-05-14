@@ -68,7 +68,7 @@ export default function AddCompanyPage() {
 
 AddCompanyPage.messages = ["Notes", "Pages", "General", "Companies", "Forms"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

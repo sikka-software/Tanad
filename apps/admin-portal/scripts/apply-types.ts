@@ -84,4 +84,4 @@ async function applyTypes() {
 }
 
 // Run the function
-applyTypes().catch(console.error); 
+applyTypes().catch(console.error);

@@ -62,7 +62,7 @@ export default function AddWebsitePage() {
 
 AddWebsitePage.messages = ["Notes", "Pages", "Websites", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

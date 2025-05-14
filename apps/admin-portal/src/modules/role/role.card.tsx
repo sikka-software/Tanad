@@ -1,4 +1,3 @@
-import { convertToPascalCase } from "@/lib/utils";
 import { MoreHorizontal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -13,6 +12,8 @@ import {
 } from "@/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { ScrollArea } from "@/ui/scroll-area";
+
+import { convertToPascalCase } from "@/lib/utils";
 
 import { app_permission } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";

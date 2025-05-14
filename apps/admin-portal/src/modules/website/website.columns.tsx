@@ -1,10 +1,11 @@
-import StatusCell from "@/components/tables/status-cell";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { Website } from "./website.type";
+import StatusCell from "@/components/tables/status-cell";
+
+import { Website } from "@/website/website.type";
 
 const useWebsiteColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,

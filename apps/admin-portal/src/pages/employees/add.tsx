@@ -71,7 +71,7 @@ AddEmployeePage.messages = [
   "Forms",
 ];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

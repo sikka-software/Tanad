@@ -1,6 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@/components/forms/notes-section";
-import { getNotesValue } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,8 +11,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import PhoneInput from "@/ui/phone-input";
 
+import NotesSection from "@/components/forms/notes-section";
+
 import { AddressFormSection } from "@/forms/address-form-section";
+
 import { createAddressSchema } from "@/lib/schemas/address.schema";
+import { getNotesValue } from "@/lib/utils";
 
 import { uploadDocument } from "@/services/documents";
 

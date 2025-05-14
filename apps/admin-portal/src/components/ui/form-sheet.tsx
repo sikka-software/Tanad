@@ -18,8 +18,7 @@ interface FormSheetProps {
   loadingSave?: boolean;
   dummyData?: () => void;
 }
-
-export function FormSheet({
+function FormSheet({
   open,
   onOpenChange,
   title,
@@ -68,3 +67,5 @@ export function FormSheet({
     </Sheet>
   );
 }
+
+export default FormSheet;

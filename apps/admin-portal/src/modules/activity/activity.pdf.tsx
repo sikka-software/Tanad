@@ -1,6 +1,6 @@
-import React from "react";
 import { Page, Text, View, Document, StyleSheet, Font } from "@react-pdf/renderer";
 import { format } from "date-fns";
+import React from "react";
 
 import type { ActivityLogListData } from "./activity.type";
 
@@ -74,9 +74,9 @@ interface ActivityLogPDFDocumentProps {
 }
 
 // Create Document Component
-export const ActivityLogPDFDocument: React.FC<ActivityLogPDFDocumentProps> = ({ 
-  data, 
-  title = "Activity Log Report" 
+export const ActivityLogPDFDocument: React.FC<ActivityLogPDFDocumentProps> = ({
+  data,
+  title = "Activity Log Report",
 }) => (
   <Document>
     <Page size="A4" style={styles.page} orientation="landscape">
@@ -106,11 +106,11 @@ export const ActivityLogPDFDocument: React.FC<ActivityLogPDFDocumentProps> = ({
               {log.target_name || log.target_id || "N/A"}
             </Text>
             <Text style={[styles.tableCol, styles.colDetails]}>
-              {typeof log.details === 'object' ? JSON.stringify(log.details) : log.details || "N/A"}
+              {typeof log.details === "object" ? JSON.stringify(log.details) : log.details || "N/A"}
             </Text>
           </View>
         ))}
       </View>
     </Page>
   </Document>
-); 
+);

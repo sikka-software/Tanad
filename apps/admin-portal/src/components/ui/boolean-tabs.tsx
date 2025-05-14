@@ -46,7 +46,7 @@ const BooleanTabs = ({
     <div className={cn("", containerClassName)}>
       <div
         className={cn(
-          "border-input border text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-md p-[4px]",
+          "border-input text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-md border p-[4px]",
           listClassName,
         )}
       >

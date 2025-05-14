@@ -16,7 +16,7 @@ import { DatePicker } from "@/ui/date-picker";
 import { Dialog } from "@/ui/dialog";
 import { DialogContent } from "@/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import NumberInputWithButtons from "@/ui/number-input-buttons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";

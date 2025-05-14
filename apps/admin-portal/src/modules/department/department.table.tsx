@@ -1,10 +1,11 @@
-import { ModuleTableProps } from "@/types/common.type";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 
 import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
+
+import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateDepartment } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";

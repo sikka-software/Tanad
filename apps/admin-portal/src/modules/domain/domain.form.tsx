@@ -1,7 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import BooleanTabs from "@/components/ui/boolean-tabs";
-import { CurrencyInput } from "@/components/ui/currency-input";
-import { getNotesValue } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -11,7 +8,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
+import BooleanTabs from "@/components/ui/boolean-tabs";
+import { CurrencyInput } from "@/components/ui/currency-input";
+
 import NotesSection from "@/forms/notes-section";
+
+import { getNotesValue } from "@/lib/utils";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 

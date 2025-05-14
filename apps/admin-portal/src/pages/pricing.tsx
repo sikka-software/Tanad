@@ -1,4 +1,3 @@
-import settings from "@root/landing.config";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
@@ -15,6 +14,8 @@ import { PricingCardProps } from "@/ui/pricing-card";
 import WaitlistSection from "@/components/landing/waitlist-section";
 
 import { plan1Price, plan2Price, plan3Price } from "@/lib/utils";
+
+import settings from "../../landing.config";
 
 export default function PricingPage() {
   const t = useTranslations();
@@ -324,7 +325,7 @@ export default function PricingPage() {
 
 PricingPage.messages = ["Pages", "General", "Pricing"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   const billingCurrencies = ["sar", "usd"];
 
   const billingCycles = ["monthly", "yearly"];

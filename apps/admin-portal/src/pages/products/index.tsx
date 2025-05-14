@@ -1,4 +1,3 @@
-import useProductColumns from "@/modules/product/product.columns";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -8,7 +7,7 @@ import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
@@ -20,6 +19,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import ProductCard from "@/product/product.card";
+import useProductColumns from "@/product/product.columns";
 import { ProductForm } from "@/product/product.form";
 import { useProducts, useBulkDeleteProducts, useDuplicateProduct } from "@/product/product.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/product/product.options";
@@ -220,7 +220,7 @@ export default function ProductsPage() {
 
 ProductsPage.messages = ["Notes", "Pages", "Products", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

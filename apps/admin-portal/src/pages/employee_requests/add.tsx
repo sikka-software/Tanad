@@ -46,7 +46,7 @@ export default function AddEmployeeRequestPage() {
 
 AddEmployeeRequestPage.messages = ["Notes", "Pages", "EmployeeRequests", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -61,7 +61,7 @@ export default function AddClientPage() {
 
 AddClientPage.messages = ["Pages", "Clients", "Companies", "Forms", "Notes", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

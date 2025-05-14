@@ -1,12 +1,15 @@
-import CurrencyCell from "@/components/tables/currency-cell";
-import SelectCell from "@/components/tables/select-cell";
-import StatusCell from "@/components/tables/status-cell";
-import { SERVER_OS, SERVER_PROVIDERS } from "@/lib/constants";
-import useUserStore from "@/stores/use-user-store";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
+
+import CurrencyCell from "@/components/tables/currency-cell";
+import SelectCell from "@/components/tables/select-cell";
+import StatusCell from "@/components/tables/status-cell";
+
+import { SERVER_OS, SERVER_PROVIDERS } from "@/lib/constants";
+
+import useUserStore from "@/stores/use-user-store";
 
 import { Server } from "./server.type";
 

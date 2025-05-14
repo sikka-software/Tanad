@@ -250,7 +250,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
                       >
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      <span className="truncate w-full">
+                      <span className="w-full truncate">
                         {renderOption ? renderOption(item) : getProperty(item, labelKey)}
                       </span>
                     </CommandItem>

@@ -20,6 +20,7 @@ import {
   SiVsco,
   SiMedium,
 } from "@icons-pack/react-simple-icons";
+
 // import { Globe } from "lucide-react";
 
 export type socialLinkOptionsType = {

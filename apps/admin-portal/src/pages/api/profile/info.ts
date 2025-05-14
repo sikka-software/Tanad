@@ -1,6 +1,5 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
 import { eq } from "drizzle-orm";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
 import { profiles } from "@/db/schema";

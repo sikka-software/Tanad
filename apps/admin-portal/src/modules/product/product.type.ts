@@ -1,6 +1,5 @@
-import { Database } from "@/lib/database.types";
-
 import { PRODUCT_CATEGORIES, PRODUCT_STATUSES } from "@/lib/constants/product-consts";
+import { Database } from "@/lib/database.types";
 
 export type Product = Database["public"]["Tables"]["products"]["Row"];
 export type ProductCreateData = Database["public"]["Tables"]["products"]["Insert"];

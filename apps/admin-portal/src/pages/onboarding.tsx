@@ -63,7 +63,7 @@ export default function OnboardingPage() {
 
 OnboardingPage.messages = ["General", "OnBoarding"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
@@ -110,7 +110,7 @@ export default function BankAccountsPage() {
 
 BankAccountsPage.messages = ["Pages", "BankAccounts", "Notes", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

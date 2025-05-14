@@ -14,7 +14,7 @@ const PricingHero: React.FC = () => {
   return (
     <div className="px-4 py-24 pb-0">
       <div className="container mx-auto max-w-4xl text-center">
-        <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white md:text-5xl">
+        <h1 className="mb-4 text-4xl font-bold text-gray-900 md:text-5xl dark:text-white">
           {t("Pricing.custom_pricing.title")}
         </h1>
         <p className="mx-auto mb-8 max-w-2xl text-xl text-gray-600 dark:text-gray-400">
