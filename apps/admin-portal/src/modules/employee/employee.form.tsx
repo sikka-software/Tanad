@@ -101,7 +101,7 @@ export function EmployeeForm({
 
   const createEmployeeFormSchema = () => {
     const supabase = createClient();
-    const EmployeeSelectSchema = createSelectSchema(employees, {
+    let EmployeeSelectSchema = createSelectSchema(employees, {
       first_name: z.string().min(1, t("Employees.form.first_name.required")),
       last_name: z.string().min(1, t("Employees.form.last_name.required")),
       email: z
@@ -143,7 +143,27 @@ export function EmployeeForm({
       salary: z.array(salaryComponentSchema).optional(),
       status: z.enum(EmployeeStatus),
       nationality: z.string().optional(),
-      birth_date: z.any().optional(),
+      birth_date: z
+        .any()
+        .optional()
+        .superRefine((val, ctx) => {
+          if (val === undefined || val === null) return;
+          if (typeof val === "object" && typeof val.toDate === "function") {
+            // Check for reasonable year range
+            const year = val.year;
+            if (year < 1800 || year > 2200) {
+              ctx.addIssue({
+                code: "custom",
+                message: t("Employees.form.birth_date.invalid"),
+              });
+            }
+            return;
+          }
+          ctx.addIssue({
+            code: "custom",
+            message: t("Employees.form.birth_date.invalid"),
+          });
+        }),
       national_id: z.string().optional(),
       eqama_id: z.string().optional(),
       gender: z.string().optional(),
@@ -247,14 +267,18 @@ export function EmployeeForm({
           id: actualEmployeeId!,
           data: {
             ...data,
-            termination_date: data.termination_date
-              ? data.termination_date.toISOString().split("T")[0]
-              : undefined,
+            termination_date:
+              data.termination_date && typeof data.termination_date.toISOString === "function"
+                ? data.termination_date.toISOString().split("T")[0]
+                : undefined,
             first_name: data.first_name.trim(),
             last_name: data.last_name.trim(),
             email: data.email.trim(),
             phone: data.phone?.trim() || undefined,
-            hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
+            hire_date:
+              data.hire_date && typeof data.hire_date.toISOString === "function"
+                ? data.hire_date.toISOString().split("T")[0]
+                : undefined,
             birth_date:
               data.birth_date && typeof data.birth_date.toString === "function"
                 ? data.birth_date.toString()
@@ -271,9 +295,10 @@ export function EmployeeForm({
         const { membership, user } = useUserStore.getState();
         await createEmployeeMutate({
           ...data,
-          termination_date: data.termination_date
-            ? data.termination_date.toISOString().split("T")[0]
-            : undefined,
+          termination_date:
+            data.termination_date && typeof data.termination_date.toISOString === "function"
+              ? data.termination_date.toISOString().split("T")[0]
+              : undefined,
           birth_date:
             data.birth_date && typeof data.birth_date.toString === "function"
               ? data.birth_date.toString()
@@ -282,7 +307,10 @@ export function EmployeeForm({
           last_name: data.last_name.trim(),
           email: data.email.trim(),
           phone: data.phone?.trim() || undefined,
-          hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
+          hire_date:
+            data.hire_date && typeof data.hire_date.toISOString === "function"
+              ? data.hire_date.toISOString().split("T")[0]
+              : undefined,
           notes: data.notes,
           salary: (data.salary || []).map((comp) => ({
             ...comp,
@@ -506,7 +534,11 @@ export function EmployeeForm({
                     <FormControl>
                       <DateInput
                         placeholder={t("Employees.form.birth_date.placeholder")}
-                        value={typeof field.value === 'string' ? parseDate(field.value) : field.value ?? null}
+                        value={
+                          typeof field.value === "string"
+                            ? parseDate(field.value)
+                            : (field.value ?? null)
+                        }
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
                         disabled={isEmployeeSaving}

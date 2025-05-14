@@ -17,7 +17,6 @@ import { cn } from "@/lib/utils";
 function DateField<T extends DateValueRac>({ className, children, ...props }: DateFieldProps<T>) {
   return (
     <DateFieldRac
-    
       className={composeRenderProps(className, (className) => cn(className))}
       {...props}
     >
@@ -31,7 +30,6 @@ function TimeField<T extends TimeValueRac>({ className, children, ...props }: Ti
     <TimeFieldRac
       className={composeRenderProps(className, (className) => cn(className))}
       {...props}
-      
     >
       {children}
     </TimeFieldRac>
@@ -41,7 +39,6 @@ function TimeField<T extends TimeValueRac>({ className, children, ...props }: Ti
 function DateSegment({ className, ...props }: DateSegmentProps) {
   return (
     <DateSegmentRac
-
       className={composeRenderProps(className, (className) =>
         cn(
           "text-foreground data-focused:bg-accent data-invalid:data-focused:bg-destructive data-focused:data-placeholder:text-foreground data-focused:text-foreground data-invalid:data-placeholder:text-destructive data-invalid:text-destructive data-placeholder:text-muted-foreground/70 data-[type=literal]:text-muted-foreground/70 inline rounded p-0.5 caret-transparent outline-hidden data-disabled:cursor-not-allowed data-disabled:opacity-50 data-invalid:data-focused:text-white data-invalid:data-focused:data-placeholder:text-white data-[type=literal]:px-0",
@@ -60,13 +57,18 @@ const dateInputStyle =
 interface DateInputProps extends DateInputPropsRac {
   className?: string;
   unstyled?: boolean;
+  ariaInvalid?: boolean;
 }
 
 function DateInput({ className, unstyled = false, ...props }: Omit<DateInputProps, "children">) {
   return (
     <DateInputRac
       className={composeRenderProps(className, (className) =>
-        cn(!unstyled && dateInputStyle, className),
+        cn(
+          !unstyled && dateInputStyle,
+          props.ariaInvalid && "ring-destructive/20 dark:ring-destructive/40 border-destructive",
+          className,
+        ),
       )}
       {...props}
     >

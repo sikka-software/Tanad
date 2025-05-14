@@ -75,7 +75,7 @@ export function DateInputField({
           onChange={onChange}
         >
           <Group className="w-full">
-            <DateInput />
+            <DateInput ariaInvalid={ariaInvalid} />
           </Group>
         </DateField>
       </I18nProvider>
