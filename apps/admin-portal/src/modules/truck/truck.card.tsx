@@ -1,49 +1,68 @@
 import { useTranslations } from "next-intl";
 
-import { Card, CardContent, CardHeader } from "@/ui/card";
+import ModuleCard from "@/components/cards/module-card";
 
-import { Truck } from "@/modules/truck/truck.type";
+import { VehicleStatus, VehicleStatusProps } from "@/types/common.type";
 
-const TruckCard = ({ truck }: { truck: Truck }) => {
-  const t = useTranslations("Trucks");
+import { useUpdateTruck } from "@/truck/truck.hooks";
+import useTruckStore from "@/truck/truck.store";
+import { Truck } from "@/truck/truck.type";
+
+const TruckCard = ({
+  truck,
+  onActionClicked,
+}: {
+  truck: Truck;
+  onActionClicked: (action: string, rowId: string) => void;
+}) => {
+  const t = useTranslations();
+  const { mutate: updateTruck } = useUpdateTruck();
+  const data = useTruckStore((state) => state.data);
+  const setData = useTruckStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateTruck({ id: rowId, data: { [columnId]: value } });
+  };
+
   return (
-    <Card key={truck.id} className="transition-shadow hover:shadow-lg">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold">{truck.name}</h3>
-            <p className="text-sm text-gray-500">
-              {t("make")}: {truck.make} | {t("model")}: {truck.model} | {t("year")}: {truck.year}
-            </p>
+    <ModuleCard
+      id={truck.id}
+      title={truck.name}
+      parentTranslationKey="Vehicles"
+      subtitle={String(truck.year) || ""}
+      currentStatus={truck.status as VehicleStatusProps}
+      statuses={Object.values(VehicleStatus) as VehicleStatusProps[]}
+      onStatusChange={(status: VehicleStatusProps) => handleEdit(truck.id, "status", status)}
+      onEdit={() => onActionClicked("edit", truck.id)}
+      onDelete={() => onActionClicked("delete", truck.id)}
+      onDuplicate={() => onActionClicked("duplicate", truck.id)}
+    >
+      <div className="space-y-3">
+        {truck.color && (
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="font-semibold">{t("color")}:</span> {truck.color}
           </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {truck.color && (
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              <span className="font-semibold">{t("color")}:</span> {truck.color}
-            </div>
-          )}
-          {truck.vin && (
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              <span className="font-semibold">{t("vin")}:</span> {truck.vin}
-            </div>
-          )}
-          {truck.license_plate && (
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              <span className="font-semibold">{t("licensePlate")}:</span> {truck.license_plate}
-              {truck.license_country && ` (${truck.license_country})`}
-            </div>
-          )}
-          {truck.code && (
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              <span className="font-semibold">{t("code")}:</span> {truck.code}
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        )}
+        {truck.vin && (
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="font-semibold">{t("vin")}:</span> {truck.vin}
+          </div>
+        )}
+        {truck.license_plate && (
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="font-semibold">{t("licensePlate")}:</span> {truck.license_plate}
+            {truck.license_country && ` (${truck.license_country})`}
+          </div>
+        )}
+        {truck.code && (
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="font-semibold">{t("code")}:</span> {truck.code}
+          </div>
+        )}
+      </div>
+    </ModuleCard>
   );
 };
 

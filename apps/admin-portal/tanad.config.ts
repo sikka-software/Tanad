@@ -27,8 +27,45 @@ import {
   Landmark,
 } from "lucide-react";
 
+type TanadModules =
+  | "users"
+  | "roles"
+  | "dashboard"
+  | "analytics"
+  | "activity_logs"
+  | "sales"
+  | "job_listings"
+  | "companies"
+  | "applicants"
+  | "purchases"
+  | "clients"
+  | "vendors"
+  | "invoices"
+  | "quotes"
+  | "products"
+  | "offices"
+  | "warehouses"
+  | "branches"
+  | "employees"
+  | "departments"
+  | "employee_requests"
+  | "jobs"
+  | "expenses"
+  | "salaries"
+  | "settings"
+  | "internet"
+  | "websites"
+  | "servers"
+  | "domains"
+  | "online_stores"
+  | "cars"
+  | "trucks"
+  | "storage"
+  | "recruitment"
+  | "bank_accounts";
+
 const ModulesOptions: Record<
-  string,
+  TanadModules,
   {
     icon: LucideIcon;
     label: string;
@@ -102,7 +139,6 @@ const ModulesOptions: Record<
     url: "/companies",
     category: "CRM",
   },
-
   applicants: {
     icon: Users,
     label: "Pages.Applicants.title",

@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { Server } from "lucide-react";
+import { Plus, Server } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -174,10 +174,12 @@ export default function ServersPage() {
                   title: t("Pages.Servers.create_first.title"),
                   description: t("Pages.Servers.create_first.description"),
                   add: t("Pages.Servers.add"),
-                  icons: [Server, Server, Server],
+                  icons: [Server, Plus, Server],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(server) => <ServerCard key={server.id} server={server} />}
+                renderItem={(server) => (
+                  <ServerCard server={server} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>
@@ -217,7 +219,7 @@ export default function ServersPage() {
   );
 }
 
-ServersPage.messages = ["Notes", "Forms", "Pages", "Servers", "General"];
+ServersPage.messages = ["Notes", "Forms", "Pages", "Servers", "General", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

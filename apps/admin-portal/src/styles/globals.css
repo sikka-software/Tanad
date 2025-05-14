@@ -220,6 +220,10 @@ body {
   scrollbar-color: var(--color-border) var(--color-background);
 }
 
+.money {
+  @apply flex flex-row items-center gap-1;
+}
+
 /* Hide arrows from number input */
 
 /* Chrome, Safari, Edge, Opera */

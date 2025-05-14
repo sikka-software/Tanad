@@ -62,7 +62,6 @@ export default function DataModelList<T>({
   if (data.length === 0 && empty) {
     return (
       <EmptyState
-        className="mx-auto"
         title={empty?.title}
         description={empty?.description}
         icons={empty?.icons}

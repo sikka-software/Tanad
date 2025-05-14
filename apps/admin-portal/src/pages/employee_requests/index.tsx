@@ -175,7 +175,12 @@ export default function EmployeeRequestsPage() {
                   icons: [User, User, User],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(request) => <EmployeeRequestCard employeeRequest={request} />}
+                renderItem={(request) => (
+                  <EmployeeRequestCard
+                    employeeRequest={request}
+                    onActionClicked={onActionClicked}
+                  />
+                )}
                 gridCols="3"
               />
             </div>

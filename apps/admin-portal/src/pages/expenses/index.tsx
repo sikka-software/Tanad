@@ -176,7 +176,9 @@ export default function ExpensesPage() {
                   icons: [File, File, File],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(expense) => <ExpenseCard expense={expense} />}
+                renderItem={(expense) => (
+                  <ExpenseCard expense={expense} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>

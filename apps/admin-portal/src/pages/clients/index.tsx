@@ -175,7 +175,9 @@ export default function ClientsPage() {
                   icons: [User, User, User],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(client) => <ClientCard client={client} />}
+                renderItem={(client) => (
+                  <ClientCard onActionClicked={onActionClicked} client={client} />
+                )}
                 gridCols="3"
               />
             </div>

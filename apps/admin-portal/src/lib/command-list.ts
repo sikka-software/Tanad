@@ -123,6 +123,13 @@ export const commandList = [
         addHref: ModulesOptions.jobs.url + "/add",
       },
       {
+        icon: ModulesOptions.job_listings.icon,
+        label: ModulesOptions.job_listings.label,
+        shortcut: "⌘J",
+        href: ModulesOptions.job_listings.url,
+        addHref: ModulesOptions.job_listings.url + "/add",
+      },
+      {
         icon: ModulesOptions.departments.icon,
         label: ModulesOptions.departments.label,
         shortcut: "⌘D",

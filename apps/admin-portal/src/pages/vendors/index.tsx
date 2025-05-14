@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { User } from "lucide-react";
+import { Plus, UserPlus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -170,10 +170,12 @@ export default function VendorsPage() {
                 title: t("Vendors.create_first.title"),
                 description: t("Vendors.create_first.description"),
                 add: t("Vendors.create_first.add"),
-                icons: [User, User, User],
+                icons: [UserPlus, Plus, UserPlus],
                 onClick: () => router.push(router.pathname + "/add"),
               }}
-              renderItem={(vendor) => <VendorCard key={vendor.id} vendor={vendor} />}
+              renderItem={(vendor) => (
+                <VendorCard vendor={vendor} onActionClicked={onActionClicked} />
+              )}
               gridCols="3"
             />
           </div>
@@ -212,7 +214,7 @@ export default function VendorsPage() {
   );
 }
 
-VendorsPage.messages = ["Notes", "Pages", "Vendors", "Forms", "General"];
+VendorsPage.messages = ["Notes", "Pages", "Vendors", "Forms", "General", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

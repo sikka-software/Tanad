@@ -4,26 +4,28 @@ import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 
-import { CommonStatusProps } from "@/types/common.type";
+import { cn } from "@/lib/utils";
 
-const CardStatusAction = ({
+interface CardStatusActionProps<T> {
+  currentStatus: T;
+  statuses: T[];
+  parentTranslationKey?: string;
+  onStatusChange: (status: T) => void;
+}
+
+const CardStatusAction = <T,>({
   currentStatus,
   statuses,
-  moduleName,
+  parentTranslationKey = "Forms",
   onStatusChange,
-}: {
-  currentStatus: CommonStatusProps;
-  statuses: CommonStatusProps[];
-  moduleName: string;
-  onStatusChange: (status: CommonStatusProps) => void;
-}) => {
+}: CardStatusActionProps<T>) => {
   const t = useTranslations();
   const lang = useLocale();
 
-  const statusTranslationKey = (status: CommonStatusProps) =>
-    moduleName === "Forms"
-      ? t(`${moduleName}.status.${status}`)
-      : t(`${moduleName}.form.status.${status}`);
+  const statusTranslationKey = (status: T) =>
+    parentTranslationKey === "Forms"
+      ? t(`CommonStatus.${status}`)
+      : t(`${parentTranslationKey}.form.status.${status}`);
   return (
     <div>
       <Popover>
@@ -34,7 +36,7 @@ const CardStatusAction = ({
         </PopoverTrigger>
         <PopoverContent
           align={lang === "ar" ? "start" : "end"}
-          className="flex max-w-fit flex-col p-1"
+          className="flex max-h-[200px] max-w-fit flex-col overflow-y-auto p-1"
         >
           {statuses &&
             statuses.map((status, i) => (
@@ -43,7 +45,10 @@ const CardStatusAction = ({
                 dir={lang === "ar" ? "rtl" : "ltr"}
                 variant="ghost"
                 onClick={() => onStatusChange(status)}
-                className="bg-400 justify-start"
+                className={cn(
+                  "bg-400 justify-start",
+                  currentStatus === status && "outline-primary outline-2 -outline-offset-2",
+                )}
               >
                 {currentStatus === status && <Check className="size-4" />}
                 <span>{statusTranslationKey(status)}</span>

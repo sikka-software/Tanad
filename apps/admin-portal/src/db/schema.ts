@@ -2190,7 +2190,7 @@ export const vendors = pgTable(
     region: text(),
     country: text(),
     zip_code: text(),
-
+    status: common_status().default("active"),
     notes: jsonb(),
     user_id: uuid().notNull(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }).default(

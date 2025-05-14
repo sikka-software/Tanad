@@ -172,7 +172,7 @@ export default function DepartmentsPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(department) => (
-                  <DepartmentCard key={department.id} department={department} />
+                  <DepartmentCard department={department} onActionClicked={onActionClicked} />
                 )}
                 gridCols="3"
               />
@@ -213,7 +213,7 @@ export default function DepartmentsPage() {
   );
 }
 
-DepartmentsPage.messages = ["Notes", "Pages", "Departments", "General"];
+DepartmentsPage.messages = ["Notes", "Pages", "Departments", "General", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

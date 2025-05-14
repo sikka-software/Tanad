@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { Globe, User } from "lucide-react";
+import { Globe, Link, Plus, User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -170,10 +170,12 @@ export default function WebsitesPage() {
                   title: t("Websites.create_first.title"),
                   description: t("Websites.create_first.description"),
                   add: t("Websites.create_first.add"),
-                  icons: [Globe, Globe, Globe],
+                  icons: [Globe, Plus, Link],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(website) => <WebsiteCard key={website.id} website={website} />}
+                renderItem={(website) => (
+                  <WebsiteCard website={website} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>
@@ -213,7 +215,7 @@ export default function WebsitesPage() {
   );
 }
 
-WebsitesPage.messages = ["Notes", "Pages", "Websites", "General"];
+WebsitesPage.messages = ["Notes", "Pages", "Websites", "General", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

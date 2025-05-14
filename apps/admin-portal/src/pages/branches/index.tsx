@@ -1,6 +1,5 @@
 import { pick } from "lodash";
-import { Plus } from "lucide-react";
-import { Building } from "lucide-react";
+import { Plus, Store } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -171,10 +170,12 @@ export default function BranchesPage() {
                   title: t("Pages.Branches.create_first.title"),
                   description: t("Pages.Branches.create_first.description"),
                   add: t("Pages.Branches.add"),
-                  icons: [Building, Plus, Building],
+                  icons: [Store, Plus, Store],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(branch) => <BranchCard key={branch.id} branch={branch} />}
+                renderItem={(branch) => (
+                  <BranchCard branch={branch} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>
@@ -223,6 +224,7 @@ BranchesPage.messages = [
   "Notes",
   "General",
   "Forms",
+  "CommonStatus",
 ];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {

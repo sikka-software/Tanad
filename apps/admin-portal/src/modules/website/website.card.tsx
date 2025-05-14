@@ -1,34 +1,56 @@
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@/ui/badge";
-import { Card, CardContent, CardHeader } from "@/ui/card";
+import ModuleCard from "@/components/cards/module-card";
 
-import { Website } from "./website.type";
+import { CommonStatus } from "@/types/common.type";
+import { CommonStatusProps } from "@/types/common.type";
 
-const WebsiteCard = ({ website }: { website: Website }) => {
+import { useUpdateWebsite } from "@/website/website.hooks";
+import useWebsiteStore from "@/website/website.store";
+import { Website } from "@/website/website.type";
+
+const WebsiteCard = ({
+  website,
+  onActionClicked,
+}: {
+  website: Website;
+  onActionClicked: (action: string, rowId: string) => void;
+}) => {
   const t = useTranslations();
+  const { mutate: updateWebsite } = useUpdateWebsite();
+  const data = useWebsiteStore((state) => state.data);
+  const setData = useWebsiteStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateWebsite({ id: rowId, data: { [columnId]: value } });
+  };
 
   return (
-    <Card key={website.id} className="transition-shadow hover:shadow-lg">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold">{website.domain_name}</h3>
-            <p className="text-sm text-gray-500">
-              {t("Websites.form.created_at.label")}:{" "}
-              {website.created_at ? new Date(website.created_at).toLocaleDateString() : "-"}
-            </p>
-            <p className="text-sm text-gray-500">
-              {t("Websites.form.updated_at.label")}:{" "}
-              {website.updated_at ? new Date(website.updated_at).toLocaleDateString() : "-"}
-            </p>
-          </div>
-          <Badge variant={website.status === "active" ? "default" : "secondary"}>
-            {t(`Websites.form.status.${website.status}`)}
-          </Badge>
+    <ModuleCard
+      id={website.id}
+      title={website.domain_name}
+      currentStatus={website.status as CommonStatusProps}
+      statuses={Object.values(CommonStatus) as CommonStatusProps[]}
+      onStatusChange={(status: CommonStatusProps) => handleEdit(website.id, "status", status)}
+      onEdit={() => onActionClicked("edit", website.id)}
+      onDelete={() => onActionClicked("delete", website.id)}
+      onDuplicate={() => onActionClicked("duplicate", website.id)}
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-gray-500">
+            {t("Websites.form.created_at.label")}:{" "}
+            {website.created_at ? new Date(website.created_at).toLocaleDateString() : "-"}
+          </p>
+          <p className="text-sm text-gray-500">
+            {t("Websites.form.updated_at.label")}:{" "}
+            {website.updated_at ? new Date(website.updated_at).toLocaleDateString() : "-"}
+          </p>
         </div>
-      </CardHeader>
-    </Card>
+      </div>
+    </ModuleCard>
   );
 };
 

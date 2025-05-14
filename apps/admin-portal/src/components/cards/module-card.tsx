@@ -1,0 +1,58 @@
+import { Card, CardContent, CardHeader } from "@/ui/card";
+
+import CardActions from "@/components/cards/card-actions";
+import CardStatusAction from "@/components/cards/card-status-action";
+
+interface ModuleCardProps<T> {
+  id: string;
+  title: string;
+  subtitle?: string;
+  currentStatus: T;
+  statuses: T[];
+  onStatusChange: (status: T) => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  onDuplicate: () => void;
+  children: React.ReactNode;
+  parentTranslationKey?: string;
+}
+
+const ModuleCard = <T,>({
+  id,
+  title,
+  subtitle,
+  currentStatus,
+  statuses,
+  onStatusChange,
+  onEdit,
+  onDelete,
+  onDuplicate,
+  children,
+  parentTranslationKey,
+}: ModuleCardProps<T>) => {
+  return (
+    <Card key={id} className="transition-shadow hover:shadow-lg">
+      <CardHeader className="bg-300 flex flex-col items-start justify-between p-0">
+        <div className="bg-muted group flex w-full flex-row items-center justify-between gap-2 p-2">
+          <CardStatusAction
+            parentTranslationKey={parentTranslationKey}
+            currentStatus={currentStatus}
+            statuses={statuses}
+            onStatusChange={onStatusChange}
+          />
+          <CardActions onEdit={onEdit} onDelete={onDelete} onDuplicate={onDuplicate} />
+        </div>
+
+        <div className="flex items-start justify-between px-4 py-2">
+          <div>
+            <h3 className="text-lg font-semibold">{title}</h3>
+            {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
+  );
+};
+
+export default ModuleCard;

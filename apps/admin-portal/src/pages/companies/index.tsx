@@ -176,11 +176,7 @@ export default function CompaniesPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(company) => (
-                  <CompanyCard
-                    key={company.id}
-                    company={company}
-                    onActionClicked={onActionClicked}
-                  />
+                  <CompanyCard company={company} onActionClicked={onActionClicked} />
                 )}
                 gridCols="3"
               />
@@ -221,7 +217,7 @@ export default function CompaniesPage() {
   );
 }
 
-CompaniesPage.messages = ["Notes", "Pages", "General", "Companies", "Forms"];
+CompaniesPage.messages = ["Notes", "Pages", "General", "Companies", "Forms", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

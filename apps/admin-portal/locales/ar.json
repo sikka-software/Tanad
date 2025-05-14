@@ -255,6 +255,15 @@
     }
   },
 
+  "CommonStatus": {
+    "label": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "published": "منشور",
+    "unpublished": "غير منشور",
+    "archived": "مؤرشف",
+    "draft": "مسودة"
+  },
   "Pages": {
     "ActivityLogs": {
       "title": "سجل الأنشطة",
@@ -3466,10 +3475,19 @@
       "status": {
         "label": "الحالة",
         "placeholder": "اختر الحالة",
-        "pending": "معلق",
+        "draft": "مسودة",
+        "submitted": "مقدمة",
+        "under_review": "قيد المراجعة",
+        "pending_verification": "قيد المراجعة",
+        "approved": "معتمد",
+        "partially_approved": "معتمد جزئيا",
+        "rejected": "مرفوض",
+        "pending_payment": "قيد الدفع",
         "paid": "مدفوع",
-        "overdue": "متأخر",
-        "rejected": "مرفوض"
+        "disputed": "متعطل",
+        "audit_flagged": "معلق",
+        "closed": "مغلق",
+        "archived": "مؤرشف"
       },
       "notes": {
         "label": "ملاحظات",

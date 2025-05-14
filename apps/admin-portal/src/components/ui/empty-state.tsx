@@ -20,9 +20,9 @@ export function EmptyState({ title, description, icons = [], action, className }
   return (
     <div
       className={cn(
-        "bg-background border-border hover:border-border/80 text-center",
-        "w-full max-w-[620px] rounded-xl border-2 border-dashed p-14",
-        "group hover:bg-muted/50 transition duration-500 hover:duration-200",
+        "from-background to-muted/10 border-border hover:border-border/80 bg-gradient-to-b text-center",
+        "w-full rounded-md border p-14",
+        "group hover:to-muted/80 transition duration-500 hover:duration-200",
         className,
       )}
     >
@@ -31,7 +31,7 @@ export function EmptyState({ title, description, icons = [], action, className }
           <>
             <div className="bg-background ring-border relative top-1.5 left-2.5 grid size-12 -rotate-6 place-items-center rounded-xl shadow-lg ring-1 transition duration-500 group-hover:-translate-x-5 group-hover:-translate-y-0.5 group-hover:-rotate-12 group-hover:duration-200">
               {React.createElement(icons[0], {
-                className: "w-6 h-6 text-muted-foreground",
+                className: "w-6 h-6 text-muted-foreground rtl:scale-x-[-1]",
               })}
             </div>
             <div className="bg-background ring-border relative z-10 grid size-12 place-items-center rounded-xl shadow-lg ring-1 transition duration-500 group-hover:-translate-y-0.5 group-hover:duration-200">
@@ -59,7 +59,7 @@ export function EmptyState({ title, description, icons = [], action, className }
       {action && (
         <Button
           onClick={action.onClick}
-          variant="outline"
+          // variant="outline"
           className={"mt-4 cursor-pointer shadow-sm active:shadow-none"}
         >
           {action.label}

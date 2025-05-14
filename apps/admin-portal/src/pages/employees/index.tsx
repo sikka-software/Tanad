@@ -182,7 +182,8 @@ export default function EmployeesPage() {
                 }}
                 renderItem={(employee) => (
                   <EmployeeCard
-                    position={jobs?.find((j) => j.id === employee.job_id)?.title}
+                    position={jobs?.find((j) => j.id === employee.job_id)?.title || ""}
+                    onActionClicked={onActionClicked}
                     employee={employee}
                   />
                 )}

@@ -167,10 +167,12 @@ export default function TrucksPage() {
                   title: t("Trucks.create_first.title"),
                   description: t("Trucks.create_first.description"),
                   add: t("Pages.Trucks.add"),
-                  icons: [Truck, Plus, Car],
+                  icons: [Truck, Plus, Truck],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(truck) => <TruckCard key={truck.id} truck={truck} />}
+                renderItem={(truck) => (
+                  <TruckCard truck={truck} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>

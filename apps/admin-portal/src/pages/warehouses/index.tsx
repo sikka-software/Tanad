@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { Warehouse } from "lucide-react";
+import { Plus, Warehouse } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -168,10 +168,12 @@ export default function WarehousesPage() {
                   title: t("Warehouses.create_first.title"),
                   description: t("Warehouses.create_first.description"),
                   add: t("Warehouses.create_first.add"),
-                  icons: [Warehouse, Warehouse, Warehouse],
+                  icons: [Warehouse, Plus, Warehouse],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(warehouse) => <WarehouseCard warehouse={warehouse} />}
+                renderItem={(warehouse) => (
+                  <WarehouseCard warehouse={warehouse} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>
@@ -211,7 +213,7 @@ export default function WarehousesPage() {
   );
 }
 
-WarehousesPage.messages = ["Notes", "Pages", "Warehouses", "Forms", "General"];
+WarehousesPage.messages = ["Notes", "Pages", "Warehouses", "Forms", "General", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

@@ -177,7 +177,9 @@ export default function DomainsPage() {
                   icons: [Globe, Globe, Globe],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(domain) => <DomainCard key={domain.id} domain={domain} />}
+                renderItem={(domain) => (
+                  <DomainCard key={domain.id} domain={domain} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>
@@ -217,7 +219,7 @@ export default function DomainsPage() {
   );
 }
 
-DomainsPage.messages = ["Pages", "Domains", "Notes", "General"];
+DomainsPage.messages = ["Pages", "Domains", "Notes", "CommonStatus", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
