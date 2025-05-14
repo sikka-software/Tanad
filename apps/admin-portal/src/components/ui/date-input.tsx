@@ -78,8 +78,6 @@ export function DateInputField({
             <DateInput />
           </Group>
         </DateField>
-        {/* Show formatted date preview if a date is selected */}
-        {formattedDate && <div className="text-muted-foreground mt-1 text-xs">{formattedDate}</div>}
       </I18nProvider>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
@@ -98,6 +96,7 @@ export function DateInputField({
           <Calendar
             mode="single"
             selected={isCalendarDate(value) ? value.toDate(getLocalTimeZone()) : undefined}
+            month={isCalendarDate(value) ? value.toDate(getLocalTimeZone()) : undefined}
             onSelect={handleCalendarSelect}
             initialFocus
           />
