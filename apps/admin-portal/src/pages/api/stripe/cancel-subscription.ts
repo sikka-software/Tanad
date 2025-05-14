@@ -44,6 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .update({
           cancel_at_period_end: cancelAtPeriodEnd,
           cancel_at: cancelAtPeriodEnd ? cancelAt : Math.floor(Date.now() / 1000), // If immediate cancellation, set to now
+          subscribed_to: cancelAtPeriodEnd ? profile.subscribed_to : "tanad_free", // Set to free plan for immediate cancellation
         })
         .eq("id", userId);
 
@@ -164,6 +165,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .update({
         cancel_at_period_end: cancelAtPeriodEnd,
         cancel_at: canceledSubscription.cancel_at || null,
+        subscribed_to: cancelAtPeriodEnd ? null : "tanad_free", // Set to free plan for immediate cancellation
       })
       .eq("id", userId);
 

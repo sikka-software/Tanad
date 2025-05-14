@@ -429,9 +429,6 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
                 !subscription.cancelAt &&
                 subscription.planLookupKey !== "tanad_free" && (
                   <div className="bg-primary/5 border-primary/10 mt-3 rounded-md border p-3">
-                    <p className="text-foreground text-sm font-semibold">
-                      {t("Billing.next_billing.title", { fallback: "Next Billing Information" })}:
-                    </p>
                     <div className="mt-1 flex flex-col gap-1 text-sm">
                       {nextBillingDate && (
                         <p className="text-foreground">
