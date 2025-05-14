@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { Package } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -176,8 +177,13 @@ export default function ProductsPage() {
                 data={sortedProducts}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Products.no_products")}
-                addFirstItemMessage={t("Products.add_first_product")}
+                empty={{
+                  title: t("Products.create_first.title"),
+                  description: t("Products.create_first.description"),
+                  add: t("Products.create_first.add"),
+                  icons: [Package, Package, Package],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(product) => <ProductCard product={product} />}
                 gridCols="3"
               />

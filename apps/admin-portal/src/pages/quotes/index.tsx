@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { Quote } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -161,8 +162,13 @@ export default function QuotesPage() {
                 data={sortedQuotes}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Quotes.no_quotes")}
-                addFirstItemMessage={t("Quotes.add_first_quote")}
+                empty={{
+                  title: t("Quotes.create_first.title"),
+                  description: t("Quotes.create_first.description"),
+                  add: t("Quotes.create_first.add"),
+                  icons: [Quote, Quote, Quote],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(quote) => <QuoteCard key={quote.id} quote={quote} />}
                 gridCols="2"
               />

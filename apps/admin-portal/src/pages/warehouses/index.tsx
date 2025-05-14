@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { Warehouse } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -163,7 +164,13 @@ export default function WarehousesPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Warehouses.no_warehouses_found")}
+                empty={{
+                  title: t("Warehouses.create_first.title"),
+                  description: t("Warehouses.create_first.description"),
+                  add: t("Warehouses.create_first.add"),
+                  icons: [Warehouse, Warehouse, Warehouse],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(warehouse) => <WarehouseCard warehouse={warehouse} />}
                 gridCols="3"
               />

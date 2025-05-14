@@ -1,7 +1,9 @@
 import { pick } from "lodash";
+import { User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
 
 import { buttonVariants } from "@/ui/button";
@@ -21,6 +23,7 @@ import { Vendor } from "@/vendor/vendor.type";
 
 export default function ContactsPage() {
   const t = useTranslations();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"clients" | "vendors">("clients");
 
   const { data: clients, isLoading: clientsLoading, error: clientsError } = useClients();
@@ -64,7 +67,13 @@ export default function ContactsPage() {
               data={clients as Client[]}
               isLoading={clientsLoading}
               error={clientsError instanceof Error ? clientsError : null}
-              emptyMessage={t("Clients.no_clients_found")}
+              empty={{
+                title: t("Clients.create_first.title"),
+                description: t("Clients.create_first.description"),
+                add: t("Clients.create_first.add"),
+                icons: [User, User, User],
+                onClick: () => router.push(router.pathname + "/add"),
+              }}
               renderItem={(client) => <ClientCard client={client} />}
               gridCols="3"
             />
@@ -75,7 +84,13 @@ export default function ContactsPage() {
               data={vendors as Vendor[]}
               isLoading={vendorsLoading}
               error={vendorsError instanceof Error ? vendorsError : null}
-              emptyMessage={t("Vendors.no_vendors")}
+              empty={{
+                title: t("Vendors.create_first.title"),
+                description: t("Vendors.create_first.description"),
+                add: t("Vendors.create_first.add"),
+                icons: [User, User, User],
+                onClick: () => router.push(router.pathname + "/add"),
+              }}
               renderItem={(vendor) => <VendorCard vendor={vendor} />}
               gridCols="3"
             />

@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -172,7 +173,13 @@ export default function EmployeesPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Pages.Employees.no_employees_found")}
+                empty={{
+                  title: t("Pages.Employees.create_first.title"),
+                  description: t("Pages.Employees.create_first.description"),
+                  add: t("Pages.Employees.add"),
+                  icons: [User, User, User],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(employee) => (
                   <EmployeeCard
                     position={jobs?.find((j) => j.id === employee.job_id)?.title}

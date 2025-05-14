@@ -1,15 +1,23 @@
+import { LucideIcon } from "lucide-react";
 import { ReactNode } from "react";
 
 import { Card, CardContent, CardHeader } from "@/ui/card";
 import { Skeleton } from "@/ui/skeleton";
 
+import { EmptyState } from "./empty-state";
+
 interface DataModelListProps<T> {
   data?: T[];
   isLoading: boolean;
   error: Error | null;
-  emptyMessage: string;
   errorMessage?: string;
-  addFirstItemMessage?: string;
+  empty?: {
+    title: string;
+    description: string;
+    add: string;
+    icons?: LucideIcon[];
+    onClick: () => void;
+  };
   renderItem: (item: T) => ReactNode;
   gridCols?: "1" | "2" | "3";
   skeletonCount?: number;
@@ -19,10 +27,9 @@ export default function DataModelList<T>({
   data = [],
   isLoading,
   error,
-  emptyMessage,
   errorMessage,
-  addFirstItemMessage,
   renderItem,
+  empty,
   gridCols = "3",
   skeletonCount = 3,
 }: DataModelListProps<T>) {
@@ -52,17 +59,22 @@ export default function DataModelList<T>({
     );
   }
 
-  if (data.length === 0) {
+  if (data.length === 0 && empty) {
     return (
-      <div className="py-12 text-center">
-        <p className="text-gray-500">{emptyMessage}</p>
-        {addFirstItemMessage && (
-          <p className="text-primary hover:text-primary/90 mt-2 inline-flex items-center gap-2">
-            {addFirstItemMessage}
-          </p>
-        )}
-      </div>
+      <EmptyState
+        className="mx-auto"
+        title={empty?.title}
+        description={empty?.description}
+        icons={empty?.icons}
+        action={{
+          label: empty?.add,
+          onClick: empty?.onClick,
+        }}
+      />
     );
+  }
+  if (data.length === 0 && !empty) {
+    return <div>No data found</div>;
   }
 
   return (

@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -167,8 +168,13 @@ export default function EmployeeRequestsPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("EmployeeRequests.no_requests")}
-                addFirstItemMessage={t("EmployeeRequests.add_first_request")}
+                empty={{
+                  title: t("EmployeeRequests.create_first.title"),
+                  description: t("EmployeeRequests.create_first.description"),
+                  add: t("Pages.EmployeeRequests.add"),
+                  icons: [User, User, User],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(request) => <EmployeeRequestCard employeeRequest={request} />}
                 gridCols="3"
               />

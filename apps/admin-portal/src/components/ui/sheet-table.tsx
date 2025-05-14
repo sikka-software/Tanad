@@ -740,7 +740,7 @@ function SheetTable<
               <TableCell
                 key={rowId + colKey + String(cell.getValue() ?? "")}
                 className={cn(
-                  "tiny-scrollbar relative overflow-scroll border group",
+                  "tiny-scrollbar group relative overflow-scroll border",
                   {
                     "bg-muted": isDisabled,
                     "bg-destructive/25": errorMsg,

@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -164,7 +165,13 @@ export default function SalariesPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Salaries.no_salaries_found")}
+                empty={{
+                  title: t("Salaries.create_first.title"),
+                  description: t("Salaries.create_first.description"),
+                  add: t("Salaries.create_first.add"),
+                  icons: [User, User, User],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(salary) => <SalaryCard key={salary.id} salary={salary} />}
                 gridCols="3"
               />

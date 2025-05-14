@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { Currency } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -168,7 +169,13 @@ export default function PurchasesPage() {
                 data={sortedPurchases}
                 isLoading={loadingFetchPurchases}
                 error={error}
-                emptyMessage={t("Purchases.no_purchases_found")}
+                empty={{
+                  title: t("Purchases.create_first.title"),
+                  description: t("Purchases.create_first.description"),
+                  add: t("Purchases.create_first.add"),
+                  icons: [Currency, Currency, Currency],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(purchase) => <PurchaseCard key={purchase.id} purchase={purchase} />}
                 gridCols="3"
               />

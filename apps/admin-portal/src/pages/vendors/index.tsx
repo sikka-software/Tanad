@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -165,7 +166,13 @@ export default function VendorsPage() {
               data={sortedData || []}
               isLoading={isLoading}
               error={error}
-              emptyMessage={t("Vendors.no_vendors")}
+              empty={{
+                title: t("Vendors.create_first.title"),
+                description: t("Vendors.create_first.description"),
+                add: t("Vendors.create_first.add"),
+                icons: [User, User, User],
+                onClick: () => router.push(router.pathname + "/add"),
+              }}
               renderItem={(vendor) => <VendorCard key={vendor.id} vendor={vendor} />}
               gridCols="3"
             />

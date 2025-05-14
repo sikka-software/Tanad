@@ -1,6 +1,8 @@
 import { pick } from "lodash";
+import { User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 
@@ -181,7 +183,6 @@ export default function RolesPage() {
             data={filteredRoles}
             isLoading={isLoading}
             error={error as Error | null}
-            emptyMessage={t("Roles.no_roles_found")}
             renderItem={(role) => (
               <RoleCard
                 key={role.id}

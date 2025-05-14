@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { Globe } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -169,7 +170,13 @@ export default function DomainsPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Domains.no_domains_found")}
+                empty={{
+                  title: t("Domains.create_first.title"),
+                  description: t("Domains.create_first.description"),
+                  add: t("Pages.Domains.add"),
+                  icons: [Globe, Globe, Globe],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(domain) => <DomainCard key={domain.id} domain={domain} />}
                 gridCols="3"
               />

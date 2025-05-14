@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { Globe, User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -165,7 +166,13 @@ export default function WebsitesPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Websites.no_websites_found")}
+                empty={{
+                  title: t("Websites.create_first.title"),
+                  description: t("Websites.create_first.description"),
+                  add: t("Websites.create_first.add"),
+                  icons: [Globe, Globe, Globe],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(website) => <WebsiteCard key={website.id} website={website} />}
                 gridCols="3"
               />

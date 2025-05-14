@@ -1,4 +1,6 @@
 import { pick } from "lodash";
+import { Plus } from "lucide-react";
+import { Building } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -165,7 +167,13 @@ export default function BranchesPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Pages.Branches.no_branches_found")}
+                empty={{
+                  title: t("Pages.Branches.create_first.title"),
+                  description: t("Pages.Branches.create_first.description"),
+                  add: t("Pages.Branches.add"),
+                  icons: [Building, Plus, Building],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(branch) => <BranchCard key={branch.id} branch={branch} />}
                 gridCols="3"
               />

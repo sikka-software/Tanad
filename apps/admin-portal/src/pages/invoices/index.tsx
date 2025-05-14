@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { File } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -169,8 +170,13 @@ export default function InvoicesPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Invoices.no_invoices_found")}
-                addFirstItemMessage={t("Invoices.add_first_invoice")}
+                empty={{
+                  title: t("Invoices.create_first.title"),
+                  description: t("Invoices.create_first.description"),
+                  add: t("Invoices.create_first.add"),
+                  icons: [File, File, File],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(invoice) => <InvoiceCard invoice={invoice} />}
                 gridCols="2"
               />

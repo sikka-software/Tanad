@@ -1,4 +1,7 @@
 import { pick } from "lodash";
+import { Car } from "lucide-react";
+import { Plus } from "lucide-react";
+import { Truck } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -162,7 +165,13 @@ export default function CarsPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Cars.no_cars_found")}
+                empty={{
+                  title: t("Cars.create_first.title"),
+                  description: t("Cars.create_first.description"),
+                  add: t("Pages.Cars.add"),
+                  icons: [Car, Car, Car],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(car) => <CarCard key={car.id} car={car} />}
                 gridCols="3"
               />

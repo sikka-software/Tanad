@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { Server } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -169,7 +170,13 @@ export default function ServersPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Pages.Servers.no_servers_found")}
+                empty={{
+                  title: t("Pages.Servers.create_first.title"),
+                  description: t("Pages.Servers.create_first.description"),
+                  add: t("Pages.Servers.add"),
+                  icons: [Server, Server, Server],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(server) => <ServerCard key={server.id} server={server} />}
                 gridCols="3"
               />

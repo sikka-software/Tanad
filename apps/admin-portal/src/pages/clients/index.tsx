@@ -1,4 +1,6 @@
 import { pick } from "lodash";
+import { Plus, User } from "lucide-react";
+import { Truck } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -166,7 +168,13 @@ export default function ClientsPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Clients.no_clients_found")}
+                empty={{
+                  title: t("Clients.create_first.title"),
+                  description: t("Clients.create_first.description"),
+                  add: t("Pages.Clients.add"),
+                  icons: [User, User, User],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(client) => <ClientCard client={client} />}
                 gridCols="3"
               />

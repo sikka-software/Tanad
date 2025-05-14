@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { Building } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -165,7 +166,13 @@ export default function OfficesPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Pages.Offices.no_offices_found")}
+                empty={{
+                  title: t("Pages.Offices.create_first.title"),
+                  description: t("Pages.Offices.create_first.description"),
+                  add: t("Pages.Offices.create_first.add"),
+                  icons: [Building, Building, Building],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(office) => <OfficeCard office={office} />}
                 gridCols="3"
               />

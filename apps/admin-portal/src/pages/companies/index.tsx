@@ -1,4 +1,6 @@
 import { pick } from "lodash";
+import { Building, Car, Plus } from "lucide-react";
+import { Truck } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -166,7 +168,13 @@ export default function CompaniesPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Companies.no_companies_found")}
+                empty={{
+                  title: t("Companies.create_first.title"),
+                  description: t("Companies.create_first.description"),
+                  add: t("Pages.Companies.add"),
+                  icons: [Building, Plus, Building],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(company) => (
                   <CompanyCard
                     key={company.id}

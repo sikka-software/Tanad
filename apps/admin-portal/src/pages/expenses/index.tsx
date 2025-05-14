@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { File } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -168,7 +169,13 @@ export default function ExpensesPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Pages.Expenses.no_expenses_found")}
+                empty={{
+                  title: t("Expenses.create_first.title"),
+                  description: t("Expenses.create_first.description"),
+                  add: t("Pages.Expenses.add"),
+                  icons: [File, File, File],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(expense) => <ExpenseCard expense={expense} />}
                 gridCols="3"
               />

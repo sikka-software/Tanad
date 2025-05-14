@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { Building, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -163,7 +164,13 @@ export default function DepartmentsPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Departments.no_departments_found")}
+                empty={{
+                  title: t("Departments.create_first.title"),
+                  description: t("Departments.create_first.description"),
+                  add: t("Pages.Departments.add"),
+                  icons: [Building, Building, Building],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(department) => (
                   <DepartmentCard key={department.id} department={department} />
                 )}

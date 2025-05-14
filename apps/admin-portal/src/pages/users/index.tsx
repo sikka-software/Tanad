@@ -148,7 +148,6 @@ export default function UsersPage() {
                 data={sortedUsers}
                 isLoading={isLoading}
                 error={error as Error | null}
-                emptyMessage={t("Pages.Users.no_users_found")}
                 renderItem={(user) => <UserCard key={user.id} user={user} />}
                 gridCols="3"
               />
