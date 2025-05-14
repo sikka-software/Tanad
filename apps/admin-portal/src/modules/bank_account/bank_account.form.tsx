@@ -7,6 +7,7 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 
+import DigitsInput from "@/components/ui/digits-input";
 import {
   Select,
   SelectContent,
@@ -260,6 +261,8 @@ export function BankAccountForm({
                 </FormItem>
               )}
             />
+          </div>
+          <div className="form-fields-cols-1">
             <FormField
               control={form.control}
               name="iban"
@@ -267,16 +270,32 @@ export function BankAccountForm({
                 <FormItem>
                   <FormLabel>{t("BankAccounts.form.iban.label")} *</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder={t("BankAccounts.form.iban.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
+                    <DigitsInput maxLength={24} disabled={isLoading} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="routing_number"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("BankAccounts.form.routing_number.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t("BankAccounts.form.routing_number.placeholder")}
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="swift_bic"
@@ -286,23 +305,6 @@ export function BankAccountForm({
                   <FormControl>
                     <Input
                       placeholder={t("BankAccounts.form.swift_bic.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="routing_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("BankAccounts.form.routing_number.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("BankAccounts.form.routing_number.placeholder")}
                       {...field}
                       disabled={isLoading}
                     />

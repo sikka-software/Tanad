@@ -181,9 +181,6 @@ export default function JobsPage() {
               setIsFormDialogOpen(false);
               setActionableItem(null);
               setLoadingSave(false);
-              toast.success(t("General.successful_operation"), {
-                description: t("Jobs.success.update"),
-              });
             }}
             defaultValues={actionableItem}
             editMode={true}

@@ -31,6 +31,7 @@ export function BankAccountsTable({
   onDelete: (account: BankAccount) => void;
 }) {
   const t = useTranslations();
+
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "active":
@@ -53,11 +54,11 @@ export function BankAccountsTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("BankAccounts.form.account_name")}</TableHead>
-            <TableHead>{t("BankAccounts.form.account_number")}</TableHead>
-            <TableHead>{t("BankAccounts.form.bank_name")}</TableHead>
-            <TableHead>{t("BankAccounts.form.account_type")}</TableHead>
-            <TableHead>{t("BankAccounts.form.status")}</TableHead>
+            <TableHead>{t("BankAccounts.form.account_name.label")}</TableHead>
+            <TableHead>{t("BankAccounts.form.account_number.label")}</TableHead>
+            <TableHead>{t("BankAccounts.form.bank_name.label")}</TableHead>
+            <TableHead>{t("BankAccounts.form.account_type.label")}</TableHead>
+            <TableHead>{t("BankAccounts.form.status.label")}</TableHead>
             <TableHead></TableHead>
           </TableRow>
         </TableHeader>
@@ -106,11 +107,11 @@ function TableSkeleton() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("BankAccounts.form.account_name")}</TableHead>
-            <TableHead>{t("BankAccounts.form.account_number")}</TableHead>
-            <TableHead>{t("BankAccounts.form.bank_name")}</TableHead>
-            <TableHead>{t("BankAccounts.form.account_type")}</TableHead>
-            <TableHead>{t("BankAccounts.form.status")}</TableHead>
+            <TableHead>{t("BankAccounts.form.account_name.label")}</TableHead>
+            <TableHead>{t("BankAccounts.form.account_number.label")}</TableHead>
+            <TableHead>{t("BankAccounts.form.bank_name.label")}</TableHead>
+            <TableHead>{t("BankAccounts.form.account_type.label")}</TableHead>
+            <TableHead>{t("BankAccounts.form.status.label")}</TableHead>
             <TableHead></TableHead>
           </TableRow>
         </TableHeader>

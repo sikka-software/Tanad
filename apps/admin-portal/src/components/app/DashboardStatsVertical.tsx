@@ -1,3 +1,4 @@
+import NumberFlow from "@number-flow/react";
 import { ModulesOptions, TanadModules } from "@tanad.config";
 import { Plus } from "lucide-react";
 import { motion } from "motion/react";
@@ -9,7 +10,7 @@ import { Button } from "@/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import { Separator } from "@/ui/separator";
 
-import { convertToPascalCase } from "@/lib/utils";
+import { cn, convertToPascalCase } from "@/lib/utils";
 
 import { DashboardStats } from "@/types/dashboard.types";
 
@@ -87,8 +88,10 @@ const DashboardStatsVertical = ({
                           <Link href={module.url || "/dashboard"}>
                             <div className="flex flex-row items-center justify-between gap-2 px-6 py-4">
                               <h3 className="text-sm font-medium">{t(module.translationKey)}</h3>
-                              <p className="text-sm font-bold">
-                                {stats[`total${pascalKey}` as keyof DashboardStats]}
+                              <p className={cn("text-sm font-bold", loadingStats && "blur-xs")}>
+                                <NumberFlow
+                                  value={Number(stats[`total${pascalKey}` as keyof DashboardStats])}
+                                />
                               </p>
                             </div>
                           </Link>

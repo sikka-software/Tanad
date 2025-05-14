@@ -1,11 +1,12 @@
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
 import { useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import FormDialog from "@/ui/form-dialog";
+
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
@@ -19,22 +20,26 @@ import PageTitle from "../components/ui/page-title";
 import { BankAccountForm } from "../modules/bank_account/bank_account.form";
 import { useBankAccounts, useDeleteBankAccount } from "../modules/bank_account/bank_account.hooks";
 import { BankAccountsTable } from "../modules/bank_account/bank_account.table";
-import { BankAccount } from "../modules/bank_account/bank_account.type";
+import { BankAccount, BankAccountUpdateData } from "../modules/bank_account/bank_account.type";
 
 export default function BankAccountsPage() {
   const t = useTranslations();
-  const router = useRouter();
+
+  const moduleHooks = createModuleStoreHooks(useBankAccountStore, "bank_accounts");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableItem, setActionableItem] = useState<BankAccountUpdateData | null>(null);
 
-  const isDeleteDialogOpen = useBankAccountStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useBankAccountStore((state) => state.setIsDeleteDialogOpen);
-  const actionableBankAccount = useBankAccountStore((state) => state.actionableItem);
-  const setActionableBankAccount = useBankAccountStore((state) => state.setActionableItem);
-  const loadingSaveBankAccount = useBankAccountStore((state) => state.isLoading);
-  const setIsLoadingSavingBankAccount = useBankAccountStore((state) => state.setIsLoading);
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
 
-  const { data: bankAccounts, isLoading: loadingFetchBankAccounts, error } = useBankAccounts();
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+
+  const { data: bankAccounts, isLoading: loadingFetchBankAccounts } = useBankAccounts();
   const { mutateAsync: deleteBankAccounts, isPending: isDeleting } = useDeleteBankAccount();
   const { createDeleteHandler } = useDeleteHandler();
 
@@ -42,9 +47,7 @@ export default function BankAccountsPage() {
     loading: "BankAccounts.loading.delete",
     success: "BankAccounts.success.delete",
     error: "BankAccounts.error.delete",
-    onSuccess: () => {
-      setIsDeleteDialogOpen(false);
-    },
+    onSuccess: () => setIsDeleteDialogOpen(false),
   });
 
   return (
@@ -52,11 +55,16 @@ export default function BankAccountsPage() {
       <CustomPageMeta title={t("BankAccounts.title")} description={t("BankAccounts.description")} />
       <DataPageLayout count={bankAccounts?.length} itemsText={t("Pages.BankAccounts.title")}>
         <PageTitle
-          texts={{
-            title: t("Pages.BankAccounts.title"),
-          }}
+          texts={{ title: t("Pages.BankAccounts.title") }}
           customButton={
-            <Button onClick={() => setIsFormDialogOpen(true)}>{t("Pages.BankAccounts.add")}</Button>
+            <Button
+              onClick={() => {
+                setIsFormDialogOpen(true);
+                setActionableItem(null);
+              }}
+            >
+              {t("Pages.BankAccounts.add")}
+            </Button>
           }
         />
 
@@ -66,11 +74,11 @@ export default function BankAccountsPage() {
             isLoading={loadingFetchBankAccounts}
             onEdit={(id) => {
               setIsFormDialogOpen(true);
-              setActionableBankAccount(id);
+              setActionableItem(id);
             }}
             onDelete={(account) => {
               setIsDeleteDialogOpen(true);
-              setActionableBankAccount(account);
+              setActionableItem(account);
             }}
           />
         </div>
@@ -78,20 +86,20 @@ export default function BankAccountsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Pages.BankAccounts.add")}
+          title={actionableItem ? t("Pages.BankAccounts.edit") : t("Pages.BankAccounts.add")}
           formId="bank-account-form"
-          loadingSave={loadingSaveBankAccount}
+          loadingSave={loadingSave}
         >
           <BankAccountForm
             formHtmlId={"bank-account-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
+              setActionableItem(null);
+              setLoadingSave(false);
             }}
-            onError={() => {
-              setIsLoadingSavingBankAccount(false);
-            }}
-            defaultValues={actionableBankAccount}
-            editMode={!!actionableBankAccount}
+            onError={() => setLoadingSave(false)}
+            defaultValues={actionableItem}
+            editMode={true}
           />
         </FormDialog>
 
@@ -99,7 +107,7 @@ export default function BankAccountsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(actionableBankAccount?.id || "")}
+          handleConfirmDelete={() => handleConfirmDelete(actionableItem?.id || "")}
           title={t("BankAccounts.confirm_delete")}
           description={t("BankAccounts.delete_description", { count: 1 })}
         />
