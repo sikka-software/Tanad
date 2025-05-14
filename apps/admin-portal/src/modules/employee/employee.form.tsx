@@ -3,6 +3,7 @@ import { createSelectSchema } from "drizzle-zod";
 import { Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { useDateFormatter } from "react-aria";
 import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -73,6 +74,8 @@ export function EmployeeForm({
 }: ModuleFormProps<EmployeeUpdateData | EmployeeCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
+
+  let formatter = useDateFormatter();
 
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
@@ -219,7 +222,9 @@ export function EmployeeForm({
     salaryComponents?.reduce((sum, comp) => sum + (Number(comp.amount) || 0), 0) || 0;
 
   const handleSubmit = async (data: z.input<ReturnType<typeof createEmployeeFormSchema>>) => {
+    console.log("data birth date", data.birth_date);
     setIsEmployeeSaving(true);
+
     // Log dirtyFields for debugging
     // console.log("Form dirtyFields:", form.formState.dirtyFields);
     // console.log("Form isDirty:", form.formState.isDirty);
@@ -249,7 +254,7 @@ export function EmployeeForm({
             email: data.email.trim(),
             phone: data.phone?.trim() || undefined,
             hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
-            birth_date: data.birth_date ? data.birth_date.toISOString().split("T")[0] : undefined,
+            birth_date: data.birth_date ? formatter.format(data.birth_date) : undefined,
             notes: data.notes,
             salary: (data.salary || []).map((comp) => ({
               ...comp,
@@ -498,6 +503,10 @@ export function EmployeeForm({
                         onSelect={field.onChange}
                         disabled={isEmployeeSaving}
                         ariaInvalid={form.formState.errors.birth_date !== undefined}
+                        onChange={(date) => {
+                          console.log("date", date);
+                          field.onChange(date);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />

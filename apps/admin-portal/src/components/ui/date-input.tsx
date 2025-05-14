@@ -1,8 +1,10 @@
 "use client";
 
-import { parseDate, getLocalTimeZone } from "@internationalized/date";
+import { parseDate, getLocalTimeZone, CalendarDate } from "@internationalized/date";
 import { CalendarIcon } from "lucide-react";
+import { useLocale } from "next-intl";
 import * as React from "react";
+import { I18nProvider, useDateFormatter } from "react-aria";
 import { Group } from "react-aria-components";
 import { DateRange } from "react-day-picker";
 
@@ -20,6 +22,8 @@ interface DatePickerProps {
   isolated?: boolean;
   mode?: "default" | "multiple" | "range" | "single";
   ariaInvalid?: boolean;
+  onChange?: (date: CalendarDate | null) => void;
+  value?: CalendarDate | null;
 }
 
 export function DateInputField({
@@ -30,8 +34,13 @@ export function DateInputField({
   isolated = false,
   mode = "single",
   ariaInvalid = false,
+  onChange,
+  value,
+  // ...props
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
+  const locale = useLocale();
+  const dateFormatter = useDateFormatter({ dateStyle: "medium" });
   // Convert JS Date to CalendarDate (react-aria format)
   const toCalendarDate = (d: Date | undefined) => {
     if (!d) return undefined;
@@ -47,7 +56,7 @@ export function DateInputField({
   };
 
   // Only support single date for now
-  const calendarValue = toCalendarDate(date as Date | undefined);
+  // const calendarValue = toCalendarDate(date as Date | undefined);
 
   // Handler for calendar selection
   const handleCalendarSelect = (selected: Date | undefined) => {
@@ -57,19 +66,30 @@ export function DateInputField({
     }
   };
 
+  // Use en-GB for dd/mm/yyyy if locale is en, otherwise use detected locale
+  const dateFieldLocale = locale === "en" ? "en-GB" : locale;
+
   return (
     <div className="flex w-full items-center gap-1">
-      <DateField
-        value={calendarValue}
-        onChange={(cd) => onSelect(toJSDate(cd))}
-        isDisabled={disabled}
-        aria-invalid={ariaInvalid}
-        className="w-full"
-      >
-        <Group className="w-full">
-          <DateInput />
-        </Group>
-      </DateField>
+      <I18nProvider locale={dateFieldLocale}>
+        <DateField
+          value={value}
+          // onChange={(cd) => onSelect(toJSDate(cd))}
+          isDisabled={disabled}
+          aria-invalid={ariaInvalid}
+          className="w-full"
+          onChange={onChange}
+          // {...props}
+        >
+          <Group className="w-full">
+            <DateInput />
+          </Group>
+        </DateField>
+        {/* Show formatted date preview if a date is selected */}
+        {date && date instanceof Date && (
+          <div className="text-muted-foreground mt-1 text-xs">{dateFormatter.format(date)}</div>
+        )}
+      </I18nProvider>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button

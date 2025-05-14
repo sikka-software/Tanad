@@ -39,6 +39,15 @@ const useCompanyColumns = (
       validationSchema: z.string().optional(),
     },
     {
+      accessorKey: "birth_date",
+      header: t("Employees.form.birth_date.label"),
+      validationSchema: z.string().optional(),
+      // cell: ({ getValue }) => {
+      //   const birthDate = getValue();
+      //   return <DateInputField date={birthDate} />;
+      // },
+    },
+    {
       accessorKey: "job_id",
       header: t("Employees.form.job.label"),
       validationSchema: z.string().min(1, t("Employees.form.job.required")),
