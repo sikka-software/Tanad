@@ -417,6 +417,7 @@ export function EmployeeForm({
                         onChange={field.onChange}
                         isLoading={jobsLoading}
                         disabled={isEmployeeSaving}
+                        ariaInvalid={form.formState.errors.job_id !== undefined}
                         texts={{
                           placeholder: t("Employees.form.job.placeholder"),
                           searchPlaceholder: t("Pages.Jobs.search"),
@@ -585,7 +586,7 @@ export function EmployeeForm({
                       dir={locale === "ar" ? "rtl" : "ltr"}
                     >
                       <FormControl>
-                        <SelectTrigger onClear={() => field.onChange("")}>
+                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
                           <SelectValue
                             placeholder={t("Employees.form.onboarding_status.placeholder")}
                           />
@@ -622,7 +623,7 @@ export function EmployeeForm({
                       dir={locale === "ar" ? "rtl" : "ltr"}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
                           <SelectValue
                             placeholder={t("Employees.form.offboarding_status.placeholder")}
                           />

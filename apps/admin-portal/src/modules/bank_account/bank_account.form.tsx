@@ -323,7 +323,7 @@ export function BankAccountForm({
                       disabled={isLoading}
                     >
                       <FormControl>
-                        <SelectTrigger onClear={() => field.onChange("")}>
+                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
                           <SelectValue placeholder={t("BankAccounts.form.status.placeholder")} />
                         </SelectTrigger>
                       </FormControl>

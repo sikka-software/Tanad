@@ -4,18 +4,10 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+import { Button } from "./button";
+
 function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  return (
-    <SelectPrimitive.Root
-      data-slot="select"
-      {...props}
-      onOpenChange={(e) => {
-        if (e && props.value === props.defaultValue) {
-          props.onValueChange?.("");
-        }
-      }}
-    />
-  );
+  return <SelectPrimitive.Root data-slot="select" {...props} />;
 }
 
 function SelectGroup({ ...props }: React.ComponentProps<typeof SelectPrimitive.Group>) {
@@ -35,6 +27,7 @@ function SelectTrigger({
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: "sm" | "default";
   onClear?: () => void;
+  value?: string;
 }) {
   return (
     <SelectPrimitive.Trigger
@@ -48,7 +41,7 @@ function SelectTrigger({
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        {onClear ? (
+        {onClear && props.value ? (
           <button
             autoFocus={false}
             type="button"
