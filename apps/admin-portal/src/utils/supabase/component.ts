@@ -10,13 +10,13 @@ if (!supabaseUrl || !supabaseKey) {
 
 export function createClient() {
   const supabase = createBrowserClient(supabaseUrl!, supabaseKey!, {
-    auth: {
-      persistSession: true, // Enable session persistence
-      storageKey: "tanad_supabase_auth", // Custom storage key
-      storage: typeof window !== "undefined" ? window.localStorage : undefined, // Use localStorage in browser
-      detectSessionInUrl: true, // Enable session detection in URL
-      autoRefreshToken: true, // Enable automatic token refresh
-    },
+    // auth: {
+    //   persistSession: true, // Enable session persistence
+    //   storageKey: "tanad_supabase_auth", // Custom storage key
+    //   storage: typeof window !== "undefined" ? window.localStorage : undefined, // Use localStorage in browser
+    //   detectSessionInUrl: true, // Enable session detection in URL
+    //   autoRefreshToken: true, // Enable automatic token refresh
+    // },
   });
   return supabase;
 }
