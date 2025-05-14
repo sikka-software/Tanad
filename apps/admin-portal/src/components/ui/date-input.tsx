@@ -39,19 +39,6 @@ export function DateInputField({
   const [open, setOpen] = React.useState(false);
   const locale = useLocale();
   const dateFormatter = useDateFormatter({ dateStyle: "medium" });
-  // Convert JS Date to CalendarDate (react-aria format)
-  const toCalendarDate = (d: Date | undefined) => {
-    if (!d) return undefined;
-    // Convert to yyyy-MM-dd string
-    const iso = d.toISOString().split("T")[0];
-    return parseDate(iso);
-  };
-  // Convert CalendarDate to JS Date
-  const toJSDate = (cd: any) => {
-    if (!cd) return undefined;
-    // cd.toDate(timeZone) returns a JS Date
-    return cd.toDate(getLocalTimeZone());
-  };
 
   // Handler for calendar selection
   const handleCalendarSelect = (selected: Date | undefined) => {
@@ -65,13 +52,13 @@ export function DateInputField({
   };
 
   // Helper to check if value is a CalendarDate
-  const isCalendarDate = (val: any): val is CalendarDate => val && typeof val.toDate === 'function';
+  const isCalendarDate = (val: any): val is CalendarDate => val && typeof val.toDate === "function";
 
   // Use en-GB for dd/mm/yyyy if locale is en, otherwise use detected locale
   const dateFieldLocale = locale === "en" ? "en-GB" : locale;
 
   // Format the selected date for preview
-  let formattedDate = '';
+  let formattedDate = "";
   if (isCalendarDate(value)) {
     const jsDate = value.toDate(getLocalTimeZone());
     formattedDate = dateFormatter.format(jsDate);
@@ -92,9 +79,7 @@ export function DateInputField({
           </Group>
         </DateField>
         {/* Show formatted date preview if a date is selected */}
-        {formattedDate && (
-          <div className="text-muted-foreground mt-1 text-xs">{formattedDate}</div>
-        )}
+        {formattedDate && <div className="text-muted-foreground mt-1 text-xs">{formattedDate}</div>}
       </I18nProvider>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>

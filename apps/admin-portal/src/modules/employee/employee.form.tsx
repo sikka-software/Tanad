@@ -506,7 +506,7 @@ export function EmployeeForm({
                     <FormControl>
                       <DateInput
                         placeholder={t("Employees.form.birth_date.placeholder")}
-                        value={field.value ?? null}
+                        value={typeof field.value === 'string' ? parseDate(field.value) : field.value ?? null}
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
                         disabled={isEmployeeSaving}
