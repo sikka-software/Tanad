@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const { version } = require("./package.json");
+const { i18n } = require("./next-i18next.config");
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -14,12 +15,12 @@ const nextConfig: NextConfig = {
     ];
   },
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
-
-  i18n: {
-    locales: ["en", "ar"],
-    defaultLocale: "ar",
-    localeDetection: false,
-  },
+  i18n,
+  // i18n: {
+  //   locales: ["en", "ar"],
+  //   defaultLocale: "ar",
+  //   localeDetection: false,
+  // },
   publicRuntimeConfig: { version },
 
   reactStrictMode: true,

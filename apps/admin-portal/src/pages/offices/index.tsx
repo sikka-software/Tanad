@@ -1,5 +1,6 @@
 import { pick } from "lodash";
 import { GetServerSideProps } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
@@ -220,10 +221,11 @@ OfficesPage.messages = [
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        OfficesPage.messages,
-      ),
+      ...(await serverSideTranslations(locale as string, OfficesPage.messages)),
+      // messages: pick(
+      //   (await import(`../../../locales/${locale}.json`)).default,
+      //   OfficesPage.messages,
+      // ),
     },
   };
 };

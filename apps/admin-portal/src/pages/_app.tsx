@@ -1,5 +1,6 @@
 "use client";
 
+import { appWithTranslation } from "next-i18next";
 import { NextIntlClientProvider, useLocale } from "next-intl";
 import { ThemeProvider } from "next-themes";
 import type { AppProps } from "next/app";
@@ -165,7 +166,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   );
 }
 
-export default function App(props: AppProps) {
+function App(props: AppProps) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AppContent {...props} />
@@ -193,3 +194,5 @@ const JobListingPage = ({ children }: { children: React.ReactNode }) => {
     </ThemeProvider>
   );
 };
+
+export default appWithTranslation(App);
