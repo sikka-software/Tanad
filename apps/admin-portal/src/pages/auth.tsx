@@ -49,12 +49,12 @@ export default function Auth() {
 
   useEffect(() => {
     setIsSignUp(router.asPath.includes("#signup"));
-    if (user && !loadingUser && supabaseSession && router.pathname === "/auth") {
-      const redirectPath = sessionStorage.getItem("redirectAfterAuth") || "/dashboard";
-      sessionStorage.removeItem("redirectAfterAuth");
-      window.location.href = redirectPath;
-    }
-  }, [user, loadingUser, supabaseSession, router]);
+    // if (user && !loadingUser && supabaseSession && router.pathname === "/auth") {
+    //   const redirectPath = sessionStorage.getItem("redirectAfterAuth") || "/dashboard";
+    //   sessionStorage.removeItem("redirectAfterAuth");
+    //   window.location.href = redirectPath;
+    // }
+  }, [router]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
