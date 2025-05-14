@@ -24,8 +24,8 @@ export default function AddExpensePage() {
     const form = (window as any).expenseForm;
     if (form) {
       form.setValue("expense_number", dummyData.stringNumber);
-      form.setValue("issue_date", dummyData.randomDate);
-      form.setValue("due_date", dummyData.randomDate);
+      // form.setValue("issue_date", dummyData.randomDate);
+      // form.setValue("due_date", dummyData.randomDate);
       form.setValue("amount", dummyData.randomNumber(4));
       form.setValue("category", dummyData.expense_category);
       form.setValue("notes", dummyData.randomString);

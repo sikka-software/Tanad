@@ -1509,19 +1509,21 @@ export const expenses = pgTable(
   "expenses",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }),
+    user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
+    // Rest
     description: text(),
     amount: numeric({ precision: 10, scale: 2 }).notNull(),
     incurred_at: date().default(sql`CURRENT_DATE`),
     created_by: uuid(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
     category: text().notNull(),
     due_date: date(),
     issue_date: date().default(sql`CURRENT_DATE`),
     notes: jsonb(),
     expense_number: text().notNull(),
     status: expense_status().default("draft").notNull(),
-    user_id: uuid().notNull(),
   },
   (table) => [
     foreignKey({
