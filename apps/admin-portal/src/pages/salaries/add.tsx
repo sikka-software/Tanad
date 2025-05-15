@@ -35,11 +35,10 @@ export default function AddSalaryPage() {
 
       <SalaryForm
         formHtmlId="salary-form"
-        onSuccess={() =>
-          router.push("/salaries").then(() => {
-            setLoading(false);
-          })
-        }
+        onSuccess={() => {
+          router.push("/salaries");
+          setLoading(false);
+        }}
       />
     </div>
   );

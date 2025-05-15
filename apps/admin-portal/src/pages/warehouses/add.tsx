@@ -33,11 +33,6 @@ export default function AddWarehousePage() {
     }
   };
 
-  const onAddSuccess = () => {
-    router.push("/warehouses");
-    setIsLoading(false);
-  };
-
   return (
     <div>
       <CustomPageMeta title={t("Pages.Warehouses.add")} />
@@ -54,7 +49,13 @@ export default function AddWarehousePage() {
         dummyButton={handleDummyData}
       />
 
-      <WarehouseForm formHtmlId="warehouse-form" onSuccess={onAddSuccess} />
+      <WarehouseForm
+        formHtmlId="warehouse-form"
+        onSuccess={() => {
+          router.push("/warehouses");
+          setIsLoading(false);
+        }}
+      />
     </div>
   );
 }

@@ -33,11 +33,6 @@ export default function AddExpensePage() {
     }
   };
 
-  const onAddSuccess = () => {
-    router.push("/expenses");
-    setIsLoading(false);
-  };
-
   return (
     <div>
       <CustomPageMeta title={t("Pages.Expenses.add")} />
@@ -54,7 +49,13 @@ export default function AddExpensePage() {
         dummyButton={handleDummyData}
       />
 
-      <ExpenseForm formHtmlId="expense-form" onSuccess={onAddSuccess} />
+      <ExpenseForm
+        formHtmlId="expense-form"
+        onSuccess={() => {
+          router.push("/expenses");
+          setIsLoading(false);
+        }}
+      />
     </div>
   );
 }

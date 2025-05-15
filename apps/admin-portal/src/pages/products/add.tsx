@@ -33,14 +33,6 @@ export default function AddProductPage() {
     }
   };
 
-  const onAddSuccess = () => {
-    toast.success(t("General.successful_operation"), {
-      description: t("Products.success.create"),
-    });
-    router.push("/products");
-    setIsLoading(false);
-  };
-
   return (
     <div>
       <CustomPageMeta title={t("Pages.Products.add")} />
@@ -57,7 +49,13 @@ export default function AddProductPage() {
         dummyButton={handleDummyData}
       />
 
-      <ProductForm formHtmlId="product-form" onSuccess={onAddSuccess} />
+      <ProductForm
+        formHtmlId="product-form"
+        onSuccess={() => {
+          router.push("/products");
+          setIsLoading(false);
+        }}
+      />
     </div>
   );
 }

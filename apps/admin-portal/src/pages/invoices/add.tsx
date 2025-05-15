@@ -18,11 +18,6 @@ export default function AddInvoicePage() {
   const isLoading = useInvoiceStore((state) => state.isLoading);
   const setIsLoading = useInvoiceStore((state) => state.setIsLoading);
 
-  const onAddSuccess = () => {
-    setIsLoading(false);
-    router.push("/invoices");
-  };
-
   return (
     <div>
       <CustomPageMeta title={t("Pages.Invoices.add")} />
@@ -38,7 +33,13 @@ export default function AddInvoicePage() {
         }}
       />
 
-      <InvoiceForm formHtmlId="invoice-form" onSuccess={onAddSuccess} />
+      <InvoiceForm
+        formHtmlId="invoice-form"
+        onSuccess={() => {
+          setIsLoading(false);
+          router.push("/invoices");
+        }}
+      />
     </div>
   );
 }

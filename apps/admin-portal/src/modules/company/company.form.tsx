@@ -10,6 +10,7 @@ import { DocumentFile } from "@/ui/documents-uploader";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import PhoneInput from "@/ui/phone-input";
+import PrefixedInput from "@/ui/prefixed-input";
 
 import NotesSection from "@/components/forms/notes-section";
 
@@ -321,7 +322,9 @@ export function CompanyForm({
                 <FormItem>
                   <FormLabel>{t("Companies.form.size.label")}</FormLabel>
                   <FormControl>
-                    <Input
+                    <PrefixedInput
+                      type="number"
+                      prefix={t("Companies.form.size.prefix")}
                       disabled={isLoading}
                       placeholder={t("Companies.form.size.placeholder")}
                       {...field}

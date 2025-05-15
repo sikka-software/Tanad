@@ -3,7 +3,6 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 import PageTitle from "@/ui/page-title";
 
@@ -31,10 +30,6 @@ export default function AddUserPage() {
     }
   };
 
-  const onAddSuccess = () => {
-    router.push("/users");
-  };
-
   return (
     <div>
       <CustomPageMeta title={t("Pages.Users.add")} />
@@ -50,7 +45,7 @@ export default function AddUserPage() {
           cancel: t("General.cancel"),
         }}
       />
-      <UserForm formHtmlId="user-form" onSuccess={onAddSuccess} />
+      <UserForm formHtmlId="user-form" onSuccess={() => router.push("/users")} />
     </div>
   );
 }

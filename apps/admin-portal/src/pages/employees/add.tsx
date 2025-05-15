@@ -50,11 +50,10 @@ export default function AddEmployeePage() {
       />
       <EmployeeForm
         formHtmlId="employee-form"
-        onSuccess={() =>
-          router.push("/employees").then(() => {
-            setLoadingSave(false);
-          })
-        }
+        onSuccess={() => {
+          router.push("/employees");
+          setLoadingSave(false);
+        }}
       />
     </div>
   );

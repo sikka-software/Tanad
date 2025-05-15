@@ -11,6 +11,8 @@ import {
 } from "@/company/company.service";
 import type { Company, CompanyCreateData, CompanyUpdateData } from "@/company/company.type";
 
+import useCompanyStore from "./company.store";
+
 // Query keys for companies
 export const companyKeys = {
   all: ["companies"] as const,
@@ -40,14 +42,14 @@ export function useCompany(id: string) {
 // Hook to create a company
 export function useCreateCompany() {
   const queryClient = useQueryClient();
+  // const setData = useCompanyStore((state) => state.setData);
   return useMutation({
     mutationFn: (company: CompanyCreateData) => createCompany(company),
     onSuccess: (newCompany: Company) => {
       const previousCompanies = queryClient.getQueryData(companyKeys.lists()) || [];
-      queryClient.setQueryData(companyKeys.lists(), [
-        ...(Array.isArray(previousCompanies) ? previousCompanies : []),
-        newCompany,
-      ]);
+      const newData = [...(Array.isArray(previousCompanies) ? previousCompanies : []), newCompany];
+      queryClient.setQueryData(companyKeys.lists(), newData);
+      // setData?.(newData);
     },
     meta: { toast: { success: "Companies.success.create", error: "Companies.error.create" } },
   });

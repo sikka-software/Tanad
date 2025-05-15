@@ -2,7 +2,6 @@ import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { toast } from "sonner";
 
 import PageTitle from "@/ui/page-title";
 
@@ -38,14 +37,6 @@ export default function AddCompanyPage() {
     }
   };
 
-  const onAddSuccess = () => {
-    toast.success(t("General.successful_operation"), {
-      description: t("Companies.success.create"),
-    });
-    router.push("/companies");
-    setIsLoading(false);
-  };
-
   return (
     <div>
       <CustomPageMeta title={t("Pages.Companies.add")} />
@@ -61,7 +52,13 @@ export default function AddCompanyPage() {
           cancel: t("General.cancel"),
         }}
       />
-      <CompanyForm formHtmlId="company-form" onSuccess={onAddSuccess} />
+      <CompanyForm
+        formHtmlId="company-form"
+        onSuccess={() => {
+          router.push("/companies");
+          setIsLoading(false);
+        }}
+      />
     </div>
   );
 }

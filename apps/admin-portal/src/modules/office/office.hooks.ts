@@ -41,7 +41,6 @@ export function useOffice(id: string) {
 // Hook to create a office
 export function useCreateOffice() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
   return useMutation({
     mutationFn: (office: OfficeCreateData) => createOffice(office),
     onSuccess: (newOffice: Office) => {

@@ -53,12 +53,8 @@ export default function AddVendorPage() {
       <VendorForm
         formHtmlId="vendor-form"
         onSuccess={() => {
-          router.push("/vendors").then(() => {
-            setIsLoading(false);
-            toast.success(t("General.successful_operation"), {
-              description: t("Vendors.success.create"),
-            });
-          });
+          router.push("/vendors");
+          setIsLoading(false);
         }}
       />
     </div>
