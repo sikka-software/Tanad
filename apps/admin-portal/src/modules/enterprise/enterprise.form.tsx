@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { createClient } from "@/utils/supabase/component";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 

@@ -12,14 +12,14 @@ import * as z from "zod";
 
 import { Button } from "@/ui/button";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
-import CountryInput from "@/ui/country-input";
-import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
+import CountryInput from "@/components/ui/inputs/country-input";
+import { CurrencyInput, MoneyFormatter } from "@/components/ui/inputs/currency-input";
 import { DatePicker } from "@/ui/date-picker";
-import DigitsInput from "@/ui/digits-input";
+import DigitsInput from "@/components/ui/inputs/digits-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
-import { Input } from "@/ui/input";
-import PhoneInput from "@/ui/phone-input";
+import { Input } from "@/components/ui/inputs/input";
+import PhoneInput from "@/components/ui/inputs/phone-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
@@ -27,7 +27,7 @@ import { createClient } from "@/utils/supabase/component";
 
 import FormSectionHeader from "@/components/forms/form-section-header";
 import NotesSection from "@/components/forms/notes-section";
-import { DateInput } from "@/components/ui/date-input";
+import { DateInput } from "@/components/ui/inputs/date-input";
 
 import { addressSchema } from "@/lib/schemas/address.schema";
 import { metadataSchema } from "@/lib/schemas/metadata.schema";

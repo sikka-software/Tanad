@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import {
   Sidebar,
   SidebarContent,

@@ -12,7 +12,7 @@ import { Button } from "./button";
 import ColumnViewPopover from "./column-view-popover";
 import FilterPopover from "./filter-popover";
 import IconButton from "./icon-button";
-import { Input } from "./input";
+import { Input } from "./inputs/input";
 import { ExtendedColumnDef } from "./sheet-table";
 import SortPopover from "./sort-popover";
 

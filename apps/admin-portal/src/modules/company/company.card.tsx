@@ -1,4 +1,5 @@
 import { Mail, Phone, Globe, MapPin, Building2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import ModuleCard from "@/components/cards/module-card";
 
@@ -15,6 +16,7 @@ const CompanyCard = ({
   company: Company;
   onActionClicked: (action: string, rowId: string) => void;
 }) => {
+  const t = useTranslations();
   const { mutate: updateCompany } = useUpdateCompany();
   const data = useCompanyStore((state) => state.data);
   const setData = useCompanyStore((state) => state.setData);
@@ -81,7 +83,9 @@ const CompanyCard = ({
         {company.size && (
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Building2 className="h-4 w-4" />
-            <span>{company.size} employees</span>
+            <span>
+              {t("Companies.form.size.label")} {Number(company.size).toLocaleString()}
+            </span>
           </div>
         )}
       </div>

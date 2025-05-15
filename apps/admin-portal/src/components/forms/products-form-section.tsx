@@ -12,9 +12,9 @@ import { useFormContext, useWatch } from "react-hook-form";
 
 import { Button } from "@/ui/button";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
-import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
+import { CurrencyInput, MoneyFormatter } from "@/components/ui/inputs/currency-input";
 import { FormField, FormItem, FormControl, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 
 import { getCurrencySymbol } from "@/lib/currency-utils";

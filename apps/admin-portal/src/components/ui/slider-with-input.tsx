@@ -4,7 +4,7 @@ import { RotateCcw } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/ui/button";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/ui/label";
 import { Slider } from "@/ui/slider";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/ui/tooltip";

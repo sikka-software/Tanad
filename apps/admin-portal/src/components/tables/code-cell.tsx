@@ -1,8 +1,8 @@
 import { useLocale, useTranslations } from "next-intl";
 import { ChangeEvent } from "react";
 
-import CodeInput from "../ui/code-input";
-import { Input } from "../ui/input";
+import CodeInput from "../ui/inputs/code-input";
+import { Input } from "../ui/inputs/input";
 
 const CodeCell = ({
   code,

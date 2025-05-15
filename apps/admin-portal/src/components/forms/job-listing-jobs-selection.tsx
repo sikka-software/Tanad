@@ -3,9 +3,9 @@ import { useTranslations } from "next-intl";
 import { useState, useMemo } from "react";
 import { FieldError, UseFormReturn } from "react-hook-form";
 
-import { MoneyFormatter } from "@/ui/currency-input";
+import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 import { FormField, FormItem } from "@/ui/form";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 
 import FormSectionHeader from "@/forms/form-section-header";
 

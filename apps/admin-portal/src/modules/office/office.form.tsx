@@ -6,12 +6,12 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import BooleanTabs from "@/ui/boolean-tabs";
-import CodeInput from "@/ui/code-input";
+import CodeInput from "@/components/ui/inputs/code-input";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
-import { Input } from "@/ui/input";
-import PhoneInput from "@/ui/phone-input";
+import { Input } from "@/components/ui/inputs/input";
+import PhoneInput from "@/components/ui/inputs/phone-input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import NotesSection from "@/components/forms/notes-section";

@@ -12,7 +12,7 @@ import {
 } from "@/ui/dialog";
 
 import { Button } from "./button";
-import { Input } from "./input";
+import { Input } from "./inputs/input";
 
 interface ConfirmDeleteProps {
   isDeleteDialogOpen: boolean;

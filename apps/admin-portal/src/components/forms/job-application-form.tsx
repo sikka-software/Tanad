@@ -17,7 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,

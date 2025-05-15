@@ -7,7 +7,7 @@ import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Textarea } from "@/ui/textarea";
 
 import JobListingJobsSelection from "@/components/forms/job-listing-jobs-selection";

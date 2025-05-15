@@ -5,9 +5,9 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 
-import DigitsInput from "@/components/ui/digits-input";
+import DigitsInput from "@/components/ui/inputs/digits-input";
 import {
   Select,
   SelectContent,

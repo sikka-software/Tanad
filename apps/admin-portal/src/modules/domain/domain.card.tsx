@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 
 import ModuleCard from "@/components/cards/module-card";
-import { MoneyFormatter } from "@/components/ui/currency-input";
+import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 
 import { getCurrencySymbol } from "@/lib/currency-utils";
 

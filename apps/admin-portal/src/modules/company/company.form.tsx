@@ -5,11 +5,11 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import DigitsInput from "@/ui/digits-input";
+import DigitsInput from "@/components/ui/inputs/digits-input";
 import { DocumentFile } from "@/ui/documents-uploader";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
-import PhoneInput from "@/ui/phone-input";
+import { Input } from "@/components/ui/inputs/input";
+import PhoneInput from "@/components/ui/inputs/phone-input";
 import PrefixedInput from "@/ui/prefixed-input";
 
 import NotesSection from "@/components/forms/notes-section";

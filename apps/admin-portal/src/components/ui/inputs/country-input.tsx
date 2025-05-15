@@ -19,7 +19,7 @@ import { Skeleton } from "@/ui/skeleton";
 import { countries } from "@/lib/constants/countries";
 import { cn } from "@/lib/utils";
 
-import { Button } from "./button";
+import { Button } from "../button";
 
 type CountryInputTypes<T> = {
   labelKey?: keyof T | any;

@@ -1,7 +1,7 @@
 import { Calendar, Tag } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { MoneyFormatter } from "@/ui/currency-input";
+import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 
 import ModuleCard from "@/components/cards/module-card";
 

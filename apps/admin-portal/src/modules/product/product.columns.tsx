@@ -2,7 +2,7 @@ import { CellContext } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { MoneyFormatter } from "@/ui/currency-input";
+import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
 import { getCurrencySymbol } from "@/lib/currency-utils";

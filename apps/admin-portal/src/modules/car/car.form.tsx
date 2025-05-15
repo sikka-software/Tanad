@@ -5,13 +5,13 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import DigitsInput from "@/ui/digits-input";
+import DigitsInput from "@/components/ui/inputs/digits-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 
-import CountryInput from "@/components/ui/country-input";
-import { CurrencyInput } from "@/components/ui/currency-input";
-import NumberInput from "@/components/ui/number-input";
+import CountryInput from "@/components/ui/inputs/country-input";
+import { CurrencyInput } from "@/components/ui/inputs/currency-input";
+import NumberInput from "@/components/ui/inputs/number-input";
 import {
   Select,
   SelectContent,

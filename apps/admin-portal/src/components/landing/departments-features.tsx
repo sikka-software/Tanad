@@ -1,5 +1,5 @@
 import { Button } from "@/ui/button";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/ui/label";
 
 import {

@@ -6,12 +6,12 @@ import { FieldError, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import CodeInput from "@/ui/code-input";
+import CodeInput from "@/components/ui/inputs/code-input";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import NotesSection from "@/forms/notes-section";

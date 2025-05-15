@@ -11,7 +11,7 @@ import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";

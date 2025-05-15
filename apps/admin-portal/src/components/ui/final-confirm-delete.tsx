@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/ui/dialog";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/ui/label";
 
 export default function Component({

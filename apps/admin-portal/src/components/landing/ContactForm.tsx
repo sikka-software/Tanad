@@ -8,7 +8,7 @@ import * as z from "zod";
 import { Button } from "@/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Textarea } from "@/ui/textarea";
 
 // Types

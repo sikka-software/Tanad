@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 
 import { Button } from "./button";
 import { Checkbox } from "./checkbox";
-import { Input } from "./input";
+import { Input } from "./inputs/input";
 import { Skeleton } from "./skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table";
 

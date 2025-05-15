@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { createClient } from "@/utils/supabase/server-props";
 
-import { MoneyFormatter } from "@/components/ui/currency-input";
+import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 
 import { Invoice, InvoiceItem } from "@/invoice/invoice.type";
 

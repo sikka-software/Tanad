@@ -27,7 +27,7 @@ import { INSERT_YOUTUBE_COMMAND } from "@/components/editor/plugins/embeds/youtu
 import { Button } from "@/components/ui/button";
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export interface CustomEmbedConfig extends EmbedConfig {

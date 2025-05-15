@@ -1,5 +1,5 @@
-import { Input } from "@/ui/input";
-import NumberInput from "@/ui/number-input";
+import { Input } from "@/components/ui/inputs/input";
+import NumberInput from "@/components/ui/inputs/number-input";
 
 import { cn } from "@/lib/utils";
 

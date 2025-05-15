@@ -33,7 +33,7 @@ import { getSelectedNode } from "@/components/editor/utils/get-selected-node";
 import { setFloatingElemPositionForLinkEditor } from "@/components/editor/utils/set-floating-elem-position-for-link-editor";
 import { sanitizeUrl } from "@/components/editor/utils/url";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 
 function FloatingLinkEditor({
   editor,

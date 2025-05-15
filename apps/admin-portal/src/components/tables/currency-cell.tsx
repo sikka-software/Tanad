@@ -3,7 +3,7 @@ import React from "react";
 
 import { getCurrencySymbol } from "@/lib/currency-utils";
 
-import { MoneyFormatter } from "../ui/currency-input";
+import { MoneyFormatter } from "../ui/inputs/currency-input";
 
 /**
  * Displays a formatted currency value with symbol.

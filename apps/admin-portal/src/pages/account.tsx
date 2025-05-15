@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 

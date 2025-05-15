@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import CodeCell from "@/components/tables/code-cell";
 import SelectCell from "@/components/tables/select-cell";
-import { MoneyFormatter } from "@/components/ui/currency-input";
+import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { getCurrencySymbol } from "@/lib/currency-utils";

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
 

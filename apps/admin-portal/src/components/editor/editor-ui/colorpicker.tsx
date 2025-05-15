@@ -2,7 +2,7 @@ import * as React from "react";
 import { HexColorPicker } from "react-colorful";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 type Props = {

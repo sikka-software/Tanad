@@ -6,7 +6,7 @@ import * as z from "zod";
 
 import BooleanTabs from "@/ui/boolean-tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 
 import NotesSection from "@/components/forms/notes-section";
 

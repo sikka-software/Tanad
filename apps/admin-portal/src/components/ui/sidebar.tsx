@@ -5,7 +5,7 @@ import { useLocale } from "next-intl";
 import * as React from "react";
 
 import { Button } from "@/ui/button";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Separator } from "@/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/ui/sheet";
 import { Skeleton } from "@/ui/skeleton";

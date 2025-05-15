@@ -8,7 +8,7 @@ import { z } from "zod";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import PasswordInput from "@/ui/password-input";
 
 import { ModuleFormProps } from "@/types/common.type";
