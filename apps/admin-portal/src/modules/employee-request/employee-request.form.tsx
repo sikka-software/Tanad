@@ -62,7 +62,7 @@ const createRequestSchema = (t: (key: string) => string) => {
 };
 
 type EmployeeRequestFormSchema = ReturnType<typeof createRequestSchema>;
-export type EmployeeRequestFormValues = z.infer<EmployeeRequestFormSchema>;
+export type EmployeeRequestFormValues = z.input<EmployeeRequestFormSchema>;
 
 export function EmployeeRequestForm({
   formHtmlId,
@@ -90,7 +90,7 @@ export function EmployeeRequestForm({
 
   // Define literal types here, now that `t` is available
   const concreteSchema = createRequestSchema(t);
-  type EmployeeRequestType = z.infer<typeof concreteSchema>["type"];
+  type EmployeeRequestType = z.input<typeof concreteSchema>["type"];
 
   const form = useForm<EmployeeRequestFormValues>({
     resolver: zodResolver(concreteSchema),

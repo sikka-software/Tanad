@@ -36,7 +36,7 @@ const createRoleSchema = (t: (key: string) => string) =>
     permissions: z.array(z.string()),
   });
 
-type FormData = z.infer<ReturnType<typeof createRoleSchema>>;
+type FormData = z.input<ReturnType<typeof createRoleSchema>>;
 
 export function RoleForm({
   formHtmlId,

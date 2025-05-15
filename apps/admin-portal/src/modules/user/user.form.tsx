@@ -47,7 +47,7 @@ const updateUserFormSchema = baseUserFormSchema.extend({
 });
 
 // Infer the type from the base schema, specific validation handled conditionally
-type UserFormData = z.infer<typeof baseUserFormSchema> & { password?: string };
+type UserFormData = z.input<typeof baseUserFormSchema> & { password?: string };
 
 export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormProps<UserType>) {
   const t = useTranslations();

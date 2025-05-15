@@ -52,7 +52,7 @@ const createJobListingSchema = (t: (key: string) => string) => {
   });
 };
 
-export type JobListingFormValues = z.infer<ReturnType<typeof createJobListingSchema>>;
+export type JobListingFormValues = z.input<ReturnType<typeof createJobListingSchema>>;
 
 export function JobListingForm({
   formHtmlId,

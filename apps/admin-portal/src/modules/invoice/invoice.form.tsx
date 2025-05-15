@@ -83,7 +83,7 @@ const createInvoiceSchema = (t: (key: string) => string) => {
   });
 };
 
-export type InvoiceFormValues = z.infer<ReturnType<typeof createInvoiceSchema>>;
+export type InvoiceFormValues = z.input<ReturnType<typeof createInvoiceSchema>>;
 
 export function InvoiceForm({
   formHtmlId,

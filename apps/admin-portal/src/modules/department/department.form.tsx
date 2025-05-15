@@ -60,7 +60,7 @@ const createDepartmentSchema = (t: (key: string) => string) => {
   });
 };
 
-export type DepartmentFormValues = z.infer<ReturnType<typeof createDepartmentSchema>>;
+export type DepartmentFormValues = z.input<ReturnType<typeof createDepartmentSchema>>;
 
 export default function DepartmentForm({
   formHtmlId,
