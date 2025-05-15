@@ -113,6 +113,7 @@ export async function deleteEmployeeRequest(id: string): Promise<void> {
 }
 
 export async function bulkDeleteEmployeeRequests(ids: string[]): Promise<void> {
+  console.log("ids are ", ids);
   try {
     const response = await fetch("/api/resource/employee_requests", {
       method: "DELETE",

@@ -113,13 +113,17 @@ export function createApiHandler({ tableName, customHandlers = {} }: Options) {
               .json({ message: "Invalid request body: 'ids' array is required." });
           }
 
-          const { error: deleteError } = await supabase
+          const { data: deletedRows, error: deleteError } = await supabase
             .from(tableName)
             .delete()
             .in("id", ids)
-            .eq("enterprise_id", enterprise_id);
+            .eq("enterprise_id", enterprise_id)
+            .select();
 
           if (deleteError) throw deleteError;
+          if (!deletedRows || deletedRows.length === 0) {
+            return res.status(404).json({ message: `No ${tableName} found or deleted` });
+          }
           return res.status(204).end();
 
         default:
