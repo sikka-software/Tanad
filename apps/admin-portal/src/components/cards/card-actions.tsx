@@ -26,11 +26,44 @@ const CardActions = ({
 }) => {
   const t = useTranslations();
   const lang = useLocale();
-  const isMobile = useMediaQuery("(max-width: 1024px)");
-  const commonClasses =
-    "translate-y-1 opacity-0 !size-8 !min-size-8 transition-all group-hover:translate-y-0 group-hover:opacity-100 @sm/module-card:hidden";
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  const calculateContainerWidth = () => {
+    let buttonsCount = 0;
+
+    if (onPreview) buttonsCount++;
+    if (onEdit) buttonsCount++;
+    if (onDuplicate) buttonsCount++;
+    if (onView) buttonsCount++;
+    if (onArchive) buttonsCount++;
+    if (onDelete) buttonsCount++;
+
+    if (!isMobile) {
+      let iconButtonClasses = {
+        "@min-[268px]/module-card:inline-flex": buttonsCount === 6,
+        "@min-[224px]/module-card:inline-flex": buttonsCount === 5,
+        "@min-[180px]/module-card:inline-flex": buttonsCount === 4,
+        "@min-[136px]/module-card:inline-flex": buttonsCount === 3,
+        "@min-[92px]/module-card:inline-flex": buttonsCount === 2,
+        "@min-[48px]/module-card:inline-flex": buttonsCount === 1,
+      };
+      let moreButtonClasses = {
+        "@min-[268px]/module-card:hidden": buttonsCount === 6,
+        "@min-[224px]/module-card:hidden": buttonsCount === 5,
+        "@min-[180px]/module-card:hidden": buttonsCount === 4,
+        "@min-[136px]/module-card:hidden": buttonsCount === 3,
+        "@min-[92px]/module-card:hidden": buttonsCount === 2,
+        "@min-[48px]/module-card:hidden": buttonsCount === 1,
+      };
+      return { iconButtonClasses, moreButtonClasses };
+    } else {
+      return { iconButtonClasses: "hidden", moreButtonClasses: "block" };
+    }
+  };
+
+  const commonClasses = `translate-y-1 opacity-0 !size-8 !min-size-8 transition-all group-hover:translate-y-0 group-hover:opacity-100 hidden`;
   return (
-    <div className="flex items-center justify-end gap-1 bg-red-400 w-full @container/module-card">
+    <div className="@container/module-card flex w-full items-center justify-end gap-1">
       {onPreview && (
         <IconButton
           icon={<Eye />}
@@ -38,7 +71,7 @@ const CardActions = ({
           variant="outline"
           onClick={onPreview}
           label={t("General.preview")}
-          className={cn(commonClasses, "duration-300")}
+          className={cn(commonClasses, calculateContainerWidth().iconButtonClasses, "duration-300")}
         />
       )}
       {onEdit && (
@@ -48,7 +81,7 @@ const CardActions = ({
           onClick={onEdit}
           icon={<Edit />}
           label={t("General.edit")}
-          className={cn(commonClasses, "duration-400")}
+          className={cn(commonClasses, calculateContainerWidth().iconButtonClasses, "duration-400")}
         />
       )}
       {onDuplicate && (
@@ -58,7 +91,7 @@ const CardActions = ({
           onClick={onDuplicate}
           icon={<Copy />}
           label={t("General.duplicate")}
-          className={cn(commonClasses, "duration-500")}
+          className={cn(commonClasses, calculateContainerWidth().iconButtonClasses, "duration-500")}
         />
       )}
       {onView && (
@@ -68,7 +101,7 @@ const CardActions = ({
           onClick={onView}
           icon={<Eye className="size-4" />}
           label={t("General.view")}
-          className={cn(commonClasses, "duration-600")}
+          className={cn(commonClasses, calculateContainerWidth().iconButtonClasses, "duration-600")}
         />
       )}
       {onArchive && (
@@ -78,7 +111,7 @@ const CardActions = ({
           onClick={onArchive}
           icon={<Archive className="size-4" />}
           label={t("General.archive")}
-          className={cn(commonClasses, "duration-700")}
+          className={cn(commonClasses, calculateContainerWidth().iconButtonClasses, "duration-700")}
         />
       )}
       {onDelete && (
@@ -88,11 +121,11 @@ const CardActions = ({
           onClick={onDelete}
           icon={<Trash2 className="text-destructive" />}
           label={t("General.delete")}
-          className={cn(commonClasses, "duration-800")}
+          className={cn(commonClasses, calculateContainerWidth().iconButtonClasses, "duration-800")}
         />
       )}
       {/* {isMobile && ( */}
-      <div className="hidden @sm/module-card:block">
+      <div className={cn("block", calculateContainerWidth().moreButtonClasses)}>
         <CardActionsPopover
           onPreview={onPreview}
           onEdit={onEdit}
