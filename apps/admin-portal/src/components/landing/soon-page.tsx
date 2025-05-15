@@ -44,7 +44,7 @@ const SoonLayout = () => {
           <ThemeSwitcher />
           <LanguageSwitcher />
         </div>
-        <div className="bg-muted inset0 absolute hidden h-full w-full flex-col p-0 text-white lg:flex">
+        <div className="bg-muted inset0 absolute h-full w-full flex-col p-0 text-white flex">
           {/* <div className="absolute inset-0 bg-zinc-900" /> */}
           <ShaderGradientCanvas className="pointer-events-none absolute inset-0">
             <ShaderGradient
@@ -97,15 +97,15 @@ const SoonLayout = () => {
               alt={`${settings.projectName.en} Logo`}
               src={logoSrc}
             />
-            <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-2 sm:space-y-0 md:w-fit">
-              <Button asChild variant="outline" size="sm">
-                <Link href="/auth">
-                  <span>{t("Landing.sign_in")}</span>
-                </Link>
-              </Button>
+            <div className="flex flex-col space-y-3 w-fit">
               <Button asChild size="sm">
                 <Link href="/auth#signup">
                   <span>{t("Landing.sign_up")}</span>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/auth">
+                  <span>{t("Landing.sign_in")}</span>
                 </Link>
               </Button>
             </div>

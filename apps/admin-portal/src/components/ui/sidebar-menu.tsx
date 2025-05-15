@@ -66,7 +66,7 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
   const locale = useLocale();
   const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(item.is_active);
-  const { state, isMobile } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
   const isCollapsed = state === "collapsed" && !isMobile;
 
   if (isCollapsed) {
@@ -95,6 +95,7 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                   href={subItem.url}
                   key={subItem.title}
                   className="focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground relative flex cursor-pointer items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                  onClick={() => setOpenMobile(false)}
                 >
                   <span>{t(subItem.translationKey)}</span>
                   {subItem.action && (
@@ -158,7 +159,7 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                       "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground cursor-pointer",
                   )}
                 >
-                  <Link href={subItem.url}>
+                  <Link href={subItem.url} onClick={() => setOpenMobile(false)}>
                     <span>{t(subItem.translationKey)}</span>
                   </Link>
                 </SidebarMenuSubButton>
@@ -170,6 +171,7 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                       e.preventDefault();
                       if (subItem.action) {
                         router.push(subItem.action);
+                        setOpenMobile(false);
                       }
                     }}
                   >

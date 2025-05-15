@@ -67,8 +67,8 @@ const DashboardStatsVertical = ({
 
             const card = (
               <Card key={categoryName} className="h-auto max-w-xs">
-                <CardHeader className="bg-muted rounded-t-md border-b">
-                  <CardTitle className="text-2xl font-semibold">
+                <CardHeader className="bg-muted rounded-t-md border-b p-2 sm:p-6">
+                  <CardTitle className="text-md font-semibold sm:text-2xl">
                     {t(`Pages.${categoryName.replace(/\s+/g, "_")}.title`) || categoryName}
                   </CardTitle>
                 </CardHeader>
@@ -86,7 +86,7 @@ const DashboardStatsVertical = ({
                           onMouseLeave={() => setIsHovered(false)}
                         >
                           <Link href={module.url || "/dashboard"}>
-                            <div className="flex flex-row items-center justify-between gap-2 px-6 py-4">
+                            <div className="flex flex-row items-center justify-between gap-2 p-2 sm:px-6 sm:py-4">
                               <h3 className="text-sm font-medium">{t(module.translationKey)}</h3>
                               <p className={cn("text-sm font-bold", loadingStats && "blur-xs")}>
                                 <NumberFlow

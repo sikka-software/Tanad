@@ -122,9 +122,11 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
               </div>
             </div>
             <div className="relative mx-auto">
-              <div className="block border-b p-2 md:hidden">
-                <AppBreadcrumb />
-              </div>
+              {!router.pathname.includes("dashboard") && (
+                <div className="block border-b p-2 md:hidden">
+                  <AppBreadcrumb />
+                </div>
+              )}
               <div className="relative">
                 <div ref={mainContentRef}>{children}</div>
                 <AnimatePresence mode="wait">

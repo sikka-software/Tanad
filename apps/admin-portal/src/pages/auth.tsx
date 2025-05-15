@@ -37,23 +37,23 @@ export default function Auth() {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const user = useUserStore((state) => state.user);
-  const loadingUser = useUserStore((state) => state.loading);
-  const [supabaseSession, setSupabaseSession] = useState<Session | null>(null);
+  const profile = useUserStore((state) => state.profile);
+  const enterprise = useUserStore((state) => state.enterprise);
 
+  // useEffect(() => {
+  //   // Always check session directly from Supabase
+  //   supabase.auth.getSession().then(({ data }) => {
+  //     setSupabaseSession(data.session);
+  //   });
+  // }, [user, loadingUser]);
   useEffect(() => {
-    // Always check session directly from Supabase
-    supabase.auth.getSession().then(({ data }) => {
-      setSupabaseSession(data.session);
-    });
-  }, [user, loadingUser]);
+    if (user && profile && enterprise) {
+      router.push("/dashboard");
+    }
+  }, [user]);
 
   useEffect(() => {
     setIsSignUp(router.asPath.includes("#signup"));
-    // if (user && !loadingUser && supabaseSession && router.pathname === "/auth") {
-    //   const redirectPath = sessionStorage.getItem("redirectAfterAuth") || "/dashboard";
-    //   sessionStorage.removeItem("redirectAfterAuth");
-    //   window.location.href = redirectPath;
-    // }
   }, [router]);
 
   const handleSignIn = async (e: React.FormEvent) => {
