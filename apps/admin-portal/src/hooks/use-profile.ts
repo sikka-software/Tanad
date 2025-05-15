@@ -112,20 +112,8 @@ export function useUpdateProfile() {
           //      avatar_url: data.avatar_url || userStore.profile.avatar_url || "",
           email: data.email || userStore.profile.email,
           username: data.username || userStore.profile.username,
-          // Careful handling of user_settings to preserve the required fields
-          user_settings: {
-            currency: userStore.profile.user_settings?.currency,
-            calendar: userStore.profile.user_settings?.calendar,
-            timezone: data.user_settings?.timezone || userStore.profile.user_settings?.timezone,
-            notifications: userStore.profile.user_settings?.notifications,
-            // Preserve the navigation settings
-            navigation:
-              data.user_settings?.navigation || userStore.profile.user_settings?.navigation,
-            // Preserve hidden menu items
-            hidden_menu_items:
-              data.user_settings?.hidden_menu_items ||
-              userStore.profile.user_settings?.hidden_menu_items,
-          },
+          // Use the entire user_settings object from the server response
+          user_settings: data.user_settings,
         };
 
         userStore.setProfile(updatedProfile as Profile);
