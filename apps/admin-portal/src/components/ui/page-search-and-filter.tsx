@@ -89,7 +89,7 @@ const PageSearchAndFilter = ({
       {...props}
     >
       <div className="flex flex-1 items-center gap-4">
-        {title && <h2 className="text-xl font-medium hidden md:block">{title}</h2>}
+        {title && <h2 className="hidden text-xl font-medium md:block">{title}</h2>}
 
         {!hideOptions && (
           <div className="relative max-w-md flex-1">
@@ -147,7 +147,7 @@ const PageSearchAndFilter = ({
         )}
 
         {onAddClick && (
-          <Button size="sm" className="h-8 cursor-pointer w-8 md:w-fit" onClick={onAddClick}>
+          <Button size="sm" className="h-8 w-8 cursor-pointer md:w-fit" onClick={onAddClick}>
             <Plus className="h-4 w-4" />
             <span className="hidden md:block">{createLabel}</span>
           </Button>

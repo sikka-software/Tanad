@@ -1,10 +1,13 @@
-import { Archive, Copy, Edit, EllipsisVertical, Eye, Trash2 } from "lucide-react";
+import { Archive, Copy, Edit, Eye, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
-import { Button } from "@/ui/button";
+import IconButton from "@/ui/icon-button";
 
-import IconButton from "../ui/icon-button";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { useMediaQuery } from "@/hooks/use-media-query";
+
+import { cn } from "@/lib/utils";
+
+import CardActionsPopover from "./card-actions-popover";
 
 const CardActions = ({
   onEdit,
@@ -23,8 +26,11 @@ const CardActions = ({
 }) => {
   const t = useTranslations();
   const lang = useLocale();
+  const isMobile = useMediaQuery("(max-width: 1024px)");
+  const commonClasses =
+    "translate-y-1 opacity-0 !size-8 !min-size-8 transition-all group-hover:translate-y-0 group-hover:opacity-100 @sm/module-card:hidden";
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center justify-end gap-1">
       {onPreview && (
         <IconButton
           icon={<Eye />}
@@ -32,7 +38,7 @@ const CardActions = ({
           variant="outline"
           onClick={onPreview}
           label={t("General.preview")}
-          className="translate-y-1 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
+          className={cn(commonClasses, "duration-300")}
         />
       )}
       {onEdit && (
@@ -42,10 +48,9 @@ const CardActions = ({
           onClick={onEdit}
           icon={<Edit />}
           label={t("General.edit")}
-          className="translate-y-1 opacity-0 transition-all duration-400 group-hover:translate-y-0 group-hover:opacity-100"
+          className={cn(commonClasses, "duration-400")}
         />
       )}
-
       {onDuplicate && (
         <IconButton
           dir={lang === "ar" ? "rtl" : "ltr"}
@@ -53,10 +58,9 @@ const CardActions = ({
           onClick={onDuplicate}
           icon={<Copy />}
           label={t("General.duplicate")}
-          className="translate-y-1 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100"
+          className={cn(commonClasses, "duration-500")}
         />
       )}
-
       {onView && (
         <IconButton
           dir={lang === "ar" ? "rtl" : "ltr"}
@@ -64,7 +68,7 @@ const CardActions = ({
           onClick={onView}
           icon={<Eye className="size-4" />}
           label={t("General.view")}
-          className="translate-y-1 opacity-0 transition-all duration-600 group-hover:translate-y-0 group-hover:opacity-100"
+          className={cn(commonClasses, "duration-600")}
         />
       )}
       {onArchive && (
@@ -74,7 +78,7 @@ const CardActions = ({
           onClick={onArchive}
           icon={<Archive className="size-4" />}
           label={t("General.archive")}
-          className="translate-y-1 opacity-0 transition-all duration-700 group-hover:translate-y-0 group-hover:opacity-100"
+          className={cn(commonClasses, "duration-700")}
         />
       )}
       {onDelete && (
@@ -84,9 +88,21 @@ const CardActions = ({
           onClick={onDelete}
           icon={<Trash2 className="text-destructive" />}
           label={t("General.delete")}
-          className="translate-y-1 opacity-0 transition-all duration-800 group-hover:translate-y-0 group-hover:opacity-100"
+          className={cn(commonClasses, "duration-800")}
         />
       )}
+      {/* {isMobile && ( */}
+      <div className="hidden @sm/module-card:block">
+        <CardActionsPopover
+          onPreview={onPreview}
+          onEdit={onEdit}
+          onDuplicate={onDuplicate}
+          onView={onView}
+          onArchive={onArchive}
+          onDelete={onDelete}
+        />
+      </div>
+      {/* )} */}
     </div>
   );
 };
