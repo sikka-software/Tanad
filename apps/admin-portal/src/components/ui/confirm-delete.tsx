@@ -47,6 +47,9 @@ const ConfirmDelete = ({
         if (!isDeleting) {
           setIsDeleteDialogOpen(open);
         }
+        if (!open) {
+          onCancel?.();
+        }
       }}
     >
       <DialogContent dir={locale === "ar" ? "rtl" : "ltr"}>

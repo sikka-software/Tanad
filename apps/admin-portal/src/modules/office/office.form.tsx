@@ -50,6 +50,8 @@ const createOfficeSchema = (t: (key: string) => string) => {
     status: z.enum(CommonStatus, {
       message: t("Offices.form.status.required"),
     }),
+    capacity: z.number().optional().nullable(),
+    working_hours: z.number().optional().nullable(),
     notes: z.any().optional().nullable(),
     ...addressSchema,
     ...metadataSchema,

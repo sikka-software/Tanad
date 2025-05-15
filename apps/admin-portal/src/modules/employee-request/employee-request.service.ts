@@ -119,6 +119,8 @@ export async function bulkDeleteEmployeeRequests(ids: string[]): Promise<void> {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),
     });
+
+    console.log("response", response);
     if (!response.ok) {
       throw new Error("Failed to delete employee requests");
     }

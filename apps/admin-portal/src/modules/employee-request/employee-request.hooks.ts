@@ -57,18 +57,28 @@ export const useCreateEmployeeRequest = () => {
 
       queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
     },
+    meta: {
+      toast: { success: "EmployeeRequests.success.create", error: "EmployeeRequests.error.create" },
+    },
   });
 };
 
 export function useDuplicateEmployeeRequest() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
-
   return useMutation({
     mutationFn: (id: string) => duplicateEmployeeRequest(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: employeeRequestKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
+    },
+    meta: {
+      toast: {
+        success: "EmployeeRequests.success.duplicate",
+        error: "EmployeeRequests.error.duplicate",
+      },
+    },
   });
 }
-
 export function useUpdateEmployeeRequest() {
   const queryClient = useQueryClient();
   const t = useTranslations();
@@ -159,6 +169,9 @@ export function useUpdateEmployeeRequest() {
         queryClient.setQueryData(employeeRequestKeys.detail(id), context.previousEmployeeRequest);
       }
     },
+    meta: {
+      toast: { success: "EmployeeRequests.success.update", error: "EmployeeRequests.error.update" },
+    },
   });
 }
 
@@ -170,6 +183,9 @@ export function useDeleteEmployeeRequest() {
       queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
       queryClient.removeQueries({ queryKey: employeeRequestKeys.detail(variables) });
     },
+    meta: {
+      toast: { success: "EmployeeRequests.success.delete", error: "EmployeeRequests.error.delete" },
+    },
   });
 }
 
@@ -177,8 +193,9 @@ export function useBulkDeleteEmployeeRequests() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: bulkDeleteEmployeeRequests,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() }),
+    meta: {
+      toast: { success: "EmployeeRequests.success.delete", error: "EmployeeRequests.error.delete" },
     },
   });
 }
