@@ -31,9 +31,12 @@ const ModuleCard = <T,>({
   parentTranslationKey,
 }: ModuleCardProps<T>) => {
   return (
-    <Card key={id} className="transition-shadow hover:shadow-lg">
-      <CardHeader className="bg-300 flex flex-col items-start justify-between p-0">
-        <div className="bg-muted group flex w-full flex-row items-center justify-between gap-2 p-2">
+    <Card
+      key={id}
+      className="group flex flex-col justify-between transition-shadow hover:shadow-lg"
+    >
+      <CardHeader className="flex flex-col items-start justify-between p-0">
+        <div className="bg-muted flex w-full flex-row items-center justify-between gap-2 p-2">
           <CardStatusAction
             parentTranslationKey={parentTranslationKey}
             currentStatus={currentStatus}
