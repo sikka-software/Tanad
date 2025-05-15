@@ -1,10 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
 import { createInsertSchema } from "drizzle-zod";
-import { useTranslations, useLocale } from "next-intl";
-import { useState, useEffect, useCallback } from "react";
-import React from "react";
-import { useForm, useFieldArray, FieldError, useWatch } from "react-hook-form";
+import { useLocale, useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
+import { FieldError, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -19,6 +18,7 @@ import NotesSection from "@/components/forms/notes-section";
 import ProductsFormSection from "@/components/forms/products-form-section";
 
 import { getNotesValue, validateYearRange } from "@/lib/utils";
+import { calculateVAT } from "@/lib/zatca/zatca-utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -26,14 +26,13 @@ import ClientCombobox from "@/client/client.combobox";
 import { useClients } from "@/client/client.hooks";
 import useClientStore from "@/client/client.store";
 
-import { useInvoices } from "@/invoice/invoice.hooks";
-import { useCreateInvoice, useUpdateInvoice } from "@/invoice/invoice.hooks";
+import { useCreateInvoice, useInvoices, useUpdateInvoice } from "@/invoice/invoice.hooks";
 import useInvoiceStore from "@/invoice/invoice.store";
 import {
-  InvoiceUpdateData,
   InvoiceCreateData,
   InvoiceItem,
   InvoiceStatus,
+  InvoiceUpdateData,
 } from "@/invoice/invoice.type";
 
 import { ProductForm } from "@/product/product.form";
@@ -152,6 +151,12 @@ export function InvoiceForm({
     defaultValues: formDefaultValues,
   });
 
+  const taxAmount = calculateVAT(form.watch("subtotal") || 0, form.watch("tax_rate") || 0);
+
+  const [zatcaEnabled, setZatcaEnabled] = useState<boolean>(false);
+  const [sellerName, setSellerName] = useState<string>("Mashreq Bank");
+  const [vatNumber, setVatNumber] = useState<string>("123456789012345");
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "items",
@@ -220,6 +225,10 @@ export function InvoiceForm({
           tax_rate: data.tax_rate,
           notes: data.notes || null,
           items: itemsPayload,
+          zatca_enabled: zatcaEnabled,
+          seller_name: zatcaEnabled ? sellerName : undefined,
+          vat_number: zatcaEnabled ? vatNumber : undefined,
+          tax_amount: taxAmount,
         };
 
         await updateInvoice(
@@ -247,6 +256,10 @@ export function InvoiceForm({
             tax_rate: data.tax_rate,
             notes: data.notes || null,
             items: itemsPayload,
+            zatca_enabled: zatcaEnabled,
+            seller_name: zatcaEnabled ? sellerName : undefined,
+            vat_number: zatcaEnabled ? vatNumber : undefined,
+            tax_amount: taxAmount,
           },
           {
             onSuccess: async (response) => {
