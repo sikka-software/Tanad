@@ -40,19 +40,10 @@ export function usePurchase(id: string) {
 // Hook for creating a new purchase
 export function useCreatePurchase() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (newPurchase: PurchaseCreateData & { user_id: string }) => {
-      // Map user_id to user_id for the service function
-      const { user_id, ...rest } = newPurchase;
-      const purchaseData: PurchaseCreateData = {
-        ...rest,
-        user_id: user_id,
-      };
-      return createPurchase(purchaseData);
-    },
+    mutationFn: (newPurchase: PurchaseCreateData) => createPurchase(newPurchase),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() }),
-    meta: { toast: { success: "Offices.success.create", error: "Offices.error.create" } },
+    meta: { toast: { success: "Purchases.success.create", error: "Purchases.error.create" } },
   });
 }
 

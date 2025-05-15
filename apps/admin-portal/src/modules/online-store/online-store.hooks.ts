@@ -46,15 +46,7 @@ export function useCreateOnlineStore() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newOnlineStore: OnlineStoreCreateData & { user_id: string }) => {
-      // Map user_id to user_id for the service function
-      const { user_id, ...rest } = newOnlineStore;
-      const onlineStoreData: OnlineStoreCreateData = {
-        ...rest,
-        user_id: user_id,
-      };
-      return createOnlineStore(onlineStoreData);
-    },
+    mutationFn: (newOnlineStore: OnlineStoreCreateData) => createOnlineStore(newOnlineStore),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: onlineStoreKeys.lists() }),
     meta: { toast: { success: "OnlineStores.success.create", error: "OnlineStores.error.create" } },
   });

@@ -13,6 +13,13 @@ import NotesSection from "@/components/forms/notes-section";
 import CodeInput from "@/components/ui/inputs/code-input";
 import { CurrencyInput } from "@/components/ui/inputs/currency-input";
 import { Input } from "@/components/ui/inputs/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { getNotesValue } from "@/lib/utils";
 
@@ -21,6 +28,7 @@ import { ModuleFormProps } from "@/types/common.type";
 import { purchases } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
+import { InvoiceStatus } from "../invoice/invoice.type";
 import { useCreatePurchase, usePurchases, useUpdatePurchase } from "./purchase.hooks";
 import usePurchaseStore from "./purchase.store";
 import { PurchaseUpdateData, PurchaseCreateData, PurchaseStatus } from "./purchase.type";
@@ -286,22 +294,25 @@ export function PurchaseForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("Purchases.form.status.label")} *</FormLabel>
-                    <FormControl>
-                      <CommandSelect
-                        disabled={isLoading}
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={[
-                          { label: t("Purchases.form.status.pending"), value: "pending" },
-                          { label: t("Purchases.form.status.paid"), value: "paid" },
-                          { label: t("Purchases.form.status.overdue"), value: "overdue" },
-                          { label: t("Purchases.form.status.cancelled"), value: "cancelled" },
-                        ]}
-                        defaultValue={field.value || "pending"}
-                        onChange={(value) => field.onChange(value || "pending")}
-                        texts={{ placeholder: t("Purchases.form.status.placeholder") }}
-                        ariaInvalid={!!form.formState.errors.status}
-                      />
-                    </FormControl>
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Purchases.form.status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        {PurchaseStatus.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`Purchases.form.status.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

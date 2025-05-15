@@ -36,7 +36,6 @@ export function useQuote(id: string) {
   });
 }
 
-// Hook for creating a new quote
 export function useCreateQuote() {
   const queryClient = useQueryClient();
   return useMutation({

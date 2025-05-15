@@ -41,14 +41,7 @@ export function useBranch(id: string) {
 export function useCreateBranch() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (newBranch: BranchCreateData & { user_id: string }) => {
-      const { user_id, ...rest } = newBranch;
-      const branchData: BranchCreateData = {
-        ...rest,
-        user_id: user_id,
-      };
-      return createBranch(branchData);
-    },
+    mutationFn: (newBranch: BranchCreateData) => createBranch(newBranch),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: branchKeys.lists() }),
     meta: { toast: { success: "Branches.success.create", error: "Branches.error.create" } },
   });

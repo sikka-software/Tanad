@@ -37,7 +37,6 @@ export function useProduct(id: string) {
   });
 }
 
-// Hook for creating a new product
 export function useCreateProduct() {
   const queryClient = useQueryClient();
   return useMutation({

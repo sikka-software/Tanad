@@ -37,14 +37,7 @@ export function useDomain(id: string) {
 export function useCreateDomain() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (newDomain: DomainCreateData) => {
-      const { user_id, ...rest } = newDomain;
-      const domainData: DomainCreateData = {
-        ...rest,
-        user_id: user_id,
-      };
-      return createDomain(domainData);
-    },
+    mutationFn: (newDomain: DomainCreateData) => createDomain(newDomain),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: domainKeys.lists() }),
     meta: { toast: { success: "Domains.success.create", error: "Domains.error.create" } },
   });

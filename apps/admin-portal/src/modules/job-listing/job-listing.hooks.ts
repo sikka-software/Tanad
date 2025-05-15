@@ -36,7 +36,6 @@ export function useJobListing(id: string) {
 
 export function useCreateJobListing() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (data: JobListingCreateData) => createJobListing(data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() }),

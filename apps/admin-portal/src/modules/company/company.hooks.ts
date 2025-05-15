@@ -13,7 +13,6 @@ import type { Company, CompanyCreateData, CompanyUpdateData } from "@/company/co
 
 import useCompanyStore from "./company.store";
 
-// Query keys for companies
 export const companyKeys = {
   all: ["companies"] as const,
   lists: () => [...companyKeys.all, "list"] as const,
@@ -22,7 +21,6 @@ export const companyKeys = {
   detail: (id: string) => [...companyKeys.details(), id] as const,
 };
 
-// Hook to fetch all companies
 export function useCompanies() {
   return useQuery({
     queryKey: companyKeys.lists(),
@@ -30,7 +28,6 @@ export function useCompanies() {
   });
 }
 
-// Hook to fetch a single company
 export function useCompany(id: string) {
   return useQuery({
     queryKey: companyKeys.detail(id),
@@ -39,18 +36,12 @@ export function useCompany(id: string) {
   });
 }
 
-// Hook to create a company
 export function useCreateCompany() {
   const queryClient = useQueryClient();
   // const setData = useCompanyStore((state) => state.setData);
   return useMutation({
     mutationFn: (company: CompanyCreateData) => createCompany(company),
-    onSuccess: (newCompany: Company) => {
-      const previousCompanies = queryClient.getQueryData(companyKeys.lists()) || [];
-      const newData = [...(Array.isArray(previousCompanies) ? previousCompanies : []), newCompany];
-      queryClient.setQueryData(companyKeys.lists(), newData);
-      // setData?.(newData);
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: companyKeys.lists() }),
     meta: { toast: { success: "Companies.success.create", error: "Companies.error.create" } },
   });
 }

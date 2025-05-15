@@ -43,13 +43,7 @@ export function useCreateOffice() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (office: OfficeCreateData) => createOffice(office),
-    onSuccess: (newOffice: Office) => {
-      const previousOffices = queryClient.getQueryData(officeKeys.lists()) || [];
-      queryClient.setQueryData(officeKeys.lists(), [
-        ...(Array.isArray(previousOffices) ? previousOffices : []),
-        newOffice,
-      ]);
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: officeKeys.lists() }),
     meta: { toast: { success: "Offices.success.create", error: "Offices.error.create" } },
   });
 }

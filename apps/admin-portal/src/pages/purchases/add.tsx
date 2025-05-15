@@ -27,7 +27,7 @@ export default function AddPurchasePage() {
       form.setValue("description", dummyData.randomString);
       form.setValue("amount", dummyData.randomNumber(4));
       form.setValue("category", dummyData.randomString);
-      form.setValue("status", dummyData.randomPicker(["pending", "paid", "overdue", "cancelled"]));
+      form.setValue("status", dummyData.randomPicker(["draft"]));
       form.setValue("issue_date", String(dummyData.randomDate));
       form.setValue("due_date", String(dummyData.randomDate));
       form.setValue("incurred_at", String(dummyData.randomDate));

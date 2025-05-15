@@ -37,18 +37,11 @@ export function useExpense(id: string) {
   });
 }
 
-// Hook to create a expense
 export function useCreateExpense() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (expense: ExpenseCreateData) => createExpense(expense),
-    onSuccess: (newExpense: Expense) => {
-      const previousExpenses = queryClient.getQueryData(expenseKeys.lists()) || [];
-      queryClient.setQueryData(expenseKeys.lists(), [
-        ...(Array.isArray(previousExpenses) ? previousExpenses : []),
-        newExpense,
-      ]);
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: expenseKeys.lists() }),
     meta: { toast: { success: "Expenses.success.create", error: "Expenses.error.create" } },
   });
 }
