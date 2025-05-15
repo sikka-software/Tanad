@@ -6,14 +6,14 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { CurrencyInput } from "@/components/ui/inputs/currency-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/components/ui/inputs/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import NotesSection from "@/components/forms/notes-section";
 import CodeInput from "@/components/ui/inputs/code-input";
+import { CurrencyInput } from "@/components/ui/inputs/currency-input";
 import { DateInput } from "@/components/ui/inputs/date-input";
+import { Input } from "@/components/ui/inputs/input";
 
 import { metadataSchema } from "@/lib/schemas/metadata.schema";
 import { getNotesValue } from "@/lib/utils";

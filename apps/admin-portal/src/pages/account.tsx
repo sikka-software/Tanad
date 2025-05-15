@@ -9,12 +9,12 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
-import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 
 import { createClient } from "@/utils/supabase/component";
 
+import { Input } from "@/components/ui/inputs/input";
 import PasswordInput from "@/components/ui/password-input";
 
 interface ProfileFormValues {

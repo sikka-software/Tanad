@@ -169,7 +169,9 @@ export default function QuotesPage() {
                   icons: [Quote, Plus, Quote],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(quote) => <QuoteCard key={quote.id} quote={quote} />}
+                renderItem={(quote) => (
+                  <QuoteCard quote={quote} onActionClicked={onActionClicked} />
+                )}
                 gridCols="2"
               />
             </div>

@@ -6,11 +6,12 @@ import * as z from "zod";
 
 import BooleanTabs from "@/ui/boolean-tabs";
 import { Combobox } from "@/ui/comboboxes/combobox";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+
 import CountryInput from "@/components/ui/inputs/country-input";
 import { CurrencyInput } from "@/components/ui/inputs/currency-input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/components/ui/inputs/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import NotesSection from "@/forms/notes-section";
 

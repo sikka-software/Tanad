@@ -8,13 +8,13 @@ import * as z from "zod";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
-import { Input } from "@/components/ui/inputs/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import NotesSection from "@/components/forms/notes-section";
 import { ProductsFormSection } from "@/components/forms/products-form-section";
-import CodeInput from "@/components/ui/inputs/code-input";
 import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
+import CodeInput from "@/components/ui/inputs/code-input";
+import { Input } from "@/components/ui/inputs/input";
 
 import { getNotesValue } from "@/lib/utils";
 

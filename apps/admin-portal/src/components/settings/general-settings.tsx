@@ -7,12 +7,13 @@ import * as z from "zod";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/components/ui/inputs/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Separator } from "@/ui/separator";
 import { Skeleton } from "@/ui/skeleton";
 
 import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
+
+import { Input } from "@/components/ui/inputs/input";
 
 import useUserStore from "@/stores/use-user-store";
 

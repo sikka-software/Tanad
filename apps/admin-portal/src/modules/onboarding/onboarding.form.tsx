@@ -6,9 +6,9 @@ import * as z from "zod";
 
 import { Button } from "@/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/components/ui/inputs/input";
 
 import { FlippableInput } from "@/components/ui/inputs/flippable-input";
+import { Input } from "@/components/ui/inputs/input";
 
 import { useCreateEnterprise } from "./onboarding.hooks";
 

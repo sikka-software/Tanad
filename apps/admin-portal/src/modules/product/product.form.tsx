@@ -4,13 +4,13 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import CodeInput from "@/components/ui/inputs/code-input";
-import { CurrencyInput } from "@/components/ui/inputs/currency-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/components/ui/inputs/input";
 import { Textarea } from "@/ui/textarea";
 
 import NotesSection from "@/components/forms/notes-section";
+import CodeInput from "@/components/ui/inputs/code-input";
+import { CurrencyInput } from "@/components/ui/inputs/currency-input";
+import { Input } from "@/components/ui/inputs/input";
 
 import { ModuleFormProps } from "@/types/common.type";
 

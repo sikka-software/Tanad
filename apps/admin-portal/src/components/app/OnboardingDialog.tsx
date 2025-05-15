@@ -12,12 +12,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 import { Button } from "@/ui/button";
 import AdjustableDialog from "@/ui/dialogs/adjustable-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/components/ui/inputs/input";
 import { Textarea } from "@/ui/textarea";
 
 import { createClient } from "@/utils/supabase/component";
 
 import { useMainStore } from "@/hooks/main.store";
+
+import { Input } from "@/components/ui/inputs/input";
 
 import { Pukla } from "@/lib/types";
 

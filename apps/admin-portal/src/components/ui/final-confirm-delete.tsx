@@ -15,8 +15,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/ui/dialog";
-import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/ui/label";
+
+import { Input } from "@/components/ui/inputs/input";
 
 export default function Component({
   onConfirm,

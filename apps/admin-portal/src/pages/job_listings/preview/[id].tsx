@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/ui/alert";
 import { Badge } from "@/ui/badge";
-import { Input } from "@/components/ui/inputs/input";
+import { Input } from "@/ui/inputs/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import { createClient } from "@/utils/supabase/server-props";

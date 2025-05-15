@@ -176,7 +176,9 @@ export default function PurchasesPage() {
                   icons: [Currency, Plus, Currency],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(purchase) => <PurchaseCard key={purchase.id} purchase={purchase} />}
+                renderItem={(purchase) => (
+                  <PurchaseCard purchase={purchase} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>
