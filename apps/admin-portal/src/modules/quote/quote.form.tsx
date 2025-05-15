@@ -259,8 +259,8 @@ export function QuoteForm({
                         onChange={(value) => field.onChange(value || null)}
                         texts={{
                           placeholder: t("Quotes.form.client.placeholder"),
-                          searchPlaceholder: t("Quotes.clients.search_clients"),
-                          noItems: t("Quotes.clients.no_clients"),
+                          searchPlaceholder: t("Pages.Clients.search"),
+                          noItems: t("Pages.Clients.no_clients_found"),
                         }}
                         addText={t("Pages.Clients.add")}
                         onAddClick={() => setIsDialogOpen(true)}

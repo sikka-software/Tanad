@@ -309,8 +309,8 @@ export function BranchForm({
                         }}
                         texts={{
                           placeholder: t("Branches.form.manager.placeholder"),
-                          searchPlaceholder: t("Employees.search_employees"),
-                          noItems: t("Branches.form.manager.no_employees"),
+                          searchPlaceholder: t("Pages.Employees.search"),
+                          noItems: t("Pages.Employees.no_employees_found"),
                         }}
                         addText={t("Pages.Employees.add")}
                         onAddClick={() => setIsEmployeeDialogOpen(true)}

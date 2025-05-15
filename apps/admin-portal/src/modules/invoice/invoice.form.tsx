@@ -1,8 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations, useLocale } from "next-intl";
-import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { useForm, useFieldArray, FieldValues, FieldError } from "react-hook-form";
+import { useForm, useFieldArray, FieldError } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -11,8 +10,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import FormDialog from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-
-import { createClient } from "@/utils/supabase/component";
 
 import NotesSection from "@/components/forms/notes-section";
 import { ProductsFormSection } from "@/components/forms/products-form-section";
@@ -276,10 +273,10 @@ export function InvoiceForm({
                         onChange={(value) => field.onChange(value || null)}
                         texts={{
                           placeholder: t("Invoices.form.client.select_client"),
-                          searchPlaceholder: t("Invoices.form.client.search_clients"),
-                          noItems: t("Invoices.form.client.no_clients"),
+                          searchPlaceholder: t("Pages.Clients.search"),
+                          noItems: t("Pages.Clients.no_clients_found"),
                         }}
-                        addText={t("Invoices.form.client.add_new_client")}
+                        addText={t("Pages.Clients.add")}
                         onAddClick={() => setIsDialogOpen(true)}
                       />
                     </FormControl>

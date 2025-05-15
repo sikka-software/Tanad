@@ -2583,7 +2583,7 @@
         "required": "العنوان مطلوب"
       },
       "type": {
-        "label": "النوع",
+        "label": "نوع الطلب",
         "placeholder": "اختر نوع الطلب",
         "leave": "إجازة",
         "expense": "مصروفات",
@@ -2597,7 +2597,7 @@
         "no_employees": "لا يوجد موظفين"
       },
       "description": {
-        "label": "الوصف",
+        "label": "وصف الطلب",
         "placeholder": "أدخل وصف الطلب",
         "required": "الوصف مطلوب"
       },

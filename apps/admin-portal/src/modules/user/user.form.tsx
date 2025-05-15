@@ -350,8 +350,8 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
                     onChange={(value) => field.onChange(value || null)} // Update form value
                     texts={{
                       placeholder: t("Users.form.role.placeholder"),
-                      searchPlaceholder: t("Users.form.role.search_placeholder"),
-                      noItems: t("Roles.no_roles_available"),
+                      searchPlaceholder: t("Pages.Roles.search"),
+                      noItems: t("Pages.Roles.no_roles_available"),
                     }}
                     addText={t("Pages.Roles.add")} // Use Role translation
                     onAddClick={() => setIsRoleDialogOpen(true)} // Open dialog

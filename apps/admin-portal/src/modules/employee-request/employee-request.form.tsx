@@ -29,6 +29,7 @@ import useEmployeeStore from "@/employee/employee.store";
 
 import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
 
+import { InvoiceStatus } from "../invoice/invoice.type";
 import { useCreateEmployeeRequest, useUpdateEmployeeRequest } from "./employee-request.hooks";
 import {
   EmployeeRequestCreateData,
@@ -167,46 +168,24 @@ export function EmployeeRequestForm({
       <Form {...form}>
         <form id={formHtmlId || "employee-request-form"} onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="form-container">
-            <FormField
-              control={form.control}
-              name="employee_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("EmployeeRequests.form.employee.label")} *</FormLabel>
-                  <FormControl>
-                    <ComboboxAdd
-                      ariaInvalid={form.formState.errors.employee_id !== undefined}
-                      dir={locale === "ar" ? "rtl" : "ltr"}
-                      data={employeeOptions}
-                      disabled={isLoadingSave}
-                      isLoading={employeesLoading}
-                      defaultValue={field.value}
-                      valueKey={"id"}
-                      onChange={(value) => {
-                        field.onChange(value || null);
-                      }}
-                      renderOption={(item) => {
-                        return (
-                          <div className="flex flex-col">
-                            <span>{item.label}</span>
-                            <span className="text-muted-foreground text-sm">{item.value}</span>
-                          </div>
-                        );
-                      }}
-                      texts={{
-                        placeholder: t("EmployeeRequests.form.employee.placeholder"),
-                        searchPlaceholder: t("Employees.search_employees"),
-                        noItems: t("EmployeeRequests.form.employee.no_employees"),
-                      }}
-                      addText={t("Employees.add")}
-                      onAddClick={() => setIsEmployeeDialogOpen(true)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <div className="form-fields-cols-2">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("EmployeeRequests.form.title.label")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder={t("EmployeeRequests.form.title.placeholder")}
+                        disabled={isLoadingSave}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="type"
@@ -236,26 +215,7 @@ export function EmployeeRequestForm({
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("EmployeeRequests.form.title.label")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder={t("EmployeeRequests.form.title.placeholder")}
-                        disabled={isLoadingSave}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
-
             <FormField
               control={form.control}
               name="description"
@@ -275,6 +235,78 @@ export function EmployeeRequestForm({
             />
 
             <div className="form-fields-cols-2">
+              <FormField
+                control={form.control}
+                name="employee_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("EmployeeRequests.form.employee.label")} *</FormLabel>
+                    <FormControl>
+                      <ComboboxAdd
+                        ariaInvalid={form.formState.errors.employee_id !== undefined}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        data={employeeOptions}
+                        disabled={isLoadingSave}
+                        isLoading={employeesLoading}
+                        defaultValue={field.value}
+                        valueKey={"id"}
+                        onChange={(value) => {
+                          field.onChange(value || null);
+                        }}
+                        renderOption={(item) => {
+                          return (
+                            <div className="flex flex-col">
+                              <span>{item.label}</span>
+                              <span className="text-muted-foreground text-sm">{item.value}</span>
+                            </div>
+                          );
+                        }}
+                        texts={{
+                          placeholder: t("EmployeeRequests.form.employee.placeholder"),
+                          searchPlaceholder: t("Pages.Employees.search"),
+                          noItems: t("Pages.Employees.no_employees_found"),
+                        }}
+                        addText={t("Pages.Employees.add")}
+                        onAddClick={() => setIsEmployeeDialogOpen(true)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("EmployeeRequests.form.status.label")} *</FormLabel>
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={t("EmployeeRequests.form.status.placeholder")}
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        {EmployeeRequestStatus.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`EmployeeRequests.form.status.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="start_date"

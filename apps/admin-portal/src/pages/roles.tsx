@@ -164,8 +164,8 @@ export default function RolesPage() {
                 return undefined;
               }
             }}
-            createLabel={t("Roles.create_role")}
-            searchPlaceholder={t("Roles.search_roles")}
+            createLabel={t("Pages.Roles.create")}
+            searchPlaceholder={t("Pages.Roles.search")}
             hideOptions={allRoles?.length === 0}
           />
         )}
