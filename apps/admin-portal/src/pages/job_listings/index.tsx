@@ -175,7 +175,7 @@ export default function JobListingsPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(listing: JobListingWithJobs) => (
-                  <JobListingCard key={listing.id} jobListing={listing} />
+                  <JobListingCard jobListing={listing} onActionClicked={onActionClicked} />
                 )}
                 gridCols="3"
               />
@@ -219,7 +219,15 @@ export default function JobListingsPage() {
   );
 }
 
-JobListingsPage.messages = ["Notes", "Pages", "JobListings", "Settings", "Jobs", "General"];
+JobListingsPage.messages = [
+  "Notes",
+  "Pages",
+  "JobListings",
+  "Settings",
+  "Jobs",
+  "General",
+  "CommonStatus",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

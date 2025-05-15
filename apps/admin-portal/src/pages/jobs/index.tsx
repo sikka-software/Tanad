@@ -161,7 +161,7 @@ export default function JobsPage() {
                   icons: [Briefcase, Plus, Briefcase],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(job) => <JobCard job={job} />}
+                renderItem={(job) => <JobCard job={job} onActionClicked={onActionClicked} />}
                 gridCols="3"
               />
             </div>
@@ -212,6 +212,7 @@ JobsPage.messages = [
   "Departments",
   "Forms",
   "General",
+  "CommonStatus",
 ];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {

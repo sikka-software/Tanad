@@ -2,60 +2,74 @@ import { format } from "date-fns";
 import { Calendar, DollarSign, MapPin, Building2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@/ui/badge";
-import { Card, CardContent, CardHeader } from "@/ui/card";
+import ModuleCard from "@/components/cards/module-card";
 
+import { CommonStatus, CommonStatusProps } from "@/types/common.type";
+
+import { useUpdateJob } from "@/job/job.hooks";
+import useJobStore from "@/job/job.store";
 import { Job } from "@/job/job.type";
 
-const JobCard = ({ job }: { job: Job }) => {
+const JobCard = ({
+  job,
+  onActionClicked,
+}: {
+  job: Job;
+  onActionClicked: (action: string, rowId: string) => void;
+}) => {
   const t = useTranslations();
+  const { mutate: updateJob } = useUpdateJob();
+  const data = useJobStore((state) => state.data);
+  const setData = useJobStore((state) => state.setData);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateJob({ id: rowId, data: { [columnId]: value } });
+  };
+
   return (
-    <Card key={job.id} className="transition-shadow hover:shadow-lg">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-lg font-semibold">{job.title}</h3>
-            <p className="text-sm text-gray-500">{job.type}</p>
+    <ModuleCard
+      id={job.id}
+      title={job.title}
+      subtitle={String(job.type)}
+      currentStatus={job.status as CommonStatusProps}
+      statuses={Object.values(CommonStatus) as CommonStatusProps[]}
+      onStatusChange={(status: CommonStatusProps) => handleEdit(job.id, "status", status)}
+      onEdit={() => onActionClicked("edit", job.id)}
+      onDelete={() => onActionClicked("delete", job.id)}
+      onDuplicate={() => onActionClicked("duplicate", job.id)}
+    >
+      <div className="space-y-3">
+        {job.department && (
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Building2 className="h-4 w-4" />
+            <span>{job.department}</span>
           </div>
-          <Badge variant={job.status === "active" ? "default" : "secondary"}>
-            {job.status === "active" ? "Active" : "Inactive"}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {job.department && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Building2 className="h-4 w-4" />
-              <span>{job.department}</span>
-            </div>
-          )}
-          {job.location && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <MapPin className="h-4 w-4" />
-              <span>{job.location}</span>
-            </div>
-          )}
-          {job.start_date && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Calendar className="h-4 w-4" />
-              <span>Starts {format(new Date(job.start_date), "MMM dd, yyyy")}</span>
-            </div>
-          )}
-          {job.salary && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <DollarSign className="h-4 w-4" />
-              <span>${job.salary.toLocaleString()}</span>
-            </div>
-          )}
-          {job.description && (
-            <p className="mt-2 line-clamp-2 border-t pt-2 text-sm text-gray-500">
-              {job.description}
-            </p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        )}
+        {job.location && (
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <MapPin className="h-4 w-4" />
+            <span>{job.location}</span>
+          </div>
+        )}
+        {job.start_date && (
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Calendar className="h-4 w-4" />
+            <span>Starts {format(new Date(job.start_date), "MMM dd, yyyy")}</span>
+          </div>
+        )}
+        {job.salary && (
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <DollarSign className="h-4 w-4" />
+            <span>${job.salary.toLocaleString()}</span>
+          </div>
+        )}
+        {job.description && (
+          <p className="mt-2 line-clamp-2 border-t pt-2 text-sm text-gray-500">{job.description}</p>
+        )}
+      </div>
+    </ModuleCard>
   );
 };
 
