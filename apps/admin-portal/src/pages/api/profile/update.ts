@@ -1,6 +1,8 @@
 import { eq } from "drizzle-orm";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { createClient } from "@/utils/supabase/server-props";
+
 import { db } from "@/db/drizzle";
 import { profiles } from "@/db/schema";
 
@@ -14,12 +16,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  // Authenticate user
+  const supabase = createClient({ req, res, query: {}, resolvedUrl: "" });
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
     const { profile_id } = req.query;
     const updateData = req.body;
 
     if (!profile_id || typeof profile_id !== "string") {
       return res.status(400).json({ error: "Profile ID is required" });
+    }
+
+    // Only allow user to update their own profile
+    if (user.id !== profile_id) {
+      return res.status(403).json({ error: "You can only update your own profile" });
     }
 
     if (!updateData || typeof updateData !== "object") {
