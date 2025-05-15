@@ -95,20 +95,25 @@ const useOfficeColumns = (
       },
     },
 
+    // {
+    //   accessorKey: "city",
+    //   header: t("Forms.city.label"),
+    //   validationSchema: z.string().min(1, t("Forms.city.required")),
+    // },
+    // {
+    //   accessorKey: "region",
+    //   header: t("Forms.region.label"),
+    //   validationSchema: z.string().min(1, t("Forms.region.required")),
+    // },
+    // {
+    //   accessorKey: "zip_code",
+    //   header: t("Forms.zip_code.label"),
+    //   validationSchema: z.string().min(1, t("Forms.zip_code.required")),
+    // },
     {
-      accessorKey: "city",
-      header: t("Forms.city.label"),
-      validationSchema: z.string().min(1, t("Forms.city.required")),
-    },
-    {
-      accessorKey: "region",
-      header: t("Forms.region.label"),
-      validationSchema: z.string().min(1, t("Forms.region.required")),
-    },
-    {
-      accessorKey: "zip_code",
-      header: t("Forms.zip_code.label"),
-      validationSchema: z.string().min(1, t("Forms.zip_code.required")),
+      accessorKey: "area",
+      header: t("Offices.form.area.label"),
+      validationSchema: z.string().min(1, t("Offices.form.area.required")),
     },
 
     {

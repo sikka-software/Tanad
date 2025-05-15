@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
 import { useQueryClient } from "@tanstack/react-query";
-import { createSelectSchema } from "drizzle-zod";
+import { createInsertSchema } from "drizzle-zod";
 import { Building2, ShoppingCart, Store, Warehouse } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
@@ -13,20 +13,17 @@ import * as z from "zod";
 import BooleanTabs from "@/ui/boolean-tabs";
 import { Card, CardHeader, CardTitle } from "@/ui/card";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
-import { DatePicker } from "@/ui/date-picker";
 import { Dialog } from "@/ui/dialog";
 import { DialogContent } from "@/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
+import { CurrencyInput } from "@/ui/inputs/currency-input";
+import { DateInput } from "@/ui/inputs/date-input";
+import { Input } from "@/ui/inputs/input";
+import NumberInputWithButtons from "@/ui/inputs/number-input-buttons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
-import { CurrencyInput } from "@/components/ui/inputs/currency-input";
-import { DateInput } from "@/components/ui/inputs/date-input";
-import { Input } from "@/components/ui/inputs/input";
-import NumberInputWithButtons from "@/components/ui/inputs/number-input-buttons";
-
-import { metadataSchema } from "@/lib/schemas/metadata.schema";
 import { validateYearRange } from "@/lib/utils";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
@@ -50,7 +47,7 @@ import { OnlineStoreForm } from "@/modules/online-store/online-store.form";
 import useUserStore from "@/stores/use-user-store";
 
 const createJobFormSchema = (t: (key: string) => string) => {
-  const JobSelectSchema = createSelectSchema(jobs, {
+  const JobSelectSchema = createInsertSchema(jobs, {
     title: z.string().min(1, t("Jobs.form.title.required")),
     description: z.string().optional(),
     requirements: z.string().optional(),
@@ -81,7 +78,6 @@ const createJobFormSchema = (t: (key: string) => string) => {
     }),
     total_positions: z.string().optional(),
     occupied_positions: z.string().optional(),
-    ...metadataSchema,
   });
 
   return JobSelectSchema;
@@ -188,6 +184,8 @@ function JobForm({
       } else {
         await createJob(
           {
+            user_id: user?.id,
+            enterprise_id: enterprise?.id || "",
             title: data.title.trim(),
             description: data.description?.trim() || null,
             requirements: data.requirements?.trim() || null,
@@ -195,7 +193,6 @@ function JobForm({
             benefits: data.benefits?.trim() || null,
             location: data.location?.trim() || null,
             department: data.department?.trim() || null,
-            enterprise_id: enterprise?.id || "",
             type: data.type.trim(),
             salary: data.salary ? parseFloat(data.salary) : null,
             status: data.status,
@@ -205,7 +202,6 @@ function JobForm({
               data.total_positions && data.total_positions.trim() !== ""
                 ? Number(data.total_positions)
                 : undefined,
-            user_id: user?.id,
           },
           {
             onSuccess: async (response) => {
@@ -241,6 +237,8 @@ function JobForm({
         }}
         className="space-y-4"
       >
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
         <div className="form-container">
           <div className="form-fields-cols-2">
             <FormField

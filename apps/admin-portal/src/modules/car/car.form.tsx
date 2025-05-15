@@ -1,24 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createSelectSchema } from "drizzle-zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-
-import CountryInput from "@/components/ui/inputs/country-input";
-import { CurrencyInput } from "@/components/ui/inputs/currency-input";
-import DigitsInput from "@/components/ui/inputs/digits-input";
-import { Input } from "@/components/ui/inputs/input";
-import NumberInput from "@/components/ui/inputs/number-input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import CountryInput from "@/ui/inputs/country-input";
+import { CurrencyInput } from "@/ui/inputs/currency-input";
+import DigitsInput from "@/ui/inputs/digits-input";
+import { Input } from "@/ui/inputs/input";
+import NumberInput from "@/ui/inputs/number-input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import { metadataSchema } from "@/lib/schemas/metadata.schema";
 import { getNotesValue } from "@/lib/utils";
@@ -27,36 +20,34 @@ import { ModuleFormProps, PaymentCycle } from "@/types/common.type";
 import { VehicleStatus } from "@/types/common.type";
 import { VehicleOwnershipStatus } from "@/types/vehicle.types";
 
+import { useCreateCar, useUpdateCar } from "@/car/car.hooks";
+import useCarStore from "@/car/car.store";
+import { CarUpdateData, CarCreateData } from "@/car/car.type";
 import { cars } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
-import { useCreateCar, useUpdateCar } from "./car.hooks";
-import useCarStore from "./car.store";
-import { CarUpdateData, CarCreateData } from "./car.type";
-
 export const createCarSchema = (t: (key: string) => string) => {
-  const CarSelectSchema = createSelectSchema(cars, {
+  const CarSelectSchema = createInsertSchema(cars, {
     name: z.string().min(1, t("Cars.form.name.required")),
-    make: z.string().optional().or(z.literal("")),
-    model: z.string().optional().or(z.literal("")),
+    make: z.string().optional(),
+    model: z.string().optional(),
     year: z.number({
       invalid_type_error: t("Forms.must_be_number"),
       message: t("Forms.must_be_number"),
     }),
-    color: z.string().optional().or(z.literal("")),
-    vin: z.string().optional().or(z.literal("")),
-    code: z.string().optional().or(z.literal("")),
-    license_country: z.string().optional().or(z.literal("")),
-    license_plate: z.string().optional().or(z.literal("")),
+    color: z.string().optional(),
+    vin: z.string().optional(),
+    code: z.string().optional(),
+    license_country: z.string().optional(),
+    license_plate: z.string().optional(),
     ownership_status: z.enum(VehicleOwnershipStatus).default("owned"),
-    monthly_payment: z.string().optional().or(z.literal("")),
-    daily_payment: z.string().optional().or(z.literal("")),
-    weekly_payment: z.string().optional().or(z.literal("")),
-    annual_payment: z.string().optional().or(z.literal("")),
+    monthly_payment: z.string().optional(),
+    daily_payment: z.string().optional(),
+    weekly_payment: z.string().optional(),
+    annual_payment: z.string().optional(),
     payment_cycle: z.enum(PaymentCycle).default("monthly"),
     status: z.enum(VehicleStatus).optional(),
     notes: z.any().optional().nullable(),
-    ...metadataSchema,
   });
 
   return CarSelectSchema;
@@ -197,6 +188,8 @@ export function CarForm({
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
         <div className="form-container">
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-fields-cols-2">
             <FormField
               control={form.control}

@@ -2121,6 +2121,7 @@ export type Database = {
           code: string | null
           country: string | null
           created_at: string | null
+          email: string | null
           enterprise_id: string
           id: string
           manager: string | null
@@ -2147,6 +2148,7 @@ export type Database = {
           code?: string | null
           country?: string | null
           created_at?: string | null
+          email?: string | null
           enterprise_id: string
           id?: string
           manager?: string | null
@@ -2173,6 +2175,7 @@ export type Database = {
           code?: string | null
           country?: string | null
           created_at?: string | null
+          email?: string | null
           enterprise_id?: string
           id?: string
           manager?: string | null

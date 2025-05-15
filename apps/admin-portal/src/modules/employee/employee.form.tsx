@@ -1,10 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
-import { createSelectSchema } from "drizzle-zod";
+import { createInsertSchema } from "drizzle-zod";
 import { Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { useDateFormatter } from "react-aria";
 import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
@@ -12,7 +11,6 @@ import * as z from "zod";
 
 import { Button } from "@/ui/button";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
-import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
@@ -50,7 +48,6 @@ import { SALARY_COMPONENT_TYPES } from "@/employee/employee.options";
 import useEmployeeStore from "@/employee/employee.store";
 import {
   EmployeeStatus,
-  EmployeeStatusProps,
   type EmployeeCreateData,
   type EmployeeUpdateData,
 } from "@/employee/employee.types";
@@ -68,6 +65,52 @@ const salaryComponentSchema = z.object({
     .default(0),
 });
 
+export const createEmployeeFormSchema = (t: (key: string) => string) => {
+  const EmployeeSelectSchema = createInsertSchema(employees, {
+    first_name: z.string().min(1, t("Employees.form.first_name.required")),
+    last_name: z.string().min(1, t("Employees.form.last_name.required")),
+    email: z.string().email(t("Employees.form.email.invalid")),
+    phone: z.string().optional(),
+    job_id: z.string().min(1, t("Employees.form.job.required")),
+
+    salary: z.array(salaryComponentSchema).optional(),
+    status: z.enum(EmployeeStatus),
+    nationality: z.string().optional(),
+    hire_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.hire_date.invalid")),
+    birth_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.birth_date.invalid")),
+    termination_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.termination_date.invalid")),
+    national_id: z.string().optional(),
+    eqama_id: z.string().optional(),
+    gender: z.string().optional(),
+    marital_status: z.string().optional(),
+    education_level: z.string().optional(),
+    employee_number: z.string().optional(),
+    onboarding_status: z.string().optional(),
+    offboarding_status: z.string().optional(),
+    emergency_contact: z
+      .object({
+        name: z.string().optional(),
+        phone: z.string().optional(),
+        relationship: z.string().optional(),
+      })
+      .optional(),
+    notes: z.any().optional().nullable(),
+    ...addressSchema,
+    ...metadataSchema,
+  });
+
+  return EmployeeSelectSchema;
+};
+
 export function EmployeeForm({
   formHtmlId,
   onSuccess,
@@ -78,7 +121,8 @@ export function EmployeeForm({
   const t = useTranslations();
   const locale = useLocale();
 
-  let formatter = useDateFormatter();
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
 
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
@@ -90,19 +134,16 @@ export function EmployeeForm({
   const isJobSaving = useJobStore((state) => state.isLoading);
   const setIsJobSaving = useJobStore((state) => state.setIsLoading);
 
-  const { mutateAsync: updateEmployeeMutate, isPending: isUpdatingEmployee } = useUpdateEmployee();
-  const { mutateAsync: createEmployeeMutate, isPending: isCreatingEmployee } = useCreateEmployee();
+  const { mutateAsync: updateEmployeeMutate } = useUpdateEmployee();
+  const { mutateAsync: createEmployeeMutate } = useCreateEmployee();
 
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
-
-  const setIsFormDialogOpen = useEmployeeStore((state) => state.setIsFormDialogOpen);
 
   const [email, setEmail] = useState(defaultValues?.email || "");
   const [debouncedEmail] = useDebounce(email, 500);
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isEmailLoading, setIsEmailLoading] = useState(false);
-  const { user } = useUserStore.getState();
   const actualEmployeeId = editMode ? defaultValues?.id : undefined;
   const initialEmail = editMode ? defaultValues?.email : undefined;
 
@@ -135,54 +176,8 @@ export function EmployeeForm({
     };
   }, [debouncedEmail, actualEmployeeId, initialEmail, user?.id]);
 
-  const createEmployeeFormSchema = () => {
-    const EmployeeSelectSchema = createSelectSchema(employees, {
-      first_name: z.string().min(1, t("Employees.form.first_name.required")),
-      last_name: z.string().min(1, t("Employees.form.last_name.required")),
-      email: z.string().email(t("Employees.form.email.invalid")),
-      phone: z.string().optional(),
-      job_id: z.string().min(1, t("Employees.form.job.required")),
-
-      salary: z.array(salaryComponentSchema).optional(),
-      status: z.enum(EmployeeStatus),
-      nationality: z.string().optional(),
-      hire_date: z
-        .any()
-        .optional()
-        .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.hire_date.invalid")),
-      birth_date: z
-        .any()
-        .optional()
-        .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.birth_date.invalid")),
-      termination_date: z
-        .any()
-        .optional()
-        .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.termination_date.invalid")),
-      national_id: z.string().optional(),
-      eqama_id: z.string().optional(),
-      gender: z.string().optional(),
-      marital_status: z.string().optional(),
-      education_level: z.string().optional(),
-      employee_number: z.string().optional(),
-      onboarding_status: z.string().optional(),
-      offboarding_status: z.string().optional(),
-      emergency_contact: z
-        .object({
-          name: z.string().optional(),
-          phone: z.string().optional(),
-          relationship: z.string().optional(),
-        })
-        .optional(),
-      notes: z.any().optional().nullable(),
-      ...addressSchema,
-      ...metadataSchema,
-    });
-
-    return EmployeeSelectSchema;
-  };
-
   const form = useForm<z.input<ReturnType<typeof createEmployeeFormSchema>>>({
-    resolver: zodResolver(createEmployeeFormSchema()),
+    resolver: zodResolver(createEmployeeFormSchema(t)),
     mode: "onChange",
     defaultValues: {
       first_name: defaultValues?.first_name || "",
@@ -289,6 +284,8 @@ export function EmployeeForm({
         const { membership, user } = useUserStore.getState();
         await createEmployeeMutate({
           ...data,
+          user_id: user?.id || "",
+          enterprise_id: membership?.enterprise_id || "",
           termination_date:
             data.termination_date && typeof data.termination_date.toString === "function"
               ? data.termination_date.toString()
@@ -310,8 +307,6 @@ export function EmployeeForm({
             ...comp,
             amount: Number(comp.amount) || 0,
           })),
-          enterprise_id: membership?.enterprise_id || "",
-          user_id: user?.id || "",
         });
         onSuccess?.();
       }
@@ -353,6 +348,8 @@ export function EmployeeForm({
             form.handleSubmit(handleSubmit)(e);
           }}
         >
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="form-fields-cols-2">
               <FormField

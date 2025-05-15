@@ -2252,6 +2252,7 @@ export const warehouses = pgTable(
     capacity: numeric({ precision: 10, scale: 2 }),
     status: common_status().default("active"),
     phone: text(),
+    email: text(),
     manager: uuid(),
     temperature_control: boolean().default(false),
     operating_hours: jsonb(),

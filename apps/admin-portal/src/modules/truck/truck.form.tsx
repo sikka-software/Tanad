@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createSelectSchema } from "drizzle-zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -14,7 +14,6 @@ import DigitsInput from "@/components/ui/inputs/digits-input";
 import { Input } from "@/components/ui/inputs/input";
 import NumberInput from "@/components/ui/inputs/number-input";
 
-import { metadataSchema } from "@/lib/schemas/metadata.schema";
 import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps, PaymentCycle, VehicleStatus } from "@/types/common.type";
@@ -27,7 +26,7 @@ import useTruckStore from "@/truck/truck.store";
 import { TruckUpdateData, TruckCreateData } from "@/truck/truck.type";
 
 export const createTruckSchema = (t: (key: string) => string) => {
-  const TruckSelectSchema = createSelectSchema(trucks, {
+  const TruckSelectSchema = createInsertSchema(trucks, {
     name: z.string().min(1, t("Trucks.form.name.required")),
     make: z.string().optional().or(z.literal("")),
     model: z.string().optional().or(z.literal("")),
@@ -48,7 +47,6 @@ export const createTruckSchema = (t: (key: string) => string) => {
     payment_cycle: z.enum(PaymentCycle).default("monthly"),
     status: z.enum(VehicleStatus).optional(),
     notes: z.any().optional().nullable(),
-    ...metadataSchema,
   });
 
   return TruckSelectSchema;
@@ -188,6 +186,8 @@ export function TruckForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
         <div className="form-container">
           <div className="form-fields-cols-2">
             <FormField

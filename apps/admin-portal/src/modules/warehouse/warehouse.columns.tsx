@@ -66,6 +66,10 @@ const useWarehouseColumns = (
       validationSchema: z.string().nullable(),
     },
     {
+      accessorKey: "area",
+      header: t("Warehouses.form.area.label"),
+    },
+    {
       accessorKey: "capacity",
       header: t("Warehouses.form.capacity.label"),
       validationSchema: z.number().min(0, t("Warehouses.form.capacity.invalid")),

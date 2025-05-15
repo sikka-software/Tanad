@@ -1,40 +1,34 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
-import { createSelectSchema } from "drizzle-zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import CodeInput from "@/ui/inputs/code-input";
+import { CurrencyInput } from "@/ui/inputs/currency-input";
+import { DateInput } from "@/ui/inputs/date-input";
+import { Input } from "@/ui/inputs/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import NotesSection from "@/components/forms/notes-section";
-import CodeInput from "@/components/ui/inputs/code-input";
-import { CurrencyInput } from "@/components/ui/inputs/currency-input";
-import { DateInput } from "@/components/ui/inputs/date-input";
-import { Input } from "@/components/ui/inputs/input";
 
-import { metadataSchema } from "@/lib/schemas/metadata.schema";
 import { getNotesValue } from "@/lib/utils";
 import { validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
+import { useCreateExpense, useUpdateExpense, useExpenses } from "@/expense/expense.hooks";
+import useExpenseStore from "@/expense/expense.store";
+import { ExpenseCreateData, ExpenseStatus, ExpenseUpdateData } from "@/expense/expense.type";
+
 import { expenses } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
-import { useCreateExpense, useUpdateExpense, useExpenses } from "./expense.hooks";
-import useExpenseStore from "./expense.store";
-import {
-  ExpenseCreateData,
-  ExpenseStatus,
-  ExpenseStatusProps,
-  ExpenseUpdateData,
-} from "./expense.type";
-
 export const createExpenseSchema = (t: (key: string) => string) => {
-  const ExpenseSelectSchema = createSelectSchema(expenses, {
+  const ExpenseSelectSchema = createInsertSchema(expenses, {
     description: z.string().optional(),
     amount: z.coerce.number().min(0, t("Expenses.form.amount.required")),
     incurred_at: z.any().optional(),
@@ -51,7 +45,6 @@ export const createExpenseSchema = (t: (key: string) => string) => {
     notes: z.any().optional().nullable(),
     expense_number: z.string().min(1, t("Expenses.form.expense_number.required")),
     status: z.enum(ExpenseStatus).default("draft"),
-    ...metadataSchema,
   });
 
   return ExpenseSelectSchema;
@@ -118,6 +111,8 @@ export function ExpenseForm({
       } else {
         await createExpense(
           {
+            user_id: user?.id,
+            enterprise_id: enterprise?.id || "",
             expense_number: data.expense_number.trim(),
             issue_date:
               data.issue_date && typeof data.issue_date.toString === "function"
@@ -128,12 +123,10 @@ export function ExpenseForm({
                 ? data.due_date.toString()
                 : undefined,
             amount: data.amount,
-            enterprise_id: enterprise?.id || "",
             category: data.category.trim(),
             // ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
             status: data.status || "draft",
             notes: data.notes,
-            user_id: user?.id,
           },
           {
             onSuccess: () => {
@@ -156,6 +149,8 @@ export function ExpenseForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
         <div className="form-container">
           <div className="form-fields-cols-2">
             <FormField

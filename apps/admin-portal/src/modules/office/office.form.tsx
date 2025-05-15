@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createSelectSchema } from "drizzle-zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,16 +10,15 @@ import BooleanTabs from "@/ui/boolean-tabs";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
+import CodeInput from "@/ui/inputs/code-input";
+import { Input } from "@/ui/inputs/input";
+import PhoneInput from "@/ui/inputs/phone-input";
+import UnitsInput from "@/ui/inputs/units-input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import NotesSection from "@/components/forms/notes-section";
-import CodeInput from "@/components/ui/inputs/code-input";
-import { Input } from "@/components/ui/inputs/input";
-import PhoneInput from "@/components/ui/inputs/phone-input";
-import UnitsInput, { UnitsInputOption } from "@/components/ui/inputs/units-input";
 
 import { addressSchema } from "@/lib/schemas/address.schema";
-import { metadataSchema } from "@/lib/schemas/metadata.schema";
 import { getNotesValue } from "@/lib/utils";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
@@ -36,7 +35,7 @@ import { offices } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
 const createOfficeSchema = (t: (key: string) => string) => {
-  const OfficeSelectSchema = createSelectSchema(offices, {
+  const OfficeSelectSchema = createInsertSchema(offices, {
     name: z.string().min(1, t("Offices.form.name.required")),
     code: z.string().optional().or(z.literal("")),
     email: z
@@ -58,7 +57,6 @@ const createOfficeSchema = (t: (key: string) => string) => {
     area: z.string().optional().nullable(),
     notes: z.any().optional().nullable(),
     ...addressSchema,
-    ...metadataSchema,
   });
   return OfficeSelectSchema;
 };
@@ -78,7 +76,7 @@ export function OfficeForm({
   const { mutateAsync: createOffice, isPending: isCreating } = useCreateOffice();
   const { mutateAsync: updateOffice, isPending: isUpdating } = useUpdateOffice();
   const user = useUserStore((state) => state.user);
-  const membership = useUserStore((state) => state.membership);
+  const enterprise = useUserStore((state) => state.enterprise);
   const isLoading = useOfficeStore((state) => state.isLoading);
   const setIsLoading = useOfficeStore((state) => state.setIsLoading);
 
@@ -140,6 +138,7 @@ export function OfficeForm({
               region: data.region?.trim() || undefined,
               country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
+              area: data.area || undefined,
               status: data.status,
               notes: data.notes,
             },
@@ -151,7 +150,7 @@ export function OfficeForm({
           },
         );
       } else {
-        if (!membership?.enterprise_id) {
+        if (!enterprise?.id) {
           toast.error(t("General.error_operation"), {
             description: t("Offices.error.no_enterprise"),
           });
@@ -161,6 +160,8 @@ export function OfficeForm({
 
         await createOffice(
           {
+            user_id: user.id,
+            enterprise_id: enterprise.id,
             name: data.name.trim(),
             code: data.code?.trim() || undefined,
             short_address: data.short_address?.trim() || undefined,
@@ -170,9 +171,8 @@ export function OfficeForm({
             region: data.region?.trim() || undefined,
             country: data.country?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
-            enterprise_id: membership.enterprise_id,
+            area: data.area || undefined,
             status: data.status,
-            user_id: user.id,
             notes: data.notes,
           },
           {
@@ -204,6 +204,8 @@ export function OfficeForm({
     <div>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="form-fields-cols-2">
               <FormField
@@ -352,6 +354,14 @@ export function OfficeForm({
                 name="area"
                 render={({ field }) => {
                   const [unit, setUnit] = useState("sqm");
+                  const initialNumber = (() => {
+                    if (typeof field.value === "string") {
+                      const match = field.value.match(/^(sqm|sqft)\s*(\d+(?:\.\d+)?)$/);
+                      if (match) return match[2];
+                    }
+                    return "";
+                  })();
+                  const [areaValue, setAreaValue] = useState(initialNumber);
                   return (
                     <FormItem>
                       <FormLabel>{t("Offices.form.area.label")}</FormLabel>
@@ -359,15 +369,20 @@ export function OfficeForm({
                         <UnitsInput
                           label={undefined}
                           inputProps={{
-                            ...field,
                             type: "number",
                             placeholder: t("Offices.form.area.placeholder"),
-                            value: field.value || "",
+                            value: areaValue,
                             onChange: (e) => {
-                              const newValue =
-                                e.target.value === "" ? undefined : Number(e.target.value);
-                              field.onChange(unit + " " + String(newValue));
+                              setAreaValue(e.target.value);
                             },
+                            onBlur: () => {
+                              if (areaValue === "") {
+                                field.onChange(undefined);
+                              } else {
+                                field.onChange(unit + " " + areaValue);
+                              }
+                            },
+                            disabled: isLoading,
                           }}
                           selectProps={{
                             options: [
@@ -375,7 +390,12 @@ export function OfficeForm({
                               { value: "sqft", label: "ft²" },
                             ],
                             value: unit,
-                            onValueChange: setUnit,
+                            onValueChange: (newUnit) => {
+                              setUnit(newUnit);
+                              if (areaValue !== "") {
+                                field.onChange(newUnit + " " + areaValue);
+                              }
+                            },
                           }}
                         />
                       </FormControl>

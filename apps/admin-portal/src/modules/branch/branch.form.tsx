@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useTranslations, useLocale } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -15,10 +16,11 @@ import FormDialog from "@/components/ui/form-dialog";
 import CodeInput from "@/components/ui/inputs/code-input";
 import { Input } from "@/components/ui/inputs/input";
 import PhoneInput from "@/components/ui/inputs/phone-input";
+import UnitsInput from "@/components/ui/inputs/units-input";
 
 import { AddressFormSection } from "@/forms/address-form-section";
 
-import { createAddressSchema } from "@/lib/schemas/address.schema";
+import { addressSchema, createAddressSchema } from "@/lib/schemas/address.schema";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
@@ -30,10 +32,11 @@ import { EmployeeForm } from "@/employee/employee.form";
 import { useEmployees } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
 
+import { branches } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
-export const createBranchSchema = (t: (key: string) => string) => {
-  const baseBranchSchema = z.object({
+const createBranchSchema = (t: (key: string) => string) => {
+  const BranchSelectSchema = createInsertSchema(branches, {
     name: z.string().min(1, t("Branches.form.name.required")),
     code: z.string().min(1, t("Branches.form.code.required")),
     phone: z.string().optional().or(z.literal("")),
@@ -47,12 +50,11 @@ export const createBranchSchema = (t: (key: string) => string) => {
       invalid_type_error: t("Branches.form.status.required"),
     }),
 
+    area: z.string().optional().nullable(),
     notes: z.any().optional().nullable(),
+    ...addressSchema,
   });
-
-  const addressSchema = createAddressSchema(t);
-
-  return baseBranchSchema.merge(addressSchema);
+  return BranchSelectSchema;
 };
 
 export type BranchFormValues = z.input<ReturnType<typeof createBranchSchema>>;
@@ -74,7 +76,8 @@ export function BranchForm({
   const t = useTranslations();
   const locale = useLocale();
 
-  const { user, enterprise } = useUserStore();
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
   const { mutate: createBranch } = useCreateBranch();
   const { mutate: updateBranch } = useUpdateBranch();
   const { data: branches } = useBranches();
@@ -202,6 +205,8 @@ export function BranchForm({
     <div>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="form-fields-cols-2">
               <FormField
@@ -341,6 +346,61 @@ export function BranchForm({
                     <FormMessage />
                   </FormItem>
                 )}
+              />
+              <FormField
+                control={form.control}
+                name="area"
+                render={({ field }) => {
+                  const [unit, setUnit] = useState("sqm");
+                  const initialNumber = (() => {
+                    if (typeof field.value === "string") {
+                      const match = field.value.match(/^(sqm|sqft)\s*(\d+(?:\.\d+)?)$/);
+                      if (match) return match[2];
+                    }
+                    return "";
+                  })();
+                  const [areaValue, setAreaValue] = useState(initialNumber);
+                  return (
+                    <FormItem>
+                      <FormLabel>{t("Branches.form.area.label")}</FormLabel>
+                      <FormControl>
+                        <UnitsInput
+                          label={undefined}
+                          inputProps={{
+                            type: "number",
+                            placeholder: t("Branches.form.area.placeholder"),
+                            value: areaValue,
+                            onChange: (e) => {
+                              setAreaValue(e.target.value);
+                            },
+                            onBlur: () => {
+                              if (areaValue === "") {
+                                field.onChange(undefined);
+                              } else {
+                                field.onChange(unit + " " + areaValue);
+                              }
+                            },
+                            disabled: isLoading,
+                          }}
+                          selectProps={{
+                            options: [
+                              { value: "sqm", label: "m²" },
+                              { value: "sqft", label: "ft²" },
+                            ],
+                            value: unit,
+                            onValueChange: (newUnit) => {
+                              setUnit(newUnit);
+                              if (areaValue !== "") {
+                                field.onChange(newUnit + " " + areaValue);
+                              }
+                            },
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
             </div>
           </div>

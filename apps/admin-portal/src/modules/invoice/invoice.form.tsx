@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
 import { useForm, useFieldArray, FieldError } from "react-hook-form";
@@ -22,6 +23,7 @@ import { ModuleFormProps } from "@/types/common.type";
 
 import { ClientForm } from "@/client/client.form";
 
+import { invoices, offices } from "@/db/schema";
 import { useInvoices } from "@/modules/invoice/invoice.hooks";
 import {
   InvoiceUpdateData,
@@ -39,8 +41,8 @@ import { ProductForm } from "../product/product.form";
 import { useProducts } from "../product/product.hooks";
 import useProductStore from "../product/product.store";
 
-const createInvoiceSchema = (t: (key: string) => string) =>
-  z.object({
+const createInvoiceSchema = (t: (key: string) => string) => {
+  const InvoiceSelectSchema = createInsertSchema(invoices, {
     client_id: z.string().min(1, t("Invoices.form.client.required")),
     invoice_number: z.string().min(1, t("Invoices.form.invoice_number.required")),
     issue_date: z.date({
@@ -55,25 +57,32 @@ const createInvoiceSchema = (t: (key: string) => string) =>
     subtotal: z.number().min(0, t("Invoices.form.subtotal.required")),
     tax_rate: z.number().min(0, t("Invoices.form.tax_rate.required")),
     notes: z.any().optional().nullable(),
-    items: z
-      .array(
-        z.object({
-          product_id: z.string().optional(),
-          description: z.string(),
-          quantity: z
-            .number({ invalid_type_error: t("ProductsFormSection.quantity.invalid") })
-            .min(1, t("ProductsFormSection.quantity.required")),
-          unit_price: z
-            .number({ invalid_type_error: t("ProductsFormSection.unit_price.invalid") })
-            .min(0, t("ProductsFormSection.unit_price.required")),
-        }),
-      )
-      .min(1, t("ProductsFormSection.items.required"))
-      .refine(
-        (items) => items.every((item) => item.description?.trim() !== "" || item.product_id),
-        t("ProductsFormSection.items.required"),
-      ),
   });
+
+  const InvoiceItemsSchema = z
+    .array(
+      z.object({
+        product_id: z.string().optional(),
+        description: z.string(),
+        quantity: z
+          .number({ invalid_type_error: t("ProductsFormSection.quantity.invalid") })
+          .min(1, t("ProductsFormSection.quantity.required")),
+        unit_price: z
+          .number({ invalid_type_error: t("ProductsFormSection.unit_price.invalid") })
+          .min(0, t("ProductsFormSection.unit_price.required")),
+      }),
+    )
+    .min(1, t("ProductsFormSection.items.required"))
+    .refine(
+      (items) => items.every((item) => item.description?.trim() !== "" || item.product_id),
+      t("ProductsFormSection.items.required"),
+    );
+
+  return z.object({
+    ...InvoiceSelectSchema,
+    items: InvoiceItemsSchema,
+  });
+};
 
 export type InvoiceFormValues = z.infer<ReturnType<typeof createInvoiceSchema>>;
 
@@ -86,7 +95,9 @@ export function InvoiceForm({
 }: ModuleFormProps<InvoiceUpdateData | InvoiceCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
-  const { profile, membership } = useUserStore();
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+
   const { mutateAsync: createInvoice } = useCreateInvoice();
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
 
@@ -256,6 +267,8 @@ export function InvoiceForm({
     <>
       <Form {...form}>
         <form id={formHtmlId || "invoice-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="form-fields-cols-2">
               <FormField
