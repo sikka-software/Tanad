@@ -63,12 +63,17 @@ export async function deleteEmployee(id: string): Promise<void> {
 }
 
 export async function bulkDeleteEmployees(ids: string[]): Promise<void> {
-  const response = await fetch("/api/resource/employees", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ids }),
-  });
-  if (!response.ok) {
+  try {
+    const response = await fetch("/api/resource/employees", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete employees");
+    }
+  } catch (error) {
+    console.error("Error deleting employees:", error);
     throw new Error("Failed to delete employees");
   }
 }

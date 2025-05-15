@@ -211,6 +211,7 @@ export default function CompaniesPage() {
           title={t("Companies.confirm_delete", { count: selectedRows.length })}
           description={t("Companies.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}
+          onCancel={() => selectedRows.length === 1 && viewMode === "cards" && setSelectedRows([])}
         />
       </DataPageLayout>
     </div>

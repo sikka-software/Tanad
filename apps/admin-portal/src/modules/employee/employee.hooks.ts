@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, UseQueryResult } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
@@ -24,7 +24,7 @@ export const employeeKeys = {
 };
 
 // Hook for fetching all employees
-export const useEmployees = () => {
+export const useEmployees = (): UseQueryResult<Employee[]> => {
   return useQuery({
     queryKey: employeeKeys.lists(),
     queryFn: fetchEmployees,

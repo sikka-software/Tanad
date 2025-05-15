@@ -63,12 +63,17 @@ export async function deleteExpense(id: string): Promise<void> {
 }
 
 export async function bulkDeleteExpenses(ids: string[]): Promise<void> {
-  const response = await fetch("/api/resource/expenses", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ids }),
-  });
-  if (!response.ok) {
+  try {
+    const response = await fetch("/api/resource/expenses", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete expenses");
+    }
+  } catch (error) {
+    console.error("Error deleting expenses:", error);
     throw new Error("Failed to delete expenses");
   }
 }

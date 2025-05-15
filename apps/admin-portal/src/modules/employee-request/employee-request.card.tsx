@@ -2,6 +2,8 @@ import { useTranslations } from "next-intl";
 
 import ModuleCard from "@/components/cards/module-card";
 
+import { Employee } from "@/employee/employee.types";
+
 import { useUpdateEmployeeRequest } from "@/employee-request/employee-request.hooks";
 import useEmployeeRequestStore from "@/employee-request/employee-request.store";
 import {
@@ -12,9 +14,11 @@ import {
 
 const EmployeeRequestCard = ({
   employeeRequest,
+  employee,
   onActionClicked,
 }: {
   employeeRequest: EmployeeRequest;
+  employee: Employee | null;
   onActionClicked: (action: string, rowId: string) => void;
 }) => {
   const t = useTranslations();
@@ -46,8 +50,7 @@ const EmployeeRequestCard = ({
       <div className="bg-400 flex h-full flex-col items-start justify-between">
         <div className="bg-400 flex flex-col items-start">
           <div className="text-sm text-gray-500">
-            <p>Employee name here</p>
-            {/* <p>{t("employee_label", { name: employeeRequest.employee_id })}</p> */}
+            {employee && <p>{employee?.first_name + " " + employee?.last_name}</p>}
             {employeeRequest.start_date && (
               <p>
                 {t("date_range", {

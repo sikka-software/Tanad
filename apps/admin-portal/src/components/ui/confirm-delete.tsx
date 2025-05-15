@@ -22,6 +22,7 @@ interface ConfirmDeleteProps {
   title: string;
   description: string;
   extraConfirm?: boolean;
+  onCancel?: () => void;
 }
 const ConfirmDelete = ({
   isDeleteDialogOpen,
@@ -31,6 +32,7 @@ const ConfirmDelete = ({
   title,
   description,
   extraConfirm,
+  onCancel,
 }: ConfirmDeleteProps) => {
   const t = useTranslations();
   const locale = useLocale();
@@ -65,7 +67,13 @@ const ConfirmDelete = ({
           </>
         )}
         <DialogFooter>
-          <Button onClick={() => setIsDeleteDialogOpen(false)} disabled={isDeleting}>
+          <Button
+            onClick={() => {
+              setIsDeleteDialogOpen(false);
+              onCancel?.();
+            }}
+            disabled={isDeleting}
+          >
             {t("General.cancel")}
           </Button>
           <Button

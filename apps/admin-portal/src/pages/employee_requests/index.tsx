@@ -32,7 +32,12 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/employee-request/employee
 import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
 import useEmployeeRequestStore from "@/employee-request/employee-request.store";
 import EmployeeRequestsTable from "@/employee-request/employee-request.table";
-import { EmployeeRequestUpdateData } from "@/employee-request/employee-request.type";
+import {
+  EmployeeRequest,
+  EmployeeRequestUpdateData,
+} from "@/employee-request/employee-request.type";
+
+import { useEmployees } from "@/modules/employee/employee.hooks";
 
 export default function EmployeeRequestsPage() {
   const t = useTranslations();
@@ -71,6 +76,7 @@ export default function EmployeeRequestsPage() {
   const getFilteredData = moduleHooks.useGetFilteredData();
   const getSortedData = moduleHooks.useGetSortedData();
 
+  const { data: employees } = useEmployees();
   const { data: employeeRequests, isLoading, error } = useEmployeeRequests();
   const { mutateAsync: deleteEmployeeRequests, isPending: isDeleting } =
     useBulkDeleteEmployeeRequests();
@@ -164,7 +170,7 @@ export default function EmployeeRequestsPage() {
             />
           ) : (
             <div className="p-4">
-              <DataModelList
+              <DataModelList<EmployeeRequest>
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
@@ -178,6 +184,7 @@ export default function EmployeeRequestsPage() {
                 renderItem={(request) => (
                   <EmployeeRequestCard
                     employeeRequest={request}
+                    employee={employees?.find((e) => e.id === request.employee_id) || null}
                     onActionClicked={onActionClicked}
                   />
                 )}
@@ -214,6 +221,7 @@ export default function EmployeeRequestsPage() {
           title={t("EmployeeRequests.confirm_delete", { count: selectedRows.length })}
           description={t("EmployeeRequests.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}
+          onCancel={() => selectedRows.length === 1 && viewMode === "cards" && setSelectedRows([])}
         />
       </DataPageLayout>
     </div>
