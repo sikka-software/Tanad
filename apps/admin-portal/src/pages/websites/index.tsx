@@ -170,7 +170,7 @@ export default function WebsitesPage() {
                   title: t("Websites.create_first.title"),
                   description: t("Websites.create_first.description"),
                   add: t("Pages.Websites.add"),
-                  icons: [Globe, Plus, Link],
+                  icons: [Globe, Plus, Globe],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(website) => (

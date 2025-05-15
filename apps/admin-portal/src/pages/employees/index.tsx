@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { Plus, User } from "lucide-react";
+import { FileUser, Plus, User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -177,7 +177,7 @@ export default function EmployeesPage() {
                   title: t("Employees.create_first.title"),
                   description: t("Employees.create_first.description"),
                   add: t("Pages.Employees.add"),
-                  icons: [User, Plus, User],
+                  icons: [FileUser, Plus, FileUser],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(employee) => (

@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { Plus, User } from "lucide-react";
+import { BanknoteArrowUp, Plus, User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -172,7 +172,7 @@ export default function SalariesPage() {
                   title: t("Salaries.create_first.title"),
                   description: t("Salaries.create_first.description"),
                   add: t("Pages.Salaries.add"),
-                  icons: [User, Plus, User],
+                  icons: [BanknoteArrowUp, Plus, BanknoteArrowUp],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(salary) => (

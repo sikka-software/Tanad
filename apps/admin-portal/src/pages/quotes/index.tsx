@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { Plus, Quote } from "lucide-react";
+import { FileClock, Plus, Quote } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -166,7 +166,7 @@ export default function QuotesPage() {
                   title: t("Quotes.create_first.title"),
                   description: t("Quotes.create_first.description"),
                   add: t("Pages.Quotes.add"),
-                  icons: [Quote, Plus, Quote],
+                  icons: [FileClock, Plus, FileClock],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(quote) => (
