@@ -568,6 +568,41 @@
       "when": 1747257748314,
       "tag": "0080_smart_thunderball",
       "breakpoints": true
+    },
+    {
+      "idx": 81,
+      "version": "7",
+      "when": 1747272439219,
+      "tag": "0081_optimal_turbo",
+      "breakpoints": true
+    },
+    {
+      "idx": 82,
+      "version": "7",
+      "when": 1747272953965,
+      "tag": "0082_condemned_midnight",
+      "breakpoints": true
+    },
+    {
+      "idx": 83,
+      "version": "7",
+      "when": 1747274016066,
+      "tag": "0083_sharp_purple_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 84,
+      "version": "7",
+      "when": 1747274731904,
+      "tag": "0084_rich_cannonball",
+      "breakpoints": true
+    },
+    {
+      "idx": 85,
+      "version": "7",
+      "when": 1747277401954,
+      "tag": "0085_classy_wrecker",
+      "breakpoints": true
     }
   ]
 }

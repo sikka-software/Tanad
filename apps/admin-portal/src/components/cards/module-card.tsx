@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader } from "@/ui/card";
 import CardActions from "@/components/cards/card-actions";
 import CardStatusAction from "@/components/cards/card-status-action";
 
+import { cn } from "@/lib/utils";
+
 interface ModuleCardProps<T> {
   id: string;
   title: string;
@@ -13,7 +15,7 @@ interface ModuleCardProps<T> {
   onEdit: () => void;
   onDelete: () => void;
   onDuplicate: () => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   parentTranslationKey?: string;
 }
 
@@ -46,14 +48,14 @@ const ModuleCard = <T,>({
           <CardActions onEdit={onEdit} onDelete={onDelete} onDuplicate={onDuplicate} />
         </div>
 
-        <div className="flex items-start justify-between px-4 py-2">
+        <div className={cn("flex items-start justify-between px-4 py-2", !children && "pb-3")}>
           <div>
             <h3 className="text-lg font-semibold">{title}</h3>
             {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
           </div>
         </div>
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      {children && <CardContent className="px-4 pb-4">{children}</CardContent>}
     </Card>
   );
 };

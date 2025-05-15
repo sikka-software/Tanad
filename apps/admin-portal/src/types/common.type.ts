@@ -6,6 +6,9 @@ import { Constants } from "../lib/database.types";
 export const CommonStatus = Constants.public.Enums.common_status;
 export type CommonStatusProps = (typeof CommonStatus)[number];
 
+export const PaymentCycle = Constants.public.Enums.payment_cycle;
+export type PaymentCycleProps = (typeof PaymentCycle)[number];
+
 export const VehicleStatus = Constants.public.Enums.vehicle_status;
 export type VehicleStatusProps = (typeof VehicleStatus)[number];
 

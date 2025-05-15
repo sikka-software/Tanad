@@ -173,7 +173,7 @@ export default function OnlineStoresPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(onlineStore) => (
-                  <OnlineStoreCard key={onlineStore.id} onlineStore={onlineStore} />
+                  <OnlineStoreCard onlineStore={onlineStore} onActionClicked={onActionClicked} />
                 )}
                 gridCols="3"
               />
@@ -214,7 +214,7 @@ export default function OnlineStoresPage() {
   );
 }
 
-OnlineStoresPage.messages = ["Notes", "Pages", "OnlineStores", "General"];
+OnlineStoresPage.messages = ["Notes", "Pages", "OnlineStores", "General", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

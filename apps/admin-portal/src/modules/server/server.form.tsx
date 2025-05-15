@@ -35,8 +35,8 @@ export const createServerSchema = (t: (key: string) => string) =>
       message: t("Servers.form.status.required"),
     }),
     tags: z.array(z.string()).optional().or(z.literal("")),
-    monthly_cost: z.number().optional().or(z.literal("")),
-    annual_cost: z.number().optional().or(z.literal("")),
+    monthly_payment: z.number().optional().or(z.literal("")),
+    annual_payment: z.number().optional().or(z.literal("")),
     payment_cycle: z.string().min(1, t("Servers.form.payment_cycle.required")),
     user_id: z.string().optional().or(z.literal("")),
     enterprise_id: z.string().optional().or(z.literal("")),
@@ -72,8 +72,8 @@ export function ServerForm({
       tags: Array.isArray(defaultValues?.tags)
         ? defaultValues.tags.filter((tag): tag is string => typeof tag === "string")
         : [],
-      monthly_cost: defaultValues?.monthly_cost || 0,
-      annual_cost: defaultValues?.annual_cost || 0,
+      monthly_payment: defaultValues?.monthly_payment || 0,
+      annual_payment: defaultValues?.annual_payment || 0,
       payment_cycle: defaultValues?.payment_cycle || "monthly",
       notes: getNotesValue(defaultValues),
       user_id: defaultValues?.user_id || "",
@@ -100,8 +100,8 @@ export function ServerForm({
       status: data.status,
       tags: Array.isArray(data.tags) && data.tags.length > 0 ? data.tags : null,
       notes: data.notes,
-      monthly_cost: data.monthly_cost || 0,
-      annual_cost: data.annual_cost || 0,
+      monthly_payment: data.monthly_payment || 0,
+      annual_payment: data.annual_payment || 0,
       payment_cycle: data.payment_cycle || "monthly",
     };
 
@@ -150,8 +150,8 @@ export function ServerForm({
           user_id: user.id,
           enterprise_id: enterprise.id,
           ip_address: commonData.ip_address as unknown | null,
-          monthly_cost: commonData.monthly_cost,
-          annual_cost: commonData.annual_cost,
+          monthly_payment: commonData.monthly_payment,
+          annual_payment: commonData.annual_payment,
           payment_cycle:
             commonData.payment_cycle === "monthly" || commonData.payment_cycle === "annual"
               ? commonData.payment_cycle
@@ -312,7 +312,7 @@ export function ServerForm({
               name="payment_cycle"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Servers.form.payment_cycle.label")}</FormLabel>
+                  <FormLabel>{t("PaymentCycles.label")}</FormLabel>
                   <FormControl>
                     <Select
                       dir={lang === "ar" ? "rtl" : "ltr"}
@@ -321,15 +321,11 @@ export function ServerForm({
                       disabled={isLoading}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder={t("Servers.form.payment_cycle.placeholder")} />
+                        <SelectValue placeholder={t("PaymentCycles.placeholder")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="monthly">
-                          {t("Servers.form.payment_cycle.monthly")}
-                        </SelectItem>
-                        <SelectItem value="annual">
-                          {t("Servers.form.payment_cycle.annual")}
-                        </SelectItem>
+                        <SelectItem value="monthly">{t("PaymentCycles.monthly")}</SelectItem>
+                        <SelectItem value="annual">{t("PaymentCycles.annual")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -340,13 +336,13 @@ export function ServerForm({
             {form.watch("payment_cycle") === "monthly" && (
               <FormField
                 control={form.control}
-                name="monthly_cost"
+                name="monthly_payment"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Servers.form.monthly_cost.label")}</FormLabel>
+                    <FormLabel>{t("PaymentCycles.monthly_payment.label")}</FormLabel>
                     <FormControl>
                       <CurrencyInput
-                        placeholder={t("Servers.form.monthly_cost.placeholder")}
+                        placeholder={t("PaymentCycles.monthly_payment.placeholder")}
                         disabled={isLoading}
                         {...field}
                         showCommas={true}
@@ -362,13 +358,13 @@ export function ServerForm({
             {form.watch("payment_cycle") === "annual" && (
               <FormField
                 control={form.control}
-                name="annual_cost"
+                name="annual_payment"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Servers.form.annual_cost.label")}</FormLabel>
+                    <FormLabel>{t("PaymentCycles.annual_payment.label")}</FormLabel>
                     <FormControl>
                       <CurrencyInput
-                        placeholder={t("Servers.form.annual_cost.placeholder")}
+                        placeholder={t("PaymentCycles.annual_payment.placeholder")}
                         disabled={isLoading}
                         {...field}
                         showCommas={true}

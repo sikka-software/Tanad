@@ -173,7 +173,9 @@ export default function OfficesPage() {
                   icons: [Building, Plus, Building],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(office) => <OfficeCard office={office} />}
+                renderItem={(office) => (
+                  <OfficeCard office={office} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>
@@ -222,6 +224,7 @@ OfficesPage.messages = [
   "Departments",
   "General",
   "Notes",
+  "CommonStatus",
 ];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {

@@ -1,15 +1,8 @@
-import { CalendarIcon } from "lucide-react"
-import {
-  Button,
-  DatePicker,
-  Dialog,
-  Group,
-  Label,
-  Popover,
-} from "react-aria-components"
+import { CalendarIcon } from "lucide-react";
+import { Button, DatePicker, Dialog, Group, Label, Popover } from "react-aria-components";
 
-import { Calendar } from "@/components/ui/calendar-rac"
-import { DateInput } from "@/components/ui/datefield-rac"
+import { Calendar } from "@/components/ui/calendar-rac";
+import { DateInput } from "@/components/ui/datefield-rac";
 
 export default function Component() {
   return (
@@ -31,11 +24,7 @@ export default function Component() {
           <Calendar />
         </Dialog>
       </Popover>
-      <p
-        className="text-muted-foreground mt-2 text-xs"
-        role="region"
-        aria-live="polite"
-      >
+      <p className="text-muted-foreground mt-2 text-xs" role="region" aria-live="polite">
         Built with{" "}
         <a
           className="hover:text-foreground underline"
@@ -47,5 +36,5 @@ export default function Component() {
         </a>
       </p>
     </DatePicker>
-  )
+  );
 }

@@ -16,9 +16,3 @@ export const SALARY_COMPONENT_TYPES = [
   { value: "commission", label: "Commission" },
   { value: "other", label: "Other" },
 ] as const;
-
-export const VEHICLE_OWNERSHIP_STATUSES = [
-  { value: "owned", label: "Owned" },
-  { value: "rented", label: "Rented" },
-  { value: "financed", label: "Financed" },
-] as const;

@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import ModuleCard from "@/components/cards/module-card";
 import { MoneyFormatter } from "@/components/ui/currency-input";
 
@@ -18,6 +20,7 @@ const DomainCard = ({
   domain: Domain;
   onActionClicked: (action: string, rowId: string) => void;
 }) => {
+  const t = useTranslations();
   const { mutate: updateDomain } = useUpdateDomain();
   const data = useDomainStore((state) => state.data);
   const setData = useDomainStore((state) => state.setData);
@@ -28,7 +31,8 @@ const DomainCard = ({
     await updateDomain({ id: rowId, data: { [columnId]: value } });
   };
 
-  let recurringCost = domain.payment_cycle === "monthly" ? domain.monthly_cost : domain.annual_cost;
+  let recurringCost =
+    domain.payment_cycle === "monthly" ? domain.monthly_payment : domain.annual_payment;
   return (
     <ModuleCard
       id={domain.id}
@@ -41,12 +45,13 @@ const DomainCard = ({
       onDelete={() => onActionClicked("delete", domain.id)}
       onDuplicate={() => onActionClicked("duplicate", domain.id)}
     >
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-500">Status:</p>
+      <div className="flex items-center justify-end">
         <span className="money">
           {MoneyFormatter(recurringCost || 0)} {getCurrencySymbol(currency || "sar").symbol}
+          <span className="text-sm text-gray-500">
+            {" \\ " + t(`PaymentCycles.${domain.payment_cycle}`)}
+          </span>
         </span>
-        <p className="text-sm text-gray-500">Expires: {domain.payment_cycle}</p>
       </div>
     </ModuleCard>
   );

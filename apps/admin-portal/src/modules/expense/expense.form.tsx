@@ -80,11 +80,9 @@ export function ExpenseForm({
     resolver: zodResolver(createExpenseSchema(t)),
     defaultValues: {
       expense_number: defaultValues?.expense_number || "",
-
       issue_date: defaultValues?.issue_date ? new Date(defaultValues.issue_date) : undefined,
       due_date: defaultValues?.due_date ? new Date(defaultValues.due_date) : undefined,
-
-      status: (defaultValues?.status || "draft") as ExpenseStatusProps,
+      status: defaultValues?.status || "draft",
       amount: defaultValues?.amount || 0,
       category: defaultValues?.category || "",
       notes: getNotesValue(defaultValues),

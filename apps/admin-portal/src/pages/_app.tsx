@@ -13,6 +13,7 @@ import ScrollToTop from "@/components/app/scroll-to-top";
 import SoonPage from "@/components/landing/soon-page";
 import AppLayout from "@/components/layouts/app-layout";
 import AuthLayout from "@/components/layouts/auth-layout";
+
 // import LandingLayout from "@/components/layouts/landing-layout";
 
 import { QueryProvider } from "@/providers/QueryProvider";

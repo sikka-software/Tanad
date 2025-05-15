@@ -336,7 +336,20 @@ export const purchase_status = pgEnum("purchase_status", [
   "closed",
   "cancelled",
 ]);
-export const payment_cycle = pgEnum("payment_cycle", ["monthly", "annual"]);
+export const payment_cycle = pgEnum("payment_cycle", [
+  "monthly",
+  "annual",
+  "daily",
+  "weekly",
+  "biweekly",
+  "quarterly",
+]);
+
+export const vehicle_ownership_status = pgEnum("vehicle_ownership_status", [
+  "owned",
+  "financed",
+  "rented",
+]);
 
 export const clients = pgTable(
   "clients",
@@ -1611,8 +1624,10 @@ export const cars = pgTable(
     code: text(),
     license_country: text(),
     license_plate: text(),
-    ownership_status: text(),
+    ownership_status: vehicle_ownership_status().default("owned"),
     status: vehicle_status().default("active"),
+    daily_payment: numeric({ precision: 10, scale: 2 }),
+    weekly_payment: numeric({ precision: 10, scale: 2 }),
     monthly_payment: numeric({ precision: 10, scale: 2 }),
     annual_payment: numeric({ precision: 10, scale: 2 }),
     payment_cycle: payment_cycle(),
@@ -1701,8 +1716,8 @@ export const domains = pgTable(
       .notNull(),
     domain_name: text().notNull(),
     registrar: text(),
-    monthly_cost: numeric({ precision: 10, scale: 2 }),
-    annual_cost: numeric({ precision: 10, scale: 2 }),
+    monthly_payment: numeric({ precision: 10, scale: 2 }),
+    annual_payment: numeric({ precision: 10, scale: 2 }),
     payment_cycle: payment_cycle(),
     created_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
@@ -2089,8 +2104,8 @@ export const servers = pgTable(
     os: text(),
     status: common_status().default("active"),
     tags: jsonb().default([]),
-    monthly_cost: numeric({ precision: 10, scale: 2 }),
-    annual_cost: numeric({ precision: 10, scale: 2 }),
+    monthly_payment: numeric({ precision: 10, scale: 2 }),
+    annual_payment: numeric({ precision: 10, scale: 2 }),
     payment_cycle: payment_cycle(),
     notes: jsonb(),
     created_at: timestamp({ withTimezone: true, mode: "string" })
@@ -2138,9 +2153,13 @@ export const trucks = pgTable(
     color: text(),
     vin: text(),
     code: text(),
-    ownership_status: text(),
+    ownership_status: vehicle_ownership_status().default("owned"),
     status: vehicle_status().default("active"),
+    daily_payment: numeric({ precision: 10, scale: 2 }),
+    weekly_payment: numeric({ precision: 10, scale: 2 }),
     monthly_payment: numeric({ precision: 10, scale: 2 }),
+    annual_payment: numeric({ precision: 10, scale: 2 }),
+    payment_cycle: payment_cycle(),
     license_country: text(),
     license_plate: text(),
     created_at: timestamp({ withTimezone: true, mode: "string" })

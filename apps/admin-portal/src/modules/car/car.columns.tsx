@@ -77,9 +77,12 @@ const useCarColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
       ),
     },
     {
+      accessorKey: "payment_cycle",
+      header: t("PaymentCycles.label"),
+    },
+    {
       accessorKey: "monthly_payment",
-      header: t("Cars.form.monthly_payment.label"),
-      validationSchema: z.number().min(0, "Required"),
+      header: t("PaymentCycles.monthly_payment.label"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
   ];

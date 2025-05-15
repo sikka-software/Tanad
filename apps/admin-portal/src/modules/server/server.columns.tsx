@@ -58,14 +58,14 @@ const useServerColumns = (
       ),
     },
     {
-      accessorKey: "monthly_cost",
-      header: t("Servers.form.monthly_cost.label"),
+      accessorKey: "monthly_payment",
+      header: t("PaymentCycles.monthly_payment.label"),
       validationSchema: z.number().min(0, "Required"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
     {
-      accessorKey: "annual_cost",
-      header: t("Servers.form.annual_cost.label"),
+      accessorKey: "annual_payment",
+      header: t("PaymentCycles.annual_payment.label"),
       validationSchema: z.number().min(0, "Required"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
@@ -73,15 +73,15 @@ const useServerColumns = (
       accessorKey: "payment_cycle",
       noPadding: true,
       enableEditing: false,
-      header: t("Servers.form.payment_cycle.label"),
+      header: t("PaymentCycles.label"),
       validationSchema: z.string().min(1, "Required"),
       cell: ({ getValue, row }) => (
         <SelectCell
           onChange={(value) => handleEdit?.(row.id, "payment_cycle", value)}
           cellValue={getValue()}
           options={[
-            { label: t("Servers.form.payment_cycle.monthly"), value: "monthly" },
-            { label: t("Servers.form.payment_cycle.annual"), value: "annual" },
+            { label: t("PaymentCycles.monthly"), value: "monthly" },
+            { label: t("PaymentCycles.annual"), value: "annual" },
           ]}
         />
       ),

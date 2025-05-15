@@ -38,14 +38,14 @@ const useDomainColumns = (
       validationSchema: z.string().min(1, "Required"),
     },
     {
-      accessorKey: "monthly_cost",
-      header: t("Domains.form.monthly_cost.label"),
+      accessorKey: "monthly_payment",
+      header: t("PaymentCycles.monthly_payment.label"),
       validationSchema: z.number().min(0, "Required"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
     {
-      accessorKey: "annual_cost",
-      header: t("Domains.form.annual_cost.label"),
+      accessorKey: "annual_payment",
+      header: t("PaymentCycles.annual_payment.label"),
       validationSchema: z.number().min(0, "Required"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
@@ -58,12 +58,12 @@ const useDomainColumns = (
           onChange={(value) => handleEdit?.(row.id, "payment_cycle", value)}
           cellValue={getValue()}
           options={[
-            { label: t("Domains.form.payment_cycle.monthly"), value: "monthly" },
-            { label: t("Domains.form.payment_cycle.annual"), value: "annual" },
+            { label: t("PaymentCycles.monthly"), value: "monthly" },
+            { label: t("PaymentCycles.annual"), value: "annual" },
           ]}
         />
       ),
-      header: t("Domains.form.payment_cycle.label"),
+      header: t("PaymentCycles.label"),
       validationSchema: z.string().min(1, "Required"),
     },
     {

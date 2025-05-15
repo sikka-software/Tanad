@@ -1,6 +1,5 @@
 import { pick } from "lodash";
 import { Plus, User } from "lucide-react";
-import { Truck } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -217,7 +216,15 @@ export default function ClientsPage() {
   );
 }
 
-ClientsPage.messages = ["Notes", "Pages", "Clients", "Companies", "General", "Forms"];
+ClientsPage.messages = [
+  "Notes",
+  "Pages",
+  "Clients",
+  "Companies",
+  "General",
+  "Forms",
+  "CommonStatus",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

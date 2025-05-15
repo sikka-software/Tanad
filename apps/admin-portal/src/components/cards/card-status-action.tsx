@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 
 import { Button } from "@/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
@@ -21,6 +22,7 @@ const CardStatusAction = <T,>({
 }: CardStatusActionProps<T>) => {
   const t = useTranslations();
   const lang = useLocale();
+  const [open, setOpen] = useState(false);
 
   const statusTranslationKey = (status: T) =>
     parentTranslationKey === "Forms"
@@ -28,7 +30,7 @@ const CardStatusAction = <T,>({
       : t(`${parentTranslationKey}.form.status.${status}`);
   return (
     <div>
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger>
           <Button variant="outline" size="sm">
             {statusTranslationKey(currentStatus)}
@@ -44,7 +46,10 @@ const CardStatusAction = <T,>({
                 key={i}
                 dir={lang === "ar" ? "rtl" : "ltr"}
                 variant="ghost"
-                onClick={() => onStatusChange(status)}
+                onClick={() => {
+                  onStatusChange(status);
+                  setOpen(false);
+                }}
                 className={cn(
                   "bg-400 justify-start",
                   currentStatus === status && "outline-primary outline-2 -outline-offset-2",

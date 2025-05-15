@@ -264,6 +264,30 @@
     "archived": "مؤرشف",
     "draft": "مسودة"
   },
+  "PaymentCycles": {
+    "label": "دورة الدفع",
+    "placeholder": "اختر دورة الدفع",
+    "monthly": "شهري",
+    "daily": "يومي",
+    "weekly": "أسبوعي",
+    "annual": "سنوي",
+    "daily_payment": {
+      "label": "الدفعات اليومية",
+      "placeholder": "أدخل الدفعات اليومية"
+    },
+    "weekly_payment": {
+      "label": "الدفعات الأسبوعية",
+      "placeholder": "أدخل الدفعات الأسبوعية"
+    },
+    "monthly_payment": {
+      "label": "الدفعات الشهرية",
+      "placeholder": "أدخل الدفعات الشهرية"
+    },
+    "annual_payment": {
+      "label": "الدفعات السنوية",
+      "placeholder": "أدخل الدفعات السنوية"
+    }
+  },
   "Pages": {
     "ActivityLogs": {
       "title": "سجل الأنشطة",
@@ -4087,7 +4111,6 @@
         "label": "رقم لوحة الترخيص",
         "placeholder": "أدخل رقم لوحة الترخيص"
       },
-
       "ownership_status": {
         "label": "حالة الملكية",
         "placeholder": "اختر حالة الملكية",
@@ -4693,23 +4716,6 @@
         "active": "نشط",
         "inactive": "غير نشط"
       },
-      "monthly_cost": {
-        "label": "التكلفة الشهرية",
-        "placeholder": "أدخل التكلفة الشهرية",
-        "required": "التكلفة الشهرية مطلوبة"
-      },
-      "annual_cost": {
-        "label": "التكلفة السنوية",
-        "placeholder": "أدخل التكلفة السنوية",
-        "required": "التكلفة السنوية مطلوبة"
-      },
-      "payment_cycle": {
-        "label": "دورة الدفع",
-        "placeholder": "أدخل دورة الدفع",
-        "required": "دورة الدفع مطلوبة",
-        "monthly": "شهري",
-        "annual": "سنوي"
-      },
       "notes": {
         "label": "الملاحظات",
         "placeholder": "أدخل الملاحظات"
@@ -4838,23 +4844,6 @@
         "active": "نشط",
         "inactive": "غير نشط"
       },
-      "monthly_cost": {
-        "label": "التكلفة الشهرية",
-        "placeholder": "أدخل التكلفة الشهرية",
-        "required": "التكلفة الشهرية مطلوبة"
-      },
-      "annual_cost": {
-        "label": "التكلفة السنوية",
-        "placeholder": "أدخل التكلفة السنوية",
-        "required": "التكلفة السنوية مطلوبة"
-      },
-      "payment_cycle": {
-        "label": "دورة الدفع",
-        "placeholder": "أدخل دورة الدفع",
-        "required": "دورة الدفع مطلوبة",
-        "monthly": "شهري",
-        "annual": "سنوي"
-      },
       "tags": {
         "label": "التصنيفات",
         "placeholder": "أدخل التصنيفات",
@@ -4964,11 +4953,6 @@
       "code": {
         "label": "الرمز التعريفي",
         "placeholder": "أدخل الرمز التعريفي للسيارة"
-      },
-
-      "monthly_payment": {
-        "label": "الدفعات الشهرية",
-        "placeholder": "أدخل الدفعات الشهرية"
       }
     },
     "success": {

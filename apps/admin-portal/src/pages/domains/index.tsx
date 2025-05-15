@@ -219,7 +219,7 @@ export default function DomainsPage() {
   );
 }
 
-DomainsPage.messages = ["Pages", "Domains", "Notes", "CommonStatus", "General"];
+DomainsPage.messages = ["Pages", "Domains", "Notes", "CommonStatus", "PaymentCycles", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

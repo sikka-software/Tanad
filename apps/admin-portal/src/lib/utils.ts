@@ -165,7 +165,7 @@ export function validateYearRange(
   t: (key: string) => string,
   minYear: number,
   maxYear: number,
-  translationKey: string
+  translationKey: string,
 ) {
   return (val: any, ctx: z.RefinementCtx) => {
     if (val === undefined || val === null) return;
