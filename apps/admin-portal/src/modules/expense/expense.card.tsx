@@ -1,5 +1,8 @@
-import { Calendar, Tag } from "lucide-react";
+import { parseDate } from "@internationalized/date";
+import { format } from "date-fns";
+import { Calendar, CalendarClock, CalendarPlus, Tag } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useDateFormatter } from "react-aria";
 
 import ModuleCard from "@/components/cards/module-card";
 import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
@@ -20,6 +23,7 @@ const ExpenseCard = ({
   onActionClicked: (action: string, id: string) => void;
 }) => {
   const t = useTranslations();
+  const formatter = useDateFormatter();
   const { mutate: updateExpense } = useUpdateExpense();
   const data = useExpenseStore((state) => state.data);
   const setData = useExpenseStore((state) => state.setData);
@@ -43,31 +47,32 @@ const ExpenseCard = ({
       onEdit={() => onActionClicked("edit", expense.id)}
       onDelete={() => onActionClicked("delete", expense.id)}
       onDuplicate={() => onActionClicked("duplicate", expense.id)}
+      // className="justify-start"
     >
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 text-sm">
-          <span className="money">
+      <div className="flex h-full flex-col justify-between gap-3">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <CalendarPlus className="h-4 w-4" />
+            <span>
+              {t("Expenses.form.issue_date.label")}:{" "}
+              {expense.issue_date ? format(new Date(expense.issue_date), "dd/MM/yyyy") : "N/A"}
+            </span>
+          </div>
+          {expense.due_date && (
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <CalendarClock className="h-4 w-4" />
+              <span>
+                {t("Expenses.form.due_date.label")}:{" "}
+                {expense.due_date ? format(new Date(expense.due_date), "dd/MM/yyyy") : "N/A"}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center justify-end gap-2 text-sm">
+          <span className="money text-xl font-bold">
             {MoneyFormatter(expense.amount)}
-            {getCurrencySymbol(currency || "sar").symbol}
+            {getCurrencySymbol(currency || "sar", { sarClassName: "size-4" }).symbol}
           </span>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-          <Calendar className="h-4 w-4" />
-          <span>
-            {t("Expenses.form.issue_date.label")}:{" "}
-            {expense.issue_date ? new Date(expense.issue_date).toLocaleDateString() : "N/A"}
-          </span>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-          <Calendar className="h-4 w-4" />
-          <span>
-            {t("Expenses.form.due_date.label")}:{" "}
-            {expense.due_date ? new Date(expense.due_date).toLocaleDateString() : "N/A"}
-          </span>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-          <Tag className="h-4 w-4" />
-          <span>{expense.category}</span>
         </div>
       </div>
     </ModuleCard>

@@ -73,8 +73,16 @@ export function ExpenseForm({
     resolver: zodResolver(createExpenseSchema(t)),
     defaultValues: {
       expense_number: defaultValues?.expense_number || "",
-      issue_date: defaultValues?.issue_date ? new Date(defaultValues.issue_date) : undefined,
-      due_date: defaultValues?.due_date ? new Date(defaultValues.due_date) : undefined,
+      issue_date: defaultValues?.issue_date
+        ? typeof defaultValues.issue_date === "string"
+          ? parseDate(defaultValues.issue_date.split("T")[0])
+          : parseDate(new Date(defaultValues.issue_date).toISOString().split("T")[0])
+        : parseDate(new Date().toISOString().split("T")[0]),
+      due_date: defaultValues?.due_date
+        ? typeof defaultValues.due_date === "string"
+          ? parseDate(defaultValues.due_date.split("T")[0])
+          : parseDate(new Date(defaultValues.due_date).toISOString().split("T")[0])
+        : undefined,
       status: defaultValues?.status || "draft",
       amount: defaultValues?.amount || 0,
       category: defaultValues?.category || "",
@@ -238,7 +246,7 @@ export function ExpenseForm({
               name="due_date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Expenses.form.due_date.label")} *</FormLabel>
+                  <FormLabel>{t("Expenses.form.due_date.label")}</FormLabel>
                   <FormControl>
                     <DateInput
                       placeholder={t("Expenses.form.due_date.placeholder")}

@@ -14,11 +14,9 @@ interface ModuleCardProps<T> extends CardActionsProps {
   currentStatus: T;
   statuses: T[];
   onStatusChange: (status: T) => void;
-  // onEdit: () => void;
-  // onDelete: () => void;
-  // onDuplicate: () => void;
   children?: React.ReactNode;
   parentTranslationKey?: string;
+  className?: string;
 }
 
 const ModuleCard = <T,>({
@@ -36,11 +34,15 @@ const ModuleCard = <T,>({
   onView,
   children,
   parentTranslationKey,
+  className,
 }: ModuleCardProps<T>) => {
   return (
     <Card
       key={id}
-      className="group flex flex-col justify-between transition-shadow hover:shadow-lg"
+      className={cn(
+        "group flex flex-col justify-between transition-shadow hover:shadow-lg",
+        className,
+      )}
     >
       <CardHeader className="flex flex-col items-start justify-between p-0">
         <div className="bg-muted flex w-full flex-row items-center justify-between gap-2 p-2">
@@ -67,7 +69,7 @@ const ModuleCard = <T,>({
           </div>
         </div>
       </CardHeader>
-      {children && <CardContent className="px-4 pb-4">{children}</CardContent>}
+      {children && <CardContent className="h-full px-4 pb-4">{children}</CardContent>}
     </Card>
   );
 };
