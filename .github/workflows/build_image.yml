@@ -37,8 +37,6 @@ jobs:
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
-        env:
-          NODE_OPTIONS: "--max-old-space-size=1024"
         with:
           context: .
           file: Dockerfile.admin
