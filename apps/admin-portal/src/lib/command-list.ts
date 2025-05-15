@@ -13,7 +13,7 @@ export const commandList = [
       {
         icon: ModulesOptions.analytics.icon,
         label: ModulesOptions.analytics.label,
-        shortcut: "⌘A",
+        // shortcut: "⌘A",
         href: ModulesOptions.analytics.url,
       },
       {
@@ -46,7 +46,7 @@ export const commandList = [
     ],
   },
   {
-    heading: "Pages.Sales.title",
+    heading: "Pages.Accounting.title",
     items: [
       {
         icon: ModulesOptions.invoices.icon,
@@ -69,6 +69,13 @@ export const commandList = [
         shortcut: "⌘P",
         href: ModulesOptions.products.url,
         addHref: ModulesOptions.products.url + "/add",
+      },
+      {
+        icon: ModulesOptions.purchases.icon,
+        label: ModulesOptions.purchases.label,
+        // shortcut: "⌘P",
+        href: ModulesOptions.purchases.url,
+        addHref: ModulesOptions.purchases.url + "/add",
       },
     ],
   },

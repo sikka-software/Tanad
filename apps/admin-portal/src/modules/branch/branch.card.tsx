@@ -1,7 +1,4 @@
 import { Mail, MapPin, Phone, User } from "lucide-react";
-import { useTranslations } from "next-intl";
-
-import { Badge } from "@/ui/badge";
 
 import ModuleCard from "@/components/cards/module-card";
 
@@ -19,7 +16,6 @@ const BranchCard = ({
   branch: Branch;
   onActionClicked: (action: string, rowId: string) => void;
 }) => {
-  const t = useTranslations();
   const { mutate: updateBranch } = useUpdateBranch();
   const data = useBranchStore((state) => state.data);
   const setData = useBranchStore((state) => state.setData);

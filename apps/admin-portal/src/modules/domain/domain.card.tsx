@@ -33,6 +33,7 @@ const DomainCard = ({
 
   let recurringCost =
     domain.payment_cycle === "monthly" ? domain.monthly_payment : domain.annual_payment;
+
   return (
     <ModuleCard
       id={domain.id}

@@ -5,10 +5,9 @@ import ModuleCard from "@/components/cards/module-card";
 import { CommonStatus } from "@/types/common.type";
 import { CommonStatusProps } from "@/types/common.type";
 
+import { useUpdateVendor } from "@/vendor/vendor.hooks";
+import useVendorStore from "@/vendor/vendor.store";
 import { Vendor } from "@/vendor/vendor.type";
-
-import { useUpdateVendor } from "./vendor.hooks";
-import useVendorStore from "./vendor.store";
 
 const VendorCard = ({
   vendor,

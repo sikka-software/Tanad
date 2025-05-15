@@ -1,20 +1,17 @@
-import { Calendar, DollarSign, Tag } from "lucide-react";
+import { Calendar, Tag } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@/ui/badge";
-import { Card, CardContent, CardHeader } from "@/ui/card";
+import { MoneyFormatter } from "@/ui/currency-input";
 
 import ModuleCard from "@/components/cards/module-card";
-import { MoneyFormatter } from "@/components/ui/currency-input";
 
 import { getCurrencySymbol } from "@/lib/currency-utils";
 
+import { useUpdateExpense } from "@/expense/expense.hooks";
+import useExpenseStore from "@/expense/expense.store";
 import { Expense, ExpenseStatus, ExpenseStatusProps } from "@/expense/expense.type";
 
 import useUserStore from "@/stores/use-user-store";
-
-import { useUpdateExpense } from "./expense.hooks";
-import useExpenseStore from "./expense.store";
 
 const ExpenseCard = ({
   expense,
@@ -34,6 +31,7 @@ const ExpenseCard = ({
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
     await updateExpense({ id: rowId, data: { [columnId]: value } });
   };
+
   return (
     <ModuleCard
       id={expense.id}

@@ -19,6 +19,14 @@ export type ThemeProps = "light" | "dark";
 
 export type ViewMode = "table" | "cards";
 
+export type CardActionsProps = {
+  onEdit?: () => void;
+  onDuplicate?: () => void;
+  onView?: () => void;
+  onArchive?: () => void;
+  onDelete?: () => void;
+  onPreview?: () => void;
+};
 export type SortRule = {
   field: string;
   direction: "asc" | "desc";

@@ -603,6 +603,13 @@
       "when": 1747277401954,
       "tag": "0085_classy_wrecker",
       "breakpoints": true
+    },
+    {
+      "idx": 86,
+      "version": "7",
+      "when": 1747287111153,
+      "tag": "0086_skinny_maestro",
+      "breakpoints": true
     }
   ]
 }

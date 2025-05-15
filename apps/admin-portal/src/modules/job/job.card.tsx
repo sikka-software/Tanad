@@ -1,6 +1,5 @@
 import { format } from "date-fns";
 import { Calendar, DollarSign, MapPin, Building2 } from "lucide-react";
-import { useTranslations } from "next-intl";
 
 import ModuleCard from "@/components/cards/module-card";
 
@@ -17,7 +16,6 @@ const JobCard = ({
   job: Job;
   onActionClicked: (action: string, rowId: string) => void;
 }) => {
-  const t = useTranslations();
   const { mutate: updateJob } = useUpdateJob();
   const data = useJobStore((state) => state.data);
   const setData = useJobStore((state) => state.setData);

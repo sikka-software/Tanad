@@ -1,7 +1,5 @@
 import { useTranslations } from "next-intl";
 
-import { Card, CardContent, CardHeader } from "@/ui/card";
-
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus } from "@/types/common.type";

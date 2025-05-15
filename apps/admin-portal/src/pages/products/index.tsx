@@ -184,7 +184,9 @@ export default function ProductsPage() {
                   icons: [Package, Plus, Package],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(product) => <ProductCard product={product} />}
+                renderItem={(product) => (
+                  <ProductCard product={product} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>
@@ -224,7 +226,7 @@ export default function ProductsPage() {
   );
 }
 
-ProductsPage.messages = ["Notes", "Pages", "Products", "Forms", "General"];
+ProductsPage.messages = ["Notes", "Pages", "Products", "Forms", "General", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

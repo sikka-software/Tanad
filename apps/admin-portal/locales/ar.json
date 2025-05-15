@@ -2506,6 +2506,9 @@
       "subtotal": {
         "label": "المجموع الفرعي"
       },
+      "total": {
+        "label": "الإجمالي"
+      },
       "issue_date": {
         "label": "تاريخ الإصدار",
         "placeholder": "اختر تاريخ الإصدار"

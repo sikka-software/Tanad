@@ -7,6 +7,8 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 
 import { cn } from "@/lib/utils";
 
+import { CardActionsProps } from "@/types/common.type";
+
 import CardActionsPopover from "./card-actions-popover";
 
 const CardActions = ({
@@ -16,14 +18,7 @@ const CardActions = ({
   onArchive,
   onDelete,
   onPreview,
-}: {
-  onEdit?: () => void;
-  onDuplicate?: () => void;
-  onView?: () => void;
-  onArchive?: () => void;
-  onDelete?: () => void;
-  onPreview?: () => void;
-}) => {
+}: CardActionsProps) => {
   const t = useTranslations();
   const lang = useLocale();
   const isMobile = useMediaQuery("(max-width: 768px)");

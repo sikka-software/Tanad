@@ -4,10 +4,9 @@ import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus, CommonStatusProps } from "@/types/common.type";
 
+import { useUpdateCompany } from "@/company/company.hooks";
+import useCompanyStore from "@/company/company.store";
 import { Company } from "@/company/company.type";
-
-import { useUpdateCompany } from "./company.hooks";
-import useCompanyStore from "./company.store";
 
 const CompanyCard = ({
   company,

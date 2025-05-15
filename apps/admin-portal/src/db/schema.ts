@@ -2075,6 +2075,7 @@ export const salaries = pgTable(
     end_date: date(),
     deductions: jsonb().default([]),
     payment_date: date(),
+    status: common_status().default("active"),
   },
   (table) => [
     index("salaries_employee_id_idx").using(

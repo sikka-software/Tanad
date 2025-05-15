@@ -5,16 +5,18 @@ import CardStatusAction from "@/components/cards/card-status-action";
 
 import { cn } from "@/lib/utils";
 
-interface ModuleCardProps<T> {
+import { CardActionsProps } from "@/types/common.type";
+
+interface ModuleCardProps<T> extends CardActionsProps {
   id: string;
   title: string;
   subtitle?: string;
   currentStatus: T;
   statuses: T[];
   onStatusChange: (status: T) => void;
-  onEdit: () => void;
-  onDelete: () => void;
-  onDuplicate: () => void;
+  // onEdit: () => void;
+  // onDelete: () => void;
+  // onDuplicate: () => void;
   children?: React.ReactNode;
   parentTranslationKey?: string;
 }
@@ -29,6 +31,9 @@ const ModuleCard = <T,>({
   onEdit,
   onDelete,
   onDuplicate,
+  onPreview,
+  onArchive,
+  onView,
   children,
   parentTranslationKey,
 }: ModuleCardProps<T>) => {
@@ -45,7 +50,14 @@ const ModuleCard = <T,>({
             statuses={statuses}
             onStatusChange={onStatusChange}
           />
-          <CardActions onEdit={onEdit} onDelete={onDelete} onDuplicate={onDuplicate} />
+          <CardActions
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onDuplicate={onDuplicate}
+            onPreview={onPreview}
+            onArchive={onArchive}
+            onView={onView}
+          />
         </div>
 
         <div className={cn("flex items-start justify-between px-4 py-2", !children && "pb-3")}>

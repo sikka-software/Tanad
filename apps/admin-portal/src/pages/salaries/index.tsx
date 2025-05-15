@@ -29,6 +29,8 @@ import useSalaryStore from "@/salary/salary.store";
 import SalariesTable from "@/salary/salary.table";
 import { Salary, SalaryUpdateData } from "@/salary/salary.type";
 
+import { useEmployees } from "@/modules/employee/employee.hooks";
+
 export default function SalariesPage() {
   const t = useTranslations();
   const router = useRouter();
@@ -67,6 +69,7 @@ export default function SalariesPage() {
   const getFilteredData = moduleHooks.useGetFilteredData();
   const getSortedData = moduleHooks.useGetSortedData();
 
+  const { data: employees } = useEmployees();
   const { data: salaries, isLoading, error } = useSalaries();
   const { mutateAsync: deleteSalaries, isPending: isDeleting } = useBulkDeleteSalaries();
   const { mutate: duplicateSalary } = useDuplicateSalary();
@@ -172,7 +175,17 @@ export default function SalariesPage() {
                   icons: [User, Plus, User],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(salary) => <SalaryCard key={salary.id} salary={salary} />}
+                renderItem={(salary) => (
+                  <SalaryCard
+                    salary={salary}
+                    employee={
+                      employees?.find((e) => e.id === salary.employee_id)?.first_name +
+                      " " +
+                      employees?.find((e) => e.id === salary.employee_id)?.last_name
+                    }
+                    onActionClicked={onActionClicked}
+                  />
+                )}
                 gridCols="3"
               />
             </div>
@@ -212,7 +225,7 @@ export default function SalariesPage() {
   );
 }
 
-SalariesPage.messages = ["Notes", "Pages", "Salaries", "General"];
+SalariesPage.messages = ["Notes", "Pages", "Salaries", "General", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

@@ -1,18 +1,13 @@
-import { Mail, MapPin, Phone, User } from "lucide-react";
-import { useTranslations } from "next-intl";
-
-import { Badge } from "@/ui/badge";
-import { Card, CardContent, CardHeader } from "@/ui/card";
+import { Mail, MapPin, Phone } from "lucide-react";
 
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus } from "@/types/common.type";
 import { CommonStatusProps } from "@/types/common.type";
 
-import { Server } from "@/modules/server/server.type";
-
-import { useUpdateServer } from "./server.hooks";
-import useServerStore from "./server.store";
+import { useUpdateServer } from "@/server/server.hooks";
+import useServerStore from "@/server/server.store";
+import { Server } from "@/server/server.type";
 
 const ServerCard = ({
   server,

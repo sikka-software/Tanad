@@ -6,10 +6,9 @@ import ModuleCard from "@/components/cards/module-card";
 import { CommonStatus } from "@/types/common.type";
 import { CommonStatusProps } from "@/types/common.type";
 
+import { useUpdateWarehouse } from "@/warehouse/warehouse.hooks";
+import useWarehouseStore from "@/warehouse/warehouse.store";
 import { Warehouse } from "@/warehouse/warehouse.type";
-
-import { useUpdateWarehouse } from "./warehouse.hooks";
-import useWarehouseStore from "./warehouse.store";
 
 const WarehouseCard = ({
   warehouse,

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from "@/ui/card";
 
 import { Car } from "@/modules/car/car.type";
 
-const CarCard = ({ car }: { car: Car }) => {
+const BankAccountCard = ({ car }: { car: Car }) => {
   const t = useTranslations("Cars");
   return (
     <Card key={car.id} className="transition-shadow hover:shadow-lg">
@@ -47,4 +47,4 @@ const CarCard = ({ car }: { car: Car }) => {
   );
 };
 
-export default CarCard;
+export default BankAccountCard;

@@ -1,17 +1,12 @@
 import { Mail, Phone, MapPin, Building2 } from "lucide-react";
-import { useTranslations } from "next-intl";
-
-import { Card, CardContent, CardHeader } from "@/ui/card";
 
 import ModuleCard from "@/components/cards/module-card";
 
-import { CommonStatus, CommonStatusProps, VehicleStatus } from "@/types/common.type";
-import { VehicleStatusProps } from "@/types/common.type";
+import { CommonStatus, CommonStatusProps } from "@/types/common.type";
 
+import { useUpdateOffice } from "@/office/office.hooks";
+import useOfficeStore from "@/office/office.store";
 import { Office } from "@/office/office.type";
-
-import { useUpdateOffice } from "./office.hooks";
-import useOfficeStore from "./office.store";
 
 const OfficeCard = ({
   office,
@@ -20,7 +15,6 @@ const OfficeCard = ({
   office: Office;
   onActionClicked: (action: string, rowId: string) => void;
 }) => {
-  const t = useTranslations();
   const { mutate: updateOffice } = useUpdateOffice();
   const data = useOfficeStore((state) => state.data);
   const setData = useOfficeStore((state) => state.setData);
