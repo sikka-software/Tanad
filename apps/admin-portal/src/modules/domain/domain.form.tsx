@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -17,13 +18,14 @@ import { getNotesValue } from "@/lib/utils";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
+import { domains } from "@/db/schema";
 import { useCreateDomain, useUpdateDomain } from "@/domain/domain.hooks";
 import useDomainStore from "@/domain/domain.store";
 import { DomainUpdateData, DomainCreateData } from "@/domain/domain.type";
 import useUserStore from "@/stores/use-user-store";
 
-export const createDomainSchema = (t: (key: string) => string) => {
-  const baseDomainSchema = z.object({
+const createDomainSchema = (t: (key: string) => string) => {
+  const DomainSelectSchema = createInsertSchema(domains, {
     domain_name: z.string().min(1, t("Domains.form.domain_name.required")),
     registrar: z.string().optional().or(z.literal("")),
     monthly_payment: z.number().optional().or(z.literal("")),
@@ -34,8 +36,7 @@ export const createDomainSchema = (t: (key: string) => string) => {
     }),
     notes: z.any().optional().nullable(),
   });
-
-  return baseDomainSchema;
+  return DomainSelectSchema;
 };
 
 export type DomainFormValues = z.input<ReturnType<typeof createDomainSchema>>;
@@ -57,7 +58,7 @@ export function DomainForm({
   const lang = useLocale();
 
   const user = useUserStore((state) => state.user);
-  const membership = useUserStore((state) => state.membership);
+  const enterprise = useUserStore((state) => state.enterprise);
 
   const { mutate: createDomain } = useCreateDomain();
   const { mutate: updateDomain } = useUpdateDomain();
@@ -113,6 +114,10 @@ export function DomainForm({
       } else {
         await createDomain(
           {
+            user_id: user?.id,
+            enterprise_id: enterprise?.id || "",
+            updated_at: new Date().toISOString(),
+
             domain_name: data.domain_name.trim(),
             registrar: data.registrar?.trim() || null,
             monthly_payment: data.monthly_payment || 0,
@@ -120,9 +125,6 @@ export function DomainForm({
             payment_cycle: data.payment_cycle?.trim() as "monthly" | "annual" | null,
             status: data.status?.trim() as "active" | "inactive" | null,
             notes: data.notes,
-            user_id: user?.id,
-            updated_at: new Date().toISOString(),
-            enterprise_id: membership?.enterprise_id || "",
           },
           {
             onSuccess: async (response) => {
@@ -150,6 +152,8 @@ export function DomainForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
         <div className="form-container">
           <div className="form-fields-cols-2">
             <FormField

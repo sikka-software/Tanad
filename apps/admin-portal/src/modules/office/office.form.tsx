@@ -72,11 +72,13 @@ export function OfficeForm({
 }: ModuleFormProps<OfficeCreateData | OfficeUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
-  const { data: offices } = useOffices();
-  const { mutateAsync: createOffice, isPending: isCreating } = useCreateOffice();
-  const { mutateAsync: updateOffice, isPending: isUpdating } = useUpdateOffice();
+
   const user = useUserStore((state) => state.user);
   const enterprise = useUserStore((state) => state.enterprise);
+
+  const { data: offices } = useOffices();
+  const { mutateAsync: createOffice } = useCreateOffice();
+  const { mutateAsync: updateOffice } = useUpdateOffice();
   const isLoading = useOfficeStore((state) => state.isLoading);
   const setIsLoading = useOfficeStore((state) => state.setIsLoading);
 

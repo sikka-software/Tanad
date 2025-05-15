@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useTranslations, useLocale } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -6,22 +7,23 @@ import * as z from "zod";
 
 import BooleanTabs from "@/ui/boolean-tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { Input } from "@/ui/inputs/input";
 
 import NotesSection from "@/components/forms/notes-section";
-import { Input } from "@/components/ui/inputs/input";
 
 import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
+import { websites } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
 import { useCreateWebsite, useUpdateWebsite } from "./website.hooks";
 import useWebsiteStore from "./website.store";
 import { WebsiteUpdateData, WebsiteCreateData } from "./website.type";
 
-export const createWebsiteSchema = (t: (key: string) => string) => {
-  return z.object({
+const createWebsiteSchema = (t: (key: string) => string) => {
+  const WebsiteSelectSchema = createInsertSchema(websites, {
     domain_name: z.string().min(1, t("Websites.form.domain_name.required")),
     notes: z.any().optional().nullable(),
     status: z
@@ -30,6 +32,7 @@ export const createWebsiteSchema = (t: (key: string) => string) => {
       })
       .default("active"),
   });
+  return WebsiteSelectSchema;
 };
 
 export type WebsiteFormValues = z.input<ReturnType<typeof createWebsiteSchema>>;
@@ -141,6 +144,8 @@ export function WebsiteForm({
     <div>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <FormField
               control={form.control}

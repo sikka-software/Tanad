@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -27,12 +28,13 @@ import { ClientCreateData, ClientUpdateData } from "@/client/client.type";
 import { CompanyForm } from "@/company/company.form";
 import { useCompanies } from "@/company/company.hooks";
 
+import { clients } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
 import useCompanyStore from "../company/company.store";
 
-export const createClientSchema = (t: (key: string) => string) => {
-  const baseClientSchema = z.object({
+const createClientSchema = (t: (key: string) => string) => {
+  const ClientSelectSchema = createInsertSchema(clients, {
     name: z.string().min(1, t("Clients.form.validation.name_required")),
     email: z
       .string()
@@ -45,10 +47,7 @@ export const createClientSchema = (t: (key: string) => string) => {
     }),
     notes: z.any().optional().nullable(),
   });
-
-  const addressSchema = createAddressSchema(t);
-
-  return baseClientSchema.merge(addressSchema);
+  return ClientSelectSchema;
 };
 
 export type ClientFormValues = z.input<ReturnType<typeof createClientSchema>>;
@@ -63,7 +62,9 @@ export function ClientForm({
   const t = useTranslations();
   const locale = useLocale();
 
-  const { user, membership } = useUserStore();
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+
   const { mutateAsync: createClient } = useCreateClient();
   const { mutateAsync: updateClient } = useUpdateClient();
 
@@ -142,6 +143,9 @@ export function ClientForm({
       } else {
         await createClient(
           {
+            user_id: user?.id || "",
+            enterprise_id: enterprise?.id || "",
+
             name: data.name.trim(),
             email: data.email.trim(),
             phone: data.phone.trim(),
@@ -158,8 +162,6 @@ export function ClientForm({
             status: data.status,
             notes: data.notes,
             additional_number: null,
-            user_id: user?.id || "",
-            enterprise_id: membership?.enterprise_id || "",
           },
           {
             onSuccess: async (response) => {
@@ -193,6 +195,8 @@ export function ClientForm({
     <>
       <Form {...form}>
         <form id={formHtmlId || "client-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="form-fields-cols-1">
               <FormField

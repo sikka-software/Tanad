@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useTranslations, useLocale } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -20,13 +21,14 @@ import { getNotesValue } from "@/lib/utils";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
+import { servers } from "@/db/schema";
 import { useCreateServer, useUpdateServer } from "@/server/server.hooks";
 import useServerStore from "@/server/server.store";
 import { ServerCreateData, ServerUpdateData } from "@/server/server.type";
 import useUserStore from "@/stores/use-user-store";
 
-export const createServerSchema = (t: (key: string) => string) =>
-  z.object({
+const createServerSchema = (t: (key: string) => string) => {
+  const ServerSelectSchema = createInsertSchema(servers, {
     name: z.string().min(1, t("Servers.form.name.required")),
     ip_address: z.string().optional().or(z.literal("")),
     location: z.string().optional().or(z.literal("")),
@@ -39,10 +41,10 @@ export const createServerSchema = (t: (key: string) => string) =>
     monthly_payment: z.number().optional().or(z.literal("")),
     annual_payment: z.number().optional().or(z.literal("")),
     payment_cycle: z.string().min(1, t("Servers.form.payment_cycle.required")),
-    user_id: z.string().optional().or(z.literal("")),
-    enterprise_id: z.string().optional().or(z.literal("")),
     notes: z.any().optional().nullable(),
   });
+  return ServerSelectSchema;
+};
 
 export type ServerFormValues = z.input<ReturnType<typeof createServerSchema>>;
 
@@ -54,7 +56,10 @@ export function ServerForm({
 }: ModuleFormProps<ServerUpdateData | ServerCreateData>) {
   const t = useTranslations();
   const lang = useLocale();
-  const { user, enterprise } = useUserStore();
+
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+
   const { mutate: createServer } = useCreateServer();
   const { mutate: updateServer } = useUpdateServer();
 
@@ -141,6 +146,8 @@ export function ServerForm({
         }
 
         const createData: ServerCreateData = {
+          user_id: user.id,
+          enterprise_id: enterprise.id,
           name: commonData.name,
           location: commonData.location,
           provider: commonData.provider,
@@ -148,8 +155,6 @@ export function ServerForm({
           status: commonData.status as "active" | "inactive" | "draft" | "archived" | null,
           tags: commonData.tags,
           notes: commonData.notes,
-          user_id: user.id,
-          enterprise_id: enterprise.id,
           ip_address: commonData.ip_address as unknown | null,
           monthly_payment: commonData.monthly_payment,
           annual_payment: commonData.annual_payment,
@@ -184,6 +189,9 @@ export function ServerForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
+
         <div className="form-container">
           <div className="form-fields-cols-2">
             <FormField

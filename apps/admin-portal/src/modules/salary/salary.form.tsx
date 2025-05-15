@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createInsertSchema } from "drizzle-zod";
 import { Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -31,6 +32,9 @@ import { DEDUCTION_TYPES } from "@/salary/salary.options";
 import useSalaryStore from "@/salary/salary.store";
 import { SalaryCreateData, SalaryUpdateData } from "@/salary/salary.type";
 
+import { offices, salaries } from "@/db/schema";
+import useUserStore from "@/stores/use-user-store";
+
 const createDeductionSchema = (t: (key: string) => string) =>
   z
     .object({
@@ -60,26 +64,26 @@ const createDeductionSchema = (t: (key: string) => string) =>
       }
     });
 
-const createSalarySchema: (t: (key: string) => string) => z.ZodObject<any> = (t) =>
-  z.object({
+const createSalarySchema = (t: (key: string) => string) => {
+  const SalarySelectSchema = createInsertSchema(salaries, {
     employee_id: z.string().min(1, t("Salaries.form.employee_name.required")),
-    pay_period_start: z.string().min(1, t("Salaries.form.pay_period_start.required")),
-    pay_period_end: z.string().min(1, t("Salaries.form.pay_period_end.required")),
+    start_date: z.string().min(1, t("Salaries.form.pay_period_start.required")),
+    end_date: z.string().min(1, t("Salaries.form.pay_period_end.required")),
     payment_date: z.string().min(1, t("Salaries.form.payment_date.required")),
-    gross_amount: z.coerce
-      .number()
-      .positive(t("Salaries.form.gross_amount.positive"))
-      .or(z.literal(0)),
-    net_amount: z.coerce.number().positive(t("Salaries.form.net_amount.positive")).or(z.literal(0)),
+    payment_frequency: z.string().min(1, t("Salaries.form.payment_frequency.required")),
+
+    amount: z.coerce.number().positive(t("Salaries.form.net_amount.positive")).or(z.literal(0)),
     deductions: z
       .array(createDeductionSchema(t))
       .transform((arr) => arr.filter((item) => item.type.trim() !== "" || item.amount !== 0))
       .default([]),
     notes: z.any().optional().nullable(),
   });
+  return SalarySelectSchema;
+};
 
 // This type will have numbers for amounts due to the .transform()
-export type SalaryFormValues = z.infer<ReturnType<typeof createSalarySchema>>;
+export type SalaryFormValues = z.input<ReturnType<typeof createSalarySchema>>;
 
 export function SalaryForm({
   formHtmlId,
@@ -89,11 +93,14 @@ export function SalaryForm({
 }: ModuleFormProps<SalaryUpdateData | SalaryCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
+
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
-  const salarySchema = createSalarySchema(t);
   const setLoading = useSalaryStore((state) => state.setIsLoading);
   const loading = useSalaryStore((state) => state.isLoading);
   const { mutate: createSalary } = useCreateSalary();
@@ -114,14 +121,16 @@ export function SalaryForm({
 
   // Use SalaryFormValues directly with useForm
   const form = useForm<SalaryFormValues>({
-    resolver: zodResolver(salarySchema),
+    resolver: zodResolver(createSalarySchema(t)),
     mode: "onChange",
     defaultValues: {
-      employee_id: "",
-      pay_period_start: "",
-      pay_period_end: "",
-      payment_date: "",
-      net_amount: 0, // Default as number
+      employee_id: defaultValues?.employee_id || "",
+      start_date: defaultValues?.start_date || "",
+      end_date: defaultValues?.end_date || "",
+      payment_date: defaultValues?.payment_date || "",
+      payment_frequency: defaultValues?.payment_frequency || "",
+      amount: defaultValues?.amount || 0,
+      // net_amount: 0, // Default as number
       deductions: parseDeductions(defaultValues?.deductions),
       notes: defaultValues?.notes || "",
     },
@@ -149,9 +158,9 @@ export function SalaryForm({
       // TODO: Replace these with actual values from context/store as needed
       const enterprise_id = defaultValues?.enterprise_id || "";
       const user_id = defaultValues?.user_id || "";
-      const amount = data.net_amount;
-      const start_date = data.pay_period_start;
-      const end_date = data.pay_period_end;
+      const amount = data.amount;
+      const start_date = data.start_date;
+      const end_date = data.end_date;
       const created_at = defaultValues?.created_at || undefined;
       const currency = defaultValues?.currency || undefined;
       const payment_date = data.payment_date;
@@ -206,6 +215,8 @@ export function SalaryForm({
     <>
       <Form {...form}>
         <form id={formHtmlId || "salary-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <FormField
               control={form.control}
@@ -234,9 +245,9 @@ export function SalaryForm({
                               sum + (component.amount || 0),
                             0,
                           );
-                          form.setValue("gross_amount", totalSalary);
+                          form.setValue("amount", totalSalary);
                         } else {
-                          form.setValue("gross_amount", 0);
+                          form.setValue("amount", 0);
                         }
                       }}
                       texts={{
@@ -257,7 +268,7 @@ export function SalaryForm({
             <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
-                name="pay_period_start"
+                name="start_date"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("Salaries.form.pay_period_start.label")} *</FormLabel>
@@ -276,7 +287,7 @@ export function SalaryForm({
                           }
                         }}
                         placeholder={t("Salaries.form.pay_period_start.placeholder")}
-                        ariaInvalid={form.formState.errors.pay_period_start !== undefined}
+                        ariaInvalid={form.formState.errors.start_date !== undefined}
                       />
                     </FormControl>
                     <FormMessage />
@@ -285,7 +296,7 @@ export function SalaryForm({
               />
               <FormField
                 control={form.control}
-                name="pay_period_end"
+                name="end_date"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("Salaries.form.pay_period_end.label")} *</FormLabel>
@@ -304,7 +315,7 @@ export function SalaryForm({
                           }
                         }}
                         placeholder={t("Salaries.form.pay_period_end.placeholder")}
-                        ariaInvalid={form.formState.errors.pay_period_end !== undefined}
+                        ariaInvalid={form.formState.errors.end_date !== undefined}
                       />
                     </FormControl>
                     <FormMessage />
@@ -347,35 +358,16 @@ export function SalaryForm({
             <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
-                name="gross_amount"
+                name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Salaries.form.gross_amount.label")} *</FormLabel>
+                    <FormLabel>{t("Salaries.form.amount.label")} *</FormLabel>
                     <FormControl>
                       <CurrencyInput
                         showCommas={true}
                         value={field.value ? parseFloat(String(field.value)) : undefined}
                         onChange={(value) => field.onChange(value?.toString() || "")}
-                        placeholder={t("Salaries.form.gross_amount.placeholder")}
-                        disabled={loading}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="net_amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Salaries.form.net_amount.label")} *</FormLabel>
-                    <FormControl>
-                      <CurrencyInput
-                        showCommas={true}
-                        value={field.value ? parseFloat(String(field.value)) : undefined}
-                        onChange={(value) => field.onChange(value?.toString() || "")}
-                        placeholder={t("Salaries.form.net_amount.placeholder")}
+                        placeholder={t("Salaries.form.amount.placeholder")}
                         disabled={loading}
                       />
                     </FormControl>

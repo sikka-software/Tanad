@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -28,20 +29,18 @@ import { useCreateVendor, useUpdateVendor } from "@/vendor/vendor.hooks";
 import useVendorStore from "@/vendor/vendor.store";
 import type { VendorCreateData, VendorUpdateData } from "@/vendor/vendor.type";
 
+import { vendors } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
-export const createVendorSchema = (t: (key: string) => string) => {
-  const baseVendorSchema = z.object({
+const createVendorSchema = (t: (key: string) => string) => {
+  const VendorSelectSchema = createInsertSchema(vendors, {
     name: z.string().min(1, t("Vendors.form.name.required")),
     email: z.string().email(t("Vendors.form.email.invalid")),
     phone: z.string().min(1, t("Vendors.form.phone.required")),
     company: z.string().optional(),
     notes: z.any().optional().nullable(),
   });
-
-  const addressSchema = createAddressSchema(t);
-
-  return baseVendorSchema.merge(addressSchema);
+  return VendorSelectSchema;
 };
 
 export type VendorFormValues = z.input<ReturnType<typeof createVendorSchema>>;
@@ -55,7 +54,9 @@ export function VendorForm({
   const t = useTranslations();
   const locale = useLocale();
 
-  const { profile, membership } = useUserStore();
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+
   const { mutateAsync: createVendor, isPending: isCreating } = useCreateVendor();
   const { mutateAsync: updateVendor, isPending: isUpdating } = useUpdateVendor();
   const isLoading = useVendorStore((state) => state.isLoading);
@@ -135,6 +136,8 @@ export function VendorForm({
         // Create vendor logic
         await createVendor(
           {
+            user_id: user?.id || "",
+            enterprise_id: enterprise?.id || "",
             name: data.name.trim(),
             email: data.email.trim(),
             phone: data.phone.trim(),
@@ -146,8 +149,6 @@ export function VendorForm({
             region: data.region?.trim() || undefined,
             country: data.country?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
-            enterprise_id: membership?.enterprise_id || "",
-            user_id: profile?.id || "",
             updated_at: new Date().toISOString(),
             notes: data.notes,
           },
@@ -173,6 +174,8 @@ export function VendorForm({
     <>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="form-fields-cols-2">
               <FormField

@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -17,14 +18,15 @@ import { getNotesValue } from "@/lib/utils";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
+import { online_stores } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
 import { useCreateOnlineStore, useUpdateOnlineStore } from "./online-store.hooks";
 import useOnlineStoreStore from "./online-store.store";
 import { OnlineStoreUpdateData, OnlineStoreCreateData } from "./online-store.type";
 
-export const createOnlineStoreSchema = (t: (key: string) => string) => {
-  const baseOnlineStoreSchema = z.object({
+const createOnlineStoreSchema = (t: (key: string) => string) => {
+  const OnlineStoreSelectSchema = createInsertSchema(online_stores, {
     domain_name: z.string().min(1, t("OnlineStores.form.domain_name.required")),
     platform: z.string().min(1, t("OnlineStores.form.platform.required")),
     notes: z.any().optional().nullable(),
@@ -32,8 +34,7 @@ export const createOnlineStoreSchema = (t: (key: string) => string) => {
       message: t("OnlineStores.form.status.required"),
     }),
   });
-
-  return baseOnlineStoreSchema;
+  return OnlineStoreSelectSchema;
 };
 
 export type OnlineStoreFormValues = z.input<ReturnType<typeof createOnlineStoreSchema>>;
@@ -53,8 +54,9 @@ export function OnlineStoreForm({
 }: ModuleFormProps<OnlineStoreUpdateData | OnlineStoreCreateData>) {
   const t = useTranslations();
   const lang = useLocale();
+
   const user = useUserStore((state) => state.user);
-  const membership = useUserStore((state) => state.membership);
+  const enterprise = useUserStore((state) => state.enterprise);
 
   const { mutate: createOnlineStore } = useCreateOnlineStore();
   const { mutate: updateOnlineStore } = useUpdateOnlineStore();
@@ -103,12 +105,12 @@ export function OnlineStoreForm({
       } else {
         await createOnlineStore(
           {
+            user_id: user?.id,
+            enterprise_id: enterprise?.id || "",
+            updated_at: new Date().toISOString(),
             domain_name: data.domain_name.trim(),
             status: data.status,
             notes: data.notes,
-            user_id: user?.id,
-            updated_at: new Date().toISOString(),
-            enterprise_id: membership?.enterprise_id || "",
           },
           {
             onSuccess: async (response) => {
@@ -136,6 +138,9 @@ export function OnlineStoreForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
+
         <div className="form-container">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField

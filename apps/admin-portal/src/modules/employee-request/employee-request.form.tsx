@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { createInsertSchema } from "drizzle-zod";
 import { CalendarIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -29,6 +30,9 @@ import useEmployeeStore from "@/employee/employee.store";
 
 import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
 
+import { employee_requests } from "@/db/schema";
+import useUserStore from "@/stores/use-user-store";
+
 import { InvoiceStatus } from "../invoice/invoice.type";
 import { useCreateEmployeeRequest, useUpdateEmployeeRequest } from "./employee-request.hooks";
 import {
@@ -37,8 +41,8 @@ import {
   EmployeeRequestUpdateData,
 } from "./employee-request.type";
 
-const createRequestSchema = (t: (key: string) => string) =>
-  z.object({
+const createRequestSchema = (t: (key: string) => string) => {
+  const RequestSelectSchema = createInsertSchema(employee_requests, {
     employee_id: z
       .string()
       .uuid({ message: t("EmployeeRequests.form.employee.required") })
@@ -54,6 +58,8 @@ const createRequestSchema = (t: (key: string) => string) =>
     amount: z.number().optional(),
     notes: z.any().optional().nullable(),
   });
+  return RequestSelectSchema;
+};
 
 type EmployeeRequestFormSchema = ReturnType<typeof createRequestSchema>;
 export type EmployeeRequestFormValues = z.infer<EmployeeRequestFormSchema>;
@@ -67,6 +73,9 @@ export function EmployeeRequestForm({
 }: ModuleFormProps<EmployeeRequestUpdateData | EmployeeRequestCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
+
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
 
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const setIsLoadingCreateEmployee = useEmployeeStore((state) => state.setIsLoading);
@@ -167,6 +176,8 @@ export function EmployeeRequestForm({
     <>
       <Form {...form}>
         <form id={formHtmlId || "employee-request-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="form-fields-cols-2">
               <FormField

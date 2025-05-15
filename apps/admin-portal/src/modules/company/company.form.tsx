@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -16,7 +17,6 @@ import PhoneInput from "@/components/ui/inputs/phone-input";
 
 import { AddressFormSection } from "@/forms/address-form-section";
 
-import { createAddressSchema } from "@/lib/schemas/address.schema";
 import { getNotesValue } from "@/lib/utils";
 
 import { uploadDocument } from "@/services/documents";
@@ -27,10 +27,11 @@ import { useCreateCompany, useUpdateCompany } from "@/company/company.hooks";
 import useCompanyStore from "@/company/company.store";
 import { CompanyCreateData, CompanyUpdateData } from "@/company/company.type";
 
+import { companies } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
-export const createCompanySchema = (t: (key: string) => string) => {
-  const baseCompanySchema = z.object({
+const createCompanySchema = (t: (key: string) => string) => {
+  const CompanySelectSchema = createInsertSchema(companies, {
     name: z.string().min(1, t("Companies.form.validation.name_required")),
     email: z
       .string()
@@ -46,10 +47,7 @@ export const createCompanySchema = (t: (key: string) => string) => {
     notes: z.any().optional().nullable(),
     vat_number: z.string().optional(),
   });
-
-  const addressSchema = createAddressSchema(t);
-
-  return baseCompanySchema.merge(addressSchema);
+  return CompanySelectSchema;
 };
 
 export type CompanyFormValues = z.input<ReturnType<typeof createCompanySchema>>;
@@ -63,7 +61,10 @@ export function CompanyForm({
 }: ModuleFormProps<CompanyUpdateData | CompanyCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
-  const { profile, membership } = useUserStore();
+
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+
   const { mutateAsync: createCompany } = useCreateCompany();
   const { mutateAsync: updateCompany } = useUpdateCompany();
   const [pendingDocuments, setPendingDocuments] = useState<DocumentFile[]>([]);
@@ -128,7 +129,7 @@ export function CompanyForm({
 
   const handleSubmit = async (data: CompanyFormValues) => {
     setIsLoading(true);
-    if (!profile?.id) {
+    if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
@@ -177,7 +178,8 @@ export function CompanyForm({
       } else {
         await createCompany(
           {
-            enterprise_id: membership?.enterprise_id || "",
+            user_id: user?.id || "",
+            enterprise_id: enterprise?.id || "",
             name: data.name.trim(),
             email: data.email.trim(),
             phone: data.phone?.trim() || undefined,
@@ -186,7 +188,6 @@ export function CompanyForm({
             size: data.size?.trim() || undefined,
             notes: data.notes ?? null,
             status: data.status as "active" | "inactive" | "draft" | "archived" | null,
-            user_id: profile?.id || "",
             short_address: data.short_address?.trim() || undefined,
             building_number: data.building_number?.trim() || undefined,
             street_name: data.street_name?.trim() || undefined,
@@ -225,6 +226,8 @@ export function CompanyForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
         <div className="form-container">
           <div className="form-fields-cols-2">
             <FormField

@@ -23,7 +23,7 @@ import { ModuleFormProps } from "@/types/common.type";
 
 import { ClientForm } from "@/client/client.form";
 
-import { invoices, offices } from "@/db/schema";
+import { invoices } from "@/db/schema";
 import { useInvoices } from "@/modules/invoice/invoice.hooks";
 import {
   InvoiceUpdateData,
@@ -78,8 +78,7 @@ const createInvoiceSchema = (t: (key: string) => string) => {
       t("ProductsFormSection.items.required"),
     );
 
-  return z.object({
-    ...InvoiceSelectSchema,
+  return InvoiceSelectSchema.extend({
     items: InvoiceItemsSchema,
   });
 };
@@ -95,6 +94,7 @@ export function InvoiceForm({
 }: ModuleFormProps<InvoiceUpdateData | InvoiceCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
+
   const user = useUserStore((state) => state.user);
   const enterprise = useUserStore((state) => state.enterprise);
 
@@ -178,7 +178,7 @@ export function InvoiceForm({
 
   const handleSubmit = async (data: InvoiceFormValues) => {
     setIsLoading(true);
-    if (!profile?.id) {
+    if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
