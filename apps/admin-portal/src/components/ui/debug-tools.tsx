@@ -33,6 +33,10 @@ const DebugTools = () => {
                 <div className="text-xs break-all">{user?.id}</div>
               </div>
               <div>
+                <div className="text-xs font-bold">Profile ID</div>
+                <div className="text-xs break-all">{profile?.id}</div>
+              </div>
+              <div>
                 <div className="text-xs font-bold">Enterprise</div>
                 <div className="text-xs break-all">
                   {enterprise?.name} ({enterprise?.id})
