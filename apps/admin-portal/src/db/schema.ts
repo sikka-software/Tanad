@@ -414,6 +414,7 @@ export const branches = pgTable(
     phone: text(),
     email: text(),
     manager: uuid(),
+    area: text(),
     status: common_status().default("active"),
     notes: jsonb(),
     user_id: uuid().notNull(),
@@ -1834,6 +1835,7 @@ export const offices = pgTable(
     status: common_status().default("active"),
     capacity: numeric({ precision: 10, scale: 2 }),
     working_hours: jsonb(),
+    area: text(),
     notes: jsonb(),
     code: text(),
     manager: uuid(),
@@ -2255,6 +2257,7 @@ export const warehouses = pgTable(
     operating_hours: jsonb(),
     warehouse_type: text().default("general"),
     safety_compliance: jsonb(),
+    area: text(),
 
     short_address: text(),
     additional_number: text(),

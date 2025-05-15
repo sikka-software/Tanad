@@ -1,27 +1,83 @@
 import { useId } from "react";
 
-import { Input } from "@/components/ui/inputs/input";
-import { Label } from "@/components/ui/label";
+import { Input } from "@/ui/inputs/input";
+import { Label } from "@/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
-// import { SelectNative } from "@/components/ui/select-native";
+import { cn } from "@/lib/utils";
 
-export default function Component() {
+export interface UnitsInputOption {
+  value: string;
+  label: React.ReactNode;
+}
+
+export interface UnitsInputProps {
+  label?: React.ReactNode;
+  labelProps?: React.ComponentProps<typeof Label>;
+  inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
+  selectProps?: Omit<React.ComponentProps<typeof Select>, "children"> & {
+    options: UnitsInputOption[];
+    value?: string;
+    defaultValue?: string;
+    onValueChange?: (value: string) => void;
+    placeholder?: string;
+    renderOption?: (option: UnitsInputOption) => React.ReactNode;
+  };
+  containerClassName?: string;
+  inputClassName?: string;
+  selectClassName?: string;
+}
+
+export default function UnitsInput({
+  label,
+  labelProps,
+  inputProps = {},
+  selectProps = { options: [] },
+  containerClassName = "",
+  inputClassName = "",
+  selectClassName = "",
+}: UnitsInputProps) {
   const id = useId();
+  const {
+    options,
+    value: selectValue,
+    defaultValue: selectDefaultValue,
+    onValueChange,
+    placeholder: selectPlaceholder = "Select an option",
+    renderOption,
+    ...restSelectProps
+  } = selectProps;
+
   return (
-    <div className="*:not-first:mt-2">
-      <Label htmlFor={id}>Input with end select</Label>
+    <div className={containerClassName + " *:not-first:mt-2"}>
+      {label && (
+        <Label htmlFor={id} {...labelProps}>
+          {label}
+        </Label>
+      )}
       <div className="flex rounded-md shadow-xs">
         <Input
           id={id}
-          className="-me-px rounded-e-none shadow-none focus-visible:z-10"
-          placeholder="google"
-          type="text"
+          className={"-me-px rounded-e-none shadow-none focus-visible:z-10 " + inputClassName}
+          {...inputProps}
         />
-        {/* <SelectNative className="text-muted-foreground hover:text-foreground w-fit rounded-s-none shadow-none">
-          <option>.com</option>
-          <option>.org</option>
-          <option>.net</option>
-        </SelectNative> */}
+        <Select
+          value={selectValue}
+          defaultValue={selectDefaultValue}
+          onValueChange={onValueChange}
+          {...restSelectProps}
+        >
+          <SelectTrigger className={cn("max-w-24 rounded-e-none", selectClassName)}>
+            <SelectValue placeholder={selectPlaceholder} />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {renderOption ? renderOption(option) : option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

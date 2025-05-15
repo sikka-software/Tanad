@@ -20,6 +20,8 @@
     "canceling": "جاري الإلغاء",
     "creating": "جاري الإنشاء",
     "deleting": "جاري الحذف",
+    "m2": "متر مربع",
+    "ft2": "قدم مربع",
     "error_alert_title": "خطأ",
     "words": "الكلمات",
     "filters": "الفرز",
@@ -4313,12 +4315,10 @@
         "placeholder": "أدخل البريد الإلكتروني",
         "invalid": "صيغة البريد الإلكتروني غير صحيحة"
       },
-      "status": {
-        "label": "الحالة",
-        "active": "نشط",
-        "inactive": "غير نشط",
-        "published": "منشور",
-        "unpublished": "غير منشور"
+      "area": {
+        "label": "المساحة",
+        "placeholder": "أدخل مساحة المكتب",
+        "required": "المساحة مطلوبة"
       },
       "address": { "label": "عنوان المكتب" },
       "notes": { "label": "ملاحظات المكتب" }

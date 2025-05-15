@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createSelectSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -15,6 +16,7 @@ import NotesSection from "@/components/forms/notes-section";
 import CodeInput from "@/components/ui/inputs/code-input";
 import { Input } from "@/components/ui/inputs/input";
 import PhoneInput from "@/components/ui/inputs/phone-input";
+import UnitsInput, { UnitsInputOption } from "@/components/ui/inputs/units-input";
 
 import { addressSchema } from "@/lib/schemas/address.schema";
 import { metadataSchema } from "@/lib/schemas/metadata.schema";
@@ -48,10 +50,12 @@ const createOfficeSchema = (t: (key: string) => string) => {
       .optional()
       .nullable(),
     status: z.enum(CommonStatus, {
-      message: t("Offices.form.status.required"),
+      message: t("CommonStatus.required"),
     }),
     capacity: z.number().optional().nullable(),
-    working_hours: z.number().optional().nullable(),
+    working_hours: z.string().optional().nullable(),
+
+    area: z.string().optional().nullable(),
     notes: z.any().optional().nullable(),
     ...addressSchema,
     ...metadataSchema,
@@ -99,6 +103,9 @@ export function OfficeForm({
       country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
       manager: defaultValues?.manager || "",
+      area: defaultValues?.area || "",
+      working_hours: (defaultValues?.working_hours as string) || "",
+
       status: defaultValues?.status || "active",
       notes: getNotesValue(defaultValues),
     },
@@ -324,11 +331,11 @@ export function OfficeForm({
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Offices.form.status.label")}</FormLabel>
+                    <FormLabel>{t("CommonStatus.label")}</FormLabel>
                     <FormControl>
                       <BooleanTabs
-                        trueText={t("Offices.form.status.active")}
-                        falseText={t("Offices.form.status.inactive")}
+                        trueText={t("CommonStatus.active")}
+                        falseText={t("CommonStatus.inactive")}
                         value={field.value === "active"}
                         onValueChange={(newValue) => {
                           field.onChange(newValue ? "active" : "inactive");
@@ -339,6 +346,43 @@ export function OfficeForm({
                     <FormMessage />
                   </FormItem>
                 )}
+              />
+              <FormField
+                control={form.control}
+                name="area"
+                render={({ field }) => {
+                  const [unit, setUnit] = useState("sqm");
+                  return (
+                    <FormItem>
+                      <FormLabel>{t("Offices.form.area.label")}</FormLabel>
+                      <FormControl>
+                        <UnitsInput
+                          label={undefined}
+                          inputProps={{
+                            ...field,
+                            type: "number",
+                            placeholder: t("Offices.form.area.placeholder"),
+                            value: field.value || "",
+                            onChange: (e) => {
+                              const newValue =
+                                e.target.value === "" ? undefined : Number(e.target.value);
+                              field.onChange(unit + " " + String(newValue));
+                            },
+                          }}
+                          selectProps={{
+                            options: [
+                              { value: "sqm", label: "m²" },
+                              { value: "sqft", label: "ft²" },
+                            ],
+                            value: unit,
+                            onValueChange: setUnit,
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
             </div>
           </div>

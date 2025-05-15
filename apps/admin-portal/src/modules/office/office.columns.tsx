@@ -114,7 +114,7 @@ const useOfficeColumns = (
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Offices.form.status.label"),
+      header: t("CommonStatus.label"),
       validationSchema: z.enum(["active", "inactive"]),
       noPadding: true,
       enableEditing: false,
@@ -125,8 +125,8 @@ const useOfficeColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Offices.form.status.active"), value: "active" },
-              { label: t("Offices.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

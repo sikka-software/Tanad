@@ -69,6 +69,7 @@ AddOfficePage.messages = [
   "Notes",
   "General",
   "Forms",
+  "CommonStatus",
 ];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
