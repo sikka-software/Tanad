@@ -108,6 +108,12 @@ const EnterprisePage = () => {
                 industry: formData.industry ?? undefined,
                 email: formData.email ?? undefined,
                 logo: formData.logo ?? undefined,
+                website: undefined,
+                phone: undefined,
+                employees: undefined,
+                description: undefined,
+                address: undefined,
+                founded: undefined,
               }}
               formId="enterprise-form"
               readOnly={!isEditing}

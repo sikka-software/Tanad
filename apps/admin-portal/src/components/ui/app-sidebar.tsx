@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/inputs/input";
 
 import { applyCustomMenuOrder, getMenuList, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
-import useUserStore, { ProfileType } from "@/stores/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 
 import { EnterpriseSwitcher } from "./enterprise-switcher";
 import { NavMain } from "./sidebar-menu";
@@ -275,7 +275,7 @@ export function AppSidebar() {
         )}
       </SidebarContent>
       <SidebarFooter className="border-t">
-        {profile && <SidebarUserFooter user={profile as ProfileType} />}
+        {profile && <SidebarUserFooter user={profile} />}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

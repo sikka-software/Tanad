@@ -43,8 +43,6 @@ import {
 import { downloadCSV } from "@/lib/csv-utils";
 import { cn } from "@/lib/utils";
 
-import { ProfileType } from "@/stores/use-user-store";
-
 import { useUsers } from "../user/user.hooks";
 import { ActivityLogPDFDocument } from "./activity.pdf";
 import { exportActivities } from "./activity.service";

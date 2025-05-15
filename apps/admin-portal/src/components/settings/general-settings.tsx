@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/ui/separator";
 import { Skeleton } from "@/ui/skeleton";
 
-import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
+import { useUpdateProfile } from "@/hooks/use-profile";
 
 import { Input } from "@/components/ui/inputs/input";
 
@@ -52,12 +52,8 @@ const GeneralSettings = ({
   const [selectedLanguage, setSelectedLanguage] = useState<string>(lang);
 
   // Get user from the existing store to get profile_id
-  const { user } = useUserStore();
-  const profile_id = user?.id || "";
-
-  // Use the profile hook to fetch data
-  // TODO: use the profile from the store for optimsitc updates
-  const { data: profile, isLoading: isLoadingProfile } = useProfile(profile_id);
+  const user = useUserStore((state) => state.user);
+  const profile = useUserStore((state) => state.profile);
 
   // Initialize the update mutation
   const updateProfileMutation = useUpdateProfile();
@@ -113,13 +109,19 @@ const GeneralSettings = ({
   const onSubmit = async (data: FormValues) => {
     onSave();
     try {
+      if (!profile?.id) {
+        throw new Error("Profile ID is required");
+      }
+
+      const currentUserSettings = profile?.user_settings || {};
+
       await updateProfileMutation.mutateAsync({
-        profile_id,
+        id: profile.id,
         data: {
           full_name: data.name,
           // Email is managed separately through auth system if needed
           user_settings: {
-            ...(profile?.user_settings || {}),
+            ...currentUserSettings,
             timezone: data.timezone,
             language: data.language,
           },
@@ -181,11 +183,11 @@ const GeneralSettings = ({
                     <FormItem>
                       <FormLabel>{t("Settings.general.profile.name")}</FormLabel>
                       <FormControl>
-                        {isLoadingProfile ? (
+                        {/* {isLoadingProfile ? (
                           <Skeleton className="h-9 w-full" />
-                        ) : (
-                          <Input {...field} disabled={isSaving} />
-                        )}
+                        ) : ( */}
+                        <Input {...field} disabled={isSaving} />
+                        {/* // )} */}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -198,11 +200,11 @@ const GeneralSettings = ({
                     <FormItem>
                       <FormLabel>{t("Settings.general.profile.email")}</FormLabel>
                       <FormControl>
-                        {isLoadingProfile ? (
-                          <Skeleton className="h-9 w-full" />
-                        ) : (
-                          <Input type="email" {...field} disabled={true} />
-                        )}
+                        {/* {isLoadingProfile ? ( */}
+                        {/* <Skeleton className="h-9 w-full" />
+                        ) : ( */}
+                        <Input type="email" {...field} disabled={true} />
+                        {/* )} */}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -222,32 +224,32 @@ const GeneralSettings = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("Settings.general.regional.language")}</FormLabel>
-                      {isLoadingProfile ? (
+                      {/* {isLoadingProfile ? (
                         <Skeleton className="h-9 w-full" />
-                      ) : (
-                        <Select
-                          disabled={isSaving}
-                          onValueChange={(val) => {
-                            field.onChange(val);
-                            setSelectedLanguage(val);
-                          }}
-                          value={field.value || selectedLanguage}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={t("General.select")}>
-                                {field.value === "en"
-                                  ? t("General.languages.en")
-                                  : t("General.languages.ar")}
-                              </SelectValue>
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="en">{t("General.languages.en")}</SelectItem>
-                            <SelectItem value="ar">{t("General.languages.ar")}</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
+                      ) : ( */}
+                      <Select
+                        disabled={isSaving}
+                        onValueChange={(val) => {
+                          field.onChange(val);
+                          setSelectedLanguage(val);
+                        }}
+                        value={field.value || selectedLanguage}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t("General.select")}>
+                              {field.value === "en"
+                                ? t("General.languages.en")
+                                : t("General.languages.ar")}
+                            </SelectValue>
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="en">{t("General.languages.en")}</SelectItem>
+                          <SelectItem value="ar">{t("General.languages.ar")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {/* )} */}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -259,50 +261,50 @@ const GeneralSettings = ({
                     return (
                       <FormItem>
                         <FormLabel>{t("Settings.general.regional.timezone")}</FormLabel>
-                        {isLoadingProfile ? (
+                        {/* {isLoadingProfile ? (
                           <Skeleton className="h-9 w-full" />
-                        ) : (
-                          <BetaFlag
-                            title={t("Flags.timezone_soon.title")}
-                            description={t("Flags.timezone_soon.description")}
+                        ) : ( */}
+                        <BetaFlag
+                          title={t("Flags.timezone_soon.title")}
+                          description={t("Flags.timezone_soon.description")}
+                        >
+                          <Select
+                            disabled={isSaving}
+                            onValueChange={(val) => {
+                              field.onChange(val);
+                              setSelectedTimezone(val);
+                            }}
+                            value={field.value || selectedTimezone} // Fall back to selectedTimezone if field.value is empty
                           >
-                            <Select
-                              disabled={isSaving}
-                              onValueChange={(val) => {
-                                field.onChange(val);
-                                setSelectedTimezone(val);
-                              }}
-                              value={field.value || selectedTimezone} // Fall back to selectedTimezone if field.value is empty
-                            >
-                              <FormControl>
-                                <SelectTrigger disabled>
-                                  <SelectValue>
-                                    {(() => {
-                                      const timezoneValue = field.value || selectedTimezone;
-                                      const timezoneLabels = {
-                                        UTC: "UTC",
-                                        EST: "Eastern Time (EST)",
-                                        CST: "Central Time (CST)",
-                                        PST: "Pacific Time (PST)",
-                                      };
-                                      return (
-                                        timezoneLabels[
-                                          timezoneValue as keyof typeof timezoneLabels
-                                        ] || timezoneValue
-                                      );
-                                    })()}
-                                  </SelectValue>
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="UTC">UTC</SelectItem>
-                                <SelectItem value="EST">Eastern Time (EST)</SelectItem>
-                                <SelectItem value="CST">Central Time (CST)</SelectItem>
-                                <SelectItem value="PST">Pacific Time (PST)</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </BetaFlag>
-                        )}
+                            <FormControl>
+                              <SelectTrigger disabled>
+                                <SelectValue>
+                                  {(() => {
+                                    const timezoneValue = field.value || selectedTimezone;
+                                    const timezoneLabels = {
+                                      UTC: "UTC",
+                                      EST: "Eastern Time (EST)",
+                                      CST: "Central Time (CST)",
+                                      PST: "Pacific Time (PST)",
+                                    };
+                                    return (
+                                      timezoneLabels[
+                                        timezoneValue as keyof typeof timezoneLabels
+                                      ] || timezoneValue
+                                    );
+                                  })()}
+                                </SelectValue>
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="UTC">UTC</SelectItem>
+                              <SelectItem value="EST">Eastern Time (EST)</SelectItem>
+                              <SelectItem value="CST">Central Time (CST)</SelectItem>
+                              <SelectItem value="PST">Pacific Time (PST)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </BetaFlag>
+                        {/* )} */}
                         <FormMessage />
                       </FormItem>
                     );

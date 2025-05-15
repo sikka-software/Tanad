@@ -4,21 +4,16 @@ import { create } from "zustand";
 
 import { createClient } from "@/utils/supabase/component";
 
-export interface ProfileType {
-  id: string;
-  email: string;
-  full_name: string | null;
-  created_at: string;
-  stripe_customer_id: string | null;
-  avatar_url: string | null;
-  address: string | null;
-  subscribed_to?: string;
-  price_id?: string;
-  username: string | null;
+import { Constants, Database } from "@/lib/database.types";
+
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
+  avatar_url: string;
   user_settings: {
     currency: (typeof currencies)[number];
-    calendar_type: "gregorian" | "hijri";
+    calendar: "gregorian" | "hijri";
     timezone: string;
+    date_format: "mdy" | "dmy" | "ymd" | "dym";
+    time_format: "12h" | "24h";
     notifications?: {
       email_updates: boolean;
       email_marketing: boolean;
@@ -27,6 +22,7 @@ export interface ProfileType {
       app_comments: boolean;
       app_tasks: boolean;
     };
+    language: string;
     navigation?: Record<
       string,
       Array<{
@@ -39,31 +35,34 @@ export interface ProfileType {
     >;
     hidden_menu_items?: Record<string, string[]>;
   };
-}
+};
 
-interface EnterpriseType {
-  id: string;
-  name: string;
-  created_at: string;
-  email: string | null;
-  industry: string | null;
-  size: string | null;
-  logo: string | null;
-}
+export type Enterprise = Database["public"]["Tables"]["enterprises"]["Row"];
+export type Membership = Database["public"]["Tables"]["memberships"]["Row"];
 
-interface MembershipType {
-  id: string;
-  profile_id: string;
-  enterprise_id: string;
-  role_id: string;
-  created_at: string;
-}
+// interface EnterpriseType {
+//   id: string;
+//   name: string;
+//   created_at: string;
+//   email: string | null;
+//   industry: string | null;
+//   size: string | null;
+//   logo: string | null;
+// }
+
+// interface MembershipType {
+//   id: string;
+//   profile_id: string;
+//   enterprise_id: string;
+//   role_id: string;
+//   created_at: string;
+// }
 
 interface UserState {
   user: User | null;
-  profile: ProfileType | null;
-  enterprise: EnterpriseType | null;
-  membership: MembershipType | null;
+  profile: Profile | null;
+  enterprise: Enterprise | null;
+  membership: Membership | null;
   permissions: string[];
   loading: boolean;
   error: string | null;
@@ -71,9 +70,9 @@ interface UserState {
   fetchUserAndProfile: () => Promise<void>;
   signOut: () => Promise<void>;
   setUser: (user: User | null) => void;
-  setProfile: (profile: ProfileType | null) => void;
-  setEnterprise: (enterprise: EnterpriseType | null) => void;
-  setMembership: (membership: MembershipType | null) => void;
+  setProfile: (profile: Profile | null) => void;
+  setEnterprise: (enterprise: Enterprise | null) => void;
+  setMembership: (membership: Membership | null) => void;
   setPermissions: (permissions: string[]) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -189,7 +188,7 @@ const useUserStore = create<UserState>((set, get) => ({
       // console.log("[UserStore] Profile data:", profileData);
 
       if (profileData) {
-        set({ profile: profileData as ProfileType });
+        set({ profile: profileData });
         // console.log("[UserStore] Fetching membership for user", session.user.id);
         const { data: membershipData, error: membershipError } = await supabase
           .from("memberships")
@@ -201,7 +200,7 @@ const useUserStore = create<UserState>((set, get) => ({
         }
         // console.log("[UserStore] Membership data:", membershipData);
         if (membershipData) {
-          set({ membership: membershipData as MembershipType });
+          set({ membership: membershipData });
           // console.log("[UserStore] Fetching enterprise for enterprise_id", membershipData.enterprise_id);
           const { data: enterpriseData, error: enterpriseError } = await supabase
             .from("enterprises")
@@ -219,7 +218,7 @@ const useUserStore = create<UserState>((set, get) => ({
                 .createSignedUrl(enterpriseData.logo, 60 * 60);
               enterpriseData.logo = imageData?.signedUrl;
             }
-            set({ enterprise: enterpriseData as EnterpriseType });
+            set({ enterprise: enterpriseData });
           }
           // console.log("[UserStore] Fetching permissions for user and enterprise");
           const { data: permissionsData, error: permissionsError } = await supabase
