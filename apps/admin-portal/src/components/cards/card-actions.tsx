@@ -30,7 +30,7 @@ const CardActions = ({
   const commonClasses =
     "translate-y-1 opacity-0 !size-8 !min-size-8 transition-all group-hover:translate-y-0 group-hover:opacity-100 @sm/module-card:hidden";
   return (
-    <div className="flex items-center justify-end gap-1">
+    <div className="flex items-center justify-end gap-1 bg-red-400 w-full @container/module-card">
       {onPreview && (
         <IconButton
           icon={<Eye />}

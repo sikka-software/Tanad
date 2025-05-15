@@ -43,9 +43,7 @@ const ModuleCard = <T,>({
             statuses={statuses}
             onStatusChange={onStatusChange}
           />
-          <div className="@container/module-card w-full bg-red-400 items-end">
-            <CardActions onEdit={onEdit} onDelete={onDelete} onDuplicate={onDuplicate} />
-          </div>
+          <CardActions onEdit={onEdit} onDelete={onDelete} onDuplicate={onDuplicate} />
         </div>
 
         <div className="flex items-start justify-between px-4 py-2">
