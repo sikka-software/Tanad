@@ -65,7 +65,7 @@ export function DateInputField({
   }
 
   return (
-    <div className="flex w-full items-center gap-1">
+    <div className="flex w-full items-center">
       <I18nProvider locale={dateFieldLocale}>
         <DateField
           value={value}

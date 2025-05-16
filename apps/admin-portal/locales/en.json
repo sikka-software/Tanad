@@ -2793,31 +2793,19 @@
       "error_not_authenticated": "You must be logged in to create a salary",
       "success_created": "Salary created successfully"
     },
-    "table": {
-      "employee_name": "Employee Name",
-      "gross_amount": "Gross Amount",
-      "net_amount": "Net Amount",
-      "payment_date": "Payment Date",
-      "pay_period_start": "Pay Period Start",
-      "pay_period_end": "Pay Period End",
-      "actions": "Actions"
-    },
+
     "form": {
       "employee_name": {
         "label": "Employee Name",
         "placeholder": "Enter employee name",
         "required": "Employee name is required"
       },
-      "gross_amount": {
-        "label": "Gross Amount",
-        "placeholder": "Enter gross amount",
-        "required": "Gross amount is required"
+      "amount": {
+        "label": "Amount",
+        "placeholder": "Enter amount",
+        "required": "Amount is required"
       },
-      "net_amount": {
-        "label": "Net Amount",
-        "placeholder": "Enter net amount",
-        "required": "Net amount is required"
-      },
+
       "payment_date": {
         "label": "Payment Date",
         "required": "Payment date is required",

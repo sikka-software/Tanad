@@ -8,8 +8,7 @@ export const generateDummySalary = () => {
     form.setValue("pay_period_start", "2021-01-01");
     form.setValue("pay_period_end", "2021-01-31");
     form.setValue("payment_date", "2021-01-31");
-    form.setValue("gross_amount", 100000);
-    form.setValue("net_amount", 10000);
+    form.setValue("amount", 10000);
   }
 };
 

@@ -238,7 +238,7 @@ export default function QuotesPage() {
   );
 }
 
-QuotesPage.messages = ["Notes", "Pages", "Quotes", "General"];
+QuotesPage.messages = ["Notes", "Pages", "Quotes", "General", "ProductsFormSection"];
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {

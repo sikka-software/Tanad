@@ -44,7 +44,7 @@ export default function AddQuotePage() {
   );
 }
 
-AddQuotePage.messages = ["Notes", "Pages", "Quotes", "General"];
+AddQuotePage.messages = ["Notes", "Pages", "Quotes", "General", "ProductsFormSection"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

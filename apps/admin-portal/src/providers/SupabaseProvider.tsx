@@ -44,7 +44,13 @@ export function SupabaseProvider({ children }: { children: ReactNode }) {
           break;
         case "SIGNED_IN":
           useUserStore.getState().fetchUserAndProfile();
-          router.push("/dashboard");
+
+          // if no user is found take them to /auth
+          if (!useUserStore.getState().user) {
+            router.push("/auth");
+          } else {
+            // router.push("/dashboard");
+          }
           break;
         default:
           // router.refresh()
