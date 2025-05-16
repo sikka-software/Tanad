@@ -41,7 +41,7 @@ const ClientCombobox = ({
       <FormField
         control={control}
         name="client_id"
-        render={({ field }) => (
+        render={({ field, fieldState }) => (
           <FormItem>
             <FormLabel>{label} *</FormLabel>
             <FormControl>
@@ -52,6 +52,7 @@ const ClientCombobox = ({
                   label: client.name,
                   email: client.email,
                 }))}
+                ariaInvalid={fieldState.error !== undefined}
                 isLoading={loadingCombobox}
                 defaultValue={field.value}
                 onChange={(value) => field.onChange(value || null)}

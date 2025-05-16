@@ -408,7 +408,7 @@ export function OfficeForm({
               />
             </div>
           </div>
-          <AddressFormSection
+          {/* <AddressFormSection
             dir={locale === "ar" ? "rtl" : "ltr"}
             inDialog={editMode || nestedForm}
             title={t("Offices.form.address.label")}
@@ -419,7 +419,7 @@ export function OfficeForm({
             inDialog={editMode || nestedForm}
             control={form.control}
             title={t("Offices.form.notes.label")}
-          />
+          /> */}
         </form>
       </Form>
       <FormDialog

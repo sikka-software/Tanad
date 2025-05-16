@@ -103,7 +103,7 @@ export default function PhoneInput({
             role="combobox"
             aria-expanded={open}
             className={cn(
-              "h-9 w-fit justify-between gap-0 rounded-e-none border-e-0",
+              "h-9 w-fit justify-between gap-0 rounded-e-none border-e-0 bg-input-background",
 
               props.ariaInvalid &&
                 "ring-destructive/20 dark:ring-destructive/40 border-destructive border-e-none",

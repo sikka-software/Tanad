@@ -2,6 +2,7 @@
 
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
+import { AnimatePresence, motion } from "motion/react";
 import * as React from "react";
 import {
   Controller,
@@ -121,23 +122,32 @@ function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
   );
 }
 
-function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
+function FormMessage({ className, children, ...rest }: React.ComponentProps<"p">) {
   const { error, formMessageId } = useFormField();
-  const body = error ? String(error?.message ?? "") : props.children;
+  const body = error ? String(error?.message ?? "") : children;
 
   if (!body) {
     return null;
   }
 
   return (
-    <p
-      data-slot="form-message"
-      id={formMessageId}
-      className={cn("text- w-fit -mt-2 ms-4 !rounded-t-none p-1 text-xs bg-destructive/20 dark:bg-destructive/90 px-2 rounded-md", className)}
-      {...props}
-    >
-      {body}
-    </p>
+    <AnimatePresence>
+      <motion.p
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        data-slot="form-message"
+        id={formMessageId}
+        className={cn(
+          "border-destructive bg-destructive/20 dark:bg-destructive/90  rounded-md !rounded-t-none border border-t-0 p-1 px-2 text-sm -mt-5 pt-3 -z-1",
+          // '-mt-2 w-fit ms-4',
+          className,
+        )}
+        {...(rest as any)}
+      >
+        {body}
+      </motion.p>
+    </AnimatePresence>
   );
 }
 

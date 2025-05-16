@@ -141,7 +141,7 @@ export function InvoiceForm({
           quantity: item.quantity,
           unit_price: item.unit_price,
         }))
-      : [{ product_id: "", description: "", quantity: 1, unit_price: 0.00 }],
+      : [{ product_id: "", description: "", quantity: 1, unit_price: 0.0 }],
   };
 
   const form = useForm<InvoiceFormValues>({
@@ -340,6 +340,7 @@ export function InvoiceForm({
                           placeholder={t("Invoices.form.invoice_number.placeholder")}
                           {...field}
                           disabled={isLoading}
+                          aria-invalid={form.formState.errors.invoice_number !== undefined}
                         />
                       </CodeInput>
                     </FormControl>
