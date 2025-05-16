@@ -228,7 +228,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
         </TableCell>
 
         {/* Subtotal */}
-        <TableCell>
+        <TableCell className="max-w-[10px] bg-green-300">
           <div className="flex flex-row items-center gap-1 text-right">
             {MoneyFormatter(subtotalNumber)}
             {getCurrencySymbol(currency || "sar").symbol}
@@ -258,7 +258,7 @@ ProductRow.displayName = "ProductRow"; // Add display name for easier debugging
 
 // --- Main Products Form Section Component ---
 
-export function ProductsFormSection({
+function ProductsFormSection({
   control,
   fields,
   append,
@@ -306,8 +306,11 @@ export function ProductsFormSection({
                 <TableHead>{t("ProductsFormSection.quantity.label")}</TableHead>
                 <TableHead>{t("ProductsFormSection.unit_price.label")}</TableHead>
                 <TableHead>{t("ProductsFormSection.description.label")}</TableHead>
-                <TableHead>{t("ProductsFormSection.subtotal")}</TableHead>
-                <TableHead></TableHead> {/* Action column header */}
+                <TableHead className="max-w-[10px] bg-red-300">
+                  {t("ProductsFormSection.subtotal")}
+                </TableHead>
+                <TableHead className="max-w-[100px] bg-blue-300"></TableHead>{" "}
+                {/* Action column header */}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -349,3 +352,5 @@ export function ProductsFormSection({
     </div>
   );
 }
+
+export default ProductsFormSection;

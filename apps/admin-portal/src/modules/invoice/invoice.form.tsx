@@ -12,7 +12,7 @@ import FormDialog from "@/ui/form-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import NotesSection from "@/components/forms/notes-section";
-import { ProductsFormSection } from "@/components/forms/products-form-section";
+import ProductsFormSection from "@/components/forms/products-form-section";
 import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 import CodeInput from "@/components/ui/inputs/code-input";
 import { Input } from "@/components/ui/inputs/input";

@@ -17,7 +17,7 @@ import CodeInput from "@/components/ui/inputs/code-input";
 import { Input } from "@/components/ui/inputs/input";
 
 import NotesSection from "@/forms/notes-section";
-import { ProductsFormSection } from "@/forms/products-form-section";
+import ProductsFormSection from "@/forms/products-form-section";
 
 import { getNotesValue } from "@/lib/utils";
 
