@@ -148,7 +148,7 @@ export function SalaryForm({
       end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
       payment_date: defaultValues?.payment_date ? new Date(defaultValues.payment_date) : undefined,
       payment_frequency: defaultValues?.payment_frequency || "",
-      amount: defaultValues?.amount || 0,
+      amount: defaultValues?.amount !== undefined ? defaultValues.amount : undefined,
       deductions: parseDeductions(defaultValues?.deductions),
       notes: defaultValues?.notes || "",
     },
@@ -298,8 +298,8 @@ export function SalaryForm({
                     <FormControl>
                       <CurrencyInput
                         showCommas={true}
-                        value={field.value ? parseFloat(String(field.value)) : undefined}
-                        onChange={(value) => field.onChange(value ? Number(value) : undefined)}
+                        value={typeof field.value === 'number' && !isNaN(field.value) ? field.value : undefined}
+                        onChange={v => field.onChange(v === undefined || v === null ? undefined : v)}
                         placeholder={t("Salaries.form.amount.placeholder")}
                         disabled={loading}
                       />
