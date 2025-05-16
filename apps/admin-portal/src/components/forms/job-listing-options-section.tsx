@@ -52,6 +52,8 @@ const JobListingOptionsSection = ({
             <FormItem>
               <FormLabel>{t("JobListings.options.currencyLabel")}</FormLabel>
               <Select
+                // TODO: this will be enabled when we have currency conversion
+                disabled
                 dir={lang === "ar" ? "rtl" : "ltr"}
                 onValueChange={(val) => {
                   field.onChange(val);
