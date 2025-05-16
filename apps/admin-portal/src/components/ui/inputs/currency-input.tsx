@@ -146,10 +146,11 @@ export function CurrencyInput({
   return (
     <div className={cn("relative", props.containerClassName)}>
       <Input
+        dir="ltr"
         type="text"
         inputMode="decimal"
         placeholder="0.00"
-        className={cn("currency-input rtl:text-end", currencyInputClassName(currency))}
+        className={cn("currency-input", currencyInputClassName(currency))}
         value={inputText}
         onChange={handleChange}
         onBlur={handleBlur}

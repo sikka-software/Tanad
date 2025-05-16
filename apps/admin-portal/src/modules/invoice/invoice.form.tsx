@@ -141,7 +141,7 @@ export function InvoiceForm({
           quantity: item.quantity,
           unit_price: item.unit_price,
         }))
-      : [{ product_id: "", description: "", quantity: 1, unit_price: 0 }],
+      : [{ product_id: "", description: "", quantity: 1, unit_price: 0.00 }],
   };
 
   const form = useForm<InvoiceFormValues>({

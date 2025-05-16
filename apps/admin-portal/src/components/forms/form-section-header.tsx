@@ -38,7 +38,11 @@ const FormSectionHeader = ({
         <div className="flex flex-col">
           <div className="flex flex-row items-center gap-2">
             <h2 className="ms-2 text-xl font-bold">{title}</h2>
-            {isError && <Badge variant={"destructive"}>{onErrorText}</Badge>}
+            {isError && (
+              <Badge className="text-md rounded-md p-0 px-2 py-0.5" variant={"destructive"}>
+                {onErrorText}
+              </Badge>
+            )}
           </div>
         </div>
         {onCreate && (
