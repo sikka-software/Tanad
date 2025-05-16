@@ -171,8 +171,13 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                     className="w-24"
                     disabled={isLoading}
                     onChange={(e) => {
-                      const value = e.target.value;
-                      formField.onChange(value === "" ? undefined : Number(value));
+                      const rawValue = e.target.value;
+                      if (rawValue === "") {
+                        formField.onChange(undefined); 
+                      } else {
+                        const numValue = parseFloat(rawValue);
+                        formField.onChange(isNaN(numValue) ? undefined : numValue);
+                      }
                     }}
                   />
                 </FormControl>
@@ -200,10 +205,9 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                       } else if (typeof valueFromInput === "number") {
                         numValue = valueFromInput;
                       } else {
-                        // Handles undefined, null, etc. by setting numValue to undefined effectively leading to NaN check
-                        numValue = parseFloat(valueFromInput as any); // Let parseFloat produce NaN for undefined/null
+                        numValue = parseFloat(valueFromInput as any);
                       }
-                      formField.onChange(isNaN(numValue as number) ? undefined : numValue);
+                      formField.onChange(isNaN(numValue as number) ? 0 : numValue);
                     }}
                     placeholder={t("ProductsFormSection.unit_price.placeholder")}
                     disabled={isLoading}

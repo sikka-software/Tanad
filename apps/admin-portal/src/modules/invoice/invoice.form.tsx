@@ -2,8 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createInsertSchema } from "drizzle-zod";
 import { useTranslations, useLocale } from "next-intl";
 import { Client } from "pg";
-import { useState, useEffect } from "react";
-import { useForm, useFieldArray, FieldError } from "react-hook-form";
+import { useState, useEffect, useCallback } from "react";
+import { useForm, useFieldArray, FieldError, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -152,23 +152,39 @@ export function InvoiceForm({
     name: "items",
   });
 
-  // Add this new function to calculate subtotal
-  const calculateSubtotal = (items: InvoiceFormValues["items"]) => {
+  const watchedItems = useWatch({
+    control: form.control,
+    name: "items",
+    defaultValue: form.getValues("items"),
+  });
+
+  const calculateSubtotal = useCallback((items: InvoiceFormValues["items"]) => {
+    console.log("DEBUG: calculateSubtotal called with items:", items);
     return items.reduce((sum, item) => {
       const quantity = item.quantity || 0;
       const price = item.unit_price || 0;
-      return sum + quantity * price;
+      // Ensure quantity and price are treated as numbers
+      const numericQuantity = Number(quantity);
+      const numericPrice = Number(price);
+      if (isNaN(numericQuantity) || isNaN(numericPrice)) {
+        console.warn("DEBUG: NaN detected in item calculation", item);
+        return sum;
+      }
+      return sum + numericQuantity * numericPrice;
     }, 0);
-  };
-
-  // Watch items and tax_rate for changes to update totals
-  const watchedItems = form.watch("items");
-  const watchedTaxRate = form.watch("tax_rate");
+  }, []);
 
   useEffect(() => {
-    const subtotal = calculateSubtotal(watchedItems);
-    form.setValue("subtotal", subtotal);
-  }, [watchedItems, form]);
+    console.log("DEBUG: Subtotal useEffect triggered. watchedItems from useWatch:", JSON.stringify(watchedItems));
+    // Ensure watchedItems is an array before trying to calculate
+    const itemsToCalculate = Array.isArray(watchedItems) ? watchedItems : [];
+    const newSubtotal = calculateSubtotal(itemsToCalculate);
+    console.log("DEBUG: Subtotal useEffect - calculated newSubtotal:", newSubtotal);
+    form.setValue("subtotal", newSubtotal, { shouldValidate: true, shouldDirty: true });
+    console.log("DEBUG: Subtotal useEffect - form.getValues().subtotal after setValue:", form.getValues().subtotal);
+    // It's often useful to log the entire form state here to see if other parts are as expected
+    // console.log("DEBUG: Subtotal useEffect - form.getValues() after subtotal update:", form.getValues());
+  }, [watchedItems, calculateSubtotal, form.setValue]); // Dependencies: watchedItems, and stable calculateSubtotal, form.setValue
 
   const handleProductSelection = (index: number, product_id: string) => {
     const selectedProduct = products?.find((product) => product.id === product_id);
@@ -272,8 +288,8 @@ export function InvoiceForm({
           id={formHtmlId || "invoice-form"}
           onSubmit={(e) => {
             e.preventDefault();
-            console.log("e is ", form.getValues());
-            // form.handleSubmit(handleSubmit)(e)
+            console.log("DEBUG: form.getValues() before handleSubmit", form.getValues());
+            form.handleSubmit(handleSubmit)(e);
           }}
         >
           <input hidden type="text" value={user?.id} {...form.register("user_id")} />
