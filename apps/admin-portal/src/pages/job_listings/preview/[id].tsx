@@ -126,20 +126,18 @@ export default function JobListingPreviewPage({
 
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8">
-          <div className="flex flex-row">
-            <div>
-              <img
-                src={enterprise?.logo}
-                alt={enterprise?.name || ""}
-                className="w-8 object-cover object-center"
-              />
-              {/* <Image
-                src={enterprise?.logo || ""}
-                alt={enterprise?.name || ""}
-                width={100}
-                height={100}
-              /> */}
-            </div>
+          <div className="flex flex-row items-center gap-4">
+            {enterprise && (
+              <div>
+                <Image
+                  src={enterprise?.logo || ""}
+                  alt={enterprise?.name || ""}
+                  width={100}
+                  height={100}
+                  className="w-18 rounded-md object-cover object-center"
+                />
+              </div>
+            )}
             <div className="flex flex-col">
               <h1 className="text-foreground mb-2 text-3xl font-bold">{jobListing.title}</h1>
               {jobListing.description && (
@@ -302,7 +300,16 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
           enterpriseError.message,
         );
       } else if (enterpriseData) {
-        enterprise = enterpriseData;
+        let logoUrl = null;
+        if (enterpriseData.logo) {
+          const { data: signedData, error: signedError } = await supabase.storage
+            .from("enterprise-images")
+            .createSignedUrl(enterpriseData.logo, 60 * 60);
+          if (signedData?.signedUrl) {
+            logoUrl = signedData.signedUrl;
+          }
+        }
+        enterprise = { name: enterpriseData.name, logo: logoUrl || "" };
       }
     }
 
