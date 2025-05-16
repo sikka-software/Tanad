@@ -1,9 +1,11 @@
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import CurrencyCell from "@/components/tables/currency-cell";
-import SelectCell from "@/components/tables/select-cell";
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
+
+import CurrencyCell from "@/tables/currency-cell";
+import SelectCell from "@/tables/select-cell";
+import TimestampCell from "@/tables/timestamp-cell";
 
 import { Purchase, PurchaseStatus } from "@/purchase/purchase.type";
 
@@ -41,6 +43,24 @@ const usePurchaseColumns = (
       accessorKey: "due_date",
       header: t("Purchases.form.due_date.label"),
       validationSchema: z.string().nullable(),
+    },
+
+    {
+      accessorKey: "created_at",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      enableEditing: false,
+
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "status",

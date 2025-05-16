@@ -13,6 +13,8 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { createModuleStoreHooks } from "@/utils/module-hooks";
+
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
@@ -28,43 +30,47 @@ import useProductStore from "@/product/product.store";
 import ProductsTable from "@/product/product.table";
 import { ProductUpdateData } from "@/product/product.type";
 
-import useUserStore from "@/stores/use-user-store";
-
 export default function ProductsPage() {
   const t = useTranslations();
   const router = useRouter();
 
   const columns = useProductColumns();
 
-  const canReadProducts = useUserStore((state) => state.hasPermission("products.read"));
-  const canCreateProducts = useUserStore((state) => state.hasPermission("products.create"));
+  const moduleHooks = createModuleStoreHooks(useProductStore, "products");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableProduct, setActionableProduct] = useState<ProductUpdateData | null>(null);
   const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
-  const loadingSaveProduct = useProductStore((state) => state.isLoading);
-  const setLoadingSaveProduct = useProductStore((state) => state.setIsLoading);
-
-  const isDeleteDialogOpen = useProductStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useProductStore((state) => state.setIsDeleteDialogOpen);
-
-  const selectedRows = useProductStore((state) => state.selectedRows);
-  const setSelectedRows = useProductStore((state) => state.setSelectedRows);
-
-  const columnVisibility = useProductStore((state) => state.columnVisibility);
-  const setColumnVisibility = useProductStore((state) => state.setColumnVisibility);
-
-  const viewMode = useProductStore((state) => state.viewMode);
-  const clearSelection = useProductStore((state) => state.clearSelection);
-  const sortRules = useProductStore((state) => state.sortRules);
-  const sortCaseSensitive = useProductStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useProductStore((state) => state.sortNullsFirst);
-  const searchQuery = useProductStore((state) => state.searchQuery);
-  const filterConditions = useProductStore((state) => state.filterConditions);
-  const filterCaseSensitive = useProductStore((state) => state.filterCaseSensitive);
-  const getFilteredProducts = useProductStore((state) => state.getFilteredData);
-  const getSortedProducts = useProductStore((state) => state.getSortedData);
+  // Permissions
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
+  // Loading
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+  // Delete Dialog
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+  // Selected Rows
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+  const clearSelection = moduleHooks.useClearSelection();
+  // Column Visibility
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+  // Sorting
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const setSortRules = moduleHooks.useSetSortRules();
+  // Filtering
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
+  // Misc
+  const searchQuery = moduleHooks.useSearchQuery();
+  const viewMode = moduleHooks.useViewMode();
 
   const { data: products, isLoading, error } = useProducts();
   const { mutateAsync: deleteProducts, isPending: isDeleting } = useBulkDeleteProducts();
@@ -115,14 +121,31 @@ export default function ProductsPage() {
   }, [products, setData]);
 
   const filteredProducts = useMemo(() => {
-    return getFilteredProducts(storeData);
-  }, [storeData, getFilteredProducts, searchQuery, filterConditions, filterCaseSensitive]);
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedProducts = useMemo(() => {
-    return getSortedProducts(filteredProducts);
+    return getSortedData(filteredProducts);
   }, [filteredProducts, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  if (!canReadProducts) {
+  const tanstackSorting = useMemo(
+    () => sortRules.map((rule) => ({ id: rule.field, desc: rule.direction === "desc" })),
+    [sortRules],
+  );
+  const handleTanstackSortingChange = (
+    updater:
+      | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
+      | { id: string; desc: boolean }[],
+  ) => {
+    let nextSorting = typeof updater === "function" ? updater(tanstackSorting) : updater;
+    const newSortRules = nextSorting.map((s: { id: string; desc: boolean }) => ({
+      field: s.id,
+      direction: (s.desc ? "desc" : "asc") as "asc" | "desc",
+    }));
+    setSortRules(newSortRules);
+  };
+
+  if (!canRead) {
     return <NoPermission />;
   }
 
@@ -150,7 +173,7 @@ export default function ProductsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Products.title")}
-            onAddClick={canCreateProducts ? () => router.push(router.pathname + "/add") : undefined}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Products.add")}
             searchPlaceholder={t("Pages.Products.search")}
             hideOptions={products?.length === 0}
@@ -170,6 +193,8 @@ export default function ProductsPage() {
               isLoading={isLoading}
               error={error}
               onActionClicked={onActionClicked}
+              sorting={tanstackSorting}
+              onSortingChange={handleTanstackSortingChange}
             />
           ) : (
             <div className="p-4">
@@ -198,14 +223,14 @@ export default function ProductsPage() {
           onOpenChange={setIsFormDialogOpen}
           title={actionableProduct ? t("Pages.Products.edit") : t("Pages.Products.add")}
           formId="product-form"
-          loadingSave={loadingSaveProduct}
+          loadingSave={loadingSave}
         >
           <ProductForm
             formHtmlId={"product-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableProduct(null);
-              setLoadingSaveProduct(false);
+              setLoadingSave(false);
             }}
             defaultValues={actionableProduct}
             editMode={true}

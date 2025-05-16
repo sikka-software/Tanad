@@ -1,15 +1,17 @@
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import SelectCell from "@/components/tables/select-cell";
-import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { MoneyFormatter } from "@/ui/inputs/currency-input";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
+
+import SelectCell from "@/tables/select-cell";
+import TimestampCell from "@/tables/timestamp-cell";
 
 import { getCurrencySymbol } from "@/lib/currency-utils";
 
-import useUserStore from "@/stores/use-user-store";
+import { Expense } from "@/expense/expense.type";
 
-import { Expense } from "./expense.type";
+import useUserStore from "@/stores/use-user-store";
 
 const useExpenseColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
@@ -53,6 +55,23 @@ const useExpenseColumns = (
       validationSchema: z.string().min(1, t("Expenses.form.category.required")),
     },
 
+    {
+      accessorKey: "created_at",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      enableEditing: false,
+
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
     {
       accessorKey: "status",
       header: t("Expenses.form.status.label"),

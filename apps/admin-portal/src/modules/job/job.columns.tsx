@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import SelectCell from "@/components/tables/select-cell";
 import StatusCell from "@/components/tables/status-cell";
+import TimestampCell from "@/components/tables/timestamp-cell";
 import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
@@ -100,6 +101,24 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
       accessorKey: "end_date",
       header: t("Jobs.form.end_date.label"),
       validationSchema: z.string().min(1, t("Jobs.form.end_date.required")),
+    },
+
+    {
+      accessorKey: "created_at",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      enableEditing: false,
+
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "status",

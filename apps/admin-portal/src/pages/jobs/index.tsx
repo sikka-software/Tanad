@@ -53,13 +53,14 @@ export default function JobsPage() {
 
   const selectedRows = moduleHooks.useSelectedRows();
   const setSelectedRows = moduleHooks.useSetSelectedRows();
+  const clearSelection = moduleHooks.useClearSelection();
 
   const columnVisibility = moduleHooks.useColumnVisibility();
   const setColumnVisibility = moduleHooks.useSetColumnVisibility();
 
   const viewMode = moduleHooks.useViewMode();
-  const clearSelection = moduleHooks.useClearSelection();
   const sortRules = moduleHooks.useSortRules();
+  const setSortRules = moduleHooks.useSetSortRules();
   const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
   const sortNullsFirst = moduleHooks.useSortNullsFirst();
   const searchQuery = moduleHooks.useSearchQuery();
@@ -103,9 +104,27 @@ export default function JobsPage() {
     return getSortedData(filteredData);
   }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
 
+  const tanstackSorting = useMemo(
+    () => sortRules.map((rule) => ({ id: rule.field, desc: rule.direction === "desc" })),
+    [sortRules],
+  );
+  const handleTanstackSortingChange = (
+    updater:
+      | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
+      | { id: string; desc: boolean }[],
+  ) => {
+    let nextSorting = typeof updater === "function" ? updater(tanstackSorting) : updater;
+    const newSortRules = nextSorting.map((s: { id: string; desc: boolean }) => ({
+      field: s.id,
+      direction: (s.desc ? "desc" : "asc") as "asc" | "desc",
+    }));
+    setSortRules(newSortRules);
+  };
+
   if (!canRead) {
     return <NoPermission />;
   }
+
   return (
     <div>
       <CustomPageMeta title={t("Pages.Jobs.title")} description={t("Pages.Jobs.description")} />
@@ -147,6 +166,8 @@ export default function JobsPage() {
               isLoading={loadingFetchJobs}
               error={error}
               onActionClicked={onActionClicked}
+              sorting={tanstackSorting}
+              onSortingChange={handleTanstackSortingChange}
             />
           ) : (
             <div className="p-4">

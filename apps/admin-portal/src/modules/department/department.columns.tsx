@@ -10,16 +10,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/ui/dropdown-menu";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import TimestampCell from "@/tables/timestamp-cell";
 
-import useUserStore from "@/stores/use-user-store";
+import { useOffices } from "@/office/office.hooks";
 
-import { useBranches } from "../branch/branch.hooks";
-import { useOffices } from "../office/office.hooks";
-import { useWarehouses } from "../warehouse/warehouse.hooks";
-import { useUpdateDepartment } from "./department.hooks";
-import { Department } from "./department.type";
+import { useBranches } from "@/branch/branch.hooks";
+
+import { useUpdateDepartment } from "@/department/department.hooks";
+import { Department } from "@/department/department.type";
+
+import { useWarehouses } from "@/warehouse/warehouse.hooks";
 
 const useDepartmentColumns = () => {
   const t = useTranslations();
@@ -103,17 +105,23 @@ const useDepartmentColumns = () => {
         }
       },
     },
+
     {
       accessorKey: "created_at",
-      header: t("Departments.form.created_at.label"),
-      validationSchema: z.string().min(1, t("Departments.form.created_at.required")),
-      className: "min-w-[180px]",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "updated_at",
-      header: t("Departments.form.updated_at.label"),
-      validationSchema: z.string().min(1, t("Departments.form.updated_at.required")),
-      className: "min-w-[180px]",
+      enableEditing: false,
+
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
   ];
 

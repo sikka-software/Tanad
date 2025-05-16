@@ -1,11 +1,15 @@
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
+import StatusCell from "@/components/tables/status-cell";
+import TimestampCell from "@/components/tables/timestamp-cell";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { Vendor } from "./vendor.type";
 
-const useVendorColumns = () => {
+const useVendorColumns = (
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
 
   const columns: ExtendedColumnDef<Vendor>[] = [
@@ -51,6 +55,44 @@ const useVendorColumns = () => {
       accessorKey: "products",
       header: t("Vendors.form.products.label"),
       validationSchema: z.string().optional(),
+    },
+    {
+      accessorKey: "created_at",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      enableEditing: false,
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "status",
+      maxSize: 80,
+      header: t("CommonStatus.label"),
+      validationSchema: z.enum(["active", "inactive"]),
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
 

@@ -1,16 +1,18 @@
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import CodeCell from "@/components/tables/code-cell";
-import SelectCell from "@/components/tables/select-cell";
-import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { MoneyFormatter } from "@/ui/inputs/currency-input";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
+
+import CodeCell from "@/tables/code-cell";
+import SelectCell from "@/tables/select-cell";
+import TimestampCell from "@/tables/timestamp-cell";
 
 import { getCurrencySymbol } from "@/lib/currency-utils";
 
 import { Invoice } from "@/invoice/invoice.type";
+import { InvoiceStatus } from "@/invoice/invoice.type";
 
-import { InvoiceStatus } from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
 const useInvoiceColumns = (
@@ -94,6 +96,24 @@ const useInvoiceColumns = (
           </span>
         );
       },
+    },
+
+    {
+      accessorKey: "created_at",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      enableEditing: false,
+
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     //status
     {

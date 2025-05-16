@@ -3,10 +3,12 @@ import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import SelectCell from "@/components/tables/select-cell";
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { Quote, QuoteStatus } from "./quote.type";
+import SelectCell from "@/tables/select-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { Quote, QuoteStatus } from "@/quote/quote.type";
 
 const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string) => void) => {
   const t = useTranslations();
@@ -56,6 +58,24 @@ const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string)
       header: t("Quotes.form.tax_rate.label"),
       validationSchema: z.number().min(0, t("Quotes.form.tax_rate.required")),
       cell: (props: CellContext<Quote, unknown>) => `${props.row.original.tax_rate || 0}%`,
+    },
+
+    {
+      accessorKey: "created_at",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      enableEditing: false,
+
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "status",

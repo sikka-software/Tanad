@@ -4,7 +4,10 @@ import { z } from "zod";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import CurrencyCell from "@/components/tables/currency-cell";
+import StatusCell from "@/components/tables/status-cell";
+
+import CurrencyCell from "@/tables/currency-cell";
+import TimestampCell from "@/tables/timestamp-cell";
 
 import { useEmployees } from "@/employee/employee.hooks";
 
@@ -13,7 +16,9 @@ import { Salary } from "@/salary/salary.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-const useSalaryColumns = () => {
+const useSalaryColumns = (
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
   const currency = useUserStore((state) => state.profile?.user_settings?.currency);
 
@@ -71,6 +76,45 @@ const useSalaryColumns = () => {
       accessorKey: "payment_date",
       header: t("Salaries.form.payment_date.label"),
       cell: ({ getValue }) => getValue() as string,
+    },
+
+    {
+      accessorKey: "created_at",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      enableEditing: false,
+
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "status",
+      maxSize: 80,
+      header: t("Domains.form.status.label"),
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("Domains.form.status.active"), value: "active" },
+              { label: t("Domains.form.status.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
   return columns;

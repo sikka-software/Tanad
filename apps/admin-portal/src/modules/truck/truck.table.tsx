@@ -25,7 +25,8 @@ const TrucksTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
     await updateTruck({ id: rowId, data: { [columnId]: value } });
   };
-  const columns = useTruckColumns();
+
+  const columns = useTruckColumns(handleEdit);
 
   const selectedRows = useTruckStore((state) => state.selectedRows);
   const setSelectedRows = useTruckStore((state) => state.setSelectedRows);

@@ -1,13 +1,16 @@
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
-import SelectCell from "@/components/tables/select-cell";
-import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
-import { useJobs } from "../job/job.hooks";
-import { Employee, EmployeeStatus } from "./employee.types";
+import SelectCell from "@/tables/select-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { useJobs } from "@/job/job.hooks";
+
+import { Employee, EmployeeStatus } from "@/employee/employee.types";
 
 const useCompanyColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
@@ -113,6 +116,24 @@ const useCompanyColumns = (
       header: t("Employees.form.nationality.label"),
       maxSize: 100,
       validationSchema: z.string().min(1, t("Employees.form.nationality.required")),
+    },
+
+    {
+      accessorKey: "created_at",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      enableEditing: false,
+
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
 
     {

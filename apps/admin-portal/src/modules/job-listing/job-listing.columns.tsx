@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { z } from "zod";
 
 import StatusCell from "@/components/tables/status-cell";
+import TimestampCell from "@/components/tables/timestamp-cell";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { JobListingWithJobs } from "./job-listing.type";
@@ -33,6 +34,24 @@ const useCompanyColumns = (
       header: t("JobListings.jobs_count.label", { defaultMessage: "Jobs" }),
       enableEditing: false,
       cell: ({ row }) => row.original.jobs_count,
+    },
+
+    {
+      accessorKey: "created_at",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      enableEditing: false,
+
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "status",

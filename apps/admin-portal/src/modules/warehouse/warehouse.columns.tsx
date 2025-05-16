@@ -4,8 +4,9 @@ import { z } from "zod";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import CodeCell from "@/components/tables/code-cell";
-import StatusCell from "@/components/tables/status-cell";
+import CodeCell from "@/tables/code-cell";
+import StatusCell from "@/tables/status-cell";
+import TimestampCell from "@/tables/timestamp-cell";
 
 import { useEmployees } from "@/employee/employee.hooks";
 
@@ -122,6 +123,23 @@ const useWarehouseColumns = (
       validationSchema: z.string().min(1, t("Forms.zip_code.required")),
     },
 
+    {
+      accessorKey: "created_at",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      enableEditing: false,
+
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
     {
       accessorKey: "status",
       maxSize: 80,

@@ -3,15 +3,15 @@ import { z } from "zod";
 
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import CurrencyCell from "@/components/tables/currency-cell";
-import SelectCell from "@/components/tables/select-cell";
-import StatusCell from "@/components/tables/status-cell";
+import CurrencyCell from "@/tables/currency-cell";
+import SelectCell from "@/tables/select-cell";
+import StatusCell from "@/tables/status-cell";
+import TimestampCell from "@/tables/timestamp-cell";
 
 import { SERVER_OS, SERVER_PROVIDERS } from "@/lib/constants";
 
+import { Server } from "@/server/server.type";
 import useUserStore from "@/stores/use-user-store";
-
-import { Server } from "./server.type";
 
 const useServerColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
@@ -87,6 +87,24 @@ const useServerColumns = (
       ),
     },
     { accessorKey: "tags", header: t("Servers.form.tags.label") },
+
+    {
+      accessorKey: "created_at",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      enableEditing: false,
+
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
     {
       accessorKey: "status",
       maxSize: 80,

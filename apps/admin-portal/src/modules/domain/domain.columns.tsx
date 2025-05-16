@@ -8,10 +8,10 @@ import { ExtendedColumnDef } from "@/ui/sheet-table";
 import CurrencyCell from "@/tables/currency-cell";
 import SelectCell from "@/tables/select-cell";
 import StatusCell from "@/tables/status-cell";
+import TimestampCell from "@/tables/timestamp-cell";
 
+import { Domain } from "@/domain/domain.type";
 import useUserStore from "@/stores/use-user-store";
-
-import { Domain } from "./domain.type";
 
 const useDomainColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
@@ -65,6 +65,24 @@ const useDomainColumns = (
       ),
       header: t("PaymentCycles.label"),
       validationSchema: z.string().min(1, "Required"),
+    },
+
+    {
+      accessorKey: "created_at",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      enableEditing: false,
+
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "status",

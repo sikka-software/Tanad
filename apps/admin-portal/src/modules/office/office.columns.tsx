@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
@@ -6,6 +7,7 @@ import { ExtendedColumnDef } from "@/ui/sheet-table";
 
 import CodeCell from "@/components/tables/code-cell";
 import StatusCell from "@/components/tables/status-cell";
+import TimestampCell from "@/components/tables/timestamp-cell";
 
 import { Office } from "@/office/office.type";
 
@@ -115,15 +117,23 @@ const useOfficeColumns = (
       header: t("Offices.form.area.label"),
       validationSchema: z.string().min(1, t("Offices.form.area.required")),
     },
+
     {
       accessorKey: "created_at",
+      enableEditing: false,
       header: t("Forms.created_at.label"),
       validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "updated_at",
+      enableEditing: false,
+
       header: t("Forms.updated_at.label"),
       validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
 
     {

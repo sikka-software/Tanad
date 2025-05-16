@@ -25,7 +25,7 @@ const VendorsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
     await updateVendor({ id: rowId, data: { [columnId]: value } });
   };
-  const columns = useVendorColumns();
+  const columns = useVendorColumns(handleEdit);
 
   const selectedRows = useVendorStore((state) => state.selectedRows);
   const setSelectedRows = useVendorStore((state) => state.setSelectedRows);

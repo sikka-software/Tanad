@@ -1,10 +1,12 @@
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import StatusCell from "@/components/tables/status-cell";
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { Client } from "./client.type";
+import StatusCell from "@/tables/status-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { Client } from "@/client/client.type";
 
 const useCompanyColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
@@ -52,6 +54,24 @@ const useCompanyColumns = (
       accessorKey: "region",
       header: t("Forms.region.label"),
       validationSchema: z.string().min(1, t("Forms.region.required")),
+    },
+
+    {
+      accessorKey: "created_at",
+      enableEditing: false,
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      enableEditing: false,
+
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
 
     {

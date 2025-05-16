@@ -1,10 +1,11 @@
 import { SquareArrowOutUpRight } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
 import IconButton from "@/ui/icon-button";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
 import StatusCell from "@/tables/status-cell";
+import TimestampCell from "@/tables/timestamp-cell";
 
 import { Website } from "@/website/website.type";
 
@@ -12,7 +13,6 @@ const useWebsiteColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
-  const locale = useLocale();
 
   const columns: ExtendedColumnDef<Website>[] = [
     {
@@ -28,23 +28,22 @@ const useWebsiteColumns = (
         />
       ),
     },
+
     {
       accessorKey: "created_at",
-      header: t("Websites.form.created_at.label"),
       enableEditing: false,
-      cell: ({ row }) => {
-        const date = row.original.created_at;
-        return date ? new Date(date).toLocaleDateString(locale) : "-";
-      },
+
+      header: t("Forms.created_at.label"),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "updated_at",
-      header: t("Websites.form.updated_at.label"),
       enableEditing: false,
-      cell: ({ row }) => {
-        const date = row.original.updated_at;
-        return date ? new Date(date).toLocaleDateString(locale) : "-";
-      },
+
+      header: t("Forms.updated_at.label"),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "status",
