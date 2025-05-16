@@ -66,7 +66,7 @@ const JobListingJobsSelection = ({
       />
       <div
         className={cn(
-          "bg-background sticky  z-10 mx-auto border-b",
+          "bg-background sticky z-10 mx-auto border-b",
           editMode ? "top-[81px]" : "top-[129px]",
         )}
       >
@@ -82,13 +82,13 @@ const JobListingJobsSelection = ({
           </div>
         </div>
       </div>
-      <div className="form-container">
+      <div className="form-container @container/jobs-section max-w-full bg--300">
         <FormField
           control={form.control}
           name="jobs"
           render={() => (
             <FormItem>
-              <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-1 @min-[500px]/jobs-section:grid-cols-3 @min-[800px]/jobs-section:grid-cols-4">
                 {filteredJobs.length > 0 ? (
                   filteredJobs.map((job: Job) => (
                     <div
