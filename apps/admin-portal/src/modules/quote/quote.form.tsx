@@ -43,6 +43,8 @@ import {
 import { quotes } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
+import ClientCombobox from "../client/client.combobox";
+
 const createQuoteSchema = (t: (key: string) => string) => {
   const QuoteSelectSchema = createInsertSchema(quotes, {
     client_id: z.string().min(1, t("Quotes.validation.client_required")),
@@ -252,40 +254,14 @@ export function QuoteForm({
 
           <div className="form-container">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <FormField
+              <ClientCombobox
+                label={t("Quotes.form.client.label")}
                 control={form.control}
-                name="client_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Quotes.form.client.label")} *</FormLabel>
-                    <FormControl>
-                      <ComboboxAdd
-                        data={clients.map((client) => ({
-                          value: client.id,
-                          label: client.name,
-                          email: client.email,
-                        }))}
-                        isLoading={clientsLoading}
-                        defaultValue={field.value}
-                        onChange={(value) => field.onChange(value || null)}
-                        texts={{
-                          placeholder: t("Quotes.form.client.placeholder"),
-                          searchPlaceholder: t("Pages.Clients.search"),
-                          noItems: t("Pages.Clients.no_clients_found"),
-                        }}
-                        addText={t("Pages.Clients.add")}
-                        onAddClick={() => setIsDialogOpen(true)}
-                        renderOption={(option) => (
-                          <div className="flex flex-col">
-                            <span>{option.label}</span>
-                            <span className="text-muted-foreground text-xs">{option.email}</span>
-                          </div>
-                        )}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                clients={clients || []}
+                loadingCombobox={clientsLoading}
+                isClientSaving={isClientSaving}
+                isDialogOpen={isDialogOpen}
+                setIsDialogOpen={setIsDialogOpen}
               />
 
               <FormField

@@ -170,6 +170,10 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                     {...formField}
                     className="w-24"
                     disabled={isLoading}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      formField.onChange(value === "" ? undefined : Number(value));
+                    }}
                   />
                 </FormControl>
                 <FormMessage />

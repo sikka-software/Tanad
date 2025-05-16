@@ -318,24 +318,6 @@ export function ExpenseForm({
               )}
             />
           </div>
-
-          {/* <FormField
-          control={form.control}
-          name="client_id"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Expenses.form.client_id.label")} *</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder={t("Expenses.form.client_id.placeholder")}
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
         </div>
 
         <NotesSection

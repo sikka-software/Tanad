@@ -19,10 +19,23 @@ const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string)
       header: t("Quotes.form.quote_number.label"),
       validationSchema: z.string().min(1, t("Quotes.form.quote_number.required")),
     },
+    //client.name
     {
-      accessorKey: "client_id",
+      enableEditing: false,
+      accessorKey: "client.name",
+      id: "client.name",
       header: t("Quotes.form.client.label"),
-      cell: (props: CellContext<Quote, unknown>) => props.row.original.client?.company || "N/A",
+      cell: ({ row }) => {
+        const client = row.original.client;
+        if (!client) return "N/A";
+        // Display name and email if available
+        return (
+          <div>
+            <div className="text-sm font-medium">{client.name || "-"}</div>
+            {/* {client.email && <div className="text-muted-foreground text-xs">{client.email}</div>} */}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "issue_date",

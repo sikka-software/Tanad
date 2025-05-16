@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createInsertSchema } from "drizzle-zod";
 import { useTranslations, useLocale } from "next-intl";
+import { Client } from "pg";
 import { useState, useEffect } from "react";
 import { useForm, useFieldArray, FieldError } from "react-hook-form";
 import { toast } from "sonner";
@@ -33,6 +34,7 @@ import {
 } from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
+import ClientCombobox from "../client/client.combobox";
 import { useClients } from "../client/client.hooks";
 import useClientStore from "../client/client.store";
 import { useCreateInvoice, useUpdateInvoice } from "../invoice/invoice.hooks";
@@ -271,32 +273,16 @@ export function InvoiceForm({
           <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="form-fields-cols-2">
-              <FormField
+              <ClientCombobox
+                label={t("Invoices.form.client.label")}
                 control={form.control}
-                name="client_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Invoices.form.client.label")} *</FormLabel>
-                    <FormControl>
-                      <ComboboxAdd
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={clientOptions || []}
-                        isLoading={clientsLoading}
-                        defaultValue={field.value}
-                        onChange={(value) => field.onChange(value || null)}
-                        texts={{
-                          placeholder: t("Invoices.form.client.select_client"),
-                          searchPlaceholder: t("Pages.Clients.search"),
-                          noItems: t("Pages.Clients.no_clients_found"),
-                        }}
-                        addText={t("Pages.Clients.add")}
-                        onAddClick={() => setIsDialogOpen(true)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                clients={clients || []}
+                loadingCombobox={clientsLoading}
+                isClientSaving={isClientSaving}
+                isDialogOpen={isDialogOpen}
+                setIsDialogOpen={setIsDialogOpen}
               />
+
               <FormField
                 control={form.control}
                 name="invoice_number"
@@ -470,7 +456,7 @@ export function InvoiceForm({
         </form>
       </Form>
 
-      <FormDialog
+      {/* <FormDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         title={t("Pages.Clients.add")}
@@ -487,7 +473,7 @@ export function InvoiceForm({
             setIsClientSaving(false);
           }}
         />
-      </FormDialog>
+      </FormDialog> */}
       <FormDialog
         open={isNewProductDialogOpen}
         onOpenChange={setIsNewProductDialogOpen}
