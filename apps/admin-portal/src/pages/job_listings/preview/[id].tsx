@@ -1,5 +1,6 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useLocale, useTranslations } from "next-intl";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -30,7 +31,10 @@ type JobListingWithJobs = Omit<JobListing, "jobs"> & {
 
 interface JobListingPreviewProps {
   jobListing: JobListingWithJobs | null;
-  enterpriseName?: string | null; // Allow null for enterpriseName
+  enterprise?: {
+    name: string;
+    logo: string;
+  } | null; // Allow null for enterpriseName
   error?: string;
 }
 
@@ -56,7 +60,7 @@ const adaptJobForCard = (job: Job): any => ({
 export default function JobListingPreviewPage({
   jobListing,
   error,
-  enterpriseName, // Destructure enterpriseName
+  enterprise, // Destructure enterprise
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const t = useTranslations();
   const locale = useLocale();
@@ -116,23 +120,40 @@ export default function JobListingPreviewPage({
   return (
     <main className="bg-background min-h-screen">
       <CustomPageMeta
-        title={`${enterpriseName} | ${jobListing.title}`}
+        title={`${enterprise?.name} | ${jobListing.title}`}
         description={jobListing.description || t("JobListingPreview.meta_description_default")}
       />
 
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8">
-          <h1 className="text-foreground mb-2 text-3xl font-bold">{jobListing.title}</h1>
-          {jobListing.description && (
-            <p className="text-muted-foreground max-w-2xl">{jobListing.description}</p>
-          )}
-          <div className="flex items-center space-x-2 pt-2">
-            <Badge variant={jobListing.status === "active" ? "default" : "outline"}>
-              {jobListing.status === "active" ? t("Status.active") : t("Status.inactive")}
-            </Badge>
-            <Badge variant={jobListing.is_public ? "default" : "outline"}>
-              {jobListing.is_public ? t("Visibility.public") : t("Visibility.private")}
-            </Badge>
+          <div className="flex flex-row">
+            <div>
+              <img
+                src={enterprise?.logo}
+                alt={enterprise?.name || ""}
+                className="w-8 object-cover object-center"
+              />
+              {/* <Image
+                src={enterprise?.logo || ""}
+                alt={enterprise?.name || ""}
+                width={100}
+                height={100}
+              /> */}
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-foreground mb-2 text-3xl font-bold">{jobListing.title}</h1>
+              {jobListing.description && (
+                <p className="text-muted-foreground max-w-2xl">{jobListing.description}</p>
+              )}
+              <div className="flex items-center space-x-2 pt-2">
+                <Badge variant={jobListing.status === "active" ? "default" : "outline"}>
+                  {jobListing.status === "active" ? t("Status.active") : t("Status.inactive")}
+                </Badge>
+                <Badge variant={jobListing.is_public ? "default" : "outline"}>
+                  {jobListing.is_public ? t("Visibility.public") : t("Visibility.private")}
+                </Badge>
+              </div>
+            </div>
           </div>
         </header>
 
@@ -235,7 +256,10 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
     return { notFound: true };
   }
 
-  let enterpriseName: string | null = null;
+  let enterprise: {
+    name: string;
+    logo: string;
+  } | null = null;
 
   try {
     // Step 1: Fetch the job listing
@@ -267,7 +291,7 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
     if (jobListingData && jobListingData.enterprise_id) {
       const { data: enterpriseData, error: enterpriseError } = await supabase
         .from("enterprises")
-        .select("name")
+        .select("name, logo")
         .eq("id", jobListingData.enterprise_id)
         .single();
 
@@ -278,14 +302,14 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
           enterpriseError.message,
         );
       } else if (enterpriseData) {
-        enterpriseName = enterpriseData.name;
+        enterprise = enterpriseData;
       }
     }
 
     return {
       props: {
         jobListing: jobListingData as JobListingWithJobs,
-        enterpriseName,
+        enterprise,
         messages: (await import(`../../../../locales/${context.locale}.json`)).default,
       },
     };
@@ -294,7 +318,7 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
     return {
       props: {
         jobListing: null,
-        enterpriseName: null,
+        enterprise: null,
         error: error.message || "Failed to load job listing.",
         messages: (await import(`../../../../locales/${context.locale}.json`)).default,
       },

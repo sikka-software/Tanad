@@ -68,7 +68,7 @@ const DashboardStatsVertical = ({
             const card = (
               <Card key={categoryName} className="h-auto max-w-xs">
                 <CardHeader className="bg-muted rounded-t-md border-b p-2 sm:p-6">
-                  <CardTitle className="text-md font-semibold sm:text-2xl">
+                  <CardTitle className="text-md font-semibold select-none sm:text-2xl">
                     {t(`Pages.${categoryName.replace(/\s+/g, "_")}.title`) || categoryName}
                   </CardTitle>
                 </CardHeader>
@@ -133,7 +133,7 @@ const DashboardStatsVertical = ({
             return acc;
           }, [] as React.JSX.Element[][])
           .map((group, index) => (
-            <div key={index} className="grid h-fit gap-4">
+            <div key={index} className="grid h-fit gap-4 select-none">
               {group}
             </div>
           ))}

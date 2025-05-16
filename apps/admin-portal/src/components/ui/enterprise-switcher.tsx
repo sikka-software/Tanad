@@ -2,6 +2,7 @@
 
 import { Asterisk, Plus, Settings } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import Image from "next/image";
 import Link from "next/link";
 import * as React from "react";
 
@@ -49,10 +50,12 @@ export function EnterpriseSwitcher({
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground aspect-squre flex size-8 !max-w-8 min-w-8 items-center justify-center overflow-hidden rounded-lg p-0">
                 {enterprise?.logo ? (
-                  <img
+                  <Image
                     src={enterprise?.logo}
                     alt={enterprise?.name || ""}
                     className="w-8 object-cover object-center"
+                    width={100}
+                    height={100}
                   />
                 ) : (
                   <Asterisk className="size-4" />
