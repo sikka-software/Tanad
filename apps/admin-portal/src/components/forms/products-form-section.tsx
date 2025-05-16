@@ -87,11 +87,13 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
 
     // Memoize the mapped products data for the combobox
     const comboboxProductsData = useMemo(() => {
-      return productsData?.map((product) => ({
-        label: product.name,
-        value: product.id,
-        price: product.price,
-      })) || [];
+      return (
+        productsData?.map((product) => ({
+          label: product.name,
+          value: product.id,
+          price: product.price,
+        })) || []
+      );
     }, [productsData]);
 
     const subtotalNumber =
@@ -176,7 +178,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                     onChange={(e) => {
                       const rawValue = e.target.value;
                       if (rawValue === "") {
-                        formField.onChange(undefined); 
+                        formField.onChange(undefined);
                       } else {
                         const numValue = parseFloat(rawValue);
                         formField.onChange(isNaN(numValue) ? undefined : numValue);

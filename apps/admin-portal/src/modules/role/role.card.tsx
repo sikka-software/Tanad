@@ -119,7 +119,7 @@ export default function RoleCard({ role, onActionClick, disableActions = false }
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2 rounded-md bg-muted/20 border">
+        <div className="bg-muted/20 space-y-2 rounded-md border">
           <Accordion type="single" collapsible>
             <AccordionItem value="permissions">
               <AccordionTrigger className="bg-muted/50 hover:bg-muted cursor-pointer rounded-md p-2 text-sm font-medium no-underline hover:no-underline data-[state=open]:rounded-b-none">

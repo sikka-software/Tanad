@@ -18,6 +18,7 @@ import ProductsFormSection from "@/components/forms/products-form-section";
 import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 import CodeInput from "@/components/ui/inputs/code-input";
 import { Input } from "@/components/ui/inputs/input";
+import NumberInput from "@/components/ui/inputs/number-input";
 
 import { getNotesValue } from "@/lib/utils";
 
@@ -364,7 +365,13 @@ export function InvoiceForm({
                   <FormItem>
                     <FormLabel>{t("Invoices.form.tax_rate.label")} (%)</FormLabel>
                     <FormControl>
-                      <Input
+                      <NumberInput
+                        disabled={isLoading}
+                        placeholder={t("Forms.zip_code.placeholder")}
+                        {...field}
+                        value={field.value || ""} // Ensure controlled component
+                      />
+                      {/* <Input
                         type="number"
                         step="0.01"
                         min="0"
@@ -374,7 +381,7 @@ export function InvoiceForm({
                           const value = parseFloat(e.target.value);
                           field.onChange(isNaN(value) ? 0 : value);
                         }}
-                      />
+                      /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>
