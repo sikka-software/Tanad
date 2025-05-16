@@ -1,5 +1,5 @@
 ---
-description: 
+description: always proceed with changes and don't ask for permission
 globs: 
 alwaysApply: true
 ---

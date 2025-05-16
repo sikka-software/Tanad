@@ -24,8 +24,10 @@ import { useCreateJobListing, useUpdateJobListing } from "@/job-listing/job-list
 import {
   bulkAssociateJobsWithListing,
   updateListingJobAssociations,
+  fetchJobListingById,
 } from "@/job-listing/job-listing.service";
 import useJobListingsStore from "@/job-listing/job-listing.store";
+import useJobListingStore from "@/job-listing/job-listing.store";
 import { JobListingUpdateData, JobListingCreateData } from "@/job-listing/job-listing.type";
 
 import { job_listings, offices } from "@/db/schema";
@@ -161,7 +163,13 @@ export function JobListingForm({
           {
             onSuccess: async (updatedListing) => {
               try {
-                const updatedWithAssociations = await updateListingJobAssociations(defaultValues.id!, selectedJobIds);
+                await updateListingJobAssociations(defaultValues.id!, selectedJobIds);
+                const latest = await fetchJobListingById(defaultValues.id!);
+                const prev = useJobListingStore.getState().data || [];
+                const setData = useJobListingStore.getState().setData;
+                if (setData) {
+                  setData(prev.map((item: any) => (item.id === latest.id ? latest : item)));
+                }
                 if (onSuccess) {
                   onSuccess();
                 }
