@@ -3805,14 +3805,6 @@
       "label": "الوصف",
       "placeholder": "أدخل الوصف"
     },
-    "created_at": {
-      "label": "تاريخ الإنشاء",
-      "placeholder": "أدخل تاريخ الإنشاء"
-    },
-    "updated_at": {
-      "label": "تاريخ التحديث",
-      "placeholder": "أدخل تاريخ التحديث"
-    },
     "name": {
       "label": "الاسم",
       "placeholder": "أدخل اسم الشركة"
@@ -4097,6 +4089,16 @@
       "yemen": "اليمن",
       "zambia": "زامبيا",
       "zimbabwe": "زيمبابوي"
+    }
+  },
+  "Metadata": {
+    "created_at": {
+      "label": "تاريخ الإنشاء",
+      "placeholder": "أدخل تاريخ الإنشاء"
+    },
+    "updated_at": {
+      "label": "تاريخ التحديث",
+      "placeholder": "أدخل تاريخ التحديث"
     }
   },
   "Vehicles": {

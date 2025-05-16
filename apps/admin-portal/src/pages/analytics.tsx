@@ -320,7 +320,7 @@ export default function Analytics() {
   );
 }
 
-Analytics.messages = ["Pages", "General", "Analytics"];
+Analytics.messages = ["Metadata","Pages", "General", "Analytics"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

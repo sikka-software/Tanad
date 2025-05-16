@@ -234,7 +234,7 @@ export default function CarsPage() {
   );
 }
 
-CarsPage.messages = ["Pages", "Cars", "Vehicles", "Notes", "Forms", "General"];
+CarsPage.messages = ["Metadata", "Pages", "Cars", "Vehicles", "Notes", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

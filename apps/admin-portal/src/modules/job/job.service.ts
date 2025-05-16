@@ -69,33 +69,3 @@ export async function duplicateJob(id: string): Promise<Job> {
   }
   return response.json();
 }
-
-export async function deleteJob(id: string): Promise<void> {
-  try {
-    const response = await fetch(`/api/resource/jobs/${id}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to delete job with id ${id}`);
-    }
-  } catch (error) {
-    console.error(`Error deleting job ${id}:`, error);
-    throw new Error(`Failed to delete job with id ${id}`);
-  }
-}
-
-export async function bulkDeleteJobs(ids: string[]): Promise<void> {
-  try {
-    const response = await fetch("/api/resource/jobs", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids }),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to delete jobs");
-    }
-  } catch (error) {
-    console.error("Error deleting jobs:", error);
-    throw new Error("Failed to delete jobs");
-  }
-}

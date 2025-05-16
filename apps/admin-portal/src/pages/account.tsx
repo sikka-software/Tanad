@@ -299,7 +299,7 @@ export default function Account() {
   // );
 }
 
-Account.messages = ["Pages", "Profile", "General"];
+Account.messages = ["Metadata","Pages", "Profile", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

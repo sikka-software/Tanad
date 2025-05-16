@@ -323,7 +323,7 @@ export default function PricingPage() {
   );
 }
 
-PricingPage.messages = ["Pages", "General", "Pricing"];
+PricingPage.messages = ["Metadata","Pages", "General", "Pricing"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   const billingCurrencies = ["sar", "usd"];

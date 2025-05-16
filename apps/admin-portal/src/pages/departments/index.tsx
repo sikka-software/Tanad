@@ -237,7 +237,7 @@ export default function DepartmentsPage() {
   );
 }
 
-DepartmentsPage.messages = ["Notes", "Pages", "Departments", "General", "CommonStatus"];
+DepartmentsPage.messages = ["Metadata","Notes", "Pages", "Departments", "General", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

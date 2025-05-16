@@ -68,29 +68,3 @@ export async function duplicateDomain(id: string): Promise<Domain> {
 
   return response.json();
 }
-
-export async function deleteDomain(id: string): Promise<void> {
-  const response = await fetch(`/api/resource/domains/${id}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to delete domain with id ${id}`);
-  }
-}
-
-export async function bulkDeleteDomains(ids: string[]): Promise<void> {
-  try {
-    const response = await fetch("/api/resource/domains", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids }),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to delete domains");
-    }
-  } catch (error) {
-    console.error("Error deleting domains:", error);
-    throw new Error("Failed to delete domains");
-  }
-}

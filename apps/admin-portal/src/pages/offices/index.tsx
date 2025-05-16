@@ -239,7 +239,7 @@ export default function OfficesPage() {
   );
 }
 
-OfficesPage.messages = [
+OfficesPage.messages = ["Metadata",
   "Offices",
   "Pages",
   "Employees",

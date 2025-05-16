@@ -58,8 +58,8 @@ const useProductColumns = () => {
     {
       accessorKey: "created_at",
       enableEditing: false,
-      header: t("Forms.created_at.label"),
-      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -67,8 +67,8 @@ const useProductColumns = () => {
       accessorKey: "updated_at",
       enableEditing: false,
 
-      header: t("Forms.updated_at.label"),
-      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },

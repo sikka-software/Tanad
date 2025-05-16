@@ -73,7 +73,6 @@ export function useUpdateInvoice() {
 
 export function useDeleteInvoice() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: deleteInvoice,
     onSuccess: (_, variables) => {

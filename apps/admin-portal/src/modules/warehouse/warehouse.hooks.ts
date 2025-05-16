@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createWarehouse,
-  deleteWarehouse,
   fetchWarehouseById,
   fetchWarehouses,
   updateWarehouse,
   duplicateWarehouse,
-  bulkDeleteWarehouses,
 } from "@/warehouse/warehouse.service";
 import type {
   Warehouse,
@@ -141,7 +141,7 @@ export function useDeleteWarehouse() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteWarehouse(id),
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/warehouses/${id}`),
     onSuccess: (_, variables) => {
       // Invalidate the list and remove the specific detail query from cache
       queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
@@ -154,7 +154,7 @@ export function useDeleteWarehouse() {
 export function useBulkDeleteWarehouses() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (ids: string[]) => bulkDeleteWarehouses(ids),
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/warehouses", ids),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
     },

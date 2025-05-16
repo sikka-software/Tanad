@@ -1,17 +1,14 @@
 import { useMutation, useQuery, useQueryClient, UseQueryResult } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
-import { departmentKeys } from "@/department/department.hooks";
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
 
 import {
   createEmployee,
-  deleteEmployee,
   duplicateEmployee,
   fetchEmployeeById,
   fetchEmployees,
   updateEmployee,
-  bulkDeleteEmployees,
 } from "@/employee/employee.service";
 import { Employee, EmployeeCreateData, EmployeeUpdateData } from "@/employee/employee.types";
 
@@ -24,25 +21,25 @@ export const employeeKeys = {
 };
 
 // Hook for fetching all employees
-export const useEmployees = (): UseQueryResult<Employee[]> => {
+export function useEmployees(): UseQueryResult<Employee[]> {
   return useQuery({
     queryKey: employeeKeys.lists(),
     queryFn: fetchEmployees,
     staleTime: 10000, // Consider data fresh for 10 seconds
   });
-};
+}
 
 // Hook for fetching a single employee by ID
-export const useEmployee = (id: string) => {
+export function useEmployee(id: string) {
   return useQuery({
     queryKey: employeeKeys.detail(id),
     queryFn: () => fetchEmployeeById(id),
     enabled: !!id,
   });
-};
+}
 
 // Hook for adding a new employee
-export const useCreateEmployee = () => {
+export function useCreateEmployee() {
   const t = useTranslations();
   const queryClient = useQueryClient();
   return useMutation({
@@ -56,18 +53,18 @@ export const useCreateEmployee = () => {
       queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
     },
   });
-};
+}
 
 // Hook for duplicating an employee
-export const useDuplicateEmployee = () => {
+export function useDuplicateEmployee() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => duplicateEmployee(id),
   });
-};
+}
 
 // Hook for updating an employee with optimistic updates
-export const useUpdateEmployee = () => {
+export function useUpdateEmployee() {
   const queryClient = useQueryClient();
   const t = useTranslations();
 
@@ -124,14 +121,14 @@ export const useUpdateEmployee = () => {
       }
     },
   });
-};
+}
 
 // Hook for deleting an employee
-export const useDeleteEmployee = () => {
+export function useDeleteEmployee() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteEmployee(id),
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/employees/${id}`),
     onMutate: async (id) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: employeeKeys.lists() });
@@ -158,12 +155,12 @@ export const useDeleteEmployee = () => {
       queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
     },
   });
-};
+}
 
 export function useBulkDeleteEmployees() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteEmployees,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/employees", ids),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
     },

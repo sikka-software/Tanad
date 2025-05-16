@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createServer,
-  deleteServer,
   fetchServerById,
   fetchServers,
   updateServer,
-  bulkDeleteServers,
   duplicateServer,
 } from "@/modules/server/server.service";
 import type { ServerCreateData, ServerUpdateData } from "@/modules/server/server.type";
@@ -87,7 +87,7 @@ export function useDuplicateServer() {
 export function useDeleteServer() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => deleteServer(id),
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/servers/${id}`),
     onSuccess: (_, variables) => {
       // Invalidate the list and remove the specific detail query from cache
       queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
@@ -101,7 +101,7 @@ export function useDeleteServer() {
 export function useBulkDeleteServers() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteServers,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/servers", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: serverKeys.lists() }),
     meta: { toast: { success: "Servers.success.delete", error: "Servers.error.delete" } },
   });

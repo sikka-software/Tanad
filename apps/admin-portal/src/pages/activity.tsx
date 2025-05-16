@@ -74,7 +74,7 @@ const ActivityPage = () => {
 
 export default ActivityPage;
 
-ActivityPage.messages = ["Pages", "General", "ActivityLogs"];
+ActivityPage.messages = ["Metadata","Pages", "General", "ActivityLogs"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

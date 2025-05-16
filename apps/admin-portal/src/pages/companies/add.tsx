@@ -46,7 +46,7 @@ export default function AddCompanyPage() {
   );
 }
 
-AddCompanyPage.messages = ["Notes", "Pages", "General", "Companies", "Forms"];
+AddCompanyPage.messages = ["Metadata","Notes", "Pages", "General", "Companies", "Forms"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

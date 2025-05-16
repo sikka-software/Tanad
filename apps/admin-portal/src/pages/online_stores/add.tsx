@@ -47,7 +47,7 @@ export default function AddOnlineStorePage() {
   );
 }
 
-AddOnlineStorePage.messages = ["Notes", "Pages", "OnlineStores", "General"];
+AddOnlineStorePage.messages = ["Metadata","Notes", "Pages", "OnlineStores", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

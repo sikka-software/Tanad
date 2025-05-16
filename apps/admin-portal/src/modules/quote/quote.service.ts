@@ -84,38 +84,6 @@ export async function updateQuote(id: string, updates: QuoteUpdateData): Promise
   }
 }
 
-export async function deleteQuote(id: string): Promise<void> {
-  try {
-    const response = await fetch(`/api/resource/quotes/${id}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to delete quote");
-    }
-  } catch (error) {
-    console.error("Error deleting quote:", error);
-    throw new Error("Failed to delete quote");
-  }
-}
-
-export async function bulkDeleteQuotes(ids: string[]): Promise<void> {
-  try {
-    const response = await fetch("/api/resource/quotes/bulk-delete", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ids }),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to delete quotes");
-    }
-  } catch (error) {
-    console.error("Error deleting quotes:", error);
-    throw new Error("Failed to delete quotes");
-  }
-}
-
 // Quote Items API endpoints
 export async function createQuoteItem(quoteItem: QuoteItemCreateServiceData) {
   try {

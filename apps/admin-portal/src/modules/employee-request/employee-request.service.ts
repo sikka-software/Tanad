@@ -97,36 +97,3 @@ export async function updateEmployeeRequest(
     throw error;
   }
 }
-
-export async function deleteEmployeeRequest(id: string): Promise<void> {
-  try {
-    const response = await fetch(`/api/resource/employee_requests/${id}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to delete employee request with id ${id}`);
-    }
-  } catch (error) {
-    console.error(`Error deleting employee request ${id}:`, error);
-    throw new Error(`Failed to delete employee request with id ${id}`);
-  }
-}
-
-export async function bulkDeleteEmployeeRequests(ids: string[]): Promise<void> {
-  console.log("ids are ", ids);
-  try {
-    const response = await fetch("/api/resource/employee_requests", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids }),
-    });
-
-    console.log("response", response);
-    if (!response.ok) {
-      throw new Error("Failed to delete employee requests");
-    }
-  } catch (error) {
-    console.error("Error deleting employee requests:", error);
-    throw new Error("Failed to delete employee requests");
-  }
-}

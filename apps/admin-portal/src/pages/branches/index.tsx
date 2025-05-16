@@ -239,7 +239,7 @@ export default function BranchesPage() {
   );
 }
 
-BranchesPage.messages = [
+BranchesPage.messages = ["Metadata",
   "Branches",
   "Employees",
   "Jobs",

@@ -46,7 +46,7 @@ export default function AddOfficePage() {
   );
 }
 
-AddOfficePage.messages = [
+AddOfficePage.messages = ["Metadata",
   "Offices",
   "Employees",
   "Jobs",

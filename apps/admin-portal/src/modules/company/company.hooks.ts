@@ -1,17 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createCompany,
-  deleteCompany,
-  bulkDeleteCompanies,
   fetchCompanyById,
   fetchCompanies,
   updateCompany,
   duplicateCompany,
 } from "@/company/company.service";
-import type { Company, CompanyCreateData, CompanyUpdateData } from "@/company/company.type";
-
-import useCompanyStore from "./company.store";
+import type { CompanyCreateData, CompanyUpdateData } from "@/company/company.type";
 
 export const companyKeys = {
   all: ["companies"] as const,
@@ -76,7 +74,7 @@ export function useDuplicateCompany() {
 export function useDeleteCompany() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteCompany,
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/companies/${id}`),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
       queryClient.removeQueries({ queryKey: companyKeys.detail(variables) });
@@ -89,7 +87,7 @@ export function useDeleteCompany() {
 export function useBulkDeleteCompanies() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteCompanies,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/companies", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: companyKeys.lists() }),
     meta: {
       toast: { success: "Companies.success.delete", error: "Companies.error.delete" },

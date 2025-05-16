@@ -228,7 +228,7 @@ export default function RolesPage() {
   );
 }
 
-RolesPage.messages = ["Pages", "Roles", "Notes", "General"];
+RolesPage.messages = ["Metadata","Pages", "Roles", "Notes", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

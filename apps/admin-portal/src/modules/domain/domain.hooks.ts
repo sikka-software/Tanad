@@ -1,15 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createDomain,
-  deleteDomain,
   fetchDomainById,
   fetchDomains,
   updateDomain,
-  bulkDeleteDomains,
   duplicateDomain,
 } from "@/modules/domain/domain.service";
-import type { Domain, DomainCreateData, DomainUpdateData } from "@/modules/domain/domain.type";
+import type { DomainCreateData, DomainUpdateData } from "@/modules/domain/domain.type";
 
 export const domainKeys = {
   all: ["domains"] as const,
@@ -70,7 +70,7 @@ export function useDuplicateDomain() {
 export function useDeleteDomain() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => deleteDomain(id),
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/domains/${id}`),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: domainKeys.lists() });
       queryClient.removeQueries({ queryKey: domainKeys.detail(variables) });
@@ -82,7 +82,7 @@ export function useDeleteDomain() {
 export function useBulkDeleteDomains() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteDomains,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/domains", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: domainKeys.lists() }),
     meta: { toast: { success: "Domains.success.delete", error: "Domains.error.delete" } },
   });

@@ -1,14 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import {
-  fetchJobs,
-  fetchJobById,
-  createJob,
-  updateJob,
-  deleteJob,
-  bulkDeleteJobs,
-  duplicateJob,
-} from "@/job/job.service";
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
+import { fetchJobs, fetchJobById, createJob, updateJob, duplicateJob } from "@/job/job.service";
 import { JobCreateData, JobUpdateData } from "@/job/job.type";
 
 export const jobKeys = {
@@ -71,7 +65,7 @@ export function useDuplicateJob() {
 export function useDeleteJob() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteJob,
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/jobs/${id}`),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
       queryClient.removeQueries({ queryKey: jobKeys.detail(variables) });
@@ -83,7 +77,7 @@ export function useDeleteJob() {
 export function useBulkDeleteJobs() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteJobs,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/jobs", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: jobKeys.lists() }),
     meta: { toast: { success: "Jobs.success.delete", error: "Jobs.error.delete" } },
   });

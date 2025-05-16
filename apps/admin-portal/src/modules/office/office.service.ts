@@ -49,9 +49,7 @@ export async function createOffice(office: OfficeCreateData): Promise<Office> {
 export async function updateOffice(id: string, updates: OfficeUpdateData): Promise<Office> {
   const response = await fetch(`/api/resource/offices/${id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(updates),
   });
   if (!response.ok) {
@@ -68,23 +66,4 @@ export async function duplicateOffice(id: string): Promise<Office> {
     throw new Error(`Failed to duplicate office with id ${id}`);
   }
   return response.json();
-}
-export async function deleteOffice(id: string): Promise<void> {
-  const response = await fetch(`/api/resource/offices/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) {
-    throw new Error(`Failed to delete office with id ${id}`);
-  }
-}
-
-export async function bulkDeleteOffices(ids: string[]): Promise<void> {
-  const response = await fetch("/api/resource/offices", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ids }),
-  });
-  if (!response.ok) {
-    throw new Error("Failed to delete offices");
-  }
 }

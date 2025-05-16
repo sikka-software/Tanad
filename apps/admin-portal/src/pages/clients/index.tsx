@@ -240,7 +240,7 @@ export default function ClientsPage() {
   );
 }
 
-ClientsPage.messages = [
+ClientsPage.messages = ["Metadata",
   "Notes",
   "Pages",
   "Clients",

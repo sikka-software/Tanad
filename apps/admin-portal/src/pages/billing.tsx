@@ -298,7 +298,7 @@ export default function Billing() {
   );
 }
 
-Billing.messages = ["Pages", "Billing", "General"];
+Billing.messages = ["Metadata","Pages", "Billing", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

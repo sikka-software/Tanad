@@ -68,27 +68,3 @@ export async function duplicateCar(id: string): Promise<Car> {
 
   return response.json();
 }
-
-export async function deleteCar(id: string): Promise<void> {
-  const response = await fetch(`/api/resource/cars/${id}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to delete car with id ${id}`);
-  }
-}
-
-export async function bulkDeleteCars(ids: string[]): Promise<void> {
-  const response = await fetch("/api/resource/cars", {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ ids }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete cars");
-  }
-}

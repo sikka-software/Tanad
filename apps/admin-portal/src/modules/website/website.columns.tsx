@@ -33,7 +33,7 @@ const useWebsiteColumns = (
       accessorKey: "created_at",
       enableEditing: false,
 
-      header: t("Forms.created_at.label"),
+      header: t("Metadata.created_at.label"),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -41,7 +41,7 @@ const useWebsiteColumns = (
       accessorKey: "updated_at",
       enableEditing: false,
 
-      header: t("Forms.updated_at.label"),
+      header: t("Metadata.updated_at.label"),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },

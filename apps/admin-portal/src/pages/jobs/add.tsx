@@ -47,7 +47,7 @@ export default function AddJobPage() {
   );
 }
 
-AddJobPage.messages = [
+AddJobPage.messages = ["Metadata",
   "Notes",
   "Pages",
   "Jobs",

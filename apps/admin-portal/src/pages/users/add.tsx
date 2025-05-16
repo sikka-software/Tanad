@@ -44,7 +44,7 @@ export default function AddUserPage() {
   );
 }
 
-AddUserPage.messages = ["Notes", "Pages", "Users", "General"];
+AddUserPage.messages = ["Metadata","Notes", "Pages", "Users", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

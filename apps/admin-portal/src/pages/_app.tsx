@@ -94,9 +94,11 @@ function AppContent({ Component, pageProps, router }: AppProps) {
           timeZone="Asia/Riyadh"
           now={new Date()}
         >
-          <QueryProvider>
-            <AuthLayout>{<Component {...pageProps} />}</AuthLayout>
-          </QueryProvider>
+          <SupabaseProvider>
+            <QueryProvider>
+              <AuthLayout>{<Component {...pageProps} />}</AuthLayout>
+            </QueryProvider>
+          </SupabaseProvider>
         </NextIntlClientProvider>
       </div>
     );
@@ -171,15 +173,6 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   );
 }
 
-export default function App(props: AppProps) {
-  return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <AppContent {...props} />
-      {process.env.NODE_ENV === "development" && <DebugTools />}
-    </ThemeProvider>
-  );
-}
-
 const InvoicePages = ({ children }: { children: React.ReactNode }) => {
   return (
     <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
@@ -199,3 +192,12 @@ const JobListingPage = ({ children }: { children: React.ReactNode }) => {
     </ThemeProvider>
   );
 };
+
+export default function App(props: AppProps) {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <AppContent {...props} />
+      {process.env.NODE_ENV === "development" && <DebugTools />}
+    </ThemeProvider>
+  );
+}

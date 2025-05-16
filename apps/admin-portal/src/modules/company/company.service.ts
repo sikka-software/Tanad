@@ -53,22 +53,3 @@ export async function duplicateCompany(id: string): Promise<Company> {
   }
   return response.json();
 }
-export async function deleteCompany(id: string): Promise<void> {
-  const response = await fetch(`/api/resource/companies/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) {
-    throw new Error(`Failed to delete company with id ${id}`);
-  }
-}
-
-export async function bulkDeleteCompanies(ids: string[]): Promise<void> {
-  const response = await fetch("/api/resource/companies", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ids }),
-  });
-  if (!response.ok) {
-    throw new Error("Failed to delete companies");
-  }
-}

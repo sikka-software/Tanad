@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createTruck,
-  deleteTruck,
   fetchTruckById,
   fetchTrucks,
   updateTruck,
-  bulkDeleteTrucks,
   duplicateTruck,
 } from "@/modules/truck/truck.service";
 import type { TruckCreateData, TruckUpdateData } from "@/modules/truck/truck.type";
@@ -79,7 +79,7 @@ export function useDeleteTruck() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteTruck(id),
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/trucks/${id}`),
     onSuccess: (_, variables) => {
       // Invalidate the list and remove the specific detail query from cache
       queryClient.invalidateQueries({ queryKey: truckKeys.lists() });
@@ -94,7 +94,7 @@ export function useBulkDeleteTrucks() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: bulkDeleteTrucks,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/trucks", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: truckKeys.lists() }),
     meta: { toast: { success: "Trucks.success.delete", error: "Trucks.error.delete" } },
   });

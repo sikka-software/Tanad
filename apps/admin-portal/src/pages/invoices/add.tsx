@@ -45,7 +45,7 @@ export default function AddInvoicePage() {
   );
 }
 
-AddInvoicePage.messages = [
+AddInvoicePage.messages = ["Metadata",
   "Notes",
   "Pages",
   "Invoices",

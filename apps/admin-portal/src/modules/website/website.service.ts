@@ -68,25 +68,3 @@ export async function duplicateWebsite(id: string): Promise<Website> {
 
   return response.json();
 }
-
-export async function deleteWebsite(id: string): Promise<void> {
-  const response = await fetch(`/api/resource/websites/${id}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to delete website with id ${id}`);
-  }
-}
-
-export async function bulkDeleteWebsites(ids: string[]): Promise<void> {
-  const response = await fetch("/api/resource/websites", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ids }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete websites");
-  }
-}

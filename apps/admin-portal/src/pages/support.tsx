@@ -18,7 +18,7 @@ export default function SupportPage() {
   );
 }
 
-SupportPage.messages = ["Pages", "Support", "General"];
+SupportPage.messages = ["Metadata","Pages", "Support", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

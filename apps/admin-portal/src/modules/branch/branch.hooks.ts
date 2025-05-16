@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createBranch,
-  deleteBranch,
   fetchBranchById,
   fetchBranches,
   updateBranch,
-  bulkDeleteBranches,
   duplicateBranch,
 } from "@/branch/branch.service";
 import type { Branch, BranchCreateData, BranchUpdateData } from "@/branch/branch.type";
@@ -123,7 +123,7 @@ export function useDeleteBranch() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteBranch(id),
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/branches/${id}`),
     onSuccess: (_, variables) => {
       // Invalidate the list and remove the specific detail query from cache
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
@@ -138,7 +138,7 @@ export function useBulkDeleteBranches() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: bulkDeleteBranches,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/branches", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: branchKeys.lists() }),
     meta: { toast: { success: "Branches.success.delete", error: "Branches.error.delete" } },
   });

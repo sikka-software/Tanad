@@ -223,7 +223,7 @@ export default function JobsPage() {
   );
 }
 
-JobsPage.messages = [
+JobsPage.messages = ["Metadata",
   "Notes",
   "Pages",
   "Jobs",

@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createClient,
-  deleteClient,
   fetchClientById,
   fetchClients,
   updateClient,
-  bulkDeleteClients,
   duplicateClient,
 } from "@/client/client.service";
 import { ClientCreateData, ClientUpdateData } from "@/client/client.type";
@@ -70,7 +70,7 @@ export function useDuplicateClient() {
 export function useDeleteClient() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => deleteClient(id),
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/clients/${id}`),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
       queryClient.removeQueries({ queryKey: clientKeys.detail(variables) });
@@ -82,7 +82,7 @@ export function useDeleteClient() {
 export function useBulkDeleteClients() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteClients,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/clients", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: clientKeys.lists() }),
     meta: { toast: { success: "Clients.success.delete", error: "Clients.error.delete" } },
   });

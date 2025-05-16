@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
-  bulkDeleteVendors,
   createVendor,
-  deleteVendor,
   fetchVendorById,
   fetchVendors,
   updateVendor,
@@ -11,7 +11,6 @@ import {
 } from "@/vendor/vendor.service";
 import type { VendorCreateData, VendorUpdateData } from "@/vendor/vendor.type";
 
-// Query keys for vendors
 export const vendorKeys = {
   all: ["vendors"] as const,
   lists: () => [...vendorKeys.all, "list"] as const,
@@ -78,7 +77,7 @@ export function useDeleteVendor() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteVendor(id),
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/vendors/${id}`),
     onSuccess: (_, variables) => {
       // Invalidate the list and remove the specific detail query from cache
       queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
@@ -92,7 +91,7 @@ export function useDeleteVendor() {
 export function useBulkDeleteVendors() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteVendors,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/vendors", ids),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
     },

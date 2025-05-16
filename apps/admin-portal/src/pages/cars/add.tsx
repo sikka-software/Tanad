@@ -47,7 +47,7 @@ export default function AddCarPage() {
   );
 }
 
-AddCarPage.messages = ["Pages", "Cars", "Vehicles", "Notes", "Forms", "General"];
+AddCarPage.messages = ["Metadata","Pages", "Cars", "Vehicles", "Notes", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

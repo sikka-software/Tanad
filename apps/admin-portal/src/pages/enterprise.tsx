@@ -156,7 +156,7 @@ const EnterprisePage = () => {
 
 export default EnterprisePage;
 
-EnterprisePage.messages = ["Pages", "General", "Enterprise"];
+EnterprisePage.messages = ["Metadata","Pages", "General", "Enterprise"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

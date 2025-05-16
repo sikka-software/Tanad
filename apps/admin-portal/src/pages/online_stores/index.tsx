@@ -238,7 +238,7 @@ export default function OnlineStoresPage() {
   );
 }
 
-OnlineStoresPage.messages = ["Notes", "Pages", "OnlineStores", "General", "CommonStatus"];
+OnlineStoresPage.messages = ["Metadata","Notes", "Pages", "OnlineStores", "General", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

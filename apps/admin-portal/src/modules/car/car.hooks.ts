@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createCar,
-  deleteCar,
   fetchCarById,
   fetchCars,
   updateCar,
-  bulkDeleteCars,
   duplicateCar,
 } from "@/modules/car/car.service";
 import type { CarCreateData, CarUpdateData } from "@/modules/car/car.type";
@@ -71,7 +71,7 @@ export function useDeleteCar() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteCar(id),
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/cars/${id}`),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: carKeys.lists() });
       queryClient.removeQueries({ queryKey: carKeys.detail(variables) });
@@ -83,7 +83,7 @@ export function useDeleteCar() {
 export function useBulkDeleteCars() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteCars,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/cars", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: carKeys.lists() }),
     meta: { toast: { success: "Cars.success.delete", error: "Cars.error.delete" } },
   });

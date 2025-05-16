@@ -116,7 +116,7 @@ export default function BankAccountsPage() {
   );
 }
 
-BankAccountsPage.messages = ["Pages", "BankAccounts", "Notes", "General"];
+BankAccountsPage.messages = ["Metadata","Pages", "BankAccounts", "Notes", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

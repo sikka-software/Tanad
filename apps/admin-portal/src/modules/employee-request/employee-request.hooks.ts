@@ -1,16 +1,14 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
-import { departmentKeys } from "../department/department.hooks";
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createEmployeeRequest,
-  deleteEmployeeRequest,
   fetchEmployeeRequestById,
   fetchEmployeeRequests,
   updateEmployeeRequest,
-  bulkDeleteEmployeeRequests,
   duplicateEmployeeRequest,
 } from "./employee-request.service";
 import {
@@ -178,7 +176,7 @@ export function useUpdateEmployeeRequest() {
 export function useDeleteEmployeeRequest() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteEmployeeRequest,
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/employee-requests/${id}`),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
       queryClient.removeQueries({ queryKey: employeeRequestKeys.detail(variables) });
@@ -192,7 +190,7 @@ export function useDeleteEmployeeRequest() {
 export function useBulkDeleteEmployeeRequests() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteEmployeeRequests,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/employee-requests", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() }),
     meta: {
       toast: { success: "EmployeeRequests.success.delete", error: "EmployeeRequests.error.delete" },

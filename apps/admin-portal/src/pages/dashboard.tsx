@@ -325,7 +325,7 @@ export default function Dashboard() {
   );
 }
 
-Dashboard.messages = ["Pages", "General", "Dashboard"];
+Dashboard.messages = ["Metadata","Pages", "General", "Dashboard"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

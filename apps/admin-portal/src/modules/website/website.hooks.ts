@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createWebsite,
-  deleteWebsite,
   fetchWebsiteById,
   fetchWebsites,
   updateWebsite,
-  bulkDeleteWebsites,
   duplicateWebsite,
 } from "./website.service";
 import type { Website, WebsiteCreateData, WebsiteUpdateData } from "./website.type";
@@ -138,7 +138,7 @@ export function useDeleteWebsite() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteWebsite(id),
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/websites/${id}`),
     onSuccess: (_, variables) => {
       // Invalidate the list and remove the specific detail query from cache
       queryClient.invalidateQueries({ queryKey: websiteKeys.lists() });
@@ -153,7 +153,7 @@ export function useBulkDeleteWebsites() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: bulkDeleteWebsites,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/websites", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: websiteKeys.lists() }),
     meta: { toast: { success: "Websites.success.delete", error: "Websites.error.delete" } },
   });

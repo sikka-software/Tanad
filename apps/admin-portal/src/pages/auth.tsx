@@ -1,4 +1,3 @@
-import type { Session } from "@supabase/supabase-js";
 import { pick } from "lodash";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { GetStaticProps } from "next";
@@ -36,21 +35,19 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const user = useUserStore((state) => state.user);
-  const profile = useUserStore((state) => state.profile);
-  const enterprise = useUserStore((state) => state.enterprise);
 
-  // useEffect(() => {
-  //   // Always check session directly from Supabase
-  //   supabase.auth.getSession().then(({ data }) => {
-  //     setSupabaseSession(data.session);
-  //   });
-  // }, [user, loadingUser]);
+  const profile = useUserStore((state) => state.profile);
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+  const membership = useUserStore((state) => state.membership);
+  const permissions = useUserStore((state) => state.permissions);
+
   useEffect(() => {
-    if (user && profile && enterprise) {
+    console.table({ user, profile, enterprise });
+    if (user?.id && profile?.id && enterprise?.id) {
       router.push("/dashboard");
     }
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     setIsSignUp(router.asPath.includes("#signup"));
@@ -400,7 +397,7 @@ export default function Auth() {
   );
 }
 
-Auth.messages = ["Pages", "Auth", "General", "SEO"];
+Auth.messages = ["Metadata", "Pages", "Auth", "General", "SEO"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

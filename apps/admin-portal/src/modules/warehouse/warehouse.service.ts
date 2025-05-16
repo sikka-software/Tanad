@@ -90,24 +90,3 @@ export async function updateWarehouse(
     throw error;
   }
 }
-
-// Delete operations
-export async function deleteWarehouse(id: string): Promise<void> {
-  const response = await fetch(`/api/resource/warehouses/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) {
-    throw new Error(`Failed to delete warehouse with id ${id}`);
-  }
-}
-
-export async function bulkDeleteWarehouses(ids: string[]): Promise<void> {
-  const response = await fetch("/api/resource/warehouses", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ids }),
-  });
-  if (!response.ok) {
-    throw new Error("Failed to delete warehouses");
-  }
-}

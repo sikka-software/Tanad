@@ -47,7 +47,7 @@ export default function AddBranchPage() {
   );
 }
 
-AddBranchPage.messages = ["Pages", "Branches", "Forms", "Notes", "General"];
+AddBranchPage.messages = ["Metadata","Pages", "Branches", "Forms", "Notes", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
