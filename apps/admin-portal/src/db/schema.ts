@@ -248,7 +248,7 @@ export const app_permission = pgEnum("app_permission", [
   "trucks.export",
   "trucks.duplicate",
 ]);
-export const app_role = pgEnum("app_role", ["superadmin", "admin", "accounting", "hr"]);
+export const app_role = pgEnum("app_role", ["superadmin", "admin", "accounting", "hr", "it"]);
 export const common_status = pgEnum("common_status", ["active", "inactive", "draft", "archived"]);
 export const vehicle_status = pgEnum("vehicle_status", [
   "active",

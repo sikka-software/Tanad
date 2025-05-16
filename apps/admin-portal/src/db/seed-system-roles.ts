@@ -329,7 +329,34 @@ const systemRolePermissions: Record<string, string[]> = {
     "purchases.export",
     // Add accounting-specific permissions here
   ],
-  // Add other system roles if needed
+  it: [
+    "domains.read",
+    "domains.create",
+    "domains.delete",
+    "domains.update",
+    "domains.export",
+
+    "servers.read",
+    "servers.create",
+    "servers.delete",
+    "servers.update",
+    "servers.duplicate",
+    "servers.export",
+
+    "websites.read",
+    "websites.create",
+    "websites.delete",
+    "websites.update",
+    "websites.duplicate",
+    "websites.export",
+
+    "online_stores.read",
+    "online_stores.create",
+    "online_stores.delete",
+    "online_stores.update",
+    "online_stores.duplicate",
+    "online_stores.export",
+  ],
 };
 
 async function seedPermissions() {
