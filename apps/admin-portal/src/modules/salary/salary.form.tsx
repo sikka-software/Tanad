@@ -173,15 +173,24 @@ export function SalaryForm({
       const deductionsPayload =
         data.deductions && data.deductions.length > 0 ? JSON.stringify(data.deductions) : undefined;
 
+      // Format dates as yyyy-mm-dd strings if they are Date objects
+      const formatDate = (val: any) => {
+        if (!val) return undefined;
+        if (val instanceof Date) return val.toISOString().split("T")[0];
+        if (typeof val === "string") return val;
+        if (val && typeof val.toString === "function") return val.toString();
+        return val;
+      };
+
       // TODO: Replace these with actual values from context/store as needed
       const enterprise_id = defaultValues?.enterprise_id || "";
       const user_id = defaultValues?.user_id || "";
       const amount = data.amount;
-      const start_date = data.start_date;
-      const end_date = data.end_date;
+      const start_date = formatDate(data.start_date);
+      const end_date = formatDate(data.end_date);
       const created_at = defaultValues?.created_at || undefined;
       const currency = defaultValues?.currency || undefined;
-      const payment_date = data.payment_date;
+      const payment_date = formatDate(data.payment_date);
       const notes = data.notes || undefined;
 
       const payload = {
@@ -232,14 +241,7 @@ export function SalaryForm({
   return (
     <>
       <Form {...form}>
-        <form
-          id={formHtmlId || "salary-form"}
-          onSubmit={(e) => {
-            e.preventDefault();
-            console.log("form errors ", form.formState.errors);
-            form.handleSubmit(handleSubmit)(e);
-          }}
-        >
+        <form id={formHtmlId || "salary-form"} onSubmit={form.handleSubmit(handleSubmit)}>
           <input hidden type="text" value={user?.id} {...form.register("user_id")} />
           <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
@@ -298,8 +300,14 @@ export function SalaryForm({
                     <FormControl>
                       <CurrencyInput
                         showCommas={true}
-                        value={typeof field.value === 'number' && !isNaN(field.value) ? field.value : undefined}
-                        onChange={v => field.onChange(v === undefined || v === null ? undefined : v)}
+                        value={
+                          typeof field.value === "number" && !isNaN(field.value)
+                            ? field.value
+                            : undefined
+                        }
+                        onChange={(v) =>
+                          field.onChange(v === undefined || v === null ? undefined : v)
+                        }
                         placeholder={t("Salaries.form.amount.placeholder")}
                         disabled={loading}
                       />
