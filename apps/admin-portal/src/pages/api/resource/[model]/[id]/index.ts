@@ -1,282 +1,196 @@
 // src/pages/api/resource/[model]/[id].ts
-import { eq } from "drizzle-orm";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { createClient } from "@/utils/supabase/server-props";
+import { createApiHandler } from "@/lib/api-handler";
+import type { Database } from "@/lib/database.types";
 
-import { db } from "@/db/drizzle";
-import * as schema from "@/db/schema";
-
+// ModelConfig for single-resource endpoints
+// id is passed to customHandlers for PUT/GET/DELETE
+// (GET for single resource, PUT for update, DELETE for delete)
 type ModelConfig = {
-  table: any;
-  query: {
-    findFirst: (config: { where: any }) => Promise<any>;
+  tableName: string;
+  customHandlers?: {
+    GET?: (
+      supabase: SupabaseClient<Database>,
+      user_id: string,
+      req: NextApiRequest,
+      id: string,
+    ) => Promise<any>;
+    PUT?: (
+      supabase: SupabaseClient<Database>,
+      user_id: string,
+      req: NextApiRequest,
+      id: string,
+    ) => Promise<any>;
+    DELETE?: (
+      supabase: SupabaseClient<Database>,
+      user_id: string,
+      req: NextApiRequest,
+      id: string,
+    ) => Promise<any>;
   };
-  idField: string;
 };
 
 const modelMap: Record<string, ModelConfig> = {
-  branches: { table: schema.branches, query: db.query.branches, idField: "id" },
-  companies: { table: schema.companies, query: db.query.companies, idField: "id" },
-  jobs: { table: schema.jobs, query: db.query.jobs, idField: "id" },
-  domains: { table: schema.domains, query: db.query.domains, idField: "id" },
-  websites: { table: schema.websites, query: db.query.websites, idField: "id" },
-  servers: { table: schema.servers, query: db.query.servers, idField: "id" },
-  online_stores: { table: schema.online_stores, query: db.query.online_stores, idField: "id" },
-  clients: { table: schema.clients, query: db.query.clients, idField: "id" },
-  expenses: { table: schema.expenses, query: db.query.expenses, idField: "id" },
-  purchases: { table: schema.purchases, query: db.query.purchases, idField: "id" },
-  departments: { table: schema.departments, query: db.query.departments, idField: "id" },
-  department_locations: {
-    table: schema.department_locations,
-    query: db.query.department_locations,
-    idField: "id",
-  },
-  salaries: { table: schema.salaries, query: db.query.salaries, idField: "id" },
-  offices: { table: schema.offices, query: db.query.offices, idField: "id" },
-  warehouses: { table: schema.warehouses, query: db.query.warehouses, idField: "id" },
-  employees: { table: schema.employees, query: db.query.employees, idField: "id" },
-  products: { table: schema.products, query: db.query.products, idField: "id" },
-  invoices: { table: schema.invoices, query: db.query.invoices, idField: "id" },
-  quotes: { table: schema.quotes, query: db.query.quotes, idField: "id" },
-  vendors: { table: schema.vendors, query: db.query.vendors, idField: "id" },
-  bank_accounts: { table: schema.bank_accounts, query: db.query.bank_accounts, idField: "id" },
-  employee_requests: {
-    table: schema.employee_requests,
-    query: db.query.employee_requests,
-    idField: "id",
-  },
+  branches: { tableName: "branches" },
+  companies: { tableName: "companies" },
+  jobs: { tableName: "jobs" },
+  expenses: { tableName: "expenses" },
+  departments: { tableName: "departments" },
+  salaries: { tableName: "salaries" },
+  domains: { tableName: "domains" },
+  servers: { tableName: "servers" },
+  purchases: { tableName: "purchases" },
+  websites: { tableName: "websites" },
+  online_stores: { tableName: "online_stores" },
+  offices: { tableName: "offices" },
+  warehouses: { tableName: "warehouses" },
+  products: { tableName: "products" },
+  cars: { tableName: "cars" },
+  trucks: { tableName: "trucks" },
+  vendors: { tableName: "vendors" },
+  employee_requests: { tableName: "employee_requests" },
+  bank_accounts: { tableName: "bank_accounts" },
+  clients: { tableName: "clients" },
+  department_locations: { tableName: "department_locations" },
+  employees: { tableName: "employees" },
+  invoices: { tableName: "invoices" },
+  quotes: { tableName: "quotes" },
   job_listings: {
-    table: schema.job_listings,
-    query: db.query.job_listings,
-    idField: "id",
-  },
-  cars: { table: schema.cars, query: db.query.cars, idField: "id" },
-  trucks: { table: schema.trucks, query: db.query.trucks, idField: "id" },
-};
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { model, id } = req.query;
-  // console.log("API Handler - Received request for model:", model, "with ID:", id);
-  // Validate model
-  if (typeof model !== "string" || !(model in modelMap)) {
-    return res.status(404).json({ message: "Model not found" });
-  }
-
-  // Validate ID
-  if (!id || typeof id !== "string") {
-    return res.status(400).json({ error: "Invalid ID" });
-  }
-
-  // Get model configuration
-  const { table, query, idField } = modelMap[model];
-
-  // Authenticate user
-  const supabase = createClient({
-    req,
-    res,
-    query: {},
-    resolvedUrl: "",
-  });
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user?.id) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  // console.log(`API Handler - Authenticated user ID: ${user.id}`);
-
-  // Handle GET request
-  if (req.method === "GET") {
-    try {
-      if (model === "job_listings") {
+    tableName: "job_listings",
+    customHandlers: {
+      GET: async (supabase, user_id, req, id) => {
         // Fetch the job listing by ID
-        const record = await query.findFirst({
-          where: eq(table[idField], id),
-        });
-        if (!record) {
-          return res.status(404).json({ message: `${model} not found` });
-        }
+        const { data: record, error } = await supabase
+          .from("job_listings")
+          .select("*")
+          .eq("id", id)
+          .maybeSingle();
+        if (error) throw error;
+        if (!record) throw new Error("job_listing not found");
         // Fetch associated jobs
         const { data: jobLinks, error: jobsError } = await supabase
           .from("job_listing_jobs")
           .select("job_id")
           .eq("job_listing_id", id);
-        if (jobsError) {
-          console.error("Error fetching job associations for job listing detail:", jobsError);
-          return res.status(500).json({ message: "Error fetching job associations" });
-        }
-        return res.status(200).json({
+        if (jobsError) throw jobsError;
+        return {
           ...record,
           jobs: jobLinks?.map((j: any) => j.job_id) || [],
           jobs_count: jobLinks?.length || 0,
-        });
-      } else {
-        const record = await query.findFirst({
-          where: eq(table[idField], id),
-        });
-        if (!record) {
-          return res.status(404).json({ message: `${model} not found` });
-        }
-        return res.status(200).json(record);
-      }
-    } catch (error) {
-      console.error(`Error fetching ${model}:`, error);
-      return res.status(500).json({ message: `Error fetching ${model}` });
-    }
-  }
-  // Handle PUT request
-  if (req.method === "PUT") {
-    // console.log("API Handler - PUT request received");
-    try {
-      const existingRecord = await query.findFirst({
-        where: eq(table[idField], id),
-      });
-
-      if (!existingRecord) {
-        return res.status(404).json({ message: `${model} not found` });
-      }
-
-      // console.log("API Handler - Existing record found:", JSON.stringify(existingRecord, null, 2));
-
-      // Check ownership if the model has a user_id field (Example - adjust if needed)
-      // Assuming enterprise_id implies ownership/permission in this context
-      if ("enterprise_id" in existingRecord) {
-        // Fetch user's enterprise membership if not already available
-        const { data: membership, error: enterpriseError } = await supabase
-          .from("memberships")
-          .select("enterprise_id")
-          .eq("profile_id", user.id)
-          .maybeSingle();
-
-        if (enterpriseError || !membership?.enterprise_id) {
-          console.error("Failed to verify enterprise membership for update:", enterpriseError);
-          return res.status(403).json({ error: `Failed to verify authorization for ${model}` });
-        }
-
-        // console.log(`API Handler - User's membership enterprise ID: ${membership.enterprise_id}`);
-
-        if (existingRecord.enterprise_id !== membership.enterprise_id) {
-          console.error(
-            `Authorization failed: Record enterprise ID (${existingRecord.enterprise_id}) !== User enterprise ID (${membership.enterprise_id})`,
-          );
-          return res.status(403).json({ error: `Not authorized to update this ${model}` });
-        }
-      }
-
-      // console.log("API Handler - req.body before update:", JSON.stringify(req.body, null, 2));
-
-      // --- Explicitly define fields to update ---
-      const updated_at = new Date().toISOString();
-      const {
-        // Exclude fields not meant for direct update
-        id: _id,
-        created_at: _createdAt,
-        // updated_at: _updatedAt,
-        // created_by: _createdBy,
-        enterprise_id: _enterpriseId, // Also exclude enterprise_id from spread if present in body
-        // Include other fields from req.body that ARE updatable
-        ...updatableDataFromRequest
-      } = req.body;
-
-      // Explicitly add the user's enterprise_id to the update payload
-      const updatableData = {
-        updated_at,
-        ...updatableDataFromRequest,
-        enterprise_id: existingRecord.enterprise_id, // Use the enterprise_id from the record being updated
-      };
-      // --- End Explicit Update Definition ---
-
-      // console.log(
-      //   "API Handler - Data being sent to Supabase update:",
-      //   JSON.stringify(updatableData, null, 2),
-      // );
-
-      // Perform the update using the AUTHENTICATED supabase client
-      // Use the actual model name string from the query param
-      const { data: updatedRecord, error: updateError } = await supabase
-        .from(model) // Use model name string directly
-        .update(updatableData) // Use the data with enterprise_id added
-        .eq(idField, id)
-        .select()
-        .single(); // Assuming you expect one record back
-
-      // console.log("API Handler - Updated record:", JSON.stringify(updatedRecord, null, 2));
-      if (updateError) {
-        console.error(`Supabase update error for ${model}:`, updateError);
-        // Throw the specific Supabase error for better debugging
-        throw updateError;
-      }
-
-      if (!updatedRecord) {
-        // This could happen if RLS prevents seeing the updated record
-        console.warn(
-          `Update operation on ${model} ${id} seemed successful but SELECT returned no data. Check RLS.`,
-        );
-        return res
-          .status(404)
-          .json({ message: `${model} not found or update failed silently (potentially RLS)` });
-      }
-
-      if (model === "job_listings") {
-        // After update, fetch the updated record and associated jobs
+        };
+      },
+      PUT: async (supabase, user_id, req, id) => {
+        // Update the job listing
+        const { data: updated, error } = await supabase
+          .from("job_listings")
+          .update({ ...req.body, updated_at: new Date().toISOString() })
+          .eq("id", id)
+          .select()
+          .single();
+        if (error) throw error;
+        // Fetch associated jobs
         const { data: jobLinks, error: jobsError } = await supabase
           .from("job_listing_jobs")
           .select("job_id")
           .eq("job_listing_id", id);
-        if (jobsError) {
-          console.error(
-            "Error fetching job associations for job listing detail after update:",
-            jobsError,
-          );
-          return res.status(500).json({ message: "Error fetching job associations" });
-        }
-        return res.status(200).json({
-          ...updatedRecord,
+        if (jobsError) throw jobsError;
+        return {
+          ...updated,
           jobs: jobLinks?.map((j: any) => j.job_id) || [],
           jobs_count: jobLinks?.length || 0,
-        });
-      }
-      return res.status(200).json(updatedRecord);
-    } catch (error: any) {
-      console.error(`Raw error object updating ${model}:`, error);
-      console.error(`Stringified error object updating ${model}:`, JSON.stringify(error, null, 2));
-      console.error(`Error message updating ${model}:`, error?.message);
-      const errorMessage =
-        error?.message || JSON.stringify(error) || "Unknown error occurred during update";
-      return res.status(500).json({
-        message: `Error updating ${model}: ${errorMessage}`,
-        errorDetails: error, // Also include the raw error in the response if possible
-      });
-    }
-  }
+        };
+      },
+    },
+  },
+};
 
-  // Handle DELETE request
-  if (req.method === "DELETE") {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { model, id } = req.query;
+  if (typeof model !== "string" || !(model in modelMap)) {
+    return res.status(404).json({ message: "Module not found" });
+  }
+  if (!id || typeof id !== "string") {
+    return res.status(400).json({ error: "Invalid ID" });
+  }
+  const config = modelMap[model as keyof typeof modelMap];
+  if (!config) {
+    return res.status(500).json({ message: "Internal server configuration error" });
+  }
+  const { tableName, customHandlers } = config;
+
+  // Custom createApiHandler for single-resource endpoints
+  async function singleResourceHandler(req: NextApiRequest, res: NextApiResponse) {
+    const supabase = (await import("@/utils/supabase/server-props")).createClient({
+      req,
+      res,
+      query: {},
+      resolvedUrl: "",
+    });
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+    if (authError || !user?.id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const user_id = user.id;
+    // id is guaranteed to be a string here
+    const resourceId = id as string;
     try {
-      // Optional: Check ownership before deletion
-      if ("user_id" in table) {
-        const existingRecord = await query.findFirst({
-          where: eq(table[idField], id),
-        });
-
-        if (existingRecord && "user_id" in existingRecord && existingRecord.user_id !== user.id) {
-          return res.status(403).json({ error: `Not authorized to delete this ${model}` });
-        }
+      switch (req.method) {
+        case "GET":
+          if (customHandlers?.GET) {
+            const data = await customHandlers.GET(supabase, user_id, req, resourceId);
+            return res.status(200).json(data);
+          }
+          // Default GET: fetch by id
+          const { data: record, error } = await supabase
+            .from(tableName)
+            .select("*")
+            .eq("id", resourceId)
+            .maybeSingle();
+          if (error) throw error;
+          if (!record) return res.status(404).json({ message: `${model} not found` });
+          return res.status(200).json(record);
+        case "PUT":
+          if (customHandlers?.PUT) {
+            const data = await customHandlers.PUT(supabase, user_id, req, resourceId);
+            return res.status(200).json(data);
+          }
+          // Default PUT: update by id
+          const { data: updated, error: updateError } = await supabase
+            .from(tableName)
+            .update({ ...req.body, updated_at: new Date().toISOString() })
+            .eq("id", resourceId)
+            .select()
+            .single();
+          if (updateError) throw updateError;
+          return res.status(200).json(updated);
+        case "DELETE":
+          if (customHandlers?.DELETE) {
+            await customHandlers.DELETE(supabase, user_id, req, resourceId);
+            return res.status(204).end();
+          }
+          // Default DELETE: delete by id
+          const { error: deleteError } = await supabase
+            .from(tableName)
+            .delete()
+            .eq("id", resourceId);
+          if (deleteError) throw deleteError;
+          return res.status(204).end();
+        default:
+          res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
+          return res.status(405).json({ message: `Method ${req.method} not allowed` });
       }
-
-      await db.delete(table).where(eq(table[idField], id));
-      return res.status(204).end();
-    } catch (error) {
-      console.error(`Error deleting ${model}:`, error);
-      return res.status(500).json({ message: `Error deleting ${model}` });
+    } catch (error: any) {
+      console.error(`Error in ${req.method} /api/resource/${tableName}/${resourceId}:`, error);
+      const message = error.message || `Error handling ${req.method} for ${tableName}`;
+      const status = typeof error.status === "number" ? error.status : 400;
+      return res.status(status).json({ message });
     }
   }
 
-  return res
-    .status(405)
-    .json({ message: "Method not allowed, only GET, PUT and DELETE are allowed" });
+  return singleResourceHandler(req, res);
 }
