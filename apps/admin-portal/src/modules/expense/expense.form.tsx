@@ -184,13 +184,12 @@ export function ExpenseForm({
                         }
                         form.setValue("expense_number", `EX-${randomCode}`);
                       }}
-                    >
-                      <Input
-                        placeholder={t("Expenses.form.expense_number.placeholder")}
-                        {...field}
-                        disabled={isLoading}
-                      />
-                    </CodeInput>
+                      inputProps={{
+                        placeholder: t("Expenses.form.expense_number.placeholder"),
+                        disabled: isLoading,
+                        ...field,
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -233,7 +232,6 @@ export function ExpenseForm({
                       onChange={field.onChange}
                       onSelect={(e) => field.onChange(e)}
                       disabled={isLoading}
-                      ariaInvalid={form.formState.errors.issue_date !== undefined}
                     />
                   </FormControl>
                   <FormMessage />
@@ -258,7 +256,6 @@ export function ExpenseForm({
                       onChange={field.onChange}
                       onSelect={(e) => field.onChange(e)}
                       disabled={isLoading}
-                      ariaInvalid={form.formState.errors.due_date !== undefined}
                     />
                   </FormControl>
                   <FormMessage />

@@ -76,7 +76,7 @@ function FormItem({ className, ...props }: React.ComponentProps<"div">) {
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div data-slot="form-item" className={cn("grid gap-2", className)} {...props} />
+      <div data-slot="form-item" className={cn("grid", className)} {...props} />
     </FormItemContext.Provider>
   );
 }
@@ -88,7 +88,7 @@ function FormLabel({ className, ...props }: React.ComponentProps<typeof LabelPri
     <Label
       data-slot="form-label"
       data-error={!!error}
-      className={cn("data-[error=true]:text-destructive", className)}
+      className={cn("data-[error=true]:text-destructive mb-2", className)}
       htmlFor={formItemId}
       {...props}
     />
@@ -126,26 +126,29 @@ function FormMessage({ className, children, ...rest }: React.ComponentProps<"p">
   const { error, formMessageId } = useFormField();
   const body = error ? String(error?.message ?? "") : children;
 
-  if (!body) {
-    return null;
-  }
-
   return (
-    <AnimatePresence>
+    <AnimatePresence presenceAffectsLayout={true} mode="wait">
       <motion.p
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
+        layout="position"
+        key={formMessageId}
+        animate={{ opacity: 1, y: -0, height: error ? 26 : 0 }}
         data-slot="form-message"
         id={formMessageId}
         className={cn(
-          "border-destructive bg-destructive/20 dark:bg-destructive/90  rounded-md !rounded-t-none border border-t-0 p-1 px-2 text-sm -mt-5 pt-3 -z-1",
-          // '-mt-2 w-fit ms-4',
+          body &&
+            "border-destructive bg-destructive/20 dark:bg-destructive/90 relative -z-1 overflow-hidden rounded-md !rounded-t-none border border-t-0 text-xs",
+          // "border-destructive bg-destructive/20 dark:bg-destructive/90 relative -z-1 overflow-hidden rounded-md !rounded-t-none border border-t-0 text-xs",
           className,
         )}
         {...(rest as any)}
       >
-        {body}
+        <span
+          className="absolute start-2 top-[4px]"
+          // "absolute start-2 top-[19px] -translate-y-[4px]"
+        >
+          {" "}
+          {body}
+        </span>
       </motion.p>
     </AnimatePresence>
   );

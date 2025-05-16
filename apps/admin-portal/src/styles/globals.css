@@ -215,6 +215,10 @@ body {
   .form-fields-cols-3 {
     @apply grid grid-cols-1 items-start gap-4 md:grid-cols-3;
   }
+
+  .form-button-input-invalid {
+    @apply ring-destructive/20 dark:ring-destructive/40 border-destructive !rounded-b-none;
+  }
 }
 
 .tiny-scrollbar {

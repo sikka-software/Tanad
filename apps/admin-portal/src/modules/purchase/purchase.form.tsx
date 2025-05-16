@@ -235,14 +235,12 @@ export function PurchaseForm({
                           }
                           form.setValue("purchase_number", `PUR-${randomCode}`);
                         }}
-                      >
-                        <Input
-                          placeholder={t("Purchases.form.purchase_number.placeholder")}
-                          {...field}
-                          disabled={isLoading}
-                          aria-invalid={!!form.formState.errors.purchase_number}
-                        />
-                      </CodeInput>
+                        inputProps={{
+                          placeholder: t("Purchases.form.purchase_number.placeholder"),
+                          disabled: isLoading,
+                          ...field,
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

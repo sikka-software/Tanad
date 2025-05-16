@@ -230,6 +230,7 @@ export function ClientForm({
                         type="email"
                         dir="ltr"
                         placeholder={t("Clients.form.email.placeholder")}
+                        disabled={isLoading}
                         {...field}
                       />
                     </FormControl>
@@ -247,7 +248,7 @@ export function ClientForm({
                       <PhoneInput
                         value={field.value || ""}
                         onChange={field.onChange}
-                        ariaInvalid={form.formState.errors.phone !== undefined}
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -266,6 +267,7 @@ export function ClientForm({
                         data={companyOptions}
                         isLoading={companiesLoading}
                         defaultValue={field.value || ""}
+                        disabled={isLoading}
                         valueKey="value"
                         onChange={(value) => field.onChange(value || null)}
                         texts={{
@@ -297,6 +299,7 @@ export function ClientForm({
                     <FormLabel>{t("Clients.form.status.label")}</FormLabel>
                     <FormControl>
                       <BooleanTabs
+                        disabled={isLoading}
                         trueText={t("Clients.form.status.active")}
                         falseText={t("Clients.form.status.inactive")}
                         value={field.value === "active"}

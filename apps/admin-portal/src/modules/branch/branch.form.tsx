@@ -249,13 +249,11 @@ export function BranchForm({
                           }
                           form.setValue("code", `BR-${randomCode}`);
                         }}
-                      >
-                        <Input
-                          placeholder={t("Branches.form.code.placeholder")}
-                          {...field}
-                          disabled={isLoading}
-                        />
-                      </CodeInput>
+                        inputProps={{
+                          placeholder: t("Branches.form.code.placeholder"),
+                          disabled: isLoading,
+                        }}
+                      ></CodeInput>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -271,7 +269,7 @@ export function BranchForm({
                       <PhoneInput
                         value={field.value || ""}
                         onChange={field.onChange}
-                        ariaInvalid={form.formState.errors.phone !== undefined}
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -319,7 +317,6 @@ export function BranchForm({
                         }}
                         addText={t("Pages.Employees.add")}
                         onAddClick={() => setIsEmployeeDialogOpen(true)}
-                        ariaInvalid={!!form.formState.errors.manager}
                       />
                     </FormControl>
                     <FormMessage />

@@ -3842,7 +3842,7 @@
     },
     "name": {
       "label": "الاسم",
-      "placeholder": "أدخل اسم الشركة"
+      "placeholder": "أدخل الاسم"
     },
     "email": {
       "label": "البريد الإلكتروني",
@@ -3850,15 +3850,15 @@
     },
     "phone": {
       "label": "الهاتف",
-      "placeholder": "أدخل رقم هاتف الشركة"
+      "placeholder": "أدخل رقم الهاتف"
     },
     "website": {
       "label": "الموقع الإلكتروني",
       "placeholder": "https://www.example.com"
     },
     "address": {
-      "label": "عنوان الشركة",
-      "placeholder": "أدخل عنوان الشركة"
+      "label": "العنوان",
+      "placeholder": "أدخل العنوان"
     },
     "short_address": {
       "label": "العنوان الوطني المختصر",
@@ -3903,12 +3903,12 @@
       "required": "الرمز البريدي مطلوب"
     },
     "industry": {
-      "label": "المجال",
-      "placeholder": "أدخل مجال الشركة"
+      "label": "المجال" ,
+      "placeholder": "أدخل المجال"
     },
-    "size": {
-      "label": "حجم الشركة",
-      "placeholder": "أدخل حجم الشركة"
+    "size": { 
+      "label": "الحجم",
+      "placeholder": "أدخل الحجم"
     },
     "notes": {
       "label": "ملاحظات",
@@ -3924,7 +3924,7 @@
       "draft": "مسودة"
     },
     "validation": {
-      "name_required": "اسم الشركة مطلوب",
+      "name_required": "الاسم مطلوب",
       "email_required": "البريد الإلكتروني مطلوب",
       "email_invalid": "البريد الإلكتروني غير صالح"
     },

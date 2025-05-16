@@ -13,6 +13,7 @@ interface BooleanTabsProps {
   buttonClassName?: string; // Common className for both buttons
   trueButtonClassName?: string; // Additional className for the "true" button
   falseButtonClassName?: string; // Additional className for the "false" button
+  disabled?: boolean;
 }
 
 const BooleanTabs = ({
@@ -26,6 +27,7 @@ const BooleanTabs = ({
   buttonClassName,
   trueButtonClassName,
   falseButtonClassName,
+  disabled,
 }: BooleanTabsProps) => {
   const [internalActiveValue, setInternalActiveValue] = React.useState(defaultValue);
 
@@ -53,6 +55,7 @@ const BooleanTabs = ({
         <div className="size-full">
           <button
             type="button"
+            disabled={disabled}
             onClick={() => handleValueChange(true)}
             data-state={activeValue === true ? "active" : "inactive"}
             className={cn(baseButtonStyles, buttonClassName, trueButtonClassName)}
@@ -63,6 +66,7 @@ const BooleanTabs = ({
         <div className="size-full">
           <button
             type="button"
+            disabled={disabled}
             onClick={() => handleValueChange(false)}
             data-state={activeValue === false ? "active" : "inactive"}
             className={cn(baseButtonStyles, buttonClassName, falseButtonClassName)}

@@ -252,7 +252,7 @@ export function VendorForm({
                       <PhoneInput
                         value={field.value || ""}
                         onChange={field.onChange}
-                        ariaInvalid={form.formState.errors.phone !== undefined}
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -265,16 +265,12 @@ export function VendorForm({
           <AddressFormSection
             dir={locale === "ar" ? "rtl" : "ltr"}
             inDialog={editMode}
-            title={t("Vendors.form.address.label")}
+            title={t("Forms.address.label")}
             control={form.control}
             isLoading={isLoading}
           />
 
-          <NotesSection
-            inDialog={editMode}
-            control={form.control}
-            title={t("Vendors.form.notes.label")}
-          />
+          <NotesSection inDialog={editMode} control={form.control} title={t("Forms.notes.label")} />
         </form>
       </Form>
 

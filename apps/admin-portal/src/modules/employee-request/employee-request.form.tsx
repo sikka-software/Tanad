@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { parseDate } from "@internationalized/date";
 import { format } from "date-fns";
 import { createInsertSchema } from "drizzle-zod";
 import { CalendarIcon } from "lucide-react";
@@ -18,9 +19,10 @@ import { Textarea } from "@/ui/textarea";
 
 import NotesSection from "@/components/forms/notes-section";
 import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
+import { DateInput } from "@/components/ui/inputs/date-input";
 import { Input } from "@/components/ui/inputs/input";
 
-import { cn, getNotesValue } from "@/lib/utils";
+import { cn, getNotesValue, validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -53,8 +55,23 @@ const createRequestSchema = (t: (key: string) => string) => {
       message: t("EmployeeRequests.form.title.required"),
     }),
     description: z.string().optional(),
-    start_date: z.date().optional(),
-    end_date: z.date().optional(),
+    start_date: z
+      .any()
+      .refine((val) => val, {
+        message: t("EmployeeRequests.form.date_range.start.required"),
+      })
+      .superRefine(
+        validateYearRange(t, 1800, 2200, "EmployeeRequests.form.date_range.start.invalid"),
+      ),
+    end_date: z
+      .any()
+      .refine((val) => val, {
+        message: t("EmployeeRequests.form.date_range.end.required"),
+      })
+      .superRefine(
+        validateYearRange(t, 1800, 2200, "EmployeeRequests.form.date_range.end.invalid"),
+      ),
+
     amount: z.number().optional(),
     notes: z.any().optional().nullable(),
   });
@@ -125,8 +142,8 @@ export function EmployeeRequestForm({
       title: data.title.trim(),
       description: data.description?.trim() || undefined,
       notes: data.notes,
-      start_date: data.start_date ? data.start_date.toISOString() : undefined,
-      end_date: data.end_date ? data.end_date.toISOString() : undefined,
+      start_date: data.start_date?.toISOString(),
+      end_date: data.end_date?.toISOString(),
     };
 
     try {
@@ -254,7 +271,6 @@ export function EmployeeRequestForm({
                     <FormLabel>{t("EmployeeRequests.form.employee.label")} *</FormLabel>
                     <FormControl>
                       <ComboboxAdd
-                        ariaInvalid={form.formState.errors.employee_id !== undefined}
                         dir={locale === "ar" ? "rtl" : "ltr"}
                         data={employeeOptions}
                         disabled={isLoadingSave}
@@ -325,35 +341,22 @@ export function EmployeeRequestForm({
                   <FormItem>
                     <FormLabel>{t("EmployeeRequests.form.date_range.start")}</FormLabel>
                     <FormControl>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !field.value && "text-muted-foreground",
-                            )}
-                            disabled={isLoadingSave}
-                          >
-                            <CalendarIcon className="me-2 h-4 w-4" />
-                            {field.value ? format(field.value, "PPP") : t("General.pick_date")}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                      <DateInput
+                        placeholder={t("EmployeeRequests.form.date_range.start")}
+                        value={
+                          typeof field.value === "string"
+                            ? parseDate(field.value)
+                            : (field.value ?? null)
+                        }
+                        onChange={field.onChange}
+                        onSelect={(e) => field.onChange(e)}
+                        disabled={isLoadingSave}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="end_date"
@@ -361,29 +364,17 @@ export function EmployeeRequestForm({
                   <FormItem>
                     <FormLabel>{t("EmployeeRequests.form.date_range.end")}</FormLabel>
                     <FormControl>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !field.value && "text-muted-foreground",
-                            )}
-                            disabled={isLoadingSave}
-                          >
-                            <CalendarIcon className="me-2 h-4 w-4" />
-                            {field.value ? format(field.value, "PPP") : t("General.pick_date")}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                      <DateInput
+                        placeholder={t("EmployeeRequests.form.date_range.end")}
+                        value={
+                          typeof field.value === "string"
+                            ? parseDate(field.value)
+                            : (field.value ?? null)
+                        }
+                        onChange={field.onChange}
+                        onSelect={(e) => field.onChange(e)}
+                        disabled={isLoadingSave}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

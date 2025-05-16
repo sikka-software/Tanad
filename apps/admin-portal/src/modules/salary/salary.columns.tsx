@@ -62,7 +62,6 @@ const useSalaryColumns = (
               noItems: t("Salaries.form.employee_name.no_employees"),
             }}
             addText={t("Pages.Employees.add")}
-            ariaInvalid={false}
           />
         );
       },

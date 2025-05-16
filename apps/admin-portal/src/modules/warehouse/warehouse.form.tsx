@@ -241,13 +241,12 @@ export function WarehouseForm({
                         }
                         form.setValue("code", `WH-${randomCode}`);
                       }}
-                    >
-                      <Input
-                        placeholder={t("Warehouses.form.code.placeholder")}
-                        {...field}
-                        disabled={isLoading}
-                      />
-                    </CodeInput>
+                      inputProps={{
+                        placeholder: t("Warehouses.form.code.placeholder"),
+                        disabled: isLoading,
+                        ...field,
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -263,7 +262,6 @@ export function WarehouseForm({
                     <PhoneInput
                       value={field.value || ""}
                       onChange={field.onChange}
-                      ariaInvalid={form.formState.errors.phone !== undefined}
                       disabled={isLoading}
                     />
                   </FormControl>

@@ -91,7 +91,6 @@ const useOfficeColumns = (
               noItems: t("Offices.form.manager.no_employees"),
             }}
             addText={t("Pages.Employees.add")}
-            ariaInvalid={false}
           />
         );
       },

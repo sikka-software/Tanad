@@ -287,13 +287,12 @@ export function QuoteForm({
                           }
                           form.setValue("quote_number", `QT-${randomCode}`);
                         }}
-                      >
-                        <Input
-                          placeholder={t("Quotes.form.quote_number.placeholder")}
-                          {...field}
-                          disabled={isLoading}
-                        />
-                      </CodeInput>
+                        inputProps={{
+                          placeholder: t("Quotes.form.quote_number.placeholder"),
+                          disabled: isLoading,
+                          ...field,
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

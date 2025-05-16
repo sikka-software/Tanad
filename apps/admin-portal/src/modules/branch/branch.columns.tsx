@@ -88,7 +88,6 @@ const useBranchColumns = (
               noItems: t("Branches.form.manager.no_employees"),
             }}
             addText={t("Pages.Employees.add")}
-            ariaInvalid={false}
           />
         );
       },

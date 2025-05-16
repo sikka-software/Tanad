@@ -251,13 +251,11 @@ export function OfficeForm({
                           }
                           form.setValue("code", `OF-${randomCode}`);
                         }}
-                      >
-                        <Input
-                          {...field}
-                          disabled={isLoading}
-                          placeholder={t("Offices.form.code.placeholder")}
-                        />
-                      </CodeInput>
+                        inputProps={{
+                          disabled: isLoading,
+                          placeholder: t("Offices.form.code.placeholder"),
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -292,7 +290,6 @@ export function OfficeForm({
                       <PhoneInput
                         value={field.value || ""}
                         onChange={field.onChange}
-                        ariaInvalid={form.formState.errors.phone !== undefined}
                         disabled={isLoading}
                       />
                     </FormControl>
@@ -323,7 +320,6 @@ export function OfficeForm({
                         }}
                         addText={t("Pages.Employees.add")}
                         onAddClick={() => setIsEmployeeFormDialogOpen(true)}
-                        ariaInvalid={!!form.formState.errors.manager}
                       />
                     </FormControl>
                     <FormMessage />
@@ -338,6 +334,7 @@ export function OfficeForm({
                     <FormLabel>{t("CommonStatus.label")}</FormLabel>
                     <FormControl>
                       <BooleanTabs
+                        disabled={isLoading}
                         trueText={t("CommonStatus.active")}
                         falseText={t("CommonStatus.inactive")}
                         value={field.value === "active"}
@@ -408,7 +405,7 @@ export function OfficeForm({
               />
             </div>
           </div>
-          {/* <AddressFormSection
+          <AddressFormSection
             dir={locale === "ar" ? "rtl" : "ltr"}
             inDialog={editMode || nestedForm}
             title={t("Offices.form.address.label")}
@@ -419,7 +416,7 @@ export function OfficeForm({
             inDialog={editMode || nestedForm}
             control={form.control}
             title={t("Offices.form.notes.label")}
-          /> */}
+          />
         </form>
       </Form>
       <FormDialog

@@ -424,10 +424,9 @@ export function EmployeeForm({
                     <FormLabel>{t("Employees.form.phone.label")}</FormLabel>
                     <FormControl>
                       <PhoneInput
+                        value={field.value || ""}
+                        onChange={field.onChange}
                         disabled={isEmployeeSaving}
-                        {...field}
-                        value={field.value ?? ""}
-                        ariaInvalid={form.formState.errors.phone !== undefined}
                       />
                     </FormControl>
                     <FormMessage />
@@ -448,7 +447,6 @@ export function EmployeeForm({
                         onChange={field.onChange}
                         isLoading={jobsLoading}
                         disabled={isEmployeeSaving}
-                        ariaInvalid={form.formState.errors.job_id !== undefined}
                         texts={{
                           placeholder: t("Employees.form.job.placeholder"),
                           searchPlaceholder: t("Pages.Jobs.search"),
@@ -499,7 +497,6 @@ export function EmployeeForm({
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
                         disabled={isEmployeeSaving}
-                        ariaInvalid={form.formState.errors.hire_date !== undefined}
                       />
                     </FormControl>
                     <FormMessage />
@@ -547,7 +544,6 @@ export function EmployeeForm({
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
                         disabled={isEmployeeSaving}
-                        ariaInvalid={form.formState.errors.birth_date !== undefined}
                       />
                     </FormControl>
                     <FormMessage />

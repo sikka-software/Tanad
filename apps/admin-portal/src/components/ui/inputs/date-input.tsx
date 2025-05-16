@@ -14,13 +14,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 
 import { DateField, DateInput } from "@/components/ui/datefield-rac";
 
+import { cn } from "@/lib/utils";
+
+import { useFormField } from "../form";
+
 interface DatePickerProps {
   onSelect?: (date: Date | DateRange | undefined) => void;
   placeholder?: string;
   disabled?: boolean;
   isolated?: boolean;
   mode?: "default" | "multiple" | "range" | "single";
-  ariaInvalid?: boolean;
   onChange?: (date: CalendarDate | null) => void;
   value?: CalendarDate | null;
 }
@@ -31,7 +34,6 @@ export function DateInputField({
   disabled = false,
   isolated = false,
   mode = "single",
-  ariaInvalid = false,
   onChange,
   value,
   // ...props
@@ -39,6 +41,7 @@ export function DateInputField({
   const [open, setOpen] = React.useState(false);
   const locale = useLocale();
   const dateFormatter = useDateFormatter({ dateStyle: "medium" });
+  const { error } = useFormField();
 
   // Handler for calendar selection
   const handleCalendarSelect = (selected: Date | undefined) => {
@@ -67,15 +70,11 @@ export function DateInputField({
   return (
     <div className="flex w-full items-center">
       <I18nProvider locale={dateFieldLocale}>
-        <DateField
-          value={value}
-          isDisabled={disabled}
-          aria-invalid={ariaInvalid}
-          className="w-full"
-          onChange={onChange}
-        >
+        <DateField value={value} isDisabled={disabled} className="w-full" onChange={onChange}>
           <Group className="w-full">
-            <DateInput ariaInvalid={ariaInvalid} />
+            <DateInput
+              className={cn("rounded-e-none", error && "rounded-bl-none rtl:rounded-br-none")}
+            />
           </Group>
         </DateField>
       </I18nProvider>
@@ -84,7 +83,11 @@ export function DateInputField({
           <Button
             type="button"
             variant="outline"
-            className="ms-1 flex !size-9 min-w-9 items-center justify-center p-0 shadow-xs"
+            className={cn(
+              "ms- flex !size-9 min-w-9 items-center justify-center rounded-s-none border-s-0 p-0 shadow-xs",
+              error &&
+                "ring-destructive/20 dark:ring-destructive/40 border-destructive rounded-br-none rtl:rounded-bl-none",
+            )}
             tabIndex={-1}
             aria-label="Open calendar"
             disabled={disabled}

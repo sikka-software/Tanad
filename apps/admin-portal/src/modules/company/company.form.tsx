@@ -276,7 +276,7 @@ export function CompanyForm({
                     <PhoneInput
                       value={field.value || ""}
                       onChange={field.onChange}
-                      ariaInvalid={form.formState.errors.phone !== undefined}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />

@@ -20,6 +20,7 @@ import { countries } from "@/lib/constants/countries";
 import { cn } from "@/lib/utils";
 
 import { Button } from "../button";
+import { useFormField } from "../form";
 
 type CountryInputTypes<T> = {
   labelKey?: keyof T | any;
@@ -78,6 +79,7 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
   ) => {
     const [open, setOpen] = React.useState(false);
     const containerRef = React.useRef<HTMLDivElement>(null);
+    const { error } = useFormField();
 
     function getProperty<T>(obj: T, key: string | ((item: T) => string)): any {
       if (typeof key === "function") return key(obj);
@@ -124,8 +126,7 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
                   className={cn(
                     "ring-offset-background focus-visible:ring-ring inline-flex h-9 w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
                     "bg-background px-3",
-                    ariaInvalid &&
-                      "ring-destructive/20 dark:ring-destructive/40 border-destructive",
+                    error && "rounded-b-none ring-destructive/20 dark:ring-destructive/40 border-destructive",
                     // inCell && "h-10 rounded-none border-none",
                     // buttonClassName,
                   )}

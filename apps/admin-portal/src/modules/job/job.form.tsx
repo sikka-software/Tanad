@@ -364,7 +364,6 @@ function JobForm({
                       onChange={field.onChange}
                       onSelect={(e) => field.onChange(e)}
                       disabled={isLoading}
-                      ariaInvalid={form.formState.errors.start_date !== undefined}
                     />
                   </FormControl>
                   <FormMessage />
@@ -389,7 +388,6 @@ function JobForm({
                       onChange={field.onChange}
                       onSelect={(e) => field.onChange(e)}
                       disabled={isLoading}
-                      ariaInvalid={form.formState.errors.end_date !== undefined}
                     />
                   </FormControl>
                   <FormMessage />

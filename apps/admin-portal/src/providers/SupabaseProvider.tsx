@@ -47,7 +47,7 @@ export function SupabaseProvider({ children }: { children: ReactNode }) {
 
           // if no user is found take them to /auth
           if (!useUserStore.getState().user) {
-            router.push("/auth");
+            // router.push("/auth");
           } else {
             // router.push("/dashboard");
           }

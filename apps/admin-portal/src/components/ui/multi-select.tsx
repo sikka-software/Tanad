@@ -21,6 +21,8 @@ import { Skeleton } from "@/ui/skeleton";
 
 import { cn } from "@/lib/utils";
 
+import { useFormField } from "./form";
+
 /**
  * Variants for the multi-select component to handle different styles.
  * Uses class-variance-authority (cva) to define different styles based on "variant" prop.
@@ -166,6 +168,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const t = useTranslations();
     const locale = useLocale();
+    const { error } = useFormField();
 
     const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter") {
@@ -223,6 +226,8 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
               onClick={handleTogglePopover}
               className={cn(
                 "flex h-auto min-h-10 w-full items-center justify-between rounded-md border bg-inherit p-1 hover:bg-inherit [&_svg]:pointer-events-auto",
+                error && "form-button-input-invalid",
+
                 className,
               )}
             >

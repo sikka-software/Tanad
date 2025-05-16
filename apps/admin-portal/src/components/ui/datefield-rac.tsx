@@ -14,6 +14,8 @@ import {
 
 import { cn } from "@/lib/utils";
 
+import { useFormField } from "./form";
+
 function DateField<T extends DateValueRac>({ className, children, ...props }: DateFieldProps<T>) {
   return (
     <DateFieldRac
@@ -61,12 +63,13 @@ interface DateInputProps extends DateInputPropsRac {
 }
 
 function DateInput({ className, unstyled = false, ...props }: Omit<DateInputProps, "children">) {
+  const { error } = useFormField();
   return (
     <DateInputRac
       className={composeRenderProps(className, (className) =>
         cn(
           !unstyled && dateInputStyle,
-          props.ariaInvalid && "ring-destructive/20 dark:ring-destructive/40 border-destructive",
+          error && "ring-destructive/20 dark:ring-destructive/40 border-destructive",
           className,
         ),
       )}

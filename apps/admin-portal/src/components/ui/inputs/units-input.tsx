@@ -67,7 +67,10 @@ export default function UnitsInput({
           onValueChange={onValueChange}
           {...restSelectProps}
         >
-          <SelectTrigger className={cn("max-w-24 rounded-e-none", selectClassName)}>
+          <SelectTrigger
+            className={cn("max-w-24 rounded-e-none", selectClassName)}
+            disabled={inputProps.disabled}
+          >
             <SelectValue placeholder={selectPlaceholder} />
           </SelectTrigger>
           <SelectContent>

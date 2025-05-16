@@ -337,24 +337,7 @@ export function SalaryForm({
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
                         disabled={loadingSave}
-                        ariaInvalid={form.formState.errors.start_date !== undefined}
                       />
-                      {/* <DatePicker
-                        date={field.value ? new Date(field.value + "T00:00:00") : undefined}
-                        onSelect={(date) => {
-                          if (date) {
-                            // Ensure we're working with the local date
-                            const localDate = new Date(
-                              (date as Date).getTime() - (date as Date).getTimezoneOffset() * 60000,
-                            );
-                            field.onChange(localDate.toISOString().split("T")[0]);
-                          } else {
-                            field.onChange("");
-                          }
-                        }}
-                        placeholder={t("Salaries.form.pay_period_start.placeholder")}
-                        ariaInvalid={form.formState.errors.start_date !== undefined}
-                      /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -377,24 +360,7 @@ export function SalaryForm({
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
                         disabled={loadingSave}
-                        ariaInvalid={form.formState.errors.end_date !== undefined}
                       />
-                      {/* <DatePicker
-                        date={field.value ? new Date(field.value + "T00:00:00") : undefined}
-                        onSelect={(date) => {
-                          if (date) {
-                            // Ensure we're working with the local date
-                            const localDate = new Date(
-                              (date as Date).getTime() - (date as Date).getTimezoneOffset() * 60000,
-                            );
-                            field.onChange(localDate.toISOString().split("T")[0]);
-                          } else {
-                            field.onChange("");
-                          }
-                        }}
-                        placeholder={t("Salaries.form.pay_period_end.placeholder")}
-                        ariaInvalid={form.formState.errors.end_date !== undefined}
-                      /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -418,24 +384,7 @@ export function SalaryForm({
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
                         disabled={loadingSave}
-                        ariaInvalid={form.formState.errors.payment_date !== undefined}
                       />
-                      {/* <DatePicker
-                      date={field.value ? new Date(field.value + "T00:00:00") : undefined}
-                      onSelect={(date) => {
-                        if (date) {
-                          // Ensure we're working with the local date
-                          const localDate = new Date(
-                            (date as Date).getTime() - (date as Date).getTimezoneOffset() * 60000,
-                          );
-                          field.onChange(localDate.toISOString().split("T")[0]);
-                        } else {
-                          field.onChange("");
-                        }
-                      }}
-                      placeholder={t("Salaries.form.payment_date.placeholder")}
-                      ariaInvalid={form.formState.errors.payment_date !== undefined}
-                    /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>

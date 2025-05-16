@@ -159,7 +159,7 @@ export function ProductForm({
         <input hidden type="text" value={user?.id} {...form.register("user_id")} />
         <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
         <div className="form-container">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="name"
@@ -201,13 +201,12 @@ export function ProductForm({
                         }
                         form.setValue("sku", `SKU-${randomCode}`);
                       }}
-                    >
-                      <Input
-                        placeholder={t("Products.form.sku.placeholder")}
-                        {...field}
-                        disabled={isLoading}
-                      />
-                    </CodeInput>
+                      inputProps={{
+                        placeholder: t("Products.form.sku.placeholder"),
+                        disabled: isLoading,
+                        ...field,
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

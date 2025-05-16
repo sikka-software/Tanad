@@ -101,7 +101,6 @@ const useWarehouseColumns = (
               return <p className="pe-2 text-start">{value.label}</p>;
             }}
             addText={t("Pages.Employees.add")}
-            ariaInvalid={false}
           />
         );
       },

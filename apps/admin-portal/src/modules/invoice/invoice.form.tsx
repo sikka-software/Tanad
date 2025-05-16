@@ -1,60 +1,66 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { parseDate } from "@internationalized/date";
 import { createInsertSchema } from "drizzle-zod";
 import { useTranslations, useLocale } from "next-intl";
-import { Client } from "pg";
 import { useState, useEffect, useCallback } from "react";
 import React from "react";
 import { useForm, useFieldArray, FieldError, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import NotesSection from "@/components/forms/notes-section";
 import ProductsFormSection from "@/components/forms/products-form-section";
-import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 import CodeInput from "@/components/ui/inputs/code-input";
-import { Input } from "@/components/ui/inputs/input";
+import { DateInput } from "@/components/ui/inputs/date-input";
 import NumberInput from "@/components/ui/inputs/number-input";
 
-import { getNotesValue } from "@/lib/utils";
+import { getNotesValue, validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
-import { ClientForm } from "@/client/client.form";
+import ClientCombobox from "@/client/client.combobox";
+import { useClients } from "@/client/client.hooks";
+import useClientStore from "@/client/client.store";
 
-import { invoices } from "@/db/schema";
-import { useInvoices } from "@/modules/invoice/invoice.hooks";
+import { useInvoices } from "@/invoice/invoice.hooks";
+import { useCreateInvoice, useUpdateInvoice } from "@/invoice/invoice.hooks";
+import useInvoiceStore from "@/invoice/invoice.store";
 import {
   InvoiceUpdateData,
   InvoiceCreateData,
   InvoiceItem,
   InvoiceStatus,
-} from "@/modules/invoice/invoice.type";
-import useUserStore from "@/stores/use-user-store";
+} from "@/invoice/invoice.type";
 
-import ClientCombobox from "../client/client.combobox";
-import { useClients } from "../client/client.hooks";
-import useClientStore from "../client/client.store";
-import { useCreateInvoice, useUpdateInvoice } from "../invoice/invoice.hooks";
-import useInvoiceStore from "../invoice/invoice.store";
-import { ProductForm } from "../product/product.form";
-import { useProducts } from "../product/product.hooks";
-import useProductStore from "../product/product.store";
+import { ProductForm } from "@/product/product.form";
+import { useProducts } from "@/product/product.hooks";
+import useProductStore from "@/product/product.store";
+
+import { invoices } from "@/db/schema";
+import useUserStore from "@/stores/use-user-store";
 
 const createInvoiceSchema = (t: (key: string) => string) => {
   const InvoiceSelectSchema = createInsertSchema(invoices, {
-    client_id: z.string().min(1, t("Invoices.form.client.required")),
+    client_id: z
+      .string({
+        message: t("Invoices.form.client.required"),
+      })
+      .min(1, t("Invoices.form.client.required")),
     invoice_number: z.string().min(1, t("Invoices.form.invoice_number.required")),
-    issue_date: z.date({
-      required_error: t("Invoices.form.issue_date.required"),
-    }),
-    due_date: z.date({
-      required_error: t("Invoices.form.due_date.required"),
-    }),
+
+    issue_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Invoices.form.issue_date.invalid")),
+    due_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Invoices.form.due_date.invalid")),
+
     status: z.enum(InvoiceStatus, {
       message: t("Invoices.form.status.required"),
     }),
@@ -124,12 +130,8 @@ export function InvoiceForm({
   const formDefaultValues = {
     client_id: defaultValues?.client_id || "",
     invoice_number: defaultValues?.invoice_number || "",
-    issue_date: defaultValues?.issue_date
-      ? new Date(defaultValues.issue_date as string)
-      : new Date(),
-    due_date: defaultValues?.due_date
-      ? new Date(defaultValues.due_date as string)
-      : new Date(new Date().setDate(new Date().getDate() + 30)),
+    issue_date: defaultValues?.issue_date ? new Date(defaultValues.issue_date) : undefined,
+    due_date: defaultValues?.due_date ? new Date(defaultValues.due_date) : undefined,
     status: defaultValues?.status || "draft",
     subtotal: defaultValues?.subtotal || 0,
     tax_rate: defaultValues?.tax_rate || 0,
@@ -335,20 +337,17 @@ export function InvoiceForm({
                           }
                           form.setValue("invoice_number", `INV-${randomCode}`);
                         }}
-                      >
-                        <Input
-                          placeholder={t("Invoices.form.invoice_number.placeholder")}
-                          {...field}
-                          disabled={isLoading}
-                          aria-invalid={form.formState.errors.invoice_number !== undefined}
-                        />
-                      </CodeInput>
+                        inputProps={{
+                          placeholder: t("Invoices.form.invoice_number.placeholder"),
+                          disabled: isLoading,
+                          ...field,
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <ClientCombobox
                 label={t("Invoices.form.client.label")}
                 control={form.control}
@@ -358,7 +357,6 @@ export function InvoiceForm({
                 isDialogOpen={isDialogOpen}
                 setIsDialogOpen={setIsDialogOpen}
               />
-
               <FormField
                 control={form.control}
                 name="tax_rate"
@@ -370,39 +368,30 @@ export function InvoiceForm({
                         disabled={isLoading}
                         placeholder={t("Forms.zip_code.placeholder")}
                         {...field}
-                        value={field.value || ""} // Ensure controlled component
+                        value={field.value || ""}
                       />
-                      {/* <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        max="100"
-                        {...field}
-                        onChange={(e) => {
-                          const value = parseFloat(e.target.value);
-                          field.onChange(isNaN(value) ? 0 : value);
-                        }}
-                      /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="issue_date"
-                render={({ field: { value, onChange, ...field } }) => (
-                  <FormItem>
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
                     <FormLabel>{t("Invoices.form.issue_date.label")} *</FormLabel>
                     <FormControl>
-                      <DatePicker
-                        date={value}
-                        onSelect={onChange}
+                      <DateInput
                         placeholder={t("Invoices.form.issue_date.placeholder")}
-                        ariaInvalid={form.formState.errors.issue_date !== undefined}
+                        value={
+                          typeof field.value === "string"
+                            ? parseDate(field.value)
+                            : (field.value ?? null)
+                        }
+                        onChange={field.onChange}
+                        onSelect={(e) => field.onChange(e)}
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -413,15 +402,20 @@ export function InvoiceForm({
               <FormField
                 control={form.control}
                 name="due_date"
-                render={({ field: { value, onChange, ...field } }) => (
-                  <FormItem>
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
                     <FormLabel>{t("Invoices.form.due_date.label")} *</FormLabel>
                     <FormControl>
-                      <DatePicker
-                        date={value}
-                        onSelect={onChange}
+                      <DateInput
                         placeholder={t("Invoices.form.due_date.placeholder")}
-                        ariaInvalid={form.formState.errors.due_date !== undefined}
+                        value={
+                          typeof field.value === "string"
+                            ? parseDate(field.value)
+                            : (field.value ?? null)
+                        }
+                        onChange={field.onChange}
+                        onSelect={(e) => field.onChange(e)}
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage />

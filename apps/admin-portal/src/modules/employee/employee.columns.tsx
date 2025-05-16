@@ -84,7 +84,6 @@ const useCompanyColumns = (
               noItems: t("Offices.form.manager.no_employees"),
             }}
             addText={t("Pages.Employees.add")}
-            ariaInvalid={false}
             renderOption={(option) => {
               return (
                 <div className="flex flex-row items-center justify-between gap-2">
