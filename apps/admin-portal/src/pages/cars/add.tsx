@@ -7,7 +7,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyCar } from "@/lib/dummy-factory";
 
 import { CarForm } from "@/car/car.form";
 import useCarStore from "@/car/car.store";
@@ -18,23 +18,6 @@ export default function AddCarPage() {
 
   const setIsLoading = useCarStore((state) => state.setIsLoading);
   const isLoading = useCarStore((state) => state.isLoading);
-
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).carForm;
-    if (form) {
-      form.setValue("name", dummyData.first_name);
-      form.setValue("make", dummyData.last_name);
-      form.setValue("model", dummyData.email);
-      form.setValue("year", dummyData.randomNumber(4));
-      form.setValue("color", dummyData.randomString);
-      form.setValue("vin", dummyData.randomNumber(17));
-      form.setValue("code", dummyData.randomNumber(3));
-      form.setValue("license_country", dummyData.randomString);
-      form.setValue("license_plate", dummyData.randomString);
-      form.setValue("notes", dummyData.state);
-    }
-  };
 
   return (
     <div>
@@ -49,7 +32,7 @@ export default function AddCarPage() {
           submit_form: t("Pages.Cars.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyCar}
       />
 
       <CarForm

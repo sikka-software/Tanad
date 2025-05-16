@@ -7,7 +7,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyDomain } from "@/lib/dummy-factory";
 
 import { DomainForm } from "@/domain/domain.form";
 import useDomainStore from "@/domain/domain.store";
@@ -18,20 +18,6 @@ export default function AddDomainPage() {
 
   const setIsLoading = useDomainStore((state) => state.setIsLoading);
   const isLoading = useDomainStore((state) => state.isLoading);
-
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).domainForm;
-    if (form) {
-      form.setValue("domain_name", dummyData.first_name.toLowerCase() + ".com");
-      form.setValue("registrar", dummyData.email);
-      form.setValue("monthly_payment", dummyData.randomNumber(3));
-      form.setValue("annual_payment", dummyData.randomNumber(3));
-      form.setValue("payment_cycle", dummyData.randomPicker(["monthly", "annual"]));
-      form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
-      form.setValue("notes", dummyData.state);
-    }
-  };
 
   return (
     <div>
@@ -46,7 +32,7 @@ export default function AddDomainPage() {
           submit_form: t("Pages.Domains.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyDomain}
       />
 
       <DomainForm

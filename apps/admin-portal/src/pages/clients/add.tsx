@@ -7,7 +7,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyClient } from "@/lib/dummy-factory";
 
 import { ClientForm } from "@/client/client.form";
 import useClientStore from "@/client/client.store";
@@ -18,20 +18,6 @@ export default function AddClientPage() {
   const setIsLoading = useClientStore((state) => state.setIsLoading);
   const isLoading = useClientStore((state) => state.isLoading);
 
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).clientForm;
-    if (form) {
-      form.setValue("name", dummyData.full_name);
-      form.setValue("email", dummyData.email);
-      form.setValue("phone", dummyData.phone);
-      form.setValue("address", dummyData.address);
-      form.setValue("city", dummyData.city);
-      form.setValue("state", dummyData.state);
-      form.setValue("zip_code", dummyData.zip_code);
-    }
-  };
-
   return (
     <div>
       <CustomPageMeta title={t("Pages.Clients.add")} />
@@ -40,7 +26,7 @@ export default function AddClientPage() {
         formId="client-form"
         loading={isLoading}
         onCancel={() => router.push("/clients")}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyClient}
         texts={{
           title: t("Pages.Clients.add"),
           submit_form: t("Pages.Clients.add"),

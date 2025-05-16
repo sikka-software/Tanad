@@ -7,9 +7,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { SERVER_OS } from "@/lib/constants";
-import { SERVER_PROVIDERS } from "@/lib/constants";
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyServer } from "@/lib/dummy-factory";
 
 import { ServerForm } from "@/server/server.form";
 import useServerStore from "@/server/server.store";
@@ -20,19 +18,6 @@ export default function AddServerPage() {
 
   const setIsLoading = useServerStore((state) => state.setIsLoading);
   const isLoading = useServerStore((state) => state.isLoading);
-
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).serverForm;
-    if (form) {
-      form.setValue("name", dummyData.full_name);
-      form.setValue("ip_address", dummyData.random_ip_address);
-      form.setValue("location", dummyData.locations);
-      form.setValue("provider", dummyData.randomPicker(SERVER_PROVIDERS).value);
-      form.setValue("os", dummyData.randomPicker(SERVER_OS).value);
-      form.setValue("notes", dummyData.randomString);
-    }
-  };
 
   return (
     <div>
@@ -47,7 +32,7 @@ export default function AddServerPage() {
           submit_form: t("Pages.Servers.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyServer}
       />
 
       <ServerForm

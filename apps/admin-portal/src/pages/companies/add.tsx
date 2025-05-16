@@ -7,7 +7,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyCompany } from "@/lib/dummy-factory";
 
 import { CompanyForm } from "@/company/company.form";
 import useCompanyStore from "@/company/company.store";
@@ -19,24 +19,6 @@ export default function AddCompanyPage() {
   const setIsLoading = useCompanyStore((state) => state.setIsLoading);
   const isLoading = useCompanyStore((state) => state.isLoading);
 
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).companyForm;
-    if (form) {
-      form.setValue("name", dummyData.full_name);
-      form.setValue("email", dummyData.email);
-      form.setValue("phone", dummyData.phone);
-      form.setValue("street_name", dummyData.address);
-      form.setValue("city", dummyData.city);
-      form.setValue("region", "Eastern");
-      form.setValue("zip_code", String(dummyData.zip_code));
-      form.setValue("building_number", String(dummyData.randomNumber(5)));
-      form.setValue("additional_number", String(dummyData.randomNumber(5)));
-      form.setValue("industry", dummyData.randomString);
-      form.setValue("size", String(dummyData.randomNumber(3)));
-    }
-  };
-
   return (
     <div>
       <CustomPageMeta title={t("Pages.Companies.add")} />
@@ -45,7 +27,7 @@ export default function AddCompanyPage() {
         formId="company-form"
         loading={isLoading}
         onCancel={() => router.push("/companies")}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyCompany}
         texts={{
           title: t("Pages.Companies.add"),
           submit_form: t("Pages.Companies.add"),

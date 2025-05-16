@@ -7,7 +7,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyWebsite } from "@/lib/dummy-factory";
 
 import { WebsiteForm } from "@/modules/website/website.form";
 import useWebsiteStore from "@/modules/website/website.store";
@@ -18,20 +18,6 @@ export default function AddWebsitePage() {
 
   const setIsLoading = useWebsiteStore((state: any) => state.setIsLoading);
   const isLoading = useWebsiteStore((state: any) => state.isLoading);
-
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).websiteForm;
-    if (form) {
-      const randomSuffix = Math.random().toString(36).substr(2, 6);
-      form.setValue("domain_name", `example-${randomSuffix}.com`);
-      form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
-      form.setValue(
-        "notes",
-        "This is a test website generated on " + new Date().toLocaleDateString(),
-      );
-    }
-  };
 
   return (
     <div>
@@ -46,7 +32,7 @@ export default function AddWebsitePage() {
           submit_form: t("Pages.Websites.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyWebsite}
       />
 
       <WebsiteForm

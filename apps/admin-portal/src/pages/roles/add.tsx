@@ -18,8 +18,6 @@ export default function AddRolePage() {
   const setIsLoading = useEnterpriseUserStore((state) => state.setIsLoading);
   const isLoading = useEnterpriseUserStore((state) => state.isLoading);
 
-  const handleDummyData = () => {};
-
   return (
     <div>
       <CustomPageMeta title={t("Pages.Roles.add")} />
@@ -33,7 +31,6 @@ export default function AddRolePage() {
           submit_form: t("Pages.Roles.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
       />
 
       <div className="mx-auto max-w-2xl p-4">

@@ -7,7 +7,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyJob } from "@/lib/dummy-factory";
 
 import JobForm from "@/job/job.form";
 import useJobStore from "@/job/job.store";
@@ -18,26 +18,6 @@ export default function AddJobPage() {
 
   const isLoading = useJobStore((state) => state.isLoading);
   const setIsLoading = useJobStore((state) => state.setIsLoading);
-
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).jobForm;
-    if (form) {
-      form.setValue("title", dummyData.job_title);
-      form.setValue("description", dummyData.job_description);
-      form.setValue("requirements", dummyData.requirements);
-      form.setValue("location", dummyData.job_location);
-      form.setValue("department", dummyData.job_department);
-      form.setValue(
-        "type",
-        dummyData.randomPicker(["full_time", "part_time", "contract", "internship", "temporary"]),
-      );
-      form.setValue("salary", dummyData.job_salary);
-      form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
-      // form.setValue("start_date", dummyData.job_start_date);
-      // form.setValue("end_date", dummyData.job_end_date);
-    }
-  };
 
   return (
     <div>
@@ -52,7 +32,7 @@ export default function AddJobPage() {
           submit_form: t("Pages.Jobs.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyJob}
       />
 
       <JobForm

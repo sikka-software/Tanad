@@ -7,8 +7,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { E_COMMERCE_PLATFORMS } from "@/lib/constants";
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyOnlineStore } from "@/lib/dummy-factory";
 
 import { OnlineStoreForm } from "@/modules/online-store/online-store.form";
 import useOnlineStoreStore from "@/modules/online-store/online-store.store";
@@ -19,18 +18,6 @@ export default function AddOnlineStorePage() {
 
   const setIsLoading = useOnlineStoreStore((state) => state.setIsLoading);
   const isLoading = useOnlineStoreStore((state) => state.isLoading);
-
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).onlineStoreForm;
-    if (form) {
-      let dd = dummyData.randomPicker(E_COMMERCE_PLATFORMS);
-      form.setValue("domain_name", dummyData.first_name.toLowerCase() + ".com");
-      form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
-      form.setValue("platform", dd.value);
-      form.setValue("notes", dummyData.state);
-    }
-  };
 
   return (
     <div>
@@ -45,7 +32,7 @@ export default function AddOnlineStorePage() {
           submit_form: t("Pages.OnlineStores.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyOnlineStore}
       />
 
       <OnlineStoreForm

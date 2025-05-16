@@ -7,7 +7,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyOffice } from "@/lib/dummy-factory";
 
 import { OfficeForm } from "@/office/office.form";
 import useOfficeStore from "@/office/office.store";
@@ -17,21 +17,6 @@ export default function AddOfficePage() {
   const router = useRouter();
   const isLoading = useOfficeStore((state) => state.isLoading);
   const setIsLoading = useOfficeStore((state) => state.setIsLoading);
-
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).officeForm;
-    if (form) {
-      form.setValue("name", "Office " + dummyData.randomNumber(5));
-      form.setValue("email", dummyData.email);
-      form.setValue("phone", dummyData.phone);
-      form.setValue("building_number", String(dummyData.address));
-      form.setValue("street_name", dummyData.city);
-      form.setValue("city", dummyData.state);
-      form.setValue("zip_code", String(dummyData.zip_code));
-      form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
-    }
-  };
 
   return (
     <div>
@@ -46,7 +31,7 @@ export default function AddOfficePage() {
           submit_form: t("Pages.Offices.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyOffice}
       />
 
       <OfficeForm
