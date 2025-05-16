@@ -59,7 +59,7 @@ export function EmptyState({ title, description, icons = [], action, className }
       {action && (
         <Button
           onClick={action.onClick}
-          // variant="outline"
+          type="button"
           className={"mt-4 cursor-pointer shadow-sm active:shadow-none"}
         >
           {action.label}

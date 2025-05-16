@@ -83,7 +83,7 @@ const JobListingOptionsSection = ({
         {/* Enable Search & Filtering */}
         <FormField
           control={form.control}
-          name="enableSearchFiltering" // Ensure this name matches your form schema
+          name="enable_search_filtering" // Ensure this name matches your form schema
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">

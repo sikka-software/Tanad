@@ -158,8 +158,12 @@ export function JobListingForm({
           {
             id: defaultValues.id,
             data: {
-              title: coreListingData.title.trim(),
-              description: coreListingData.description?.trim() || null,
+              ...(() => {
+                const { jobs, ...rest } = data;
+                return rest;
+              })(),
+              title: data.title.trim(),
+              description: data.description?.trim() || null,
             },
           },
           {

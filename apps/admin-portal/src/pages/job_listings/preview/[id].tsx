@@ -128,7 +128,7 @@ export default function JobListingPreviewPage({
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8">
           <div className="flex flex-row items-center gap-4">
-            {enterprise && (
+            {enterprise?.logo && (
               <div>
                 <Image
                   src={enterprise?.logo || ""}
@@ -145,10 +145,10 @@ export default function JobListingPreviewPage({
                 <p className="text-muted-foreground max-w-2xl">{jobListing.description}</p>
               )}
               <div className="flex items-center space-x-2 pt-2">
-                <Badge variant={jobListing.status === "active" ? "default" : "outline"}>
+                <Badge className="rounded-md" variant={jobListing.status === "active" ? "default" : "outline"}>
                   {jobListing.status === "active" ? t("Status.active") : t("Status.inactive")}
                 </Badge>
-                <Badge variant={jobListing.is_public ? "default" : "outline"}>
+                <Badge className="rounded-md" variant={jobListing.is_public ? "default" : "outline"}>
                   {jobListing.is_public ? t("Visibility.public") : t("Visibility.private")}
                 </Badge>
               </div>

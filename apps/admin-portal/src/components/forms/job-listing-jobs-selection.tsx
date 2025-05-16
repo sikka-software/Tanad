@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Briefcase, Plus, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useMemo } from "react";
 import { FieldError, UseFormReturn } from "react-hook-form";
@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils";
 import { Job } from "@/job/job.type";
 
 import { JobListingFormValues } from "@/job-listing/job-listing.form";
+
+import { EmptyState } from "../ui/empty-state";
 
 interface JobListingJobsSelectionProps {
   editMode?: boolean;
@@ -82,14 +84,14 @@ const JobListingJobsSelection = ({
           </div>
         </div>
       </div>
-      <div className="form-container @container/jobs-section max-w-full bg--300">
+      <div className="form-container bg--300 @container/jobs-section max-w-full">
         <FormField
           control={form.control}
           name="jobs"
           render={() => (
             <FormItem>
               <div className="grid gap-4 md:grid-cols-1 @min-[500px]/jobs-section:grid-cols-3 @min-[800px]/jobs-section:grid-cols-4">
-                {filteredJobs.length > 0 ? (
+                {filteredJobs.length > 0 &&
                   filteredJobs.map((job: Job) => (
                     <div
                       key={job.id}
@@ -101,7 +103,9 @@ const JobListingJobsSelection = ({
                       onClick={() => handleJobSelect(job.id)}
                     >
                       <div className="mb-2 flex flex-row justify-between">
-                        <span className="text-sm text-gray-500">0/10</span>
+                        <span className="text-sm text-gray-500">
+                          {job.occupied_positions}/{job.total_positions}
+                        </span>
                         {selectedJobs.includes(job.id) && (
                           <div className="bg-primary size-3 rounded-full" />
                         )}
@@ -125,11 +129,19 @@ const JobListingJobsSelection = ({
                         )}
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <p className="py-4 text-center text-gray-500">
-                    {t("JobListings.jobs_section.no_jobs_found")}
-                  </p>
+                  ))}
+                {filteredJobs.length === 0 && (
+                  <div className="col-span-full">
+                    <EmptyState
+                      title={t("Jobs.create_first.title")}
+                      description={t("Jobs.create_first.description")}
+                      icons={[Briefcase, Plus, Briefcase]}
+                      action={{
+                        label: t("Pages.Jobs.add"),
+                        onClick: () => setIsJobDialogOpen(true),
+                      }}
+                    />
+                  </div>
                 )}
               </div>
             </FormItem>
