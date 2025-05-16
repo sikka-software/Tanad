@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 
 import ModuleCard from "@/components/cards/module-card";
 
@@ -26,6 +27,10 @@ const JobListingCard = ({
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
     await updateJobListing({ id: rowId, data: { [columnId]: value } });
   };
+
+  useEffect(() => {
+    console.log("jobListing", jobListing);
+  }, [jobListing]);
 
   return (
     <ModuleCard

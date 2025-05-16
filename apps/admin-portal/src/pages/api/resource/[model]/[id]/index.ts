@@ -92,16 +92,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Handle GET request
   if (req.method === "GET") {
     try {
-      const record = await query.findFirst({
-        where: eq(table[idField], id),
-      });
-
-      // console.log("record is ", record);
-
-      if (!record) {
-        return res.status(404).json({ message: `${model} not found` });
+      if (model === "job_listings") {
+        // Fetch the job listing by ID
+        const record = await query.findFirst({
+          where: eq(table[idField], id),
+        });
+        if (!record) {
+          return res.status(404).json({ message: `${model} not found` });
+        }
+        // Fetch associated jobs
+        const { data: jobLinks, error: jobsError } = await supabase
+          .from("job_listing_jobs")
+          .select("job_id")
+          .eq("job_listing_id", id);
+        if (jobsError) {
+          console.error("Error fetching job associations for job listing detail:", jobsError);
+          return res.status(500).json({ message: "Error fetching job associations" });
+        }
+        return res.status(200).json({
+          ...record,
+          jobs: jobLinks?.map((j: any) => j.job_id) || [],
+          jobs_count: jobLinks?.length || 0,
+        });
+      } else {
+        const record = await query.findFirst({
+          where: eq(table[idField], id),
+        });
+        if (!record) {
+          return res.status(404).json({ message: `${model} not found` });
+        }
+        return res.status(200).json(record);
       }
-      return res.status(200).json(record);
     } catch (error) {
       console.error(`Error fetching ${model}:`, error);
       return res.status(500).json({ message: `Error fetching ${model}` });
@@ -200,6 +221,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .json({ message: `${model} not found or update failed silently (potentially RLS)` });
       }
 
+      if (model === "job_listings") {
+        // After update, fetch the updated record and associated jobs
+        const { data: jobLinks, error: jobsError } = await supabase
+          .from("job_listing_jobs")
+          .select("job_id")
+          .eq("job_listing_id", id);
+        if (jobsError) {
+          console.error(
+            "Error fetching job associations for job listing detail after update:",
+            jobsError,
+          );
+          return res.status(500).json({ message: "Error fetching job associations" });
+        }
+        return res.status(200).json({
+          ...updatedRecord,
+          jobs: jobLinks?.map((j: any) => j.job_id) || [],
+          jobs_count: jobLinks?.length || 0,
+        });
+      }
       return res.status(200).json(updatedRecord);
     } catch (error: any) {
       console.error(`Raw error object updating ${model}:`, error);
