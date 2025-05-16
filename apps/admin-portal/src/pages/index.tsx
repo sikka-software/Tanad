@@ -50,7 +50,7 @@ export default function LandingPage() {
   );
 }
 
-LandingPage.messages = ["Metadata","Pages", "General", "Landing", "SEO"];
+LandingPage.messages = ["Metadata", "Pages", "General", "Landing", "SEO"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

@@ -26,8 +26,8 @@ import useJobListingColumns from "@/job-listing/job-listing.columns";
 import { JobListingForm } from "@/job-listing/job-listing.form";
 import {
   useJobListings,
-  useBulkDeleteJobListings,
   useDuplicateJobListing,
+  useBulkDeleteJobListings,
 } from "@/job-listing/job-listing.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/job-listing/job-listing.options";
 import useJobListingsStore from "@/job-listing/job-listing.store";
@@ -240,7 +240,8 @@ export default function JobListingsPage() {
   );
 }
 
-JobListingsPage.messages = ["Metadata",
+JobListingsPage.messages = [
+  "Metadata",
   "Notes",
   "Pages",
   "JobListings",

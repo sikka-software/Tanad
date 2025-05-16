@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
+
 import { createClient } from "@/utils/supabase/server-props";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -52,7 +53,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (listingVerifyError) throw listingVerifyError;
     if (listingCount === 0) {
-      return res.status(404).json({ message: `Job listing with id ${id} not found or not accessible.` });
+      return res
+        .status(404)
+        .json({ message: `Job listing with id ${id} not found or not accessible.` });
     }
 
     // 3. Delete all existing associations for this job listing
@@ -70,7 +73,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         user_id,
         enterprise_id,
       }));
-      const { error: insertError } = await supabase.from("job_listing_jobs").insert(recordsToInsert);
+      const { error: insertError } = await supabase
+        .from("job_listing_jobs")
+        .insert(recordsToInsert);
       if (insertError) throw insertError;
     }
 
@@ -97,4 +102,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error("Error in PUT /api/resource/job_listings/[id]/associations:", error);
     return res.status(500).json({ message: error.message || "Failed to update associations" });
   }
-} 
+}

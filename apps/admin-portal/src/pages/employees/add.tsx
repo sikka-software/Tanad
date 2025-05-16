@@ -46,7 +46,8 @@ export default function AddEmployeePage() {
   );
 }
 
-AddEmployeePage.messages = ["Metadata",
+AddEmployeePage.messages = [
+  "Metadata",
   "Employees",
   "Jobs",
   "Departments",

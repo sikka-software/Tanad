@@ -241,7 +241,15 @@ export default function CompaniesPage() {
   );
 }
 
-CompaniesPage.messages = ["Metadata","Notes", "Pages", "General", "Companies", "Forms", "CommonStatus"];
+CompaniesPage.messages = [
+  "Metadata",
+  "Notes",
+  "Pages",
+  "General",
+  "Companies",
+  "Forms",
+  "CommonStatus",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

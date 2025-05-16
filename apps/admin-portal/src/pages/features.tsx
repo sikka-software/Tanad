@@ -50,7 +50,7 @@ export default function FeaturesPage() {
   );
 }
 
-FeaturesPage.messages = ["Metadata","Pages", "General", "Features"];
+FeaturesPage.messages = ["Metadata", "Pages", "General", "Features"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

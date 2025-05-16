@@ -232,7 +232,7 @@ const SettingsPage = () => {
 
 export default SettingsPage;
 
-SettingsPage.messages = ["Metadata","Pages", "Settings", "General"];
+SettingsPage.messages = ["Metadata", "Pages", "Settings", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

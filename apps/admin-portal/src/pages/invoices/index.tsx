@@ -243,7 +243,8 @@ export default function InvoicesPage() {
   );
 }
 
-InvoicesPage.messages = ["Metadata",
+InvoicesPage.messages = [
+  "Metadata",
   "Notes",
   "Pages",
   "Clients",

@@ -47,7 +47,7 @@ export default function AddRolePage() {
   );
 }
 
-AddRolePage.messages = ["Metadata","Notes", "Pages", "Roles", "General"];
+AddRolePage.messages = ["Metadata", "Notes", "Pages", "Roles", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

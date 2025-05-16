@@ -47,7 +47,7 @@ export default function AddVendorPage() {
   );
 }
 
-AddVendorPage.messages = ["Metadata","Notes", "Pages", "Vendors", "Forms", "General"];
+AddVendorPage.messages = ["Metadata", "Notes", "Pages", "Vendors", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

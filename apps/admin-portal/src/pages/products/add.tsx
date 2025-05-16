@@ -48,7 +48,7 @@ export default function AddProductPage() {
   );
 }
 
-AddProductPage.messages = ["Metadata","Notes", "Pages", "Products", "Forms", "General"];
+AddProductPage.messages = ["Metadata", "Notes", "Pages", "Products", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

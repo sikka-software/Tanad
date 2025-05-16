@@ -48,7 +48,7 @@ export function CurrencyInput({
   ...props
 }: CurrencyInputProps) {
   const [inputText, setInputText] = useState(
-    typeof value === 'number' && !isNaN(value) ? value.toFixed(2) : ''
+    typeof value === "number" && !isNaN(value) ? value.toFixed(2) : "",
   );
   const isUserInput = useRef(false);
   const profile = useUserStore((state) => state.profile);
@@ -58,10 +58,10 @@ export function CurrencyInput({
   // Update input text when value prop changes, but only if it's not from user input
   useEffect(() => {
     if (!isUserInput.current) {
-      if (typeof value === 'number' && !isNaN(value)) {
+      if (typeof value === "number" && !isNaN(value)) {
         setInputText(value.toFixed(2));
       } else {
-        setInputText('');
+        setInputText("");
       }
     }
     isUserInput.current = false;

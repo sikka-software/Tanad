@@ -174,7 +174,7 @@ const ResetPassword = () => {
 
 export default ResetPassword;
 
-ResetPassword.messages = ["Metadata","Pages", "Auth", "General"];
+ResetPassword.messages = ["Metadata", "Pages", "Auth", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

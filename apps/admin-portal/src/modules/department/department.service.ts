@@ -137,4 +137,3 @@ export async function duplicateDepartment(id: string): Promise<Department> {
   }
   return response.json();
 }
-

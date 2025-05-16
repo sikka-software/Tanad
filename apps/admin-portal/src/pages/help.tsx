@@ -78,7 +78,7 @@ export default function HelpPage() {
   );
 }
 
-HelpPage.messages = ["Metadata","Pages", "General", "Help"];
+HelpPage.messages = ["Metadata", "Pages", "General", "Help"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

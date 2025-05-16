@@ -23,7 +23,7 @@ export default function TermsPage() {
   );
 }
 
-TermsPage.messages = ["Metadata","Pages", "Terms", "General"];
+TermsPage.messages = ["Metadata", "Pages", "Terms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

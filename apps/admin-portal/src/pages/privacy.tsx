@@ -23,7 +23,7 @@ export default function PrivacyPage() {
   );
 }
 
-PrivacyPage.messages = ["Metadata","Pages", "General", "Privacy"];
+PrivacyPage.messages = ["Metadata", "Pages", "General", "Privacy"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

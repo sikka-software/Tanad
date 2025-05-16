@@ -9,7 +9,7 @@ export default function LegalPage() {
   );
 }
 
-LegalPage.messages = ["Metadata","Pages", "General", "Legal"];
+LegalPage.messages = ["Metadata", "Pages", "General", "Legal"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

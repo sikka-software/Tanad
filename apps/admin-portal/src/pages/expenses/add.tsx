@@ -46,7 +46,7 @@ export default function AddExpensePage() {
   );
 }
 
-AddExpensePage.messages = ["Metadata","Notes", "Pages", "Expenses", "Forms", "General"];
+AddExpensePage.messages = ["Metadata", "Notes", "Pages", "Expenses", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

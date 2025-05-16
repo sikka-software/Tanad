@@ -238,7 +238,15 @@ export default function VendorsPage() {
   );
 }
 
-VendorsPage.messages = ["Metadata","Notes", "Pages", "Vendors", "Forms", "General", "CommonStatus"];
+VendorsPage.messages = [
+  "Metadata",
+  "Notes",
+  "Pages",
+  "Vendors",
+  "Forms",
+  "General",
+  "CommonStatus",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

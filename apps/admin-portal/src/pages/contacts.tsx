@@ -105,7 +105,7 @@ export default function ContactsPage() {
   );
 }
 
-ContactsPage.messages = ["Metadata","Pages", "General", "Contacts"];
+ContactsPage.messages = ["Metadata", "Pages", "General", "Contacts"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

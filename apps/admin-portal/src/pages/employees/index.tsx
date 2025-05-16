@@ -250,7 +250,8 @@ export default function EmployeesPage() {
   );
 }
 
-EmployeesPage.messages = ["Metadata",
+EmployeesPage.messages = [
+  "Metadata",
   "Employees",
   "Jobs",
   "Departments",

@@ -61,7 +61,7 @@ export default function OnboardingPage() {
   );
 }
 
-OnboardingPage.messages = ["Metadata","General", "OnBoarding"];
+OnboardingPage.messages = ["Metadata", "General", "OnBoarding"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

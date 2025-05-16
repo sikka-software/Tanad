@@ -251,7 +251,14 @@ export default function EmployeeRequestsPage() {
   );
 }
 
-EmployeeRequestsPage.messages = ["Metadata","Notes", "Pages", "EmployeeRequests", "General", "CommonStatus"];
+EmployeeRequestsPage.messages = [
+  "Metadata",
+  "Notes",
+  "Pages",
+  "EmployeeRequests",
+  "General",
+  "CommonStatus",
+];
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {

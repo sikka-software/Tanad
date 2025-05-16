@@ -19,7 +19,7 @@ export default function BlogPage() {
   );
 }
 
-BlogPage.messages = ["Metadata","Pages", "General", "Blog"];
+BlogPage.messages = ["Metadata", "Pages", "General", "Blog"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

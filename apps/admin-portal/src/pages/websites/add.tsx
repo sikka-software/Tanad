@@ -47,7 +47,7 @@ export default function AddWebsitePage() {
   );
 }
 
-AddWebsitePage.messages = ["Metadata","Notes", "Pages", "Websites", "General"];
+AddWebsitePage.messages = ["Metadata", "Notes", "Pages", "Websites", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

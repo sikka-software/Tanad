@@ -145,10 +145,16 @@ export default function JobListingPreviewPage({
                 <p className="text-muted-foreground max-w-2xl">{jobListing.description}</p>
               )}
               <div className="flex items-center space-x-2 pt-2">
-                <Badge className="rounded-md" variant={jobListing.status === "active" ? "default" : "outline"}>
+                <Badge
+                  className="rounded-md"
+                  variant={jobListing.status === "active" ? "default" : "outline"}
+                >
                   {jobListing.status === "active" ? t("Status.active") : t("Status.inactive")}
                 </Badge>
-                <Badge className="rounded-md" variant={jobListing.is_public ? "default" : "outline"}>
+                <Badge
+                  className="rounded-md"
+                  variant={jobListing.is_public ? "default" : "outline"}
+                >
                   {jobListing.is_public ? t("Visibility.public") : t("Visibility.private")}
                 </Badge>
               </div>

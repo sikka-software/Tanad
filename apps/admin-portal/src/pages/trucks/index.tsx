@@ -236,7 +236,7 @@ export default function TrucksPage() {
   );
 }
 
-TrucksPage.messages = ["Metadata","Pages", "Trucks", "Vehicles", "Notes", "Forms", "General"];
+TrucksPage.messages = ["Metadata", "Pages", "Trucks", "Vehicles", "Notes", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

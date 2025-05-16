@@ -239,7 +239,7 @@ export default function WebsitesPage() {
   );
 }
 
-WebsitesPage.messages = ["Metadata","Notes", "Pages", "Websites", "General", "CommonStatus"];
+WebsitesPage.messages = ["Metadata", "Notes", "Pages", "Websites", "General", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

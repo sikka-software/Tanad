@@ -239,7 +239,8 @@ export default function OfficesPage() {
   );
 }
 
-OfficesPage.messages = ["Metadata",
+OfficesPage.messages = [
+  "Metadata",
   "Offices",
   "Pages",
   "Employees",

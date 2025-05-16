@@ -189,7 +189,7 @@ export default function UsersPage() {
   );
 }
 
-UsersPage.messages = ["Metadata","Notes", "Pages", "Users", "Roles", "General"];
+UsersPage.messages = ["Metadata", "Notes", "Pages", "Users", "Roles", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

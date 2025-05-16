@@ -243,7 +243,15 @@ export default function ServersPage() {
   );
 }
 
-ServersPage.messages = ["Metadata","Notes", "Forms", "Pages", "Servers", "General", "CommonStatus"];
+ServersPage.messages = [
+  "Metadata",
+  "Notes",
+  "Forms",
+  "Pages",
+  "Servers",
+  "General",
+  "CommonStatus",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

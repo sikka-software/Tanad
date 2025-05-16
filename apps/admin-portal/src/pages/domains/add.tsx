@@ -47,7 +47,7 @@ export default function AddDomainPage() {
   );
 }
 
-AddDomainPage.messages = ["Metadata","Pages", "Domains", "Notes", "General", "PaymentCycles"];
+AddDomainPage.messages = ["Metadata", "Pages", "Domains", "Notes", "General", "PaymentCycles"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

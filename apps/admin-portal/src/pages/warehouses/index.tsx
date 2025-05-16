@@ -237,7 +237,15 @@ export default function WarehousesPage() {
   );
 }
 
-WarehousesPage.messages = ["Metadata","Notes", "Pages", "Warehouses", "Forms", "General", "CommonStatus"];
+WarehousesPage.messages = [
+  "Metadata",
+  "Notes",
+  "Pages",
+  "Warehouses",
+  "Forms",
+  "General",
+  "CommonStatus",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
