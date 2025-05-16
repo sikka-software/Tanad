@@ -150,11 +150,6 @@ export function QuoteForm({
     }, 0);
   }, [watchedItems]);
 
-  const clientOptions = clients.map((client) => ({
-    value: client.id,
-    label: `${client.name}${client.company ? ` (${client.company})` : ""}`,
-  }));
-
   const handleProductSelection = (index: number, product_id: string | undefined) => {
     if (!product_id) return;
     const product = products.find((p) => p.id === product_id);
@@ -265,7 +260,11 @@ export function QuoteForm({
                     <FormLabel>{t("Quotes.form.client.label")} *</FormLabel>
                     <FormControl>
                       <ComboboxAdd
-                        data={clientOptions}
+                        data={clients.map((client) => ({
+                          value: client.id,
+                          label: client.name,
+                          email: client.email,
+                        }))}
                         isLoading={clientsLoading}
                         defaultValue={field.value}
                         onChange={(value) => field.onChange(value || null)}
@@ -276,6 +275,12 @@ export function QuoteForm({
                         }}
                         addText={t("Pages.Clients.add")}
                         onAddClick={() => setIsDialogOpen(true)}
+                        renderOption={(option) => (
+                          <div className="flex flex-col">
+                            <span>{option.label}</span>
+                            <span className="text-muted-foreground text-xs">{option.email}</span>
+                          </div>
+                        )}
                       />
                     </FormControl>
                     <FormMessage />

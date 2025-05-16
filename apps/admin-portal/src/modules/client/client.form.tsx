@@ -257,40 +257,37 @@ export function ClientForm({
               <FormField
                 control={form.control}
                 name="company"
-                render={({ field }) => {
-                  console.log("companies ", companies);
-                  return (
-                    <FormItem>
-                      <FormLabel>{t("Clients.form.company.label")}</FormLabel>
-                      <FormControl>
-                        <ComboboxAdd
-                          dir={locale === "ar" ? "rtl" : "ltr"}
-                          data={companyOptions}
-                          isLoading={companiesLoading}
-                          defaultValue={field.value || ""}
-                          valueKey="value"
-                          onChange={(value) => field.onChange(value || null)}
-                          texts={{
-                            placeholder: t("Clients.form.company.placeholder"),
-                            searchPlaceholder: t("Pages.Companies.search"),
-                            noItems: t("Clients.form.company.no_companies"),
-                          }}
-                          addText={t("Pages.Companies.add")}
-                          onAddClick={() => setIsCompanyDialogOpen(true)}
-                          renderOption={(item) => (
-                            <div>
-                              <p>{item.label}</p>
-                              <p className="text-muted-foreground text-xs">
-                                {item.email ? item.email : item.website}
-                              </p>
-                            </div>
-                          )}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Clients.form.company.label")}</FormLabel>
+                    <FormControl>
+                      <ComboboxAdd
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        data={companyOptions}
+                        isLoading={companiesLoading}
+                        defaultValue={field.value || ""}
+                        valueKey="value"
+                        onChange={(value) => field.onChange(value || null)}
+                        texts={{
+                          placeholder: t("Clients.form.company.placeholder"),
+                          searchPlaceholder: t("Pages.Companies.search"),
+                          noItems: t("Clients.form.company.no_companies"),
+                        }}
+                        addText={t("Pages.Companies.add")}
+                        onAddClick={() => setIsCompanyDialogOpen(true)}
+                        renderOption={(item) => (
+                          <div>
+                            <p>{item.label}</p>
+                            <p className="text-muted-foreground text-xs">
+                              {item.email ? item.email : item.website}
+                            </p>
+                          </div>
+                        )}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
               <FormField
                 control={form.control}
