@@ -1,4 +1,4 @@
-import { MoreHorizontal } from "lucide-react";
+import { ChevronDown, MoreHorizontal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { Badge } from "@/ui/badge";
@@ -12,6 +12,13 @@ import {
 } from "@/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { ScrollArea } from "@/ui/scroll-area";
+
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 
 import { convertToPascalCase } from "@/lib/utils";
 
@@ -112,50 +119,63 @@ export default function RoleCard({ role, onActionClick, disableActions = false }
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
-          <div>
-            <h4 className="text-sm font-medium">{t("Roles.permissions.title")}</h4>
-            <div className="text-muted-foreground flex flex-wrap gap-1 pt-1 text-sm">
-              {Object.keys(allPermissionsByCategory).length > 0 ? (
-                Object.entries(allPermissionsByCategory)
-                  .filter(([category]) => assignedPermissionsByCategory[category]?.length > 0)
-                  .map(([category]) => {
-                    const assignedPerms = assignedPermissionsByCategory[category] || [];
-                    const assignedCount = assignedPerms.length;
+        <div className="space-y-2 rounded-md bg-muted/20 border">
+          <Accordion type="single" collapsible>
+            <AccordionItem value="permissions">
+              <AccordionTrigger className="bg-muted/50 hover:bg-muted cursor-pointer rounded-md p-2 text-sm font-medium no-underline hover:no-underline data-[state=open]:rounded-b-none">
+                <div className="flex w-full flex-row items-center justify-between">
+                  <span>{t("Roles.permissions.title")}</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="p-0">
+                <div className="text-muted-foreground flex flex-wrap gap-1 p-4 text-sm">
+                  {Object.keys(allPermissionsByCategory).length > 0 ? (
+                    Object.entries(allPermissionsByCategory)
+                      .filter(([category]) => assignedPermissionsByCategory[category]?.length > 0)
+                      .map(([category]) => {
+                        const assignedPerms = assignedPermissionsByCategory[category] || [];
+                        const assignedCount = assignedPerms.length;
 
-                    const displayCategory = convertToPascalCase(category);
-                    return (
-                      <Popover key={category}>
-                        <PopoverTrigger asChild>
-                          <Badge variant="secondary" className="cursor-pointer font-normal">
-                            {t(`Pages.${displayCategory}.title`)} ({assignedCount})
-                          </Badge>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-fit p-0" dir={locale === "ar" ? "rtl" : "ltr"}>
-                          <ScrollArea className="h-auto max-h-48">
-                            <div className="p-4">
-                              <h5 className="mb-2 text-sm leading-none font-medium">
-                                {t(`Pages.${displayCategory}.title`)}
-                              </h5>
-                              <ul className="space-y-1 text-center text-xs">
-                                {assignedPerms.map((perm) => (
-                                  <li key={perm}>{t(`Roles.permissions.${perm.split(".")[1]}`)}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          </ScrollArea>
-                        </PopoverContent>
-                      </Popover>
-                    );
-                  })
-              ) : (
-                <span>{t("Roles.no_permissions")}</span>
-              )}
-              {(!role.permissions || role.permissions.length === 0) && (
-                <span>{t("Roles.no_permissions")}</span>
-              )}
-            </div>
-          </div>
+                        const displayCategory = convertToPascalCase(category);
+                        return (
+                          <Popover key={category}>
+                            <PopoverTrigger asChild>
+                              <Badge variant="secondary" className="cursor-pointer font-normal">
+                                {t(`Pages.${displayCategory}.title`)} ({assignedCount})
+                              </Badge>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-fit p-0"
+                              dir={locale === "ar" ? "rtl" : "ltr"}
+                            >
+                              <ScrollArea className="h-auto max-h-48">
+                                <div className="p-4">
+                                  <h5 className="mb-2 text-sm leading-none font-medium">
+                                    {t(`Pages.${displayCategory}.title`)}
+                                  </h5>
+                                  <ul className="space-y-1 text-center text-xs">
+                                    {assignedPerms.map((perm) => (
+                                      <li key={perm}>
+                                        {t(`Roles.permissions.${perm.split(".")[1]}`)}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </ScrollArea>
+                            </PopoverContent>
+                          </Popover>
+                        );
+                      })
+                  ) : (
+                    <span>{t("Roles.no_permissions")}</span>
+                  )}
+                  {(!role.permissions || role.permissions.length === 0) && (
+                    <span>{t("Roles.no_permissions")}</span>
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </CardContent>
     </Card>
