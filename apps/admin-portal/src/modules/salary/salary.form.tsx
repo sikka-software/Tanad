@@ -72,19 +72,25 @@ const createSalarySchema = (t: (key: string) => string) => {
     employee_id: z.string().min(1, t("Salaries.form.employee_name.required")),
     start_date: z
       .any()
-      .optional()
+      .refine((val) => val, {
+        message: t("Salaries.form.pay_period_start.required"),
+      })
       .superRefine(validateYearRange(t, 1800, 2200, "Salaries.form.pay_period_start.invalid")),
     end_date: z
       .any()
-      .optional()
+      .refine((val) => val, {
+        message: t("Salaries.form.pay_period_end.required"),
+      })
       .superRefine(validateYearRange(t, 1800, 2200, "Salaries.form.pay_period_end.invalid")),
     payment_date: z
       .any()
-      .optional()
+      .refine((val) => val, {
+        message: t("Salaries.form.payment_date.required"),
+      })
       .superRefine(validateYearRange(t, 1800, 2200, "Salaries.form.payment_date.invalid")),
     payment_frequency: z.string().min(1, t("Salaries.form.payment_frequency.required")),
 
-    amount: z.number().positive(t("Salaries.form.amount.positive")),
+    amount: z.coerce.number().positive(t("Salaries.form.amount.positive")),
     // z.number().optional().or(z.literal(""))
     deductions: z
       .array(createDeductionSchema(t))
@@ -293,7 +299,7 @@ export function SalaryForm({
                       <CurrencyInput
                         showCommas={true}
                         value={field.value ? parseFloat(String(field.value)) : undefined}
-                        onChange={(value) => field.onChange(value || "")}
+                        onChange={(value) => field.onChange(value ? Number(value) : undefined)}
                         placeholder={t("Salaries.form.amount.placeholder")}
                         disabled={loading}
                       />
