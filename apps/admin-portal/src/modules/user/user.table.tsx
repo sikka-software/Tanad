@@ -58,7 +58,7 @@ export default function UsersTable({
       validationSchema: z.string().min(1, t("Users.form.role.required")),
     },
     {
-      accessorKey: "created_at",
+      accessorKey: "created_at", maxSize: 95,
       header: t("Users.form.created_at.label"),
       cell: ({ row }) => {
         const date = row.original.created_at;
@@ -85,7 +85,7 @@ export default function UsersTable({
 
   if (isLoading) {
     return (
-      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
+      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={12} />
     );
   }
 

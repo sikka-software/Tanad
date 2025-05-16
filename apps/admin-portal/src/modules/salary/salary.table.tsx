@@ -61,7 +61,7 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
         columns={columns
           .map((col) => col.accessorKey || col.id)
           .filter((key): key is string => !!key)}
-        rows={5}
+        rows={12}
       />
     );
   }

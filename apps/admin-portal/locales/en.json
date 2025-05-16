@@ -3362,6 +3362,16 @@
       "placeholder": "Enter update date"
     }
   },
+  "Metadata": {
+    "created_at": {
+      "label": "Created At",
+      "placeholder": "Enter creation date"
+    },
+    "updated_at": {
+      "label": "Updated At",
+      "placeholder": "Enter update date"
+    }
+  },
   "Companies": {
     "title": "Companies",
     "add_new": "Add Company",

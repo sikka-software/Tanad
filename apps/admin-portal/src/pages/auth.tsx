@@ -39,15 +39,12 @@ export default function Auth() {
   const profile = useUserStore((state) => state.profile);
   const user = useUserStore((state) => state.user);
   const enterprise = useUserStore((state) => state.enterprise);
-  const membership = useUserStore((state) => state.membership);
-  const permissions = useUserStore((state) => state.permissions);
 
   useEffect(() => {
-    console.table({ user, profile, enterprise });
     if (user?.id && profile?.id && enterprise?.id) {
       router.push("/dashboard");
     }
-  }, []);
+  }, [user, profile, enterprise]);
 
   useEffect(() => {
     setIsSignUp(router.asPath.includes("#signup"));

@@ -79,7 +79,7 @@ const useSalaryColumns = (
     },
 
     {
-      accessorKey: "created_at",
+      accessorKey: "created_at", maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
       validationSchema: z.string().min(1, t("Metadata.created_at.required")),
@@ -87,7 +87,7 @@ const useSalaryColumns = (
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
-      accessorKey: "updated_at",
+      accessorKey: "updated_at", maxSize: 95,
       enableEditing: false,
 
       header: t("Metadata.updated_at.label"),

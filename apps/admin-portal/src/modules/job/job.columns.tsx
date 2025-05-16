@@ -105,6 +105,7 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
 
     {
       accessorKey: "created_at",
+      maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
       validationSchema: z.string().min(1, t("Metadata.created_at.required")),
@@ -113,8 +114,9 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
     },
     {
       accessorKey: "updated_at",
-      enableEditing: false,
+      maxSize: 95,
 
+      enableEditing: false,
       header: t("Metadata.updated_at.label"),
       validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
