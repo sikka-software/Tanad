@@ -85,6 +85,15 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
     const quantity = useWatch({ control, name: `items.${index}.quantity` });
     const unitPrice = useWatch({ control, name: `items.${index}.unit_price` });
 
+    // Memoize the mapped products data for the combobox
+    const comboboxProductsData = useMemo(() => {
+      return productsData?.map((product) => ({
+        label: product.name,
+        value: product.id,
+        price: product.price,
+      })) || [];
+    }, [productsData]);
+
     const subtotalNumber =
       typeof quantity === "number" && typeof unitPrice === "number" ? quantity * unitPrice : 0;
     const subtotal = subtotalNumber.toFixed(2);
@@ -101,13 +110,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                 <FormControl>
                   <ComboboxAdd
                     dir={locale === "ar" ? "rtl" : "ltr"}
-                    data={
-                      productsData?.map((product) => ({
-                        label: product.name,
-                        value: product.id,
-                        price: product.price,
-                      })) || []
-                    }
+                    data={comboboxProductsData}
                     disabled={isLoading}
                     containerClassName="min-w-[150px] w-full"
                     isLoading={productsLoading}

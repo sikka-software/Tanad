@@ -3,6 +3,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { useTranslations, useLocale } from "next-intl";
 import { Client } from "pg";
 import { useState, useEffect, useCallback } from "react";
+import React from "react";
 import { useForm, useFieldArray, FieldError, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -159,15 +160,12 @@ export function InvoiceForm({
   });
 
   const calculateSubtotal = useCallback((items: InvoiceFormValues["items"]) => {
-    console.log("DEBUG: calculateSubtotal called with items:", items);
     return items.reduce((sum, item) => {
       const quantity = item.quantity || 0;
       const price = item.unit_price || 0;
-      // Ensure quantity and price are treated as numbers
       const numericQuantity = Number(quantity);
       const numericPrice = Number(price);
       if (isNaN(numericQuantity) || isNaN(numericPrice)) {
-        console.warn("DEBUG: NaN detected in item calculation", item);
         return sum;
       }
       return sum + numericQuantity * numericPrice;
@@ -175,16 +173,10 @@ export function InvoiceForm({
   }, []);
 
   useEffect(() => {
-    console.log("DEBUG: Subtotal useEffect triggered. watchedItems from useWatch:", JSON.stringify(watchedItems));
-    // Ensure watchedItems is an array before trying to calculate
     const itemsToCalculate = Array.isArray(watchedItems) ? watchedItems : [];
     const newSubtotal = calculateSubtotal(itemsToCalculate);
-    console.log("DEBUG: Subtotal useEffect - calculated newSubtotal:", newSubtotal);
     form.setValue("subtotal", newSubtotal, { shouldValidate: true, shouldDirty: true });
-    console.log("DEBUG: Subtotal useEffect - form.getValues().subtotal after setValue:", form.getValues().subtotal);
-    // It's often useful to log the entire form state here to see if other parts are as expected
-    // console.log("DEBUG: Subtotal useEffect - form.getValues() after subtotal update:", form.getValues());
-  }, [watchedItems, calculateSubtotal, form.setValue]); // Dependencies: watchedItems, and stable calculateSubtotal, form.setValue
+  }, [watchedItems, calculateSubtotal, form.setValue]);
 
   const handleProductSelection = (index: number, product_id: string) => {
     const selectedProduct = products?.find((product) => product.id === product_id);
@@ -275,12 +267,6 @@ export function InvoiceForm({
     (window as any).invoiceForm = form;
   }
 
-  // Format clients for ComboboxAdd
-  const clientOptions = clients?.map((client) => ({
-    label: client.company ? `${client.name} (${client.company})` : client.name,
-    value: client.id,
-  }));
-
   return (
     <>
       <Form {...form}>
@@ -288,7 +274,6 @@ export function InvoiceForm({
           id={formHtmlId || "invoice-form"}
           onSubmit={(e) => {
             e.preventDefault();
-            console.log("DEBUG: form.getValues() before handleSubmit", form.getValues());
             form.handleSubmit(handleSubmit)(e);
           }}
         >
@@ -296,14 +281,34 @@ export function InvoiceForm({
           <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="form-fields-cols-2">
-              <ClientCombobox
-                label={t("Invoices.form.client.label")}
+              <FormField
                 control={form.control}
-                clients={clients || []}
-                loadingCombobox={clientsLoading}
-                isClientSaving={isClientSaving}
-                isDialogOpen={isDialogOpen}
-                setIsDialogOpen={setIsDialogOpen}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Invoices.form.status.label")} *</FormLabel>
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Invoices.form.status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        {InvoiceStatus.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`Invoices.form.status.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
 
               <FormField
@@ -341,27 +346,15 @@ export function InvoiceForm({
                   </FormItem>
                 )}
               />
-            </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <FormField
+              <ClientCombobox
+                label={t("Invoices.form.client.label")}
                 control={form.control}
-                name="subtotal"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Invoices.form.subtotal.label")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={field.value.toFixed(2)}
-                        readOnly
-                        disabled
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                clients={clients || []}
+                loadingCombobox={clientsLoading}
+                isClientSaving={isClientSaving}
+                isDialogOpen={isDialogOpen}
+                setIsDialogOpen={setIsDialogOpen}
               />
 
               <FormField
@@ -428,36 +421,6 @@ export function InvoiceForm({
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Invoices.form.status.label")} *</FormLabel>
-                  <Select
-                    defaultValue={field.value}
-                    onValueChange={field.onChange}
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("Invoices.form.status.placeholder")} />
-                      </SelectTrigger>
-                    </FormControl>
-
-                    <SelectContent>
-                      {InvoiceStatus.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {t(`Invoices.form.status.${status}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
 
           <ProductsFormSection
