@@ -216,6 +216,8 @@ export interface SheetTableProps<T extends object> extends FooterProps {
   // --- Column visibility ---
   columnVisibility?: Record<string, boolean>;
   onColumnVisibilityChange?: (updater: any) => void;
+  sorting?: any;
+  onSortingChange?: (updater: any) => void;
 }
 
 /**
@@ -358,6 +360,8 @@ function SheetTable<
     columnVisibility,
     onColumnVisibilityChange,
     tableOptions,
+    sorting,
+    onSortingChange,
   } = props;
 
   const t = useTranslations();
@@ -422,6 +426,7 @@ function SheetTable<
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: onColumnVisibilityChange,
+    onSortingChange,
     ...(tableOptions || {}),
     state: {
       ...tableOptions?.state,
@@ -429,6 +434,7 @@ function SheetTable<
       columnVisibility,
       globalFilter,
       expanded,
+      sorting,
       pagination: {
         pageSize: data.length,
         pageIndex: 0,

@@ -149,12 +149,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // console.log("API Handler - req.body before update:", JSON.stringify(req.body, null, 2));
 
       // --- Explicitly define fields to update ---
+      const updated_at = new Date().toISOString();
       const {
         // Exclude fields not meant for direct update
         id: _id,
         created_at: _createdAt,
-        updated_at: _updatedAt,
-        created_by: _createdBy,
+        // updated_at: _updatedAt,
+        // created_by: _createdBy,
         enterprise_id: _enterpriseId, // Also exclude enterprise_id from spread if present in body
         // Include other fields from req.body that ARE updatable
         ...updatableDataFromRequest
@@ -162,6 +163,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Explicitly add the user's enterprise_id to the update payload
       const updatableData = {
+        updated_at,
         ...updatableDataFromRequest,
         enterprise_id: existingRecord.enterprise_id, // Use the enterprise_id from the record being updated
       };

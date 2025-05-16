@@ -6,4 +6,5 @@ export const FILTERABLE_FIELDS: FilterableField[] = [
 
 export const SORTABLE_COLUMNS: SortableColumn[] = [
   { value: "created_at", translationKey: "Forms.created_at.label" },
+  { value: "updated_at", translationKey: "Forms.updated_at.label" },
 ];

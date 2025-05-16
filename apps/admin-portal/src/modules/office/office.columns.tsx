@@ -115,6 +115,16 @@ const useOfficeColumns = (
       header: t("Offices.form.area.label"),
       validationSchema: z.string().min(1, t("Offices.form.area.required")),
     },
+    {
+      accessorKey: "created_at",
+      header: t("Forms.created_at.label"),
+      validationSchema: z.string().min(1, t("Forms.created_at.required")),
+    },
+    {
+      accessorKey: "updated_at",
+      header: t("Forms.updated_at.label"),
+      validationSchema: z.string().min(1, t("Forms.updated_at.required")),
+    },
 
     {
       accessorKey: "status",

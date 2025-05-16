@@ -68,6 +68,8 @@ export interface ModuleTableProps<T> {
   isLoading?: boolean;
   error?: Error | null;
   onActionClicked: (action: string, rowId: string) => void;
+  sorting?: any;
+  onSortingChange?: (updater: any) => void;
 }
 
 export interface ModuleFormProps<T> {
