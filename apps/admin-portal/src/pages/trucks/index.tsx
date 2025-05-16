@@ -71,7 +71,7 @@ export default function TrucksPage() {
   const searchQuery = moduleHooks.useSearchQuery();
   const viewMode = moduleHooks.useViewMode();
 
-  const { data: trucks, isLoading, error } = useTrucks();
+  const { data: trucks, isLoading: isFetchingTrucks, error } = useTrucks();
   const { mutateAsync: deleteTrucks, isPending: isDeleting } = useBulkDeleteTrucks();
   const { mutate: duplicateTruck } = useDuplicateTruck();
   const { createDeleteHandler } = useDeleteHandler();
@@ -174,7 +174,7 @@ export default function TrucksPage() {
           {viewMode === "table" ? (
             <TrucksTable
               data={sortedData}
-              isLoading={isLoading}
+              isLoading={isFetchingTrucks}
               error={error}
               onActionClicked={onActionClicked}
               sorting={tanstackSorting}
@@ -184,7 +184,7 @@ export default function TrucksPage() {
             <div className="p-4">
               <DataModelList
                 data={sortedData}
-                isLoading={isLoading}
+                isLoading={isFetchingTrucks}
                 error={error}
                 empty={{
                   title: t("Trucks.create_first.title"),
@@ -236,7 +236,16 @@ export default function TrucksPage() {
   );
 }
 
-TrucksPage.messages = ["Metadata", "Pages", "Trucks", "Vehicles", "Notes", "Forms", "General"];
+TrucksPage.messages = [
+  "Metadata",
+  "Pages",
+  "Trucks",
+  "Vehicles",
+  "Notes",
+  "Forms",
+  "General",
+  "PaymentCycles",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

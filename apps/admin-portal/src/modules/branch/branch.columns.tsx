@@ -18,7 +18,7 @@ const useBranchColumns = (
   const t = useTranslations();
   const locale = useLocale();
 
-  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const { data: employees = [], isLoading: isFetchingEmployees } = useEmployees();
   const employeeOptions = employees.map((emp) => ({
     label: `${emp.first_name} ${emp.last_name}`,
     value: emp.id,
@@ -78,7 +78,7 @@ const useBranchColumns = (
             dir={locale === "ar" ? "rtl" : "ltr"}
             inCell
             data={employeeOptions}
-            isLoading={employeesLoading}
+            isLoading={isFetchingEmployees}
             buttonClassName="bg-transparent"
             defaultValue={branch.manager || ""}
             onChange={async (value) => handleEdit?.(branch.id, "manager", value)}

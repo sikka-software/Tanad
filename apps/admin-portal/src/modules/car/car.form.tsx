@@ -205,7 +205,7 @@ export function CarForm({
                       dir={lang === "ar" ? "rtl" : "ltr"}
                     >
                       <FormControl>
-                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
+                        <SelectTrigger value={field.value}>
                           <SelectValue placeholder={t("Vehicles.form.status.placeholder")} />
                         </SelectTrigger>
                       </FormControl>
@@ -258,6 +258,167 @@ export function CarForm({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="ownership_status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.ownership_status.label")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      key={field.value}
+                      value={field.value}
+                      onValueChange={(val) => field.onChange(val)}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
+                          <SelectValue
+                            placeholder={t("Vehicles.form.ownership_status.placeholder")}
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {VehicleOwnershipStatus.map((typeOpt) => (
+                          <SelectItem key={typeOpt} value={typeOpt}>
+                            {t(`Vehicles.form.ownership_status.${typeOpt}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {(form.watch("ownership_status") === "financed" ||
+              form.watch("ownership_status") === "rented") && (
+              <FormField
+                control={form.control}
+                name="payment_cycle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("PaymentCycles.label")}</FormLabel>
+                    <FormControl>
+                      <Select
+                        dir={lang === "ar" ? "rtl" : "ltr"}
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={isLoading}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("PaymentCycles.placeholder")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="daily">{t("PaymentCycles.daily")}</SelectItem>
+                          <SelectItem value="weekly">{t("PaymentCycles.weekly")}</SelectItem>
+                          <SelectItem value="monthly">{t("PaymentCycles.monthly")}</SelectItem>
+                          <SelectItem value="annual">{t("PaymentCycles.annual")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            {(form.watch("ownership_status") === "financed" ||
+              form.watch("ownership_status") === "rented") &&
+              form.watch("payment_cycle") === "daily" && (
+                <FormField
+                  control={form.control}
+                  name="daily_payment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("PaymentCycles.daily_payment.label")}</FormLabel>
+                      <FormControl>
+                        <CurrencyInput
+                          placeholder={t("PaymentCycles.daily_payment.placeholder")}
+                          disabled={isLoading}
+                          {...field}
+                          showCommas={true}
+                          value={field.value ? parseFloat(String(field.value)) : undefined}
+                          onChange={(value) => field.onChange(value?.toString() || "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            {(form.watch("ownership_status") === "financed" ||
+              form.watch("ownership_status") === "rented") &&
+              form.watch("payment_cycle") === "weekly" && (
+                <FormField
+                  control={form.control}
+                  name="weekly_payment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("PaymentCycles.weekly_payment.label")}</FormLabel>
+                      <FormControl>
+                        <CurrencyInput
+                          placeholder={t("PaymentCycles.weekly_payment.placeholder")}
+                          disabled={isLoading}
+                          {...field}
+                          showCommas={true}
+                          value={field.value ? parseFloat(String(field.value)) : undefined}
+                          onChange={(value) => field.onChange(value?.toString() || "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            {(form.watch("ownership_status") === "financed" ||
+              form.watch("ownership_status") === "rented") &&
+              form.watch("payment_cycle") === "monthly" && (
+                <FormField
+                  control={form.control}
+                  name="monthly_payment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("PaymentCycles.monthly_payment.label")}</FormLabel>
+                      <FormControl>
+                        <CurrencyInput
+                          placeholder={t("PaymentCycles.monthly_payment.placeholder")}
+                          disabled={isLoading}
+                          {...field}
+                          showCommas={true}
+                          value={field.value ? parseFloat(String(field.value)) : undefined}
+                          onChange={(value) => field.onChange(value?.toString() || "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            {(form.watch("ownership_status") === "financed" ||
+              form.watch("ownership_status") === "rented") &&
+              form.watch("payment_cycle") === "annual" && (
+                <FormField
+                  control={form.control}
+                  name="annual_payment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("PaymentCycles.annual_payment.label")}</FormLabel>
+                      <FormControl>
+                        <CurrencyInput
+                          placeholder={t("PaymentCycles.annual_payment.placeholder")}
+                          disabled={isLoading}
+                          {...field}
+                          showCommas={true}
+                          value={field.value ? parseFloat(String(field.value)) : undefined}
+                          onChange={(value) => field.onChange(value?.toString() || "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
             <FormField
               control={form.control}
@@ -389,166 +550,6 @@ export function CarForm({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="ownership_status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.ownership_status.label")}</FormLabel>
-                  <FormControl>
-                    <Select
-                      key={field.value}
-                      value={field.value}
-                      onValueChange={(val) => field.onChange(val)}
-                      dir={lang === "ar" ? "rtl" : "ltr"}
-                    >
-                      <FormControl>
-                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
-                          <SelectValue
-                            placeholder={t("Vehicles.form.ownership_status.placeholder")}
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {VehicleOwnershipStatus.map((typeOpt) => (
-                          <SelectItem key={typeOpt} value={typeOpt}>
-                            {t(`Vehicles.form.ownership_status.${typeOpt}`)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {(form.watch("ownership_status") === "financed" ||
-              form.watch("ownership_status") === "rented") && (
-              <FormField
-                control={form.control}
-                name="payment_cycle"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("PaymentCycles.label")}</FormLabel>
-                    <FormControl>
-                      <Select
-                        dir={lang === "ar" ? "rtl" : "ltr"}
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={isLoading}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder={t("PaymentCycles.placeholder")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="daily">{t("PaymentCycles.daily")}</SelectItem>
-                          <SelectItem value="weekly">{t("PaymentCycles.weekly")}</SelectItem>
-                          <SelectItem value="monthly">{t("PaymentCycles.monthly")}</SelectItem>
-                          <SelectItem value="annual">{t("PaymentCycles.annual")}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-            {(form.watch("ownership_status") === "financed" ||
-              form.watch("ownership_status") === "rented") &&
-              form.watch("payment_cycle") === "daily" && (
-                <FormField
-                  control={form.control}
-                  name="daily_payment"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("PaymentCycles.daily_payment.label")}</FormLabel>
-                      <FormControl>
-                        <CurrencyInput
-                          placeholder={t("PaymentCycles.daily_payment.placeholder")}
-                          disabled={isLoading}
-                          {...field}
-                          showCommas={true}
-                          value={field.value ? parseFloat(String(field.value)) : undefined}
-                          onChange={(value) => field.onChange(value?.toString() || "")}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-            {(form.watch("ownership_status") === "financed" ||
-              form.watch("ownership_status") === "rented") &&
-              form.watch("payment_cycle") === "weekly" && (
-                <FormField
-                  control={form.control}
-                  name="weekly_payment"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("PaymentCycles.weekly_payment.label")}</FormLabel>
-                      <FormControl>
-                        <CurrencyInput
-                          placeholder={t("PaymentCycles.weekly_payment.placeholder")}
-                          disabled={isLoading}
-                          {...field}
-                          showCommas={true}
-                          value={field.value ? parseFloat(String(field.value)) : undefined}
-                          onChange={(value) => field.onChange(value?.toString() || "")}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-            {(form.watch("ownership_status") === "financed" ||
-              form.watch("ownership_status") === "rented") &&
-              form.watch("payment_cycle") === "monthly" && (
-                <FormField
-                  control={form.control}
-                  name="monthly_payment"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("PaymentCycles.monthly_payment.label")}</FormLabel>
-                      <FormControl>
-                        <CurrencyInput
-                          placeholder={t("PaymentCycles.monthly_payment.placeholder")}
-                          disabled={isLoading}
-                          {...field}
-                          showCommas={true}
-                          value={field.value ? parseFloat(String(field.value)) : undefined}
-                          onChange={(value) => field.onChange(value?.toString() || "")}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-            {(form.watch("ownership_status") === "financed" ||
-              form.watch("ownership_status") === "rented") &&
-              form.watch("payment_cycle") === "annual" && (
-                <FormField
-                  control={form.control}
-                  name="annual_payment"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("PaymentCycles.annual_payment.label")}</FormLabel>
-                      <FormControl>
-                        <CurrencyInput
-                          placeholder={t("PaymentCycles.annual_payment.placeholder")}
-                          disabled={isLoading}
-                          {...field}
-                          showCommas={true}
-                          value={field.value ? parseFloat(String(field.value)) : undefined}
-                          onChange={(value) => field.onChange(value?.toString() || "")}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
           </div>
         </div>
       </form>

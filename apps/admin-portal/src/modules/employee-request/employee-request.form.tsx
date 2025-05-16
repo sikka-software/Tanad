@@ -62,15 +62,15 @@ const createRequestSchema = (t: (key: string) => string) => {
       })
       .superRefine(
         validateYearRange(t, 1800, 2200, "EmployeeRequests.form.date_range.start.invalid"),
-      ),
+      )
+      .optional(),
     end_date: z
       .any()
       .refine((val) => val, {
         message: t("EmployeeRequests.form.date_range.end.required"),
       })
-      .superRefine(
-        validateYearRange(t, 1800, 2200, "EmployeeRequests.form.date_range.end.invalid"),
-      ),
+      .superRefine(validateYearRange(t, 1800, 2200, "EmployeeRequests.form.date_range.end.invalid"))
+      .optional(),
 
     amount: z.number().optional(),
     notes: z.any().optional().nullable(),
@@ -94,7 +94,7 @@ export function EmployeeRequestForm({
   const user = useUserStore((state) => state.user);
   const enterprise = useUserStore((state) => state.enterprise);
 
-  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const { data: employees = [], isLoading: isFetchingEmployees } = useEmployees();
   const setIsLoadingCreateEmployee = useEmployeeStore((state) => state.setIsLoading);
   const isLoadingCreateEmployee = useEmployeeStore((state) => state.isLoading);
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
@@ -142,8 +142,8 @@ export function EmployeeRequestForm({
       title: data.title.trim(),
       description: data.description?.trim() || undefined,
       notes: data.notes,
-      start_date: data.start_date?.toISOString(),
-      end_date: data.end_date?.toISOString(),
+      start_date: data.start_date.toString(),
+      end_date: data.end_date.toString(),
     };
 
     try {
@@ -274,7 +274,7 @@ export function EmployeeRequestForm({
                         dir={locale === "ar" ? "rtl" : "ltr"}
                         data={employeeOptions}
                         disabled={isLoadingSave}
-                        isLoading={employeesLoading}
+                        isLoading={isFetchingEmployees}
                         defaultValue={field.value}
                         valueKey={"id"}
                         onChange={(value) => {

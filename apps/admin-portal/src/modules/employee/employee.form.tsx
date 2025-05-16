@@ -130,7 +130,7 @@ export function EmployeeForm({
   const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
 
   const [isJobDialogOpen, setIsJobDialogOpen] = useState(false);
-  const { data: jobs, isLoading: jobsLoading } = useJobs();
+  const { data: jobs, isLoading: isFetchingJobs } = useJobs();
   const isJobSaving = useJobStore((state) => state.isLoading);
   const setIsJobSaving = useJobStore((state) => state.setIsLoading);
 
@@ -445,7 +445,7 @@ export function EmployeeForm({
                         data={jobOptions}
                         defaultValue={field.value ?? undefined}
                         onChange={field.onChange}
-                        isLoading={jobsLoading}
+                        isLoading={isFetchingJobs}
                         disabled={isEmployeeSaving}
                         texts={{
                           placeholder: t("Employees.form.job.placeholder"),

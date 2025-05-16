@@ -19,6 +19,7 @@ import { Skeleton } from "@/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 import { Button } from "../button";
+import { useFormField } from "../form";
 
 type ComboboxTypes<T> = {
   labelKey?: keyof T | any;
@@ -51,7 +52,6 @@ type ComboboxTypes<T> = {
   onChange?: (selectedValue: string) => void;
   renderOption?: (item: T) => React.ReactNode;
   renderSelected?: (item: T) => React.ReactNode;
-  ariaInvalid?: boolean;
   filter?: (value: string, search: string) => number;
 };
 export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
@@ -65,7 +65,6 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
       labelProps,
       inputProps,
       data,
-      ariaInvalid,
       renderOption,
       renderSelected,
       value: controlledValue,
@@ -77,6 +76,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
   ) => {
     const [open, setOpen] = React.useState(false);
     const containerRef = React.useRef<HTMLDivElement>(null);
+    const { error } = useFormField();
 
     function getProperty<T>(obj: T, key: string): any {
       return key.split(".").reduce((o: any, k: string) => (o || {})[k], obj);
@@ -123,8 +123,8 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
                   className={cn(
                     "ring-offset-background focus-visible:ring-ring inline-flex h-9 w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
                     "bg-background px-3",
-                    ariaInvalid &&
-                      "ring-destructive/20 dark:ring-destructive/40 border-destructive",
+                    error && "form-button-input-invalid",
+                    // "ring-destructive/20 dark:ring-destructive/40 border-destructive",
                     // inCell && "h-10 rounded-none border-none",
                     // buttonClassName,
                   )}

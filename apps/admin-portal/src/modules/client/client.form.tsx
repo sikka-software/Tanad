@@ -66,10 +66,11 @@ export function ClientForm({
   const { mutateAsync: createClient } = useCreateClient();
   const { mutateAsync: updateClient } = useUpdateClient();
 
-  const isLoading = useClientStore((state) => state.isLoading);
-  const setIsLoading = useClientStore((state) => state.setIsLoading);
+  const isSavingClient = useClientStore((state) => state.isLoading);
+  const setIsSavingClient = useClientStore((state) => state.setIsLoading);
 
-  const { data: companies, isLoading: companiesLoading } = useCompanies();
+  const { data: companies, isLoading: isFetchingCompanies } = useCompanies();
+
   const setIsCompanySaving = useCompanyStore((state) => state.setIsLoading);
   const isCompanySaving = useCompanyStore((state) => state.isLoading);
   const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
@@ -99,7 +100,7 @@ export function ClientForm({
   });
 
   const handleSubmit = async (data: ClientFormValues) => {
-    setIsLoading(true);
+    setIsSavingClient(true);
     if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
@@ -171,7 +172,7 @@ export function ClientForm({
         );
       }
     } catch (error) {
-      setIsLoading(false);
+      setIsSavingClient(false);
       console.error("Failed to save client:", error);
       toast.error(t("General.error_operation"), {
         description: t("Clients.error.create"),
@@ -209,7 +210,7 @@ export function ClientForm({
                       <Input
                         placeholder={t("Clients.form.name.placeholder")}
                         {...field}
-                        disabled={isLoading}
+                        disabled={isSavingClient}
                       />
                     </FormControl>
                     <FormMessage />
@@ -230,7 +231,7 @@ export function ClientForm({
                         type="email"
                         dir="ltr"
                         placeholder={t("Clients.form.email.placeholder")}
-                        disabled={isLoading}
+                        disabled={isSavingClient}
                         {...field}
                       />
                     </FormControl>
@@ -248,7 +249,7 @@ export function ClientForm({
                       <PhoneInput
                         value={field.value || ""}
                         onChange={field.onChange}
-                        disabled={isLoading}
+                        disabled={isSavingClient}
                       />
                     </FormControl>
                     <FormMessage />
@@ -265,9 +266,9 @@ export function ClientForm({
                       <ComboboxAdd
                         dir={locale === "ar" ? "rtl" : "ltr"}
                         data={companyOptions}
-                        isLoading={companiesLoading}
+                        isLoading={isFetchingCompanies}
                         defaultValue={field.value || ""}
-                        disabled={isLoading}
+                        disabled={isSavingClient}
                         valueKey="value"
                         onChange={(value) => field.onChange(value || null)}
                         texts={{
@@ -299,7 +300,7 @@ export function ClientForm({
                     <FormLabel>{t("Clients.form.status.label")}</FormLabel>
                     <FormControl>
                       <BooleanTabs
-                        disabled={isLoading}
+                        disabled={isSavingClient}
                         trueText={t("Clients.form.status.active")}
                         falseText={t("Clients.form.status.inactive")}
                         value={field.value === "active"}
@@ -321,7 +322,7 @@ export function ClientForm({
             inDialog={editMode || nestedForm}
             title={t("Clients.form.address.label")}
             control={form.control}
-            isLoading={isLoading}
+            disabled={isSavingClient}
           />
           <NotesSection
             inDialog={editMode || nestedForm}

@@ -109,7 +109,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
         {
           title: ModulesOptions.companies.label,
           translationKey: ModulesOptions.companies.label,
-          is_active: pathname === ModulesOptions.companies.url,
+          is_active: pathname.startsWith(ModulesOptions.companies.url),
           action: ModulesOptions.companies.url + "/add",
           url: ModulesOptions.companies.url,
           requiredPermission: "companies.read",
@@ -263,7 +263,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
           translationKey: "Pages.Employees.all",
           url: ModulesOptions.employees.url,
           action: ModulesOptions.employees.url + "/add",
-          is_active: pathname === ModulesOptions.employees.url,
+          is_active: pathname.startsWith(ModulesOptions.employees.url),
           requiredPermission: "employees.read",
         },
         {
@@ -279,7 +279,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
           translationKey: ModulesOptions.salaries.label,
           url: ModulesOptions.salaries.url,
           action: ModulesOptions.salaries.url + "/add",
-          is_active: pathname === ModulesOptions.salaries.url,
+          is_active: pathname.startsWith(ModulesOptions.salaries.url),
           requiredPermission: "salaries.read",
         },
         // {
@@ -325,7 +325,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
           translationKey: ModulesOptions.job_listings.label,
           url: ModulesOptions.job_listings.url,
           action: ModulesOptions.job_listings.url + "/add",
-          is_active: pathname === ModulesOptions.job_listings.url,
+          is_active: pathname.startsWith(ModulesOptions.job_listings.url),
           requiredPermission: "job_listings.read",
         },
         {
@@ -333,7 +333,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
           translationKey: ModulesOptions.jobs.label,
           url: ModulesOptions.jobs.url,
           action: ModulesOptions.jobs.url + "/add",
-          is_active: pathname === ModulesOptions.jobs.url,
+          is_active: pathname.startsWith(ModulesOptions.jobs.url),
           requiredPermission: "jobs.read",
         },
         {
@@ -341,7 +341,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
           translationKey: ModulesOptions.applicants.label,
           url: ModulesOptions.applicants.url,
           action: ModulesOptions.applicants.url + "/add",
-          is_active: pathname === ModulesOptions.applicants.url,
+          is_active: pathname.startsWith(ModulesOptions.applicants.url),
           requiredPermission: "applicants.read",
         },
       ],
@@ -404,14 +404,14 @@ function getSystemAdminMenus(pathname: string): SidebarMenuGroupProps["items"] {
       translationKey: ModulesOptions.users.label,
       icon: ModulesOptions.users.icon,
       url: ModulesOptions.users.url,
-      is_active: pathname === ModulesOptions.users.url,
+      is_active: pathname.startsWith(ModulesOptions.users.url),
     },
     {
       title: ModulesOptions.roles.label,
       translationKey: ModulesOptions.roles.label,
       icon: ModulesOptions.roles.icon,
       url: ModulesOptions.roles.url,
-      is_active: pathname === ModulesOptions.roles.url,
+      is_active: pathname.startsWith(ModulesOptions.roles.url),
     },
   ];
 }
@@ -423,7 +423,7 @@ function getFleetMenus(pathname: string): SidebarMenuGroupProps["items"] {
       translationKey: ModulesOptions.cars.label,
       icon: ModulesOptions.cars.icon,
       url: ModulesOptions.cars.url,
-      is_active: pathname === ModulesOptions.cars.url,
+      is_active: pathname.startsWith(ModulesOptions.cars.url),
       action: ModulesOptions.cars.url + "/add",
     },
     {
@@ -431,7 +431,7 @@ function getFleetMenus(pathname: string): SidebarMenuGroupProps["items"] {
       translationKey: ModulesOptions.trucks.label,
       icon: ModulesOptions.trucks.icon,
       url: ModulesOptions.trucks.url,
-      is_active: pathname === ModulesOptions.trucks.url,
+      is_active: pathname.startsWith(ModulesOptions.trucks.url),
       action: ModulesOptions.trucks.url + "/add",
     },
   ];

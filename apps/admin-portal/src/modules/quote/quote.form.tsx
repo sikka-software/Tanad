@@ -104,8 +104,8 @@ export function QuoteForm({
 
   const setIsLoading = useQuoteStore((state) => state.setIsLoading);
   const isLoading = useQuoteStore((state) => state.isLoading);
-  const setIsClientSaving = useClientStore((state) => state.setIsLoading);
-  const isClientSaving = useClientStore((state) => state.isLoading);
+  const setIsSavingClient = useClientStore((state) => state.setIsLoading);
+  const isSavingClient = useClientStore((state) => state.isLoading);
   const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
 
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
@@ -259,7 +259,7 @@ export function QuoteForm({
                 control={form.control}
                 clients={clients || []}
                 loadingCombobox={clientsLoading}
-                isClientSaving={isClientSaving}
+                isSaving={isSavingClient}
                 isDialogOpen={isDialogOpen}
                 setIsDialogOpen={setIsDialogOpen}
               />
@@ -490,7 +490,7 @@ export function QuoteForm({
           nestedForm
           formHtmlId="client-form-quote"
           onSuccess={() => {
-            setIsClientSaving(false);
+            setIsSavingClient(false);
             setIsClientDialogOpen(false);
           }}
         />

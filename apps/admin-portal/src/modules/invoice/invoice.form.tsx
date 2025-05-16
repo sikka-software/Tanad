@@ -111,23 +111,24 @@ export function InvoiceForm({
   const { mutateAsync: createInvoice } = useCreateInvoice();
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
 
-  const isProductSaving = useProductStore((state) => state.isLoading);
-  const setIsProductSaving = useProductStore((state) => state.setIsLoading);
+  const isSavingInvoice = useInvoiceStore((state) => state.isLoading);
+  const setIsSavingInvoice = useInvoiceStore((state) => state.setIsLoading);
 
-  const isClientSaving = useClientStore((state) => state.isLoading);
-  const setIsClientSaving = useClientStore((state) => state.setIsLoading);
+  const isSavingProduct = useProductStore((state) => state.isLoading);
+  const setIsSavingProduct = useProductStore((state) => state.setIsLoading);
+
+  const isSavingClient = useClientStore((state) => state.isLoading);
+  const setIsSavingClient = useClientStore((state) => state.setIsLoading);
 
   const { data: invoices } = useInvoices();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
 
-  const { data: products, isLoading: productsLoading } = useProducts();
-  const { data: clients, isLoading: clientsLoading } = useClients();
-
-  const isLoading = useInvoiceStore((state) => state.isLoading);
-  const setIsLoading = useInvoiceStore((state) => state.setIsLoading);
+  const { data: products, isLoading: isFetchingProducts } = useProducts();
+  const { data: clients, isLoading: isFetchingClients } = useClients();
 
   const formDefaultValues = {
+    // ...defaultValues,
     client_id: defaultValues?.client_id || "",
     invoice_number: defaultValues?.invoice_number || "",
     issue_date: defaultValues?.issue_date ? new Date(defaultValues.issue_date) : undefined,
@@ -190,12 +191,12 @@ export function InvoiceForm({
   };
 
   const handleSubmit = async (data: InvoiceFormValues) => {
-    setIsLoading(true);
+    setIsSavingInvoice(true);
     if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
-      setIsLoading(false);
+      setIsSavingInvoice(false);
       return;
     }
 
@@ -262,7 +263,7 @@ export function InvoiceForm({
         description: editMode ? t("Invoices.error.update") : t("Invoices.error.create"),
       });
     } finally {
-      setIsLoading(false);
+      setIsSavingInvoice(false);
     }
   };
 
@@ -339,7 +340,7 @@ export function InvoiceForm({
                         }}
                         inputProps={{
                           placeholder: t("Invoices.form.invoice_number.placeholder"),
-                          disabled: isLoading,
+                          disabled: isSavingInvoice,
                           ...field,
                         }}
                       />
@@ -352,8 +353,8 @@ export function InvoiceForm({
                 label={t("Invoices.form.client.label")}
                 control={form.control}
                 clients={clients || []}
-                loadingCombobox={clientsLoading}
-                isClientSaving={isClientSaving}
+                loadingCombobox={isFetchingClients}
+                isSaving={isSavingClient}
                 isDialogOpen={isDialogOpen}
                 setIsDialogOpen={setIsDialogOpen}
               />
@@ -365,7 +366,7 @@ export function InvoiceForm({
                     <FormLabel>{t("Invoices.form.tax_rate.label")} (%)</FormLabel>
                     <FormControl>
                       <NumberInput
-                        disabled={isLoading}
+                        disabled={isSavingInvoice}
                         placeholder={t("Forms.zip_code.placeholder")}
                         {...field}
                         value={field.value || ""}
@@ -391,7 +392,7 @@ export function InvoiceForm({
                         }
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
-                        disabled={isLoading}
+                        disabled={isSavingInvoice}
                       />
                     </FormControl>
                     <FormMessage />
@@ -415,7 +416,7 @@ export function InvoiceForm({
                         }
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
-                        disabled={isLoading}
+                        disabled={isSavingInvoice}
                       />
                     </FormControl>
                     <FormMessage />
@@ -433,8 +434,9 @@ export function InvoiceForm({
             onAddNewProduct={() => setIsNewProductDialogOpen(true)}
             handleProductSelection={handleProductSelection}
             title={t("ProductsFormSection.title")}
-            isLoading={isLoading}
+            isFetching={isFetchingProducts}
             isError={form.formState.errors.items as FieldError}
+            disabled={isSavingInvoice}
           />
           <NotesSection
             inDialog={editMode || nestedForm}
@@ -469,14 +471,14 @@ export function InvoiceForm({
         formId="product-form"
         cancelText={t("cancel")}
         submitText={t("save")}
-        loadingSave={isProductSaving}
+        loadingSave={isSavingProduct}
       >
         <ProductForm
           formHtmlId="product-form"
           nestedForm
           onSuccess={() => {
             setIsNewProductDialogOpen(false);
-            setIsProductSaving(false);
+            setIsSavingProduct(false);
           }}
         />
       </FormDialog>

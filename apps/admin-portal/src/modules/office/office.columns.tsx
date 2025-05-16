@@ -19,7 +19,7 @@ const useOfficeColumns = (
   const t = useTranslations();
   const locale = useLocale();
   // Employees for manager combobox
-  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const { data: employees = [], isLoading: isFetchingEmployees } = useEmployees();
   const employeeOptions = employees.map((emp) => ({
     label: `${emp.first_name} ${emp.last_name}`,
     value: emp.id,
@@ -79,7 +79,7 @@ const useOfficeColumns = (
             dir={locale === "ar" ? "rtl" : "ltr"}
             inCell
             data={employeeOptions}
-            isLoading={employeesLoading}
+            isLoading={isFetchingEmployees}
             buttonClassName="bg-transparent"
             defaultValue={office.manager || ""}
             onChange={async (value) => {

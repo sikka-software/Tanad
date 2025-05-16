@@ -80,12 +80,13 @@ export function BranchForm({
   const enterprise = useUserStore((state) => state.enterprise);
   const { mutate: createBranch } = useCreateBranch();
   const { mutate: updateBranch } = useUpdateBranch();
+
   const { data: branches } = useBranches();
 
-  const isLoading = useBranchStore((state) => state.isLoading);
-  const setIsLoading = useBranchStore((state) => state.setIsLoading);
+  const isSavingBranch = useBranchStore((state) => state.isLoading);
+  const setIsSavingBranch = useBranchStore((state) => state.setIsLoading);
 
-  const { data: employees, isLoading: employeesLoading } = useEmployees();
+  const { data: employees, isLoading: isFetchingEmployees } = useEmployees();
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
@@ -116,19 +117,19 @@ export function BranchForm({
   });
 
   const handleSubmit = async (data: BranchFormValues) => {
-    setIsLoading(true);
+    setIsSavingBranch(true);
     if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
-      setIsLoading(false);
+      setIsSavingBranch(false);
       return;
     }
     if (!enterprise?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.no_enterprise_selected"),
       });
-      setIsLoading(false);
+      setIsSavingBranch(false);
       return;
     }
 
@@ -167,23 +168,23 @@ export function BranchForm({
           },
           {
             onSuccess: () => {
-              setIsLoading(false);
+              setIsSavingBranch(false);
               if (onSuccess) onSuccess();
             },
-            onError: () => setIsLoading(false),
+            onError: () => setIsSavingBranch(false),
           },
         );
       } else {
         await createBranch(payload, {
           onSuccess: () => {
-            setIsLoading(false);
+            setIsSavingBranch(false);
             if (onSuccess) onSuccess();
           },
-          onError: () => setIsLoading(false),
+          onError: () => setIsSavingBranch(false),
         });
       }
     } catch (error) {
-      setIsLoading(false);
+      setIsSavingBranch(false);
       console.error("Failed to save branch:", error);
       toast.error(t("General.error_operation"), {
         description: t("Branches.error.create"),
@@ -219,7 +220,7 @@ export function BranchForm({
                       <Input
                         placeholder={t("Branches.form.name.placeholder")}
                         {...field}
-                        disabled={isLoading}
+                        disabled={isSavingBranch}
                       />
                     </FormControl>
                     <FormMessage />
@@ -251,7 +252,7 @@ export function BranchForm({
                         }}
                         inputProps={{
                           placeholder: t("Branches.form.code.placeholder"),
-                          disabled: isLoading,
+                          disabled: isSavingBranch,
                         }}
                       ></CodeInput>
                     </FormControl>
@@ -269,7 +270,7 @@ export function BranchForm({
                       <PhoneInput
                         value={field.value || ""}
                         onChange={field.onChange}
-                        disabled={isLoading}
+                        disabled={isSavingBranch}
                       />
                     </FormControl>
                     <FormMessage />
@@ -288,7 +289,7 @@ export function BranchForm({
                         type="email"
                         placeholder={t("Branches.form.email.placeholder")}
                         {...field}
-                        disabled={isLoading}
+                        disabled={isSavingBranch}
                       />
                     </FormControl>
                     <FormMessage />
@@ -305,7 +306,7 @@ export function BranchForm({
                       <ComboboxAdd
                         dir={locale === "ar" ? "rtl" : "ltr"}
                         data={employeeOptions}
-                        isLoading={employeesLoading}
+                        isLoading={isFetchingEmployees}
                         defaultValue={field.value || ""}
                         onChange={(value) => {
                           field.onChange(value || null);
@@ -377,7 +378,7 @@ export function BranchForm({
                                 field.onChange(unit + " " + areaValue);
                               }
                             },
-                            disabled: isLoading,
+                            disabled: isSavingBranch,
                           }}
                           selectProps={{
                             options: [
@@ -407,7 +408,7 @@ export function BranchForm({
             inDialog={editMode || nestedForm}
             title={t("Branches.form.address.label")}
             control={form.control}
-            isLoading={isLoading}
+            disabled={isSavingBranch}
           />
           <NotesSection
             inDialog={editMode || nestedForm}

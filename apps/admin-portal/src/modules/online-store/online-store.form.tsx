@@ -184,7 +184,6 @@ export function OnlineStoreForm({
                       renderOption={(item) => <div>{t(item.label)}</div>}
                       renderSelected={(item) => <div>{t(item.label)}</div>}
                       onChange={field.onChange}
-                      ariaInvalid={!!form.formState.errors.platform}
                     />
                   </FormControl>
                   <FormMessage />

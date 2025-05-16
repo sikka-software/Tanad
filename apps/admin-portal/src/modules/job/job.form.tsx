@@ -35,6 +35,7 @@ import useJobStore from "@/job/job.store";
 import { JobUpdateData, JobCreateData } from "@/job/job.type";
 
 import { BranchForm } from "@/branch/branch.form";
+import useBranchStore from "@/branch/branch.store";
 
 import DepartmentForm from "@/department/department.form";
 import { useDepartments } from "@/department/department.hooks";
@@ -44,6 +45,7 @@ import { WarehouseForm } from "@/warehouse/warehouse.form";
 
 import { jobs } from "@/db/schema";
 import { OnlineStoreForm } from "@/modules/online-store/online-store.form";
+import useOnlineStoreStore from "@/modules/online-store/online-store.store";
 import useUserStore from "@/stores/use-user-store";
 
 const createJobFormSchema = (t: (key: string) => string) => {
@@ -97,9 +99,15 @@ function JobForm({
   const locale = useLocale();
   const queryClient = useQueryClient();
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
-  const { data: departments = [], isLoading: departmentsLoading } = useDepartments();
-  const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
-  const isDepartmentSaving = useDepartmentStore((state) => state.isLoading);
+  const { data: departments = [], isLoading: isFetchingDepartments } = useDepartments();
+  const setIsSavingDepartment = useDepartmentStore((state) => state.setIsLoading);
+  const isSavingDepartment = useDepartmentStore((state) => state.isLoading);
+
+  const isSavingBranch = useBranchStore((state) => state.isLoading);
+  const setIsSavingBranch = useBranchStore((state) => state.setIsLoading);
+
+  const isSavingOnlineStore = useOnlineStoreStore((state) => state.isLoading);
+  const setIsSavingOnlineStore = useOnlineStoreStore((state) => state.setIsLoading);
 
   const [isChooseLocationDialogOpen, setIsChooseLocationDialogOpen] = useState(false);
   const [chosenForm, setChosenForm] = useState<
@@ -109,10 +117,9 @@ function JobForm({
   const { mutate: createJob } = useCreateJob();
   const { mutate: updateJob } = useUpdateJob();
 
-  const isLoading = useJobStore((state) => state.isLoading);
-  const setIsLoading = useJobStore((state) => state.setIsLoading);
+  const isSavingJob = useJobStore((state) => state.isLoading);
+  const setIsSavingJob = useJobStore((state) => state.setIsLoading);
 
-  console.log("defaut values are", defaultValues);
   const form = useForm<JobFormValues>({
     resolver: zodResolver(createJobFormSchema(t)),
     defaultValues: {
@@ -141,7 +148,7 @@ function JobForm({
   }));
 
   const handleSubmit = async (data: JobFormValues) => {
-    setIsLoading(true);
+    setIsSavingJob(true);
     if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
@@ -213,7 +220,7 @@ function JobForm({
         );
       }
     } catch (error) {
-      setIsLoading(false);
+      setIsSavingJob(false);
       console.error("Failed to save job:", error);
       toast.error(t("General.error_operation"), {
         description: t("Jobs.error.create"),
@@ -297,7 +304,7 @@ function JobForm({
                     <ComboboxAdd
                       dir={locale === "ar" ? "rtl" : "ltr"}
                       data={departmentOptions}
-                      isLoading={departmentsLoading}
+                      isLoading={isFetchingDepartments}
                       defaultValue={field.value || ""}
                       onChange={(value) => field.onChange(value || null)}
                       texts={{
@@ -327,7 +334,7 @@ function JobForm({
                     <ComboboxAdd
                       dir={locale === "ar" ? "rtl" : "ltr"}
                       data={departmentOptions}
-                      isLoading={departmentsLoading}
+                      isLoading={isFetchingDepartments}
                       defaultValue={field.value || ""}
                       onChange={(value) => field.onChange(value || null)}
                       texts={{
@@ -363,7 +370,7 @@ function JobForm({
                       }
                       onChange={field.onChange}
                       onSelect={(e) => field.onChange(e)}
-                      disabled={isLoading}
+                      disabled={isSavingJob}
                     />
                   </FormControl>
                   <FormMessage />
@@ -387,7 +394,7 @@ function JobForm({
                       }
                       onChange={field.onChange}
                       onSelect={(e) => field.onChange(e)}
-                      disabled={isLoading}
+                      disabled={isSavingJob}
                     />
                   </FormControl>
                   <FormMessage />
@@ -436,7 +443,7 @@ function JobForm({
                       value={field.value ? parseFloat(field.value) : undefined}
                       onChange={(value) => field.onChange(value?.toString() || "")}
                       placeholder={t("Jobs.form.salary.placeholder")}
-                      disabled={isLoading}
+                      disabled={isSavingJob}
                     />
                   </FormControl>
                   <FormMessage />
@@ -598,7 +605,7 @@ function JobForm({
         onOpenChange={setIsDepartmentDialogOpen}
         title={t(`Pages.${chosenForm}.add`)}
         formId="department-form"
-        loadingSave={isDepartmentSaving}
+        loadingSave={isSavingDepartment}
         // dummyData={() => process.env.NODE_ENV === "development" && generateDummyDepartment()} // Commented out
       >
         {chosenForm === "Warehouses" && (
@@ -606,7 +613,7 @@ function JobForm({
             nestedForm
             formHtmlId="warehouse-form"
             onSuccess={() => {
-              setIsDepartmentSaving(false);
+              setIsSavingDepartment(false);
               setIsDepartmentDialogOpen(false);
             }}
           />
@@ -626,7 +633,7 @@ function JobForm({
             nestedForm
             formHtmlId="branch-form"
             onSuccess={() => {
-              setIsDepartmentSaving(false);
+              setIsSavingBranch(false);
               setIsDepartmentDialogOpen(false);
             }}
           />
@@ -636,7 +643,7 @@ function JobForm({
             nestedForm
             formHtmlId="department-form"
             onSuccess={() => {
-              setIsDepartmentSaving(false);
+              setIsSavingDepartment(false);
               setIsDepartmentDialogOpen(false);
               queryClient.invalidateQueries({ queryKey: ["departments"] });
             }}
@@ -647,7 +654,7 @@ function JobForm({
             nestedForm
             formHtmlId="online-store-form"
             onSuccess={() => {
-              setIsDepartmentSaving(false);
+              setIsSavingOnlineStore(false);
               setIsDepartmentDialogOpen(false);
               queryClient.invalidateQueries({ queryKey: ["departments"] });
             }}

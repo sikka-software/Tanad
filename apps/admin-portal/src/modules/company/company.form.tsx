@@ -362,7 +362,7 @@ export function CompanyForm({
           inDialog={editMode || nestedForm}
           title={t("Companies.form.address.label")}
           control={form.control}
-          isLoading={isLoading}
+          disabled={isLoading}
         />
 
         <NotesSection

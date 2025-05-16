@@ -47,7 +47,15 @@ export default function AddServerPage() {
   );
 }
 
-AddServerPage.messages = ["Metadata", "Notes", "Forms", "Pages", "Servers", "General"];
+AddServerPage.messages = [
+  "Metadata",
+  "Notes",
+  "Forms",
+  "Pages",
+  "Servers",
+  "General",
+  "PaymentCycles",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

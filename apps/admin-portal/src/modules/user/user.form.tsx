@@ -26,28 +26,26 @@ import type { UserCreateData, UserUpdateData, UserType } from "@/user/user.type"
 
 import useUserStore from "@/stores/use-user-store";
 
-const baseUserFormSchema = z.object({
-  first_name: z.string().min(1, { message: "First name is required." }),
-  last_name: z.string().min(1, { message: "Last name is required." }),
-  email: z.string().email({ message: "Invalid email address." }),
-  role: z.string().min(1, { message: "Role is required." }),
-});
+const createUserFormSchema = (t: (key: string) => string) => {
+  const UserFormSchema = z.object({
+    first_name: z.string().min(1, { message: t("Users.form.first_name.required") }),
+    last_name: z.string().min(1, { message: t("Users.form.last_name.required") }),
+    email: z.string().email({ message: t("Users.form.email.invalid") }),
+    role: z.string().min(1, { message: t("Users.form.role.required") }),
+    password: z.string().min(8, { message: t("Users.form.password.required") }),
+  });
+  return UserFormSchema;
+};
 
-const createUserFormSchema = baseUserFormSchema.extend({
-  password: z.string().min(8, { message: "Password must be at least 8 characters." }),
-});
-
-const updateUserFormSchema = baseUserFormSchema.extend({
-  // Password is optional for update, validation happens server-side if provided
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters." })
-    .optional()
-    .or(z.literal("")),
-});
+// Password is optional for update, validation happens server-side if provided
+// password: z
+//   .string()
+//   .min(8, { message: "Password must be at least 8 characters." })
+//   .optional()
+//   .or(z.literal("")),
 
 // Infer the type from the base schema, specific validation handled conditionally
-type UserFormData = z.input<typeof baseUserFormSchema> & { password?: string };
+export type UserFormValues = z.input<ReturnType<typeof createUserFormSchema>>;
 
 export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormProps<UserType>) {
   const t = useTranslations();
@@ -104,10 +102,10 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
   const rolesError = customRolesError || systemRolesError;
 
   const isEditing = !!defaultValues;
-  const currentSchema = isEditing ? updateUserFormSchema : createUserFormSchema;
+  // const currentSchema = isEditing ? updateUserFormSchema : createUserFormSchema;
 
-  const form = useForm<UserFormData>({
-    resolver: zodResolver(currentSchema),
+  const form = useForm<UserFormValues>({
+    resolver: zodResolver(createUserFormSchema(t)),
     defaultValues: useMemo(() => {
       // Revert to splitting full_name
       const [firstName = "", lastName = ""] = (defaultValues?.full_name || "").split(" ", 2);
@@ -162,7 +160,7 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
     [t, setIsRoleDialogOpen, form],
   );
 
-  const onSubmit = async (values: UserFormData) => {
+  const onSubmit = async (values: UserFormValues) => {
     if (!enterprise?.id) {
       toast.error(t("Users.error.missing_enterprise"));
       return;

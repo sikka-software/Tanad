@@ -34,7 +34,8 @@ interface ProductFormSectionProps {
   onAddNewProduct: () => void;
   handleProductSelection: (index: number, productId: string) => void; // Function to handle product selection
   title: string;
-  isLoading?: boolean;
+  disabled?: boolean;
+  isFetching?: boolean;
   isError?: FieldError;
 }
 
@@ -283,7 +284,8 @@ function ProductsFormSection({
   onAddNewProduct,
   handleProductSelection,
   title,
-  isLoading = false,
+  disabled,
+  isFetching,
   isError,
 }: ProductFormSectionProps) {
   const t = useTranslations();
@@ -300,7 +302,7 @@ function ProductsFormSection({
           append({ product_id: undefined, description: "", quantity: 1, unit_price: 0 })
         }
         onCreateText={t("ProductsFormSection.add_product")}
-        onCreateDisabled={isLoading}
+        onCreateDisabled={disabled}
         isError={isError}
         onErrorText={t("ProductsFormSection.required")}
       />
@@ -335,7 +337,7 @@ function ProductsFormSection({
                       control={control}
                       remove={remove}
                       locale={locale}
-                      isLoading={isLoading}
+                      isLoading={isFetching}
                       productsLoading={productsLoading}
                       productsData={productsData}
                       setValue={setValue}

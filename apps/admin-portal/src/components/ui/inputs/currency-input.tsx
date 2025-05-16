@@ -150,7 +150,7 @@ export function CurrencyInput({
         type="text"
         inputMode="decimal"
         placeholder="0.00"
-        className={cn("currency-input", currencyInputClassName(currency))}
+        className={cn("currency-input placeholder:select-none", currencyInputClassName(currency))}
         value={inputText}
         onChange={handleChange}
         onBlur={handleBlur}

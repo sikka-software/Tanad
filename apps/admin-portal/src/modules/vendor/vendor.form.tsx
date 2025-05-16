@@ -267,7 +267,7 @@ export function VendorForm({
             inDialog={editMode}
             title={t("Forms.address.label")}
             control={form.control}
-            isLoading={isLoading}
+            disabled={isLoading}
           />
 
           <NotesSection inDialog={editMode} control={form.control} title={t("Forms.notes.label")} />

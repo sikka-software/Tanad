@@ -261,138 +261,6 @@ export function TruckForm({
 
             <FormField
               control={form.control}
-              name="make"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.make.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Vehicles.form.make.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="model"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.model.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Vehicles.form.model.placeholder")}
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="year"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.year.label")}</FormLabel>
-                  <FormControl>
-                    <NumberInput
-                      placeholder={t("Vehicles.form.year.placeholder")}
-                      disabled={isLoading}
-                      maxLength={4}
-                      value={field.value === undefined || field.value === null ? "" : field.value}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        field.onChange(val === "" ? undefined : Number(val));
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="color"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.color.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Vehicles.form.color.placeholder")}
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <FormField
-            control={form.control}
-            name="vin"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Vehicles.form.vin.label")}</FormLabel>
-                <FormControl>
-                  <DigitsInput disabled={isLoading} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="form-fields-cols-2">
-            <FormField
-              control={form.control}
-              name="license_country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.license_country.label")}</FormLabel>
-                  <FormControl>
-                    <CountryInput
-                      value={field.value ?? ""}
-                      onChange={field.onChange}
-                      disabled={isLoading}
-                      dir={lang === "ar" ? "rtl" : "ltr"}
-                      ariaInvalid={false}
-                      texts={{
-                        placeholder: t("Forms.country.placeholder"),
-                        searchPlaceholder: t("Forms.country.search_placeholder"),
-                        noItems: t("Forms.country.no_items"),
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="license_plate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.license_plate.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Vehicles.form.license_plate.placeholder")}
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="ownership_status"
               render={({ field }) => (
                 <FormItem>
@@ -551,6 +419,137 @@ export function TruckForm({
                   )}
                 />
               )}
+            <FormField
+              control={form.control}
+              name="make"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.make.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Vehicles.form.make.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="model"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.model.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Vehicles.form.model.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="year"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.year.label")}</FormLabel>
+                  <FormControl>
+                    <NumberInput
+                      placeholder={t("Vehicles.form.year.placeholder")}
+                      disabled={isLoading}
+                      maxLength={4}
+                      value={field.value === undefined || field.value === null ? "" : field.value}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        field.onChange(val === "" ? undefined : Number(val));
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="color"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.color.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Vehicles.form.color.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <FormField
+            control={form.control}
+            name="vin"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Vehicles.form.vin.label")}</FormLabel>
+                <FormControl>
+                  <DigitsInput disabled={isLoading} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="license_country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.license_country.label")}</FormLabel>
+                  <FormControl>
+                    <CountryInput
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      disabled={isLoading}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      ariaInvalid={false}
+                      texts={{
+                        placeholder: t("Forms.country.placeholder"),
+                        searchPlaceholder: t("Forms.country.search_placeholder"),
+                        noItems: t("Forms.country.no_items"),
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="license_plate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.license_plate.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Vehicles.form.license_plate.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
         </div>
       </form>

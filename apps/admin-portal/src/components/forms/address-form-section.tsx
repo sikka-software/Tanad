@@ -14,7 +14,7 @@ import FormSectionHeader from "./form-section-header";
 
 interface AddressFormSectionProps {
   control: Control<any>;
-  isLoading?: boolean;
+  disabled?: boolean;
   title: string;
   inDialog?: boolean;
   dir: "rtl" | "ltr";
@@ -22,7 +22,7 @@ interface AddressFormSectionProps {
 
 export function AddressFormSection({
   control,
-  isLoading = false,
+  disabled = false,
   title,
   inDialog = false,
   dir,
@@ -42,7 +42,7 @@ export function AddressFormSection({
               <FormControl>
                 <div className="relative">
                   <Input
-                    disabled={isLoading}
+                    disabled={disabled}
                     placeholder={t("Forms.short_address.placeholder")}
                     {...field}
                     value={field.value || ""} // Ensure controlled component
@@ -50,7 +50,7 @@ export function AddressFormSection({
                   <IconButton
                     size="icon_sm"
                     buttonType="button"
-                    disabled={isLoading}
+                    disabled={disabled}
                     contentClassName="flex flex-col gap-1 max-w-40"
                     onClick={(e) => e.preventDefault()}
                     icon={<MapPin className="size-6" />}
@@ -83,7 +83,7 @@ export function AddressFormSection({
               <FormLabel>{t("Forms.building_number.label")}</FormLabel>
               <FormControl>
                 <Input
-                  disabled={isLoading}
+                  disabled={disabled}
                   placeholder={t("Forms.building_number.placeholder")}
                   {...field}
                   value={field.value || ""} // Ensure controlled component
@@ -101,7 +101,7 @@ export function AddressFormSection({
               <FormLabel>{t("Forms.street_name.label")}</FormLabel>
               <FormControl>
                 <Input
-                  disabled={isLoading}
+                  disabled={disabled}
                   placeholder={t("Forms.street_name.placeholder")}
                   {...field}
                   value={field.value || ""} // Ensure controlled component
@@ -119,7 +119,7 @@ export function AddressFormSection({
               <FormLabel>{t("Forms.city.label")}</FormLabel>
               <FormControl>
                 <Input
-                  disabled={isLoading}
+                  disabled={disabled}
                   placeholder={t("Forms.city.placeholder")}
                   {...field}
                   value={field.value || ""} // Ensure controlled component
@@ -137,7 +137,7 @@ export function AddressFormSection({
               <FormLabel>{t("Forms.region.label")}</FormLabel>
               <FormControl>
                 <Input
-                  disabled={isLoading}
+                  disabled={disabled}
                   placeholder={t("Forms.region.placeholder")}
                   {...field}
                   value={field.value || ""} // Ensure controlled component
@@ -157,7 +157,7 @@ export function AddressFormSection({
                 <CountryInput
                   value={field.value ?? ""}
                   onChange={field.onChange}
-                  disabled={isLoading}
+                  disabled={disabled}
                   dir={dir}
                   ariaInvalid={false}
                   texts={{
@@ -179,7 +179,7 @@ export function AddressFormSection({
               <FormLabel>{t("Forms.zip_code.label")}</FormLabel>
               <FormControl>
                 <NumberInput
-                  disabled={isLoading}
+                  disabled={disabled}
                   placeholder={t("Forms.zip_code.placeholder")}
                   {...field}
                   value={field.value || ""} // Ensure controlled component
@@ -197,7 +197,7 @@ export function AddressFormSection({
               <FormLabel>{t("Forms.additional_number.label")}</FormLabel>
               <FormControl>
                 <NumberInput
-                  disabled={isLoading}
+                  disabled={disabled}
                   placeholder={t("Forms.additional_number.placeholder")}
                   {...field}
                   value={field.value || ""} // Ensure controlled component

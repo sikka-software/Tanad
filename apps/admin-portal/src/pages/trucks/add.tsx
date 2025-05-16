@@ -47,7 +47,16 @@ export default function AddTruckPage() {
   );
 }
 
-AddTruckPage.messages = ["Metadata", "Pages", "Trucks", "Vehicles", "Notes", "Forms", "General"];
+AddTruckPage.messages = [
+  "Metadata",
+  "Pages",
+  "Trucks",
+  "Vehicles",
+  "Notes",
+  "Forms",
+  "General",
+  "PaymentCycles",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

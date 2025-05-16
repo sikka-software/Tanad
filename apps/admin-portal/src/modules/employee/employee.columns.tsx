@@ -16,7 +16,7 @@ const useCompanyColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
-  const { data: jobs, isLoading: jobsLoading } = useJobs();
+  const { data: jobs, isLoading: isFetchingJobs } = useJobs();
   const locale = useLocale();
 
   const columns: ExtendedColumnDef<Employee>[] = [
@@ -72,7 +72,7 @@ const useCompanyColumns = (
             data={jobs || []}
             labelKey="title"
             valueKey="id"
-            isLoading={jobsLoading}
+            isLoading={isFetchingJobs}
             buttonClassName="bg-transparent"
             defaultValue={employee.job_id || ""}
             onChange={async (value) => {

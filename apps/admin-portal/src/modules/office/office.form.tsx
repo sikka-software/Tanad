@@ -82,7 +82,7 @@ export function OfficeForm({
   const isLoading = useOfficeStore((state) => state.isLoading);
   const setIsLoading = useOfficeStore((state) => state.setIsLoading);
 
-  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const { data: employees = [], isLoading: isFetchingEmployees } = useEmployees();
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
   const isEmployeeFormDialogOpen = useEmployeeStore((state) => state.isFormDialogOpen);
@@ -308,7 +308,7 @@ export function OfficeForm({
                       <ComboboxAdd
                         dir={locale === "ar" ? "rtl" : "ltr"}
                         data={employeeOptions}
-                        isLoading={employeesLoading}
+                        isLoading={isFetchingEmployees}
                         defaultValue={field.value || ""}
                         onChange={(value) => {
                           field.onChange(value || null);
@@ -410,7 +410,7 @@ export function OfficeForm({
             inDialog={editMode || nestedForm}
             title={t("Offices.form.address.label")}
             control={form.control}
-            isLoading={isLoading}
+            disabled={isLoading}
           />
           <NotesSection
             inDialog={editMode || nestedForm}

@@ -350,7 +350,7 @@ export function WarehouseForm({
           inDialog={editMode || nestedForm}
           title={t("Warehouses.form.address.label")}
           control={form.control}
-          isLoading={isLoading}
+          disabled={isLoading}
         />
 
         <NotesSection

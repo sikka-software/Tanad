@@ -16,8 +16,8 @@ interface ClientComboboxProps {
   control: Control<any>;
   clients: Client[];
   loadingCombobox: boolean;
-  isClientSaving: boolean;
-
+  isSaving: boolean;
+  disabled?: boolean;
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;
 }
@@ -27,14 +27,15 @@ const ClientCombobox = ({
   control,
   clients,
   loadingCombobox,
-  isClientSaving,
+  isSaving,
   isDialogOpen,
   setIsDialogOpen,
+  disabled,
 }: ClientComboboxProps) => {
   const t = useTranslations();
   const locale = useLocale();
 
-  const setIsClientSaving = useClientStore((state) => state.setIsLoading);
+  const setIsSaving = useClientStore((state) => state.setIsLoading);
 
   return (
     <div>
@@ -62,6 +63,7 @@ const ClientCombobox = ({
                 }}
                 addText={t("Pages.Clients.add")}
                 onAddClick={() => setIsDialogOpen(true)}
+                disabled={disabled}
                 renderOption={(option) => (
                   <div className="flex flex-col">
                     <span>{option.label}</span>
@@ -82,14 +84,14 @@ const ClientCombobox = ({
         formId="client-form"
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
-        loadingSave={isClientSaving}
+        loadingSave={isSaving}
       >
         <ClientForm
           formHtmlId="client-form"
           nestedForm
           onSuccess={() => {
             setIsDialogOpen(false);
-            setIsClientSaving(false);
+            setIsSaving(false);
           }}
         />
       </FormDialog>
