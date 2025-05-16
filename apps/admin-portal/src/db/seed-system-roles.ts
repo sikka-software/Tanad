@@ -359,7 +359,38 @@ const systemRolePermissions: Record<string, string[]> = {
   ],
 };
 
+async function ensureSystemRolesExist() {
+  const roleNames = Object.keys(systemRolePermissions);
+  // Fetch existing system roles
+  const { data: existingRoles, error: fetchError } = await supabase
+    .from("roles")
+    .select("name")
+    .in("name", roleNames)
+    .eq("is_system", true);
+
+  if (fetchError) {
+    throw new Error(`Error fetching roles: ${fetchError.message}`);
+  }
+
+  const existingRoleNames = (existingRoles || []).map((r) => r.name);
+  const missingRoleNames = roleNames.filter((name) => !existingRoleNames.includes(name));
+
+  if (missingRoleNames.length > 0) {
+    console.log(`Inserting missing system roles: ${missingRoleNames.join(", ")}`);
+    const rolesToInsert = missingRoleNames.map((name) => ({ name, is_system: true }));
+    const { error: insertError } = await supabase.from("roles").insert(rolesToInsert);
+    if (insertError) {
+      throw new Error(`Error inserting missing roles: ${insertError.message}`);
+    }
+    console.log("Missing system roles inserted successfully.");
+  } else {
+    console.log("All system roles already exist.");
+  }
+}
+
 async function seedPermissions() {
+  console.log("Ensuring all system roles exist...");
+  await ensureSystemRolesExist();
   console.log("Starting permission seeding for system roles...");
 
   try {

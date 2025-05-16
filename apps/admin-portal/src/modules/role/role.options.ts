@@ -21,6 +21,11 @@ export const predefinedRoles = (t: (key: string) => string, role: string) => {
       description: t("Roles.predefined.superadmin.description"),
     },
     {
+      id: "it",
+      name: t("Roles.predefined.it.title"),
+      description: t("Roles.predefined.it.description"),
+    },
+    {
       id: "admin",
       name: t("Roles.predefined.admin.title"),
       description: t("Roles.predefined.admin.description"),
