@@ -1750,6 +1750,7 @@ export const invoices = pgTable(
   "invoices",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
+    user_id: uuid(),
     enterprise_id: uuid(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
@@ -1773,7 +1774,6 @@ END`),
     notes: jsonb(),
     client_id: uuid().notNull(),
     created_by: uuid(),
-    user_id: uuid(),
   },
   (table) => [
     index("idx_invoices_enterprise_id").using(

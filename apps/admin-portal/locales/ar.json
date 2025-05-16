@@ -2431,6 +2431,7 @@
       "placeholder": "أدخل سعر الوحدة",
       "invalid": "السعر يجب أن يكون رقماً موجباً"
     },
+    "required": "يجب إضافة منتج",
     "subtotal": "المجموع الفرعي",
     "select_product": "اختر منتج",
     "search_products": "بحث عن منتجات",
