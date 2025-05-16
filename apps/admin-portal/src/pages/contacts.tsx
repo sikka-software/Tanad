@@ -21,11 +21,15 @@ import VendorCard from "@/vendor/vendor.card";
 import { useVendors } from "@/vendor/vendor.hooks";
 import { Vendor } from "@/vendor/vendor.type";
 
+import { useCompanies } from "@/modules/company/company.hooks";
+import { Company } from "@/modules/company/company.type";
+
 export default function ContactsPage() {
   const t = useTranslations();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"clients" | "vendors">("clients");
 
+  const { data: companies } = useCompanies();
   const { data: clients, isLoading: clientsLoading, error: clientsError } = useClients();
   const { data: vendors, isLoading: vendorsLoading, error: vendorsError } = useVendors();
 
@@ -75,7 +79,11 @@ export default function ContactsPage() {
                 onClick: () => router.push(router.pathname + "/add"),
               }}
               renderItem={(client) => (
-                <ClientCard client={client} onActionClicked={() => console.log("TODO")} />
+                <ClientCard
+                  client={client}
+                  company={companies?.find((company) => company.id === client.company) as Company}
+                  onActionClicked={() => console.log("TODO")}
+                />
               )}
               gridCols="3"
             />

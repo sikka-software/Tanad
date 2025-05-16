@@ -64,7 +64,7 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
             {MoneyFormatter(props.row.original.salary)}
             {
               getCurrencySymbol(currency || "sar", {
-                usdClassName: "-ms-1",
+                usd: { className: "-ms-1" },
               }).symbol
             }
           </span>
