@@ -75,7 +75,7 @@ const InvoiceCard = ({
           <span className="text-sm text-gray-500">{t("Invoices.form.total.label")}</span>
           <span className="money text-lg font-bold">
             {MoneyFormatter(invoice.total || 0)}{" "}
-            {getCurrencySymbol(currency || "sar", { sarClassName: "size-4" }).symbol}
+            {getCurrencySymbol(currency || "sar", { sar: { className: "size-4" } }).symbol}
           </span>
         </div>
         <div className="border-t pt-2">

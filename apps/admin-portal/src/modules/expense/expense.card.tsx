@@ -71,7 +71,7 @@ const ExpenseCard = ({
         <div className="flex items-center justify-end gap-2 text-sm">
           <span className="money text-xl font-bold">
             {MoneyFormatter(expense.amount)}
-            {getCurrencySymbol(currency || "sar", { sarClassName: "size-4" }).symbol}
+            {getCurrencySymbol(currency || "sar", { sar: { className: "size-4" } }).symbol}
           </span>
         </div>
       </div>

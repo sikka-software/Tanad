@@ -60,7 +60,7 @@ const QuoteCard = ({
             {MoneyFormatter(
               (quote.subtotal || 0) + ((quote.subtotal || 0) * (quote.tax_rate || 0)) / 100 || 0,
             )}{" "}
-            {getCurrencySymbol(currency || "sar", { sarClassName: "size-4" }).symbol}
+            {getCurrencySymbol(currency || "sar", { sar: { className: "size-4" } }).symbol}
           </span>
         </div>
         <div className="border-t pt-2">
