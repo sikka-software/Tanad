@@ -48,7 +48,7 @@ const useWebsiteColumns = (
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Websites.form.status.label"),
+      header: t("CommonStatus.label"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -58,8 +58,8 @@ const useWebsiteColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Websites.form.status.active"), value: "active" },
-              { label: t("Websites.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

@@ -99,7 +99,7 @@ const useCompanyColumns = (
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Companies.form.status.label"),
+      header: t("CommonStatus.label"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -109,8 +109,8 @@ const useCompanyColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Companies.form.status.active"), value: "active" },
-              { label: t("Companies.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

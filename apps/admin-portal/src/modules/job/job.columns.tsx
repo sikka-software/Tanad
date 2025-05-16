@@ -123,7 +123,7 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Jobs.form.status.label"),
+      header: t("CommonStatus.label"),
       validationSchema: z.enum(["active", "inactive"]),
       noPadding: true,
       enableEditing: false,
@@ -134,8 +134,8 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Jobs.form.status.active"), value: "active" },
-              { label: t("Jobs.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

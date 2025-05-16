@@ -56,7 +56,7 @@ const useCompanyColumns = (
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("JobListings.form.status.label"),
+      header: t("CommonStatus.label"),
       validationSchema: z.enum(["active", "inactive"]),
       noPadding: true,
       enableEditing: false,
@@ -67,8 +67,8 @@ const useCompanyColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("JobListings.form.status.active"), value: "active" },
-              { label: t("JobListings.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

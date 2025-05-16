@@ -143,7 +143,7 @@ const useWarehouseColumns = (
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Warehouses.form.status.label"),
+      header: t("CommonStatus.label"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -153,8 +153,8 @@ const useWarehouseColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Warehouses.form.status.active"), value: "active" },
-              { label: t("Warehouses.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

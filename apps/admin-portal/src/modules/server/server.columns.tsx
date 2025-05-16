@@ -108,7 +108,7 @@ const useServerColumns = (
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Servers.form.status.label"),
+      header: t("CommonStatus.label"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -118,8 +118,8 @@ const useServerColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Servers.form.status.active"), value: "active" },
-              { label: t("Servers.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

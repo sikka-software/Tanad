@@ -69,7 +69,7 @@ const useOnlineStoreColumns = (
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("OnlineStores.form.status.label"),
+      header: t("CommonStatus.label"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -79,8 +79,8 @@ const useOnlineStoreColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("OnlineStores.form.status.active"), value: "active" },
-              { label: t("OnlineStores.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

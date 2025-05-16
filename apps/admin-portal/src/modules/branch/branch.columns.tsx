@@ -136,7 +136,7 @@ const useBranchColumns = (
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Branches.form.status.label"),
+      header: t("CommonStatus.label"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -146,8 +146,8 @@ const useBranchColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Branches.form.status.active"), value: "active" },
-              { label: t("Branches.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

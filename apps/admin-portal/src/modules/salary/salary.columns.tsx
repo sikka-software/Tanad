@@ -98,7 +98,7 @@ const useSalaryColumns = (
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Domains.form.status.label"),
+      header: t("CommonStatus.label"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -108,8 +108,8 @@ const useSalaryColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Domains.form.status.active"), value: "active" },
-              { label: t("Domains.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />
