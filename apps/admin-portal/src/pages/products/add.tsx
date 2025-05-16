@@ -52,8 +52,9 @@ export default function AddProductPage() {
       <ProductForm
         formHtmlId="product-form"
         onSuccess={() => {
-          router.push("/products");
-          setIsLoading(false);
+          router.push("/products").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

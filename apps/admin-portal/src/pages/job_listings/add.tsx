@@ -35,8 +35,9 @@ export default function AddJobListingPage() {
       <JobListingForm
         formHtmlId="job-listing-form"
         onSuccess={() => {
-          router.push("/job_listings");
-          setIsLoading(false);
+          router.push("/job_listings").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

@@ -35,8 +35,9 @@ export default function AddEmployeeRequestPage() {
       <EmployeeRequestForm
         formHtmlId="employee-request-form"
         onSuccess={() => {
-          router.push("/employee_requests");
-          setLoadingSave(false);
+          router.push("/employee_requests").then(() => {
+            setLoadingSave(false);
+          });
         }}
       />
     </div>

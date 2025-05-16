@@ -55,8 +55,9 @@ export default function AddBranchPage() {
       <BranchForm
         formHtmlId="branch-form"
         onSuccess={() => {
-          router.push("/branches");
-          setIsLoading(false);
+          router.push("/branches").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

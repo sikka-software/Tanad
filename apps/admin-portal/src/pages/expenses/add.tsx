@@ -52,8 +52,9 @@ export default function AddExpensePage() {
       <ExpenseForm
         formHtmlId="expense-form"
         onSuccess={() => {
-          router.push("/expenses");
-          setIsLoading(false);
+          router.push("/expenses").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

@@ -55,8 +55,9 @@ export default function AddTruckPage() {
       <TruckForm
         formHtmlId="truck-form"
         onSuccess={() => {
-          router.push("/trucks");
-          setIsLoading(false);
+          router.push("/trucks").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

@@ -52,8 +52,9 @@ export default function AddWebsitePage() {
       <WebsiteForm
         formHtmlId="website-form"
         onSuccess={() => {
-          router.push("/websites");
-          setIsLoading(false);
+          router.push("/websites").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

@@ -53,8 +53,9 @@ export default function AddPurchasePage() {
       <PurchaseForm
         formHtmlId="purchase-form"
         onSuccess={() => {
-          router.push("/purchases");
-          setIsLoading(false);
+          router.push("/purchases").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

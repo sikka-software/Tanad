@@ -58,8 +58,9 @@ export default function AddJobPage() {
       <JobForm
         formHtmlId="job-form"
         onSuccess={() => {
-          setIsLoading(false);
-          router.push("/jobs");
+          router.push("/jobs").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

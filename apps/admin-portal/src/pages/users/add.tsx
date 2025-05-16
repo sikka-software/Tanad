@@ -45,7 +45,14 @@ export default function AddUserPage() {
           cancel: t("General.cancel"),
         }}
       />
-      <UserForm formHtmlId="user-form" onSuccess={() => router.push("/users")} />
+      <UserForm
+        formHtmlId="user-form"
+        onSuccess={() =>
+          router.push("/users").then(() => {
+            createUser.reset();
+          })
+        }
+      />
     </div>
   );
 }

@@ -51,8 +51,9 @@ export default function AddOnlineStorePage() {
       <OnlineStoreForm
         formHtmlId="online-store-form"
         onSuccess={() => {
-          router.push("/online_stores");
-          setIsLoading(false);
+          router.push("/online_stores").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

@@ -53,8 +53,9 @@ export default function AddServerPage() {
       <ServerForm
         formHtmlId="server-form"
         onSuccess={() => {
-          router.push("/servers");
-          setIsLoading(false);
+          router.push("/servers").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

@@ -36,8 +36,9 @@ export default function AddQuotePage() {
       <QuoteForm
         formHtmlId="quote-form"
         onSuccess={() => {
-          router.push("/quotes");
-          setIsLoading(false);
+          router.push("/quotes").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

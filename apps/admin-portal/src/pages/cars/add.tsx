@@ -55,8 +55,9 @@ export default function AddCarPage() {
       <CarForm
         formHtmlId="car-form"
         onSuccess={() => {
-          router.push("/cars");
-          setIsLoading(false);
+          router.push("/cars").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

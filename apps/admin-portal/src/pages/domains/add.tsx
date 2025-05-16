@@ -52,8 +52,9 @@ export default function AddDomainPage() {
       <DomainForm
         formHtmlId="domain-form"
         onSuccess={() => {
-          router.push("/domains");
-          setIsLoading(false);
+          router.push("/domains").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

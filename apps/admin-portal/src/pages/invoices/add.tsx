@@ -36,8 +36,9 @@ export default function AddInvoicePage() {
       <InvoiceForm
         formHtmlId="invoice-form"
         onSuccess={() => {
-          setIsLoading(false);
-          router.push("/invoices");
+          router.push("/invoices").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

@@ -10,7 +10,6 @@ import * as z from "zod";
 
 import { Button } from "@/ui/button";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
-import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
@@ -35,7 +34,7 @@ import { DEDUCTION_TYPES } from "@/salary/salary.options";
 import useSalaryStore from "@/salary/salary.store";
 import { SalaryCreateData, SalaryUpdateData } from "@/salary/salary.type";
 
-import { offices, salaries } from "@/db/schema";
+import { salaries } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
 const createDeductionSchema = (t: (key: string) => string) =>
@@ -116,12 +115,13 @@ export function SalaryForm({
   const user = useUserStore((state) => state.user);
   const enterprise = useUserStore((state) => state.enterprise);
 
+  const setLoadingSave = useSalaryStore((state) => state.setIsLoading);
+  const loadingSave = useSalaryStore((state) => state.isLoading);
+
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
-  const setLoading = useSalaryStore((state) => state.setIsLoading);
-  const loading = useSalaryStore((state) => state.isLoading);
   const { mutate: createSalary } = useCreateSalary();
   const { mutate: updateSalary } = useUpdateSalary();
 
@@ -167,7 +167,7 @@ export function SalaryForm({
   }));
 
   const handleSubmit: (data: SalaryFormValues) => Promise<void> = async (data) => {
-    setLoading(true);
+    setLoadingSave(true);
     try {
       // Revert to stringifying; pass undefined if empty to match expected type signature
       const deductionsPayload =
@@ -309,7 +309,7 @@ export function SalaryForm({
                           field.onChange(v === undefined || v === null ? undefined : v)
                         }
                         placeholder={t("Salaries.form.amount.placeholder")}
-                        disabled={loading}
+                        disabled={loadingSave}
                       />
                     </FormControl>
                     <FormMessage />
@@ -336,7 +336,7 @@ export function SalaryForm({
                         }
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
-                        disabled={loading}
+                        disabled={loadingSave}
                         ariaInvalid={form.formState.errors.start_date !== undefined}
                       />
                       {/* <DatePicker
@@ -376,7 +376,7 @@ export function SalaryForm({
                         }
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
-                        disabled={loading}
+                        disabled={loadingSave}
                         ariaInvalid={form.formState.errors.end_date !== undefined}
                       />
                       {/* <DatePicker
@@ -417,7 +417,7 @@ export function SalaryForm({
                         }
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
-                        disabled={loading}
+                        disabled={loadingSave}
                         ariaInvalid={form.formState.errors.payment_date !== undefined}
                       />
                       {/* <DatePicker
@@ -453,7 +453,7 @@ export function SalaryForm({
                         dir={locale === "ar" ? "rtl" : "ltr"}
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        disabled={loading}
+                        disabled={loadingSave}
                       >
                         <SelectTrigger>
                           <SelectValue
@@ -504,7 +504,7 @@ export function SalaryForm({
                               }
                               onChange={(value) => amountField.onChange(value?.toString() || "")}
                               placeholder={t("Salaries.form.deduction_amount.placeholder")}
-                              disabled={loading}
+                              disabled={loadingSave}
                             />
                           </FormControl>
                           <FormMessage />
@@ -525,7 +525,7 @@ export function SalaryForm({
                             dir={locale === "ar" ? "rtl" : "ltr"}
                             onValueChange={typeField.onChange}
                             defaultValue={typeField.value}
-                            disabled={loading}
+                            disabled={loadingSave}
                           >
                             <FormControl>
                               <SelectTrigger>
@@ -556,7 +556,7 @@ export function SalaryForm({
                       size="icon"
                       className="h-10 min-w-10"
                       onClick={() => remove(index)}
-                      disabled={loading}
+                      disabled={loadingSave}
                       aria-label={t("Salaries.form.remove_deduction")}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -569,7 +569,7 @@ export function SalaryForm({
                   variant="outline"
                   size="sm"
                   onClick={() => append({ type: "", amount: 0 })}
-                  disabled={loading}
+                  disabled={loadingSave}
                 >
                   {t("Salaries.form.deductions.add")}
                 </Button>

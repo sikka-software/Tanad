@@ -51,8 +51,9 @@ export default function AddClientPage() {
       <ClientForm
         formHtmlId="client-form"
         onSuccess={() => {
-          router.push("/clients");
-          setIsLoading(false);
+          router.push("/clients").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

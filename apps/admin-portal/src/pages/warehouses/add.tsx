@@ -52,8 +52,9 @@ export default function AddWarehousePage() {
       <WarehouseForm
         formHtmlId="warehouse-form"
         onSuccess={() => {
-          router.push("/warehouses");
-          setIsLoading(false);
+          router.push("/warehouses").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

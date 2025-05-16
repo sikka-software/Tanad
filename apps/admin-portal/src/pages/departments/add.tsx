@@ -49,8 +49,9 @@ export default function AddDepartmentPage() {
       <DepartmentForm
         formHtmlId="department-form"
         onSuccess={() => {
-          router.push("/departments");
-          setIsLoading(false);
+          router.push("/departments").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

@@ -55,8 +55,9 @@ export default function AddCompanyPage() {
       <CompanyForm
         formHtmlId="company-form"
         onSuccess={() => {
-          router.push("/companies");
-          setIsLoading(false);
+          router.push("/companies").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>

@@ -1,14 +1,17 @@
+import { parseDate } from "@internationalized/date";
+
 export const generateDummySalary = () => {
   const form = (window as any).salaryForm;
   if (form) {
-    // form.setValue("employee_id", "1");
-    form.setValue("salary", "100000");
-
-    form.setValue("employee_name", "John Doe");
-    form.setValue("pay_period_start", "2021-01-01");
-    form.setValue("pay_period_end", "2021-01-31");
-    form.setValue("payment_date", "2021-01-31");
+    // Use a real employee_id from the db
+    form.setValue("employee_id", "19070611-efa8-42ae-aa69-6b8a602cdd6d");
     form.setValue("amount", 10000);
+    form.setValue("start_date", parseDate("2024-01-01"));
+    form.setValue("end_date", parseDate("2024-01-31"));
+    form.setValue("payment_date", parseDate("2024-02-01"));
+    form.setValue("payment_frequency", "monthly");
+    form.setValue("currency", "sar");
+    // Deductions intentionally ignored as per instructions
   }
 };
 

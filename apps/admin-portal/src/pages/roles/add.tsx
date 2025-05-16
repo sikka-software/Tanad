@@ -40,8 +40,9 @@ export default function AddRolePage() {
         <RoleForm
           formHtmlId="role-form"
           onSuccess={() => {
-            router.push("/roles");
-            setIsLoading(false);
+            router.push("/roles").then(() => {
+              setIsLoading(false);
+            });
           }}
         />
       </div>
