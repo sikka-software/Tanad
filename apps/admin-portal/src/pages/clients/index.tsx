@@ -21,14 +21,16 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import ClientCard from "@/client/client.card";
+import useClientColumns from "@/client/client.columns";
 import { ClientForm } from "@/client/client.form";
 import { useClients, useBulkDeleteClients, useDuplicateClient } from "@/client/client.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/client/client.options";
 import useClientStore from "@/client/client.store";
 import ClientsTable from "@/client/client.table";
-import { ClientUpdateData } from "@/client/client.type";
+import { ClientUpdateData, Client } from "@/client/client.type";
 
-import useClientColumns from "@/modules/client/client.columns";
+import { useCompanies } from "@/company/company.hooks";
+import { Company } from "@/company/company.type";
 
 export default function ClientsPage() {
   const t = useTranslations();
@@ -72,6 +74,7 @@ export default function ClientsPage() {
   const searchQuery = moduleHooks.useSearchQuery();
   const viewMode = moduleHooks.useViewMode();
 
+  const { data: companies } = useCompanies();
   const { data: clients, isLoading, error } = useClients();
   const { mutateAsync: deleteClients, isPending: isDeleting } = useBulkDeleteClients();
   const { mutate: duplicateClient } = useDuplicateClient();
@@ -186,7 +189,7 @@ export default function ClientsPage() {
             />
           ) : (
             <div className="p-4">
-              <DataModelList
+              <DataModelList<Client>
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
@@ -198,7 +201,11 @@ export default function ClientsPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(client) => (
-                  <ClientCard onActionClicked={onActionClicked} client={client} />
+                  <ClientCard
+                    client={client}
+                    company={companies?.find((company) => company.id === client.company) as Company}
+                    onActionClicked={onActionClicked}
+                  />
                 )}
                 gridCols="3"
               />

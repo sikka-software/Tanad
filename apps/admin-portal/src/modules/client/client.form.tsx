@@ -16,7 +16,6 @@ import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 import { Input } from "@/components/ui/inputs/input";
 import PhoneInput from "@/components/ui/inputs/phone-input";
 
-import { createAddressSchema } from "@/lib/schemas/address.schema";
 import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps, CommonStatus } from "@/types/common.type";
@@ -27,11 +26,10 @@ import { ClientCreateData, ClientUpdateData } from "@/client/client.type";
 
 import { CompanyForm } from "@/company/company.form";
 import { useCompanies } from "@/company/company.hooks";
+import useCompanyStore from "@/company/company.store";
 
 import { clients } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
-
-import useCompanyStore from "../company/company.store";
 
 const createClientSchema = (t: (key: string) => string) => {
   const ClientSelectSchema = createInsertSchema(clients, {
@@ -185,6 +183,8 @@ export function ClientForm({
     companies?.map((company) => ({
       label: company.name,
       value: company.id,
+      email: company.email,
+      website: company.website,
     })) || [];
 
   if (typeof window !== "undefined") {
@@ -257,28 +257,40 @@ export function ClientForm({
               <FormField
                 control={form.control}
                 name="company"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Clients.form.company.label")}</FormLabel>
-                    <FormControl>
-                      <ComboboxAdd
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={companyOptions}
-                        isLoading={companiesLoading}
-                        defaultValue={field.value || ""}
-                        onChange={(value) => field.onChange(value || null)}
-                        texts={{
-                          placeholder: t("Clients.form.company.placeholder"),
-                          searchPlaceholder: t("Pages.Companies.search"),
-                          noItems: t("Clients.form.company.no_companies"),
-                        }}
-                        addText={t("Pages.Companies.add")}
-                        onAddClick={() => setIsCompanyDialogOpen(true)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  console.log("companies ", companies);
+                  return (
+                    <FormItem>
+                      <FormLabel>{t("Clients.form.company.label")}</FormLabel>
+                      <FormControl>
+                        <ComboboxAdd
+                          dir={locale === "ar" ? "rtl" : "ltr"}
+                          data={companyOptions}
+                          isLoading={companiesLoading}
+                          defaultValue={field.value || ""}
+                          valueKey="value"
+                          onChange={(value) => field.onChange(value || null)}
+                          texts={{
+                            placeholder: t("Clients.form.company.placeholder"),
+                            searchPlaceholder: t("Pages.Companies.search"),
+                            noItems: t("Clients.form.company.no_companies"),
+                          }}
+                          addText={t("Pages.Companies.add")}
+                          onAddClick={() => setIsCompanyDialogOpen(true)}
+                          renderOption={(item) => (
+                            <div>
+                              <p>{item.label}</p>
+                              <p className="text-muted-foreground text-xs">
+                                {item.email ? item.email : item.website}
+                              </p>
+                            </div>
+                          )}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
               <FormField
                 control={form.control}

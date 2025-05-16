@@ -33,15 +33,14 @@ const useCompanyColumns = (
     },
     {
       accessorKey: "company_name",
-
       header: t("Clients.form.company.label", { defaultValue: "Company" }),
-      cell: ({ row }) => {
-        const company = row.original.company;
-        if (company && typeof company === "object" && "name" in company) {
-          return (company as any).name || "-";
-        }
-        return "-";
-      },
+      // cell: ({ row }) => {
+      //   const company = row.original.company;
+      //   if (company && typeof company === "object" && "name" in company) {
+      //     return (company as any).name || "-";
+      //   }
+      //   return "-";
+      // },
       enableEditing: false,
     },
 
