@@ -63,6 +63,7 @@ const useDepartmentColumns = () => {
       className: "min-w-[250px]",
     },
     {
+      enableEditing: false,
       accessorKey: "locations",
       header: t("Departments.form.locations.label"),
       validationSchema: z.array(z.string()).min(1, t("Departments.form.locations.required")),

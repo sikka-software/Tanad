@@ -213,6 +213,10 @@ export function JobListingForm({
             status: "active",
             is_public: true,
             slug: generatedSlug,
+            currency: currency,
+            enable_search_filtering: enable_search_filtering,
+            locations: locations,
+            departments: departments,
           },
           {
             onSuccess: async (createdListing) => {

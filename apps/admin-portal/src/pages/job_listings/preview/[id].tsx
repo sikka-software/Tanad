@@ -159,7 +159,7 @@ export default function JobListingPreviewPage({
         {/* Filter UI from job-listings.tsx */}
         {jobListing.enable_search_filtering && (
           <div className="bg--500 border-border mb-8 rounded-md border p-6 shadow-sm">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
               <div>
                 <Input
                   placeholder={t("Pages.Jobs.search") || "Search jobs..."}
@@ -168,7 +168,7 @@ export default function JobListingPreviewPage({
                   className="w-full"
                 />
               </div>
-              <div>
+              {/* <div>
                 <Select
                   dir={locale === "ar" ? "rtl" : "ltr"}
                   value={selectedDepartment}
@@ -211,7 +211,7 @@ export default function JobListingPreviewPage({
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
             </div>
           </div>
         )}
