@@ -64,7 +64,12 @@ const JobListingJobsSelection = ({
         isError={form.formState.errors.jobs as FieldError}
         onErrorText={t("JobListings.form.jobs.required")}
       />
-      <div className={cn("bg-background sticky top-[129px] z-10 mx-auto border-b")}>
+      <div
+        className={cn(
+          "bg-background sticky  z-10 mx-auto border-b",
+          editMode ? "top-[81px]" : "top-[129px]",
+        )}
+      >
         <div className="form-container py-2">
           <div className="relative">
             <Input
