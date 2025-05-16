@@ -117,6 +117,7 @@ export default function JobListingPreviewPage({
     setSelectedJob(null);
   };
 
+  console.log(jobListing);
   return (
     <main className="bg-background min-h-screen">
       <CustomPageMeta
@@ -156,60 +157,64 @@ export default function JobListingPreviewPage({
         </header>
 
         {/* Filter UI from job-listings.tsx */}
-        <div className="bg--500 border-border mb-8 rounded-md border p-6 shadow-sm">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div>
-              <Input
-                placeholder={t("Pages.Jobs.search") || "Search jobs..."}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            <div>
-              <Select
-                dir={locale === "ar" ? "rtl" : "ltr"}
-                value={selectedDepartment}
-                onValueChange={setSelectedDepartment}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("Jobs.department_placeholder") || "Department"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    {t("Jobs.all_departments") || "All Departments"}
-                  </SelectItem>
-                  {departments.map((department) => (
-                    <SelectItem key={department} value={department}>
-                      {department}
+        {jobListing.enable_search_filtering && (
+          <div className="bg--500 border-border mb-8 rounded-md border p-6 shadow-sm">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div>
+                <Input
+                  placeholder={t("Pages.Jobs.search") || "Search jobs..."}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <Select
+                  dir={locale === "ar" ? "rtl" : "ltr"}
+                  value={selectedDepartment}
+                  onValueChange={setSelectedDepartment}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("Jobs.department_placeholder") || "Department"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      {t("Jobs.all_departments") || "All Departments"}
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Select
-                dir={locale === "ar" ? "rtl" : "ltr"}
-                value={selectedLocation}
-                onValueChange={setSelectedLocation}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("JobListings.location_placeholder") || "Location"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    {t("JobListings.all_locations") || "All Locations"}
-                  </SelectItem>
-                  {locations.map((location) => (
-                    <SelectItem key={location} value={location}>
-                      {location}
+                    {departments.map((department) => (
+                      <SelectItem key={department} value={department}>
+                        {department}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Select
+                  dir={locale === "ar" ? "rtl" : "ltr"}
+                  value={selectedLocation}
+                  onValueChange={setSelectedLocation}
+                >
+                  <SelectTrigger>
+                    <SelectValue
+                      placeholder={t("JobListings.location_placeholder") || "Location"}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      {t("JobListings.all_locations") || "All Locations"}
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    {locations.map((location) => (
+                      <SelectItem key={location} value={location}>
+                        {location}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Job Grid UI from job-listings.tsx */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">

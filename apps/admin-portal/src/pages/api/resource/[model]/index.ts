@@ -398,27 +398,28 @@ const modelMap: Record<string, ModelConfig> = {
         }
         const enterprise_id = membership.enterprise_id;
 
-        // 2. Fetch job listings with job count
+        // 2. Fetch job listings with job IDs
         const { data, error } = await supabase
           .from("job_listings")
           .select(
             `
             *,
-            job_listing_jobs (count)
+            job_listing_jobs:job_listing_jobs (job_id)
           `,
           )
           .eq("enterprise_id", enterprise_id)
           .order("created_at", { ascending: false });
 
         if (error) {
-          console.error("Error fetching job listings with count:", error);
+          console.error("Error fetching job listings with job IDs:", error);
           throw error;
         }
 
-        // 3. Map result to flatten the count
+        // 3. Map result to flatten the job IDs and count
         return data.map((listing) => ({
           ...listing,
-          jobs_count: listing.job_listing_jobs[0]?.count || 0,
+          jobs: listing.job_listing_jobs?.map((j: any) => j.job_id) || [],
+          jobs_count: listing.job_listing_jobs?.length || 0,
         }));
       },
     },

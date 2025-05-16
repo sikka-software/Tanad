@@ -75,7 +75,12 @@ export function JobListingForm({
   const { mutateAsync: createJobListing, isPending: isCreating } = useCreateJobListing();
   const { mutateAsync: updateJobListing, isPending: isUpdating } = useUpdateJobListing();
 
-  const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
+  const getJobIds = (jobs: any[] | undefined) =>
+    Array.isArray(jobs)
+      ? jobs.map((j: any) => (typeof j === "string" ? j : j.job_id || j.id)).filter(Boolean)
+      : [];
+
+  const [selectedJobs, setSelectedJobs] = useState<string[]>(() => getJobIds(defaultValues?.jobs));
 
   const [isJobDialogOpen, setIsJobDialogOpen] = useState(false);
   const isJobSaving = useJobStore((state) => state.isLoading);
@@ -86,15 +91,18 @@ export function JobListingForm({
   const form = useForm<JobListingFormValues>({
     resolver: zodResolver(createJobListingSchema(t)),
     defaultValues: {
-      title: "",
-      description: "",
-      jobs: [],
-      currency: "sar",
-      enable_search_filtering: true,
-      locations: [],
-      departments: [],
+      title: defaultValues?.title || "",
+      description: defaultValues?.description || "",
+      currency: defaultValues?.currency || "sar",
+      enable_search_filtering: defaultValues?.enable_search_filtering || true,
+      slug: defaultValues?.slug || "",
+      status: defaultValues?.status || "active",
+      is_public: defaultValues?.is_public || true,
+      jobs: Array.isArray(defaultValues?.jobs) ? defaultValues.jobs.map((job: any) => job.id) : [],
     },
   });
+
+  console.log("default jobs ", defaultValues);
 
   const handleJobSelect = (job_id: string) => {
     setSelectedJobs((prev) => {
@@ -259,11 +267,10 @@ export function JobListingForm({
   // --- End Options Data ---
 
   useEffect(() => {
-    //  if there's at least one job selected, remove the form validation error state
-    if (form.getValues("jobs").length > 0) {
-      form.clearErrors("jobs");
-    }
-  }, [form.getValues("jobs")]);
+    const jobIds = getJobIds(defaultValues?.jobs);
+    setSelectedJobs(jobIds);
+    form.setValue("jobs", jobIds);
+  }, [defaultValues?.jobs]);
 
   return (
     <>
