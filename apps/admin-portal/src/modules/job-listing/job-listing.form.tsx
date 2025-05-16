@@ -161,15 +161,16 @@ export function JobListingForm({
           {
             onSuccess: async (updatedListing) => {
               try {
-                await updateListingJobAssociations(defaultValues.id!, selectedJobIds);
-                // toast.info(t("JobListings.success.associations_updated"));
+                const updatedWithAssociations = await updateListingJobAssociations(defaultValues.id!, selectedJobIds);
+                if (onSuccess) {
+                  onSuccess();
+                }
               } catch (assocError) {
                 console.error("Failed to update job associations:", assocError);
                 toast.warning(t("JobListings.warning.associations_failed"));
-              }
-
-              if (onSuccess) {
-                onSuccess();
+                if (onSuccess) {
+                  onSuccess();
+                }
               }
             },
             onError: (error) => {

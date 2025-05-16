@@ -415,12 +415,18 @@ const modelMap: Record<string, ModelConfig> = {
           throw error;
         }
 
-        // 3. Map result to flatten the job IDs and count
-        return data.map((listing) => ({
-          ...listing,
-          jobs: listing.job_listing_jobs?.map((j: any) => j.job_id) || [],
-          jobs_count: listing.job_listing_jobs?.length || 0,
-        }));
+        // 3. Map result to flatten the job IDs and count, using only job_listing_jobs
+        return data.map((listing: any) => {
+          const jobs = Array.isArray(listing.job_listing_jobs)
+            ? listing.job_listing_jobs.map((j: any) => j.job_id)
+            : [];
+          const { job_listing_jobs, jobs: _jobs, ...rest } = listing;
+          return {
+            ...rest,
+            jobs,
+            jobs_count: jobs.length,
+          };
+        });
       },
     },
   },

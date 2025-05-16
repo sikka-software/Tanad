@@ -64,21 +64,20 @@ const modelMap: Record<string, ModelConfig> = {
         // Fetch the job listing by ID
         const { data: record, error } = await supabase
           .from("job_listings")
-          .select("*")
+          .select("*, job_listing_jobs(job_id)")
           .eq("id", id)
           .maybeSingle();
         if (error) throw error;
         if (!record) throw new Error("job_listing not found");
-        // Fetch associated jobs
-        const { data: jobLinks, error: jobsError } = await supabase
-          .from("job_listing_jobs")
-          .select("job_id")
-          .eq("job_listing_id", id);
-        if (jobsError) throw jobsError;
+        // Consolidate jobs from job_listing_jobs only
+        const jobs = Array.isArray(record.job_listing_jobs)
+          ? record.job_listing_jobs.map((j: any) => j.job_id)
+          : [];
+        const { job_listing_jobs, jobs: _jobs, ...rest } = record as any;
         return {
-          ...record,
-          jobs: jobLinks?.map((j: any) => j.job_id) || [],
-          jobs_count: jobLinks?.length || 0,
+          ...rest,
+          jobs,
+          jobs_count: jobs.length,
         };
       },
       PUT: async (supabase, user_id, req, id) => {
