@@ -77,10 +77,11 @@ export function JobListingForm({
   const { mutateAsync: createJobListing, isPending: isCreating } = useCreateJobListing();
   const { mutateAsync: updateJobListing, isPending: isUpdating } = useUpdateJobListing();
 
-  const getJobIds = (jobs: any[] | undefined) =>
-    Array.isArray(jobs)
-      ? jobs.map((j: any) => (typeof j === "string" ? j : j.job_id || j.id)).filter(Boolean)
-      : [];
+  const getJobIds = (jobs: any[] | undefined) => {
+    if (!Array.isArray(jobs)) return [];
+    if (jobs.length > 0 && typeof jobs[0] === "string") return jobs as string[];
+    return jobs.map((j: any) => j?.job_id || j?.id).filter(Boolean);
+  };
 
   const [selectedJobs, setSelectedJobs] = useState<string[]>(() => getJobIds(defaultValues?.jobs));
 
@@ -89,6 +90,7 @@ export function JobListingForm({
   const setIsJobSaving = useJobStore((state) => state.setIsLoading);
   const isLoading = useJobListingsStore((state) => state.isLoading);
   const setIsLoading = useJobListingsStore((state) => state.setIsLoading);
+  const setData = useJobListingStore((state) => state.setData);
 
   const form = useForm<JobListingFormValues>({
     resolver: zodResolver(createJobListingSchema(t)),
@@ -100,7 +102,7 @@ export function JobListingForm({
       slug: defaultValues?.slug || "",
       status: defaultValues?.status || "active",
       is_public: defaultValues?.is_public || true,
-      jobs: Array.isArray(defaultValues?.jobs) ? defaultValues.jobs.map((job: any) => job.id) : [],
+      jobs: getJobIds(defaultValues?.jobs),
     },
   });
 
@@ -166,7 +168,6 @@ export function JobListingForm({
                 await updateListingJobAssociations(defaultValues.id!, selectedJobIds);
                 const latest = await fetchJobListingById(defaultValues.id!);
                 const prev = useJobListingStore.getState().data || [];
-                const setData = useJobListingStore.getState().setData;
                 if (setData) {
                   setData(prev.map((item: any) => (item.id === latest.id ? latest : item)));
                 }
@@ -278,6 +279,12 @@ export function JobListingForm({
   useEffect(() => {
     const jobIds = getJobIds(defaultValues?.jobs);
     setSelectedJobs(jobIds);
+    if (defaultValues?.id && setData) {
+      const prev = useJobListingStore.getState().data || [];
+      setData(
+        prev.map((item: any) => (item.id === defaultValues.id ? { ...item, jobs: jobIds } : item)),
+      );
+    }
     form.setValue("jobs", jobIds);
   }, [defaultValues?.jobs]);
 
