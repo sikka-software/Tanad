@@ -145,15 +145,7 @@ export default function CompaniesPage() {
       />
       <DataPageLayout count={companies?.length} itemsText={t("Pages.Companies.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useCompanyStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useCompanyStore}
@@ -166,12 +158,6 @@ export default function CompaniesPage() {
             searchPlaceholder={t("Pages.Companies.search")}
             hideOptions={companies?.length === 0}
             id="companies-table"
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

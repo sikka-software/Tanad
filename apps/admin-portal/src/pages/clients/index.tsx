@@ -148,15 +148,7 @@ export default function ClientsPage() {
       />
       <DataPageLayout count={clients?.length} itemsText={t("Pages.Clients.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useClientStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useClientStore}
@@ -168,12 +160,6 @@ export default function ClientsPage() {
             createLabel={t("Pages.Clients.add")}
             searchPlaceholder={t("Pages.Clients.search")}
             hideOptions={clients?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
         <div>

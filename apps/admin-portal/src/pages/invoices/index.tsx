@@ -147,15 +147,7 @@ export default function InvoicesPage() {
       />
       <DataPageLayout count={invoices?.length} itemsText={t("Pages.Invoices.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useInvoiceStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useInvoiceStore}
@@ -168,12 +160,6 @@ export default function InvoicesPage() {
             searchPlaceholder={t("Pages.Invoices.search")}
             hideOptions={invoices?.length === 0}
             id="invoices-table"
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

@@ -35,8 +35,6 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
     setSortCaseSensitive: (sortCaseSensitive: boolean) => void;
     sortNullsFirst: boolean;
     setSortNullsFirst: (sortNullsFirst: boolean) => void;
-    clearSelection: () => void;
-    setSelectedRows: (ids: string[]) => void;
     columnVisibility: BaseStates<any>["columnVisibility"];
     setColumnVisibility: BaseActions<any>["setColumnVisibility"];
   }>;

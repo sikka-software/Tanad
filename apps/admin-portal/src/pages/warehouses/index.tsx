@@ -145,12 +145,7 @@ export default function WarehousesPage() {
       />
       <DataPageLayout count={warehouses?.length} itemsText={t("Pages.Warehouses.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-          />
+          <SelectionMode store={useWarehouseStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useWarehouseStore}
@@ -162,12 +157,6 @@ export default function WarehousesPage() {
             createLabel={t("Pages.Warehouses.create")}
             searchPlaceholder={t("Pages.Warehouses.search")}
             hideOptions={warehouses?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

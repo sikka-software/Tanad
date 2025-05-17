@@ -157,15 +157,7 @@ export default function ProductsPage() {
       />
       <DataPageLayout count={products?.length} itemsText={t("Pages.Products.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useProductStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useProductStore}
@@ -177,12 +169,6 @@ export default function ProductsPage() {
             createLabel={t("Pages.Products.add")}
             searchPlaceholder={t("Pages.Products.search")}
             hideOptions={products?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

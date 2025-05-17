@@ -156,12 +156,7 @@ export default function EmployeeRequestsPage() {
         itemsText={t("Pages.EmployeeRequests.title")}
       >
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-          />
+          <SelectionMode store={useEmployeeRequestsStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useEmployeeRequestsStore}
@@ -173,12 +168,6 @@ export default function EmployeeRequestsPage() {
             createLabel={t("Pages.EmployeeRequests.add")}
             searchPlaceholder={t("Pages.EmployeeRequests.search")}
             hideOptions={employeeRequests?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
         <div>

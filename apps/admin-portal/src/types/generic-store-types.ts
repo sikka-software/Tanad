@@ -10,6 +10,7 @@ export type BaseStates<T> = {
   isLoading: boolean;
   error: string | null;
   selectedRows: string[];
+  pendingDeleteIds: string[];
   filterConditions: FilterCondition[];
   filterCaseSensitive: boolean;
   searchQuery: string;
@@ -30,6 +31,7 @@ export type BaseActions<T> = {
   setError: (error: string | null) => void;
   setSelectedRows: (ids: string[]) => void;
   clearSelection: () => void;
+  setPendingDeleteIds: (ids: string[]) => void;
   setFilterConditions: (filterConditions: FilterCondition[]) => void;
   setFilterCaseSensitive: (filterCaseSensitive: boolean) => void;
   setSearchQuery: (searchQuery: string) => void;

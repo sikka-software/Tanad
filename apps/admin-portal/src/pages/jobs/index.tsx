@@ -130,15 +130,7 @@ export default function JobsPage() {
       <CustomPageMeta title={t("Pages.Jobs.title")} description={t("Pages.Jobs.description")} />
       <DataPageLayout count={jobs?.length} itemsText={t("Pages.Jobs.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useJobsStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useJobsStore}
@@ -150,12 +142,6 @@ export default function JobsPage() {
             createLabel={t("Pages.Jobs.add")}
             searchPlaceholder={t("Pages.Jobs.search")}
             hideOptions={jobs?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

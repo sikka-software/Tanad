@@ -144,15 +144,7 @@ export default function VendorsPage() {
       />
       <DataPageLayout count={vendors?.length} itemsText={t("Pages.Vendors.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useVendorStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useVendorStore}
@@ -164,12 +156,6 @@ export default function VendorsPage() {
             createLabel={t("Pages.Vendors.add")}
             searchPlaceholder={t("Pages.Vendors.search")}
             hideOptions={vendors?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

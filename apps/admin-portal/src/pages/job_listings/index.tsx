@@ -148,12 +148,7 @@ export default function JobListingsPage() {
       />
       <DataPageLayout count={jobListings?.length} itemsText={t("Pages.JobListings.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-          />
+          <SelectionMode store={useJobListingsStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useJobListingsStore}
@@ -165,12 +160,6 @@ export default function JobListingsPage() {
             createLabel={t("Pages.JobListings.add")}
             searchPlaceholder={t("Pages.JobListings.search")}
             hideOptions={jobListings?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

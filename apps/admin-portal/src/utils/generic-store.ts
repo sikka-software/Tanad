@@ -56,6 +56,7 @@ export function createGenericStore<T extends { id: string }>(
     sortNullsFirst: false,
     isFormDialogOpen: false,
     actionableItem: null,
+    pendingDeleteIds: [],
     ...initialState,
 
     setColumnVisibility: (columnVisibilityOrUpdater) => {
@@ -128,7 +129,7 @@ export function createGenericStore<T extends { id: string }>(
     setIsDeleteDialogOpen: (isDeleteDialogOpen) => set({ isDeleteDialogOpen }),
     setIsFormDialogOpen: (isFormDialogOpen) => set({ isFormDialogOpen }),
     setActionableItem: (actionableItem) => set({ actionableItem }),
-
+    setPendingDeleteIds: (ids) => set({ pendingDeleteIds: ids }),
     setSelectedRows: (ids) => {
       set((state) => {
         if (JSON.stringify(state.selectedRows) === JSON.stringify(ids)) {

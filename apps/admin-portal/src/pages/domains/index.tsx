@@ -144,15 +144,7 @@ export default function DomainsPage() {
       />
       <DataPageLayout count={domains?.length} itemsText={t("Pages.Domains.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useDomainStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useDomainStore}
@@ -164,12 +156,6 @@ export default function DomainsPage() {
             createLabel={t("Pages.Domains.add")}
             searchPlaceholder={t("Pages.Domains.search")}
             hideOptions={domains?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

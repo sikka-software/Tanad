@@ -144,15 +144,7 @@ export default function ServersPage() {
       />
       <DataPageLayout count={servers?.length} itemsText={t("Pages.Servers.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useServerStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useServerStore}
@@ -164,12 +156,6 @@ export default function ServersPage() {
             createLabel={t("Pages.Servers.add")}
             searchPlaceholder={t("Pages.Servers.search")}
             hideOptions={servers?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

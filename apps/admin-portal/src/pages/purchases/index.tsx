@@ -148,15 +148,7 @@ export default function PurchasesPage() {
       />
       <DataPageLayout count={purchases?.length} itemsText={t("Pages.Purchases.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={usePurchaseStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={usePurchaseStore}
@@ -168,12 +160,6 @@ export default function PurchasesPage() {
             createLabel={t("Pages.Purchases.add")}
             searchPlaceholder={t("Pages.Purchases.search")}
             hideOptions={purchases?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

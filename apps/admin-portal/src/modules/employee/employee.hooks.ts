@@ -160,7 +160,10 @@ export function useDeleteEmployee() {
 export function useBulkDeleteEmployees() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/employees", ids),
+    mutationFn: (ids: string[]) => {
+      console.log("ids", ids);
+      return bulkDeleteResource("/api/resource/employees", ids);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
     },

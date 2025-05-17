@@ -141,15 +141,7 @@ export default function CarsPage() {
       <CustomPageMeta title={t("Pages.Cars.title")} description={t("Pages.Cars.description")} />
       <DataPageLayout count={cars?.length} itemsText={t("Pages.Cars.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useCarStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useCarStore}
@@ -161,12 +153,6 @@ export default function CarsPage() {
             createLabel={t("Pages.Cars.add")}
             searchPlaceholder={t("Pages.Cars.search")}
             hideOptions={cars?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

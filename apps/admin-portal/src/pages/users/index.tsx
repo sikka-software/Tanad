@@ -108,12 +108,7 @@ export default function UsersPage() {
       <CustomPageMeta title={t("Pages.Users.title")} description={t("Pages.Users.description")} />
       <DataPageLayout count={users?.length} itemsText={t("Pages.Users.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-          />
+          <SelectionMode store={useEnterpriseUsersStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useEnterpriseUsersStore}
@@ -124,12 +119,6 @@ export default function UsersPage() {
             createLabel={t("Pages.Users.add")}
             searchPlaceholder={t("Pages.Users.search")}
             hideOptions={users?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

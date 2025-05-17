@@ -144,15 +144,7 @@ export default function WebsitesPage() {
       />
       <DataPageLayout count={websites?.length} itemsText={t("Pages.Websites.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useWebsiteStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useWebsiteStore}
@@ -164,12 +156,6 @@ export default function WebsitesPage() {
             createLabel={t("Pages.Websites.add")}
             searchPlaceholder={t("Pages.Websites.search")}
             hideOptions={sortedData?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

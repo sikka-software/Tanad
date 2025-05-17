@@ -145,12 +145,7 @@ export default function DepartmentsPage() {
       />
       <DataPageLayout count={departments?.length} itemsText={t("Pages.Departments.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-          />
+          <SelectionMode store={useDepartmentsStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useDepartmentsStore}
@@ -162,12 +157,6 @@ export default function DepartmentsPage() {
             createLabel={t("Pages.Departments.add")}
             searchPlaceholder={t("Pages.Departments.search")}
             hideOptions={departments?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

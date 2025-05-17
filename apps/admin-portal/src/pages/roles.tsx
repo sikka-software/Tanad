@@ -143,12 +143,7 @@ export default function RolesPage() {
       <CustomPageMeta title={t("Roles.title")} description={t("Roles.description")} />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-          />
+          <SelectionMode store={useRoleStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useRoleStore}

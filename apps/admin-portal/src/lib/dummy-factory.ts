@@ -216,7 +216,7 @@ export const generateDummyEmployee = () => {
     form.setValue("phone", dummyData.phone);
     form.setValue("position", dummyData.employee_position);
     form.setValue("status", dummyData.employee_status);
-    form.setValue("national_id", dummyData.employee_notes);
+    form.setValue("national_id", dummyData.randomNumber(10));
   }
 };
 

@@ -148,15 +148,7 @@ export default function ExpensesPage() {
       />
       <DataPageLayout count={expenses?.length} itemsText={t("Pages.Expenses.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useExpenseStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useExpenseStore}
@@ -168,12 +160,6 @@ export default function ExpensesPage() {
             createLabel={t("Pages.Expenses.add")}
             searchPlaceholder={t("Pages.Expenses.search")}
             hideOptions={expenses?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

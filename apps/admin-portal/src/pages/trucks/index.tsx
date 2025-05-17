@@ -141,15 +141,7 @@ export default function TrucksPage() {
       <CustomPageMeta title={t("Pages.Trucks.title")} description={t("Pages.Trucks.description")} />
       <DataPageLayout count={trucks?.length} itemsText={t("Pages.Trucks.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useTruckStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useTruckStore}
@@ -161,12 +153,6 @@ export default function TrucksPage() {
             createLabel={t("Pages.Trucks.add")}
             searchPlaceholder={t("Pages.Trucks.search")}
             hideOptions={trucks?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

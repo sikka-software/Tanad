@@ -143,15 +143,7 @@ export default function QuotesPage() {
       <CustomPageMeta title={t("Pages.Quotes.title")} description={t("Pages.Quotes.description")} />
       <DataPageLayout count={quotes?.length} itemsText={t("Pages.Quotes.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useQuotesStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useQuotesStore}
@@ -163,12 +155,6 @@ export default function QuotesPage() {
             createLabel={t("Pages.Quotes.add")}
             searchPlaceholder={t("Pages.Quotes.search")}
             hideOptions={quotes?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

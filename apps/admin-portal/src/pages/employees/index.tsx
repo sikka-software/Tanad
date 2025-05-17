@@ -57,7 +57,6 @@ export default function EmployeesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<EmployeeUpdateData | null>(null);
-  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   // Permissions
   const canRead = moduleHooks.useCanRead();
@@ -65,9 +64,12 @@ export default function EmployeesPage() {
   // Loading
   const loadingSave = moduleHooks.useIsLoading();
   const setLoadingSave = moduleHooks.useSetIsLoading();
-  // Delete Dialog
+  // Deleting
   const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
   const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+  const pendingDeleteIds = moduleHooks.usePendingDeleteIds();
+  const setPendingDeleteIds = moduleHooks.useSetPendingDeleteIds();
+
   // Selected Rows
   const selectedRows = moduleHooks.useSelectedRows();
   const setSelectedRows = moduleHooks.useSetSelectedRows();
@@ -217,6 +219,10 @@ export default function EmployeesPage() {
   if (!canRead) {
     return <NoPermission />;
   }
+
+  useEffect(() => {
+    setPendingDeleteIds(selectedRows);
+  }, [selectedRows, setPendingDeleteIds]);
 
   return (
     <div>

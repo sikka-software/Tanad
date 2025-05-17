@@ -34,6 +34,9 @@ export interface ModuleStoreBase {
   filterCaseSensitive: boolean;
   setFilterConditions: (conditions: FilterCondition[]) => void;
   getFilteredData: (data: any[]) => any[];
+
+  pendingDeleteIds: string[];
+  setPendingDeleteIds: (ids: string[]) => void;
 }
 
 export function createModuleStoreHooks<T extends ModuleStoreBase>(
@@ -64,5 +67,7 @@ export function createModuleStoreHooks<T extends ModuleStoreBase>(
     useGetFilteredData: () => useStore().getFilteredData,
     useGetSortedData: () => useStore().getSortedData,
     useSetSortRules: () => useStore().setSortRules,
+    usePendingDeleteIds: () => useStore().pendingDeleteIds,
+    useSetPendingDeleteIds: () => useStore().setPendingDeleteIds,
   };
 }

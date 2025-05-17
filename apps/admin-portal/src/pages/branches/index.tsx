@@ -144,15 +144,7 @@ export default function BranchesPage() {
       />
       <DataPageLayout count={branches?.length} itemsText={t("Pages.Branches.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useBranchStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useBranchStore}
@@ -164,12 +156,6 @@ export default function BranchesPage() {
             createLabel={t("Pages.Branches.add")}
             searchPlaceholder={t("Pages.Branches.search")}
             hideOptions={branches?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

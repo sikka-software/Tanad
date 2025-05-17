@@ -147,15 +147,7 @@ export default function SalariesPage() {
       />
       <DataPageLayout count={salaries?.length} itemsText={t("Pages.Salaries.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useSalaryStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useSalaryStore}
@@ -167,12 +159,6 @@ export default function SalariesPage() {
             createLabel={t("Pages.Salaries.create")}
             searchPlaceholder={t("Pages.Salaries.search")}
             hideOptions={salaries?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
         <div>

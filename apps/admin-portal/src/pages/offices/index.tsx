@@ -144,15 +144,7 @@ export default function OfficesPage() {
       />
       <DataPageLayout count={offices?.length} itemsText={t("Pages.Offices.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
-          />
+          <SelectionMode store={useOfficeStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useOfficeStore}
@@ -164,12 +156,6 @@ export default function OfficesPage() {
             createLabel={t("Pages.Offices.add")}
             searchPlaceholder={t("Pages.Offices.search")}
             hideOptions={offices?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 

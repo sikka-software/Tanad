@@ -146,12 +146,7 @@ export default function OnlineStoresPage() {
       />
       <DataPageLayout count={onlineStores?.length} itemsText={t("Pages.OnlineStores.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-          />
+          <SelectionMode store={useOnlineStoreStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useOnlineStoreStore}
@@ -163,12 +158,6 @@ export default function OnlineStoresPage() {
             createLabel={t("Pages.OnlineStores.add")}
             searchPlaceholder={t("Pages.OnlineStores.search")}
             hideOptions={onlineStores?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
           />
         )}
 
