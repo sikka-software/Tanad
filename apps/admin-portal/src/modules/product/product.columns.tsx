@@ -7,15 +7,14 @@ import { ExtendedColumnDef } from "@/ui/sheet-table";
 
 import TimestampCell from "@/tables/timestamp-cell";
 
-import { getCurrencySymbol } from "@/lib/currency-utils";
+import { useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import { Product } from "@/product/product.type";
 
-import useUserStore from "@/stores/use-user-store";
-
 const useProductColumns = () => {
   const t = useTranslations();
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+
+  const currency = useAppCurrencySymbol().symbol;
 
   const columns: ExtendedColumnDef<Product>[] = [
     {
@@ -35,7 +34,7 @@ const useProductColumns = () => {
       cell: (props: CellContext<Product, unknown>) => (
         <span className="flex flex-row items-center gap-1 text-sm font-medium">
           {MoneyFormatter(props.row.original.price)}
-          {getCurrencySymbol(currency || "sar").symbol}
+          {currency}
         </span>
       ),
     },

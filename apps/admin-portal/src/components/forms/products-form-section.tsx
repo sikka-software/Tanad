@@ -18,10 +18,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { CurrencyInput, MoneyFormatter } from "@/components/ui/inputs/currency-input";
 import { Input } from "@/components/ui/inputs/input";
 
-import { getCurrencySymbol } from "@/lib/currency-utils";
+import { useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import { useProducts } from "@/modules/product/product.hooks";
-import useUserStore from "@/stores/use-user-store";
 
 import FormSectionHeader from "./form-section-header";
 
@@ -82,7 +81,6 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
     t,
     canDelete,
   }) => {
-    const currency = useUserStore((state) => state.profile?.user_settings?.currency);
     const quantity = useWatch({ control, name: `items.${index}.quantity` });
     const unitPrice = useWatch({ control, name: `items.${index}.unit_price` });
 
@@ -139,7 +137,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                         <div className="flex flex-row items-center gap-1 text-sm font-medium !text-black">
                           <span>{MoneyFormatter(option.price)}</span>
                           {
-                            getCurrencySymbol(currency || "sar", {
+                            useAppCurrencySymbol({
                               sar: { className: "!size-2.5 text-black", strokeWidth: 28 },
                             }).symbol
                           }
@@ -249,7 +247,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
         <TableCell className="w-[150px] max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap">
           <div className="flex flex-row items-center gap-1 text-right">
             {MoneyFormatter(subtotalNumber)}
-            {getCurrencySymbol(currency || "sar").symbol}
+            {useAppCurrencySymbol().symbol}
           </div>
         </TableCell>
 

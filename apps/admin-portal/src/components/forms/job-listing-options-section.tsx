@@ -15,7 +15,7 @@ import { MultiSelect } from "@/ui/multi-select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Switch } from "@/ui/switch";
 
-import { getCurrencySymbol } from "@/lib/currency-utils";
+import { useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import FormSectionHeader from "./form-section-header";
 
@@ -71,7 +71,7 @@ const JobListingOptionsSection = ({
                     <SelectItem key={currency} value={currency}>
                       <div className="flex flex-row items-center gap-2">
                         <span>{t(`Settings.preferences.currency.${currency}`)}</span>
-                        {getCurrencySymbol(currency).symbol}
+                        {useAppCurrencySymbol().symbol}
                       </div>
                     </SelectItem>
                   ))}

@@ -1,7 +1,7 @@
 import { currencies } from "@tanad.config";
 import React from "react";
 
-import { getCurrencySymbol } from "@/lib/currency-utils";
+import { getCurrencySymbol, useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import { MoneyFormatter } from "../ui/inputs/currency-input";
 
@@ -26,7 +26,7 @@ const CurrencyCell = ({
   if (typeof value !== "number" || !currency) {
     return <span>{fallback}</span>;
   }
-  const symbol = getCurrencySymbol(currency).symbol;
+  const symbol = useAppCurrencySymbol().symbol;
   return (
     <span
       className="flex flex-row items-center gap-1 text-sm font-medium"

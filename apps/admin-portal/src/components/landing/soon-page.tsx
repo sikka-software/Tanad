@@ -1,4 +1,3 @@
-import * as reactSpring from "@react-spring/three";
 import { ShaderGradientCanvas, ShaderGradient } from "@shadergradient/react";
 import { useLocale, useTranslations } from "next-intl";
 import { ThemeProvider, useTheme } from "next-themes";
@@ -12,7 +11,6 @@ import settings from "../../../landing.config";
 import { Button } from "../ui/button";
 import LanguageSwitcher from "../ui/language-switcher";
 import { LoadingBar } from "../ui/loading-bar";
-import { Toaster } from "../ui/sonner";
 import ThemeSwitcher from "../ui/theme-switcher";
 
 const SoonLayout = () => {

@@ -8,7 +8,7 @@ import TimestampCell from "@/components/tables/timestamp-cell";
 import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
-import { getCurrencySymbol } from "@/lib/currency-utils";
+import { getCurrencySymbol, useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -16,7 +16,9 @@ import { Job } from "./job.type";
 
 const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unknown) => void) => {
   const t = useTranslations();
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+  const currency = useAppCurrencySymbol({
+    usd: { className: "-ms-1" },
+  }).symbol;
 
   const columns: ExtendedColumnDef<Job>[] = [
     {
@@ -62,11 +64,7 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
         props.row.original.salary ? (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
             {MoneyFormatter(props.row.original.salary)}
-            {
-              getCurrencySymbol(currency || "sar", {
-                usd: { className: "-ms-1" },
-              }).symbol
-            }
+            {currency}
           </span>
         ) : (
           "N/A"

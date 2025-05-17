@@ -4,13 +4,11 @@ import { useTranslations } from "next-intl";
 import ModuleCard from "@/components/cards/module-card";
 import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 
-import { getCurrencySymbol } from "@/lib/currency-utils";
+import { useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import { useUpdateQuote } from "@/quote/quote.hooks";
 import useQuoteStore from "@/quote/quote.store";
 import { Quote, QuoteStatus, QuoteStatusProps } from "@/quote/quote.type";
-
-import useUserStore from "@/stores/use-user-store";
 
 const QuoteCard = ({
   quote,
@@ -21,7 +19,6 @@ const QuoteCard = ({
 }) => {
   const t = useTranslations();
   const { mutate: updateQuote } = useUpdateQuote();
-  const currency = useUserStore((state) => state.profile?.user_settings.currency);
 
   const data = useQuoteStore((state) => state.data);
   const setData = useQuoteStore((state) => state.setData);
@@ -60,7 +57,7 @@ const QuoteCard = ({
             {MoneyFormatter(
               (quote.subtotal || 0) + ((quote.subtotal || 0) * (quote.tax_rate || 0)) / 100 || 0,
             )}{" "}
-            {getCurrencySymbol(currency || "sar", { sar: { className: "size-4" } }).symbol}
+            {useAppCurrencySymbol({ sar: { className: "size-4" } }).symbol}
           </span>
         </div>
         <div className="border-t pt-2">

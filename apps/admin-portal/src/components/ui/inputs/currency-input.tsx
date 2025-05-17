@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 
 import { Input } from "@/components/ui/inputs/input";
 
-import { currencyInputClassName, getCurrencySymbol } from "@/lib/currency-utils";
+import { currencyInputClassName, useAppCurrencySymbol } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 
 import useUserStore from "@/stores/use-user-store";
@@ -51,9 +51,7 @@ export function CurrencyInput({
     typeof value === "number" && !isNaN(value) ? value.toFixed(2) : "",
   );
   const isUserInput = useRef(false);
-  const profile = useUserStore((state) => state.profile);
-  const currency = profile?.user_settings?.currency || "sar";
-  const [currencySymbol, setCurrencySymbol] = useState(getCurrencySymbol(currency));
+  const currency = useAppCurrencySymbol();
 
   // Update input text when value prop changes, but only if it's not from user input
   useEffect(() => {
@@ -137,12 +135,6 @@ export function CurrencyInput({
     }
   };
 
-  useEffect(() => {
-    setCurrencySymbol(getCurrencySymbol(currency));
-  }, [profile]);
-
-  // let currencySymbol = getCurrencySymbol(currency);
-
   return (
     <div className={cn("relative", props.containerClassName)}>
       <Input
@@ -150,7 +142,10 @@ export function CurrencyInput({
         type="text"
         inputMode="decimal"
         placeholder="0.00"
-        className={cn("currency-input placeholder:select-none", currencyInputClassName(currency))}
+        className={cn(
+          "currency-input placeholder:select-none",
+          currencyInputClassName(currency.currency),
+        )}
         value={inputText}
         onChange={handleChange}
         onBlur={handleBlur}
@@ -162,7 +157,7 @@ export function CurrencyInput({
             "text-muted-foreground absolute top-1/2 -translate-y-1/2 ltr:start-2 rtl:left-2"
           }
         >
-          {currencySymbol.symbol}
+          {currency.symbol}
         </span>
       )}
     </div>

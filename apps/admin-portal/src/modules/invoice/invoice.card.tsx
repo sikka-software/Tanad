@@ -5,7 +5,7 @@ import Link from "next/link";
 import ModuleCard from "@/components/cards/module-card";
 import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 
-import { getCurrencySymbol } from "@/lib/currency-utils";
+import { useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import { useUpdateInvoice } from "@/invoice/invoice.hooks";
 import useInvoiceStore from "@/invoice/invoice.store";
@@ -29,7 +29,7 @@ const InvoiceCard = ({
   const { mutate: updateInvoice } = useUpdateInvoice();
   const data = useInvoiceStore((state) => state.data);
   const setData = useInvoiceStore((state) => state.setData);
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+  const currency = useAppCurrencySymbol({ sar: { className: "size-4" } }).symbol;
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
@@ -74,8 +74,7 @@ const InvoiceCard = ({
         <div className="flex justify-between">
           <span className="text-sm text-gray-500">{t("Invoices.form.total.label")}</span>
           <span className="money text-lg font-bold">
-            {MoneyFormatter(invoice.total || 0)}{" "}
-            {getCurrencySymbol(currency || "sar", { sar: { className: "size-4" } }).symbol}
+            {MoneyFormatter(invoice.total || 0)} {currency}
           </span>
         </div>
         <div className="border-t pt-2">

@@ -3,19 +3,15 @@ import { CalendarDays, CircleDollarSign, ReceiptText } from "lucide-react";
 import ModuleCard from "@/components/cards/module-card";
 import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 
-import { getCurrencySymbol } from "@/lib/currency-utils";
+import { useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import { CommonStatus } from "@/types/common.type";
 import { CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateSalary } from "@/salary/salary.hooks";
+import useSalaryStore from "@/salary/salary.store";
 import { Salary } from "@/salary/salary.type";
 
-import useUserStore from "@/stores/use-user-store";
-
-import useSalaryStore from "./salary.store";
-
-// Helper to format date string (optional)
 const formatDate = (dateString: string | null | undefined) => {
   if (!dateString) return "N/A";
   try {
@@ -37,7 +33,7 @@ const SalaryCard = ({
   const { mutate: updateSalary } = useUpdateSalary();
   const data = useSalaryStore((state) => state.data);
   const setData = useSalaryStore((state) => state.setData);
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+  const currency = useAppCurrencySymbol().symbol;
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
@@ -66,7 +62,7 @@ const SalaryCard = ({
           <CircleDollarSign className="h-4 w-4" />
           <span className="money">
             {MoneyFormatter(salary.amount)}
-            {getCurrencySymbol(currency || "sar").symbol}
+            {currency}
           </span>
         </div>
 

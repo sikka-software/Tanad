@@ -7,17 +7,15 @@ import { ExtendedColumnDef } from "@/ui/sheet-table";
 import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
-import { getCurrencySymbol } from "@/lib/currency-utils";
+import { useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import { Expense } from "@/expense/expense.type";
-
-import useUserStore from "@/stores/use-user-store";
 
 const useExpenseColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+  const currency = useAppCurrencySymbol().symbol;
 
   const columns: ExtendedColumnDef<Expense>[] = [
     {
@@ -44,7 +42,7 @@ const useExpenseColumns = (
         return (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
             {MoneyFormatter(row.getValue("amount"))}
-            {getCurrencySymbol(currency || "sar").symbol}
+            {currency}
           </span>
         );
       },

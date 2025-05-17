@@ -7,7 +7,7 @@ import { useDateFormatter } from "react-aria";
 import ModuleCard from "@/components/cards/module-card";
 import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 
-import { getCurrencySymbol } from "@/lib/currency-utils";
+import { useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import { useUpdateExpense } from "@/expense/expense.hooks";
 import useExpenseStore from "@/expense/expense.store";
@@ -27,7 +27,7 @@ const ExpenseCard = ({
   const { mutate: updateExpense } = useUpdateExpense();
   const data = useExpenseStore((state) => state.data);
   const setData = useExpenseStore((state) => state.setData);
-  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+  const currency = useAppCurrencySymbol({ sar: { className: "size-4" } }).symbol;
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
@@ -71,7 +71,7 @@ const ExpenseCard = ({
         <div className="flex items-center justify-end gap-2 text-sm">
           <span className="money text-xl font-bold">
             {MoneyFormatter(expense.amount)}
-            {getCurrencySymbol(currency || "sar", { sar: { className: "size-4" } }).symbol}
+            {currency}
           </span>
         </div>
       </div>

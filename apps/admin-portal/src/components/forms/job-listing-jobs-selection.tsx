@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/inputs/input";
 
 import FormSectionHeader from "@/forms/form-section-header";
 
-import { getCurrencySymbol } from "@/lib/currency-utils";
+import { useAppCurrencySymbol } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 
 import { Job } from "@/job/job.type";
@@ -124,7 +124,7 @@ const JobListingJobsSelection = ({
                         {job.salary && (
                           <div className="flex flex-row items-center gap-1 text-sm text-gray-600">
                             <span>{MoneyFormatter(job.salary, false)}</span>
-                            <span>{getCurrencySymbol(currency || "sar").symbol}</span>
+                            <span>{useAppCurrencySymbol(currency || "sar").symbol}</span>
                           </div>
                         )}
                       </div>

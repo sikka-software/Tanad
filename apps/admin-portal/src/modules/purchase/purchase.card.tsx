@@ -2,13 +2,11 @@ import { MoneyFormatter } from "@/ui/inputs/currency-input";
 
 import ModuleCard from "@/components/cards/module-card";
 
-import { getCurrencySymbol } from "@/lib/currency-utils";
+import { useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import { useUpdatePurchase } from "@/purchase/purchase.hooks";
 import usePurchaseStore from "@/purchase/purchase.store";
 import { Purchase, PurchaseStatus, PurchaseStatusProps } from "@/purchase/purchase.type";
-
-import useUserStore from "@/stores/use-user-store";
 
 const PurchaseCard = ({
   purchase,
@@ -17,7 +15,7 @@ const PurchaseCard = ({
   purchase: Purchase;
   onActionClicked: (action: string, rowId: string) => void;
 }) => {
-  const currency = useUserStore((state) => state.profile?.user_settings.currency);
+  const currency = useAppCurrencySymbol().symbol;
   const { mutate: updatePurchase } = useUpdatePurchase();
   const data = usePurchaseStore((state) => state.data);
   const setData = usePurchaseStore((state) => state.setData);
@@ -43,7 +41,7 @@ const PurchaseCard = ({
     >
       <div className="space-y-3">
         <p className="money text-sm text-gray-500">
-          {MoneyFormatter(purchase.amount || 0)} {getCurrencySymbol(currency || "sar").symbol}
+          {MoneyFormatter(purchase.amount || 0)} {currency}
         </p>
         <p className="text-sm text-gray-500">Due Date: {purchase.due_date}</p>
       </div>
