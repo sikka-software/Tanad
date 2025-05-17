@@ -20,7 +20,9 @@ export interface ModuleStoreBase {
   sortCaseSensitive: boolean;
   sortNullsFirst: boolean;
   searchQuery: string;
+  setSearchQuery: (query: string) => void;
   filterConditions: FilterCondition[]; // Replace with your actual type
+  setFilterConditions: (conditions: FilterCondition[]) => void;
   filterCaseSensitive: boolean;
   getFilteredData: (data: any[]) => any[]; // Adjust as needed
   getSortedData: (data: any[]) => any[]; // Adjust as needed
@@ -47,7 +49,9 @@ export function createModuleStoreHooks<T extends ModuleStoreBase>(
     useSortCaseSensitive: () => useStore().sortCaseSensitive,
     useSortNullsFirst: () => useStore().sortNullsFirst,
     useSearchQuery: () => useStore().searchQuery,
+    useSetSearchQuery: () => useStore().setSearchQuery,
     useFilterConditions: () => useStore().filterConditions,
+    useSetFilterConditions: () => useStore().setFilterConditions,
     useFilterCaseSensitive: () => useStore().filterCaseSensitive,
     useGetFilteredData: () => useStore().getFilteredData,
     useGetSortedData: () => useStore().getSortedData,

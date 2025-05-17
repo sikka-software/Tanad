@@ -20,6 +20,8 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { FilterCondition } from "@/types/common.type";
+
 import EmployeeCard from "@/employee/employee.card";
 import useEmployeeColumns from "@/employee/employee.columns";
 import { EmployeeForm } from "@/employee/employee.form";
@@ -29,7 +31,6 @@ import {
   useDuplicateEmployee,
 } from "@/employee/employee.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/employee/employee.options";
-import useEmployeesStore from "@/employee/employee.store";
 import useEmployeeStore from "@/employee/employee.store";
 import EmployeesTable from "@/employee/employee.table";
 import { Employee, EmployeeUpdateData } from "@/employee/employee.types";
@@ -68,30 +69,16 @@ export default function EmployeesPage() {
   const setColumnVisibility = moduleHooks.useSetColumnVisibility();
   // Sorting
   const sortRules = moduleHooks.useSortRules();
-  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
-  const sortNullsFirst = moduleHooks.useSortNullsFirst();
   const setSortRules = moduleHooks.useSetSortRules();
-  // Filtering
+  // Filtering & Search
+  const searchQuery = moduleHooks.useSearchQuery();
+  const setSearchQuery = moduleHooks.useSetSearchQuery();
   const filterConditions = moduleHooks.useFilterConditions();
-  const getFilteredData = moduleHooks.useGetFilteredData();
-  const getSortedData = moduleHooks.useGetSortedData();
+  const setFilterConditions = moduleHooks.useSetFilterConditions();
   // Misc
   const viewMode = moduleHooks.useViewMode();
-
-  // Get state and setters directly from the store for filters if not in moduleHooks
-  const zustandSearchQuery = useEmployeesStore((state) => state.searchQuery);
-  const zustandSetSearchQuery = useEmployeesStore((state) => state.setSearchQuery);
-  const zustandFilterConditions = useEmployeesStore((state) => state.filterConditions);
-  const zustandSetFilterConditions = useEmployeesStore((state) => state.setFilterConditions);
-  const zustandFilterCaseSensitive = useEmployeesStore((state) => state.filterCaseSensitive);
-  const zustandCaseSensitive = useEmployeesStore((state) => state.sortCaseSensitive);
-  const zustandSortRules = useEmployeesStore((state) => state.sortRules);
-  const zustandSortCaseSensitive = useEmployeesStore((state) => state.sortCaseSensitive);
-  const zustandSortNullsFirst = useEmployeesStore((state) => state.sortNullsFirst);
-
-  // Re-introduce client-side filtering/sorting for non-TanStack views (e.g., Card view)
-  const getFilteredDataClient = useEmployeesStore((state) => state.getFilteredData);
-  const getSortedDataClient = useEmployeesStore((state) => state.getSortedData);
+  const getFilteredDataClient = moduleHooks.useGetFilteredData();
+  const getSortedDataClient = moduleHooks.useGetSortedData();
 
   const { data: employeesFromHook, isLoading, error } = useEmployees();
   const { mutateAsync: deleteEmployees, isPending: isDeleting } = useBulkDeleteEmployees();
@@ -129,9 +116,8 @@ export default function EmployeesPage() {
     }
   }, [employeesFromHook, setData]);
 
-  // Transform filterConditions from store to TanStack Table's ColumnFiltersState
   const columnFiltersTanStack = useMemo(() => {
-    return zustandFilterConditions.map((condition) => ({
+    return filterConditions.map((condition) => ({
       id: condition.field,
       value: {
         filterValue: condition.value,
@@ -139,48 +125,38 @@ export default function EmployeesPage() {
         type: condition.type,
       },
     }));
-  }, [zustandFilterConditions]);
+  }, [filterConditions]);
 
-  // Handler for TanStack Table's onColumnFiltersChange
   const handleColumnFiltersChange = (updaterOrValue: any) => {
-    const newFilters =
+    const newTanStackFilters =
       typeof updaterOrValue === "function" ? updaterOrValue(columnFiltersTanStack) : updaterOrValue;
-    // This is still a simplification. Converting newFilters (ColumnFilter[]) back to FilterCondition[]
-    // is non-trivial as TanStack's state doesn't hold operator, type, conjunction.
-    // For a robust solution, FilterPopover should perhaps emit TanStack-ready filters,
-    // or this function becomes much more complex, or columns get individual filter controls.
-    // As a TEMPORARY step, if PageSearchAndFilter updates zustandFilterConditions directly,
-    // this handler might not need to do much other than log or be a pass-through if TanStack manages it internally.
-    // For now, we will assume zustandSetFilterConditions handles the FilterCondition[] format.
-    // We'd need to map `newFilters` back or adjust how `PageSearchAndFilter` updates.
-    // console.log("New TanStack Column Filters:", newFilters);
 
-    // Simplistic: If `PageSearchAndFilter` is the sole source of truth for `filterConditions`
-    // in the store, this function might not need to call `zustandSetFilterConditions`
-    // unless TanStack Table needs to be the one driving that state update.
-    // Let's assume PageSearchAndFilter updates zustandFilterConditions, and this is for TanStack to read.
+    const newStoreFilters: FilterCondition[] = newTanStackFilters.map((tf: any) => ({
+      field: tf.id,
+      value: tf.value.filterValue,
+      operator: tf.value.operator,
+      type: tf.value.type,
+      conjunction: "and",
+    }));
+    setFilterConditions(newStoreFilters);
   };
 
-  // Effect to manage the isApplyingClientFilter state for visual feedback
   useEffect(() => {
-    // This effect triggers when the actual filters in the store change.
-    // We want to show loading briefly.
     setIsApplyingClientFilter(true);
     const timer = setTimeout(() => {
       setIsApplyingClientFilter(false);
-    }, 50); // Brief delay to ensure UI can show loading
+    }, 50);
 
     return () => clearTimeout(timer);
-  }, [zustandFilterConditions, zustandSearchQuery]); // Dependencies that trigger table re-filter
+  }, [filterConditions, searchQuery]);
 
-  // Data for Card View (uses client-side filtering/sorting from the store)
   const filteredDataForCards = useMemo(() => {
-    return getFilteredDataClient(storeData); // Uses storeData, searchQuery, filterConditions from store
-  }, [storeData, getFilteredDataClient]); // searchQuery and filterConditions are implicit via getFilteredDataClient
+    return getFilteredDataClient(storeData);
+  }, [storeData, getFilteredDataClient, searchQuery, filterConditions]);
 
   const sortedDataForCards = useMemo(() => {
     return getSortedDataClient(filteredDataForCards);
-  }, [filteredDataForCards, getSortedDataClient]); // sortRules etc. are implicit via getSortedDataClient
+  }, [filteredDataForCards, getSortedDataClient, sortRules]);
 
   const tanstackSorting = useMemo(
     () => sortRules.map((rule) => ({ id: rule.field, desc: rule.direction === "desc" })),
@@ -202,9 +178,9 @@ export default function EmployeesPage() {
 
   const handleTanstackGlobalFilterChange = (updater: string | ((old: string) => string)) => {
     if (typeof updater === "function") {
-      zustandSetSearchQuery(updater(zustandSearchQuery));
+      setSearchQuery(updater(searchQuery));
     } else {
-      zustandSetSearchQuery(updater);
+      setSearchQuery(updater);
     }
   };
 
@@ -231,7 +207,7 @@ export default function EmployeesPage() {
           />
         ) : (
           <PageSearchAndFilter
-            store={useEmployeesStore}
+            store={useEmployeeStore}
             columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
@@ -258,7 +234,7 @@ export default function EmployeesPage() {
               onActionClicked={onActionClicked}
               sorting={tanstackSorting}
               onSortingChange={handleTanstackSortingChange}
-              globalFilter={zustandSearchQuery}
+              globalFilter={searchQuery}
               onGlobalFilterChange={handleTanstackGlobalFilterChange}
               columnFilters={columnFiltersTanStack}
               onColumnFiltersChange={handleColumnFiltersChange}
