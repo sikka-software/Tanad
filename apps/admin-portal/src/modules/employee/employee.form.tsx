@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
 import { createInsertSchema } from "drizzle-zod";
-import { Trash2Icon } from "lucide-react";
+import { Loader2, Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -10,7 +10,6 @@ import { useDebounce } from "use-debounce";
 import * as z from "zod";
 
 import { Button } from "@/ui/button";
-import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
 import CountryInput from "@/ui/inputs/country-input";
@@ -20,7 +19,6 @@ import DigitsInput from "@/ui/inputs/digits-input";
 import { Input } from "@/ui/inputs/input";
 import PhoneInput from "@/ui/inputs/phone-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 import { createClient } from "@/utils/supabase/component";
 
@@ -48,7 +46,7 @@ import DepartmentForm from "@/department/department.form";
 import { useDepartments } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";
 
-import JobForm from "@/job/job.form";
+import JobCombobox from "@/job/job.combobox";
 import { useJobs } from "@/job/job.hooks";
 import useJobStore from "@/job/job.store";
 
@@ -140,41 +138,10 @@ export function EmployeeForm({
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
 
-  const [email, setEmail] = useState(defaultValues?.email || "");
-  const [debouncedEmail] = useDebounce(email, 500);
-  const [isEmailValid, setIsEmailValid] = useState(true);
+  // const [email, setEmail] = useState(defaultValues?.email || "");
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const actualEmployeeId = editMode ? defaultValues?.id : undefined;
   const initialEmail = editMode ? defaultValues?.email : undefined;
-
-  useEffect(() => {
-    if (!debouncedEmail) {
-      setIsEmailValid(true);
-      setIsEmailLoading(false);
-      return;
-    }
-    if (actualEmployeeId && debouncedEmail === initialEmail) {
-      setIsEmailValid(true);
-      setIsEmailLoading(false);
-      return;
-    }
-    let cancelled = false;
-    setIsEmailLoading(true);
-    const supabase = createClient();
-    supabase
-      .from("employees")
-      .select("id", { count: "exact" })
-      .eq("email", debouncedEmail)
-      .then(({ error, count }) => {
-        if (!cancelled) {
-          setIsEmailValid(!error && count === 0);
-          setIsEmailLoading(false);
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [debouncedEmail, actualEmployeeId, initialEmail, user?.id]);
 
   const form = useForm<z.input<ReturnType<typeof createEmployeeFormSchema>>>({
     resolver: zodResolver(createEmployeeFormSchema(t)),
@@ -233,6 +200,41 @@ export function EmployeeForm({
   const salaryComponents = form.watch("salary");
   const totalSalary =
     salaryComponents?.reduce((sum, comp) => sum + (Number(comp.amount) || 0), 0) || 0;
+
+  const [email, setEmail] = useState(defaultValues?.email || "");
+  const [debouncedEmail] = useDebounce(email, 500);
+
+  useEffect(() => {
+    if (!debouncedEmail) {
+      setIsEmailLoading(false);
+      return;
+    }
+    if (actualEmployeeId && debouncedEmail === initialEmail) {
+      setIsEmailLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setIsEmailLoading(true);
+    const supabase = createClient();
+    supabase
+      .from("employees")
+      .select("id", { count: "exact" })
+      .eq("email", debouncedEmail)
+      .then(({ error, count }) => {
+        console.log("count", count);
+        if (!cancelled) {
+          if (count && count > 0) {
+            form.setError("email", {
+              message: t("Employees.form.email.duplicate"),
+            });
+          }
+          setIsEmailLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedEmail, actualEmployeeId, initialEmail, user?.id]);
 
   const handleSubmit = async (data: z.input<ReturnType<typeof createEmployeeFormSchema>>) => {
     console.log("data birth date", data.birth_date);
@@ -323,21 +325,6 @@ export function EmployeeForm({
     (window as any).employeeForm = form;
   }
 
-  const departmentOptions =
-    departments?.map((department) => ({
-      label: department.name,
-      value: department.id,
-    })) || [];
-
-  const jobOptions =
-    jobs?.map((job) => ({
-      label: job.title,
-      value: job.id,
-      occupied_positions: job.occupied_positions,
-      total_positions: job.total_positions,
-      department: job.department,
-    })) || [];
-
   return (
     <>
       <Form {...form}>
@@ -394,25 +381,27 @@ export function EmployeeForm({
                   <FormItem>
                     <FormLabel>{t("Employees.form.email.label")} *</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder={t("Employees.form.email.placeholder")}
-                        disabled={isEmployeeSaving}
-                        type="email"
-                        dir="ltr"
-                        {...field}
-                        value={email}
-                        onChange={(e) => {
-                          field.onChange(e);
-                          setEmail(e.target.value);
-                        }}
-                      />
+                      <div className="relative">
+                        <Input
+                          placeholder={t("Employees.form.email.placeholder")}
+                          disabled={isEmployeeSaving}
+                          type="email"
+                          dir="ltr"
+                          {...field}
+                          value={email}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            setEmail(e.target.value);
+                          }}
+                          aria-invalid={!!form.formState.errors.email}
+                        />
+                        {isEmailLoading && (
+                          <div className="absolute top-0 right-3 bottom-0 flex items-center justify-center">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          </div>
+                        )}
+                      </div>
                     </FormControl>
-                    {!isEmailValid && (
-                      <FormMessage>{t("Employees.form.email.duplicate")}</FormMessage>
-                    )}
-                    {isEmailLoading && (
-                      <div className="text-xs text-gray-500">{t("General.loading")}</div>
-                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -434,53 +423,18 @@ export function EmployeeForm({
                   </FormItem>
                 )}
               />
-              <FormField
+
+              <JobCombobox
+                formName="job_id"
+                label={t("Employees.form.job.label")}
                 control={form.control}
-                name="job_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Employees.form.job.label")} *</FormLabel>
-                    <FormControl>
-                      <ComboboxAdd
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={jobOptions}
-                        defaultValue={field.value ?? undefined}
-                        onChange={field.onChange}
-                        isLoading={isFetchingJobs}
-                        disabled={isEmployeeSaving}
-                        texts={{
-                          placeholder: t("Employees.form.job.placeholder"),
-                          searchPlaceholder: t("Pages.Jobs.search"),
-                          noItems: t("Pages.Jobs.no_jobs_found"),
-                        }}
-                        addText={t("Pages.Jobs.add")}
-                        onAddClick={() => setIsJobDialogOpen(true)}
-                        renderOption={(option) => (
-                          <div className="flex flex-row items-center justify-between gap-2">
-                            <div className="flex flex-col">
-                              <span>{option.label}</span>
-                              <span className="text-xs text-gray-500">{option.department}</span>
-                            </div>
-                            <Tooltip delayDuration={500}>
-                              <TooltipTrigger>
-                                <span className="text-xs text-gray-500">
-                                  {option.occupied_positions} / {option.total_positions}
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {t("Jobs.form.occupied_positions.label") +
-                                  " / " +
-                                  t("Jobs.form.total_positions.label")}
-                              </TooltipContent>
-                            </Tooltip>
-                          </div>
-                        )}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                jobs={jobs || []}
+                loadingCombobox={isFetchingJobs}
+                isSaving={isJobSaving}
+                isDialogOpen={isJobDialogOpen}
+                setIsDialogOpen={setIsJobDialogOpen}
               />
+
               <FormField
                 control={form.control}
                 name="hire_date"
@@ -807,23 +761,6 @@ export function EmployeeForm({
         </form>
       </Form>
 
-      <FormDialog
-        open={isJobDialogOpen}
-        onOpenChange={setIsJobDialogOpen}
-        title={t("Pages.Jobs.add")}
-        formId="job-form"
-        cancelText={t("General.cancel")}
-        submitText={t("General.save")}
-        loadingSave={isJobSaving}
-      >
-        <JobForm
-          formHtmlId="job-form"
-          onSuccess={() => {
-            setIsJobSaving(false);
-            setIsJobDialogOpen(false);
-          }}
-        />
-      </FormDialog>
       <FormDialog
         open={isDepartmentDialogOpen}
         onOpenChange={setIsDepartmentDialogOpen}
