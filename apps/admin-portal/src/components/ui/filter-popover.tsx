@@ -26,6 +26,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 import { FilterCondition } from "@/types/common.type";
 
 // Define filter operators for different field types
+
+// "equals": "يساوي",
+// "not_equals": "لا يساوي",
+// "contains": "يحتوي",
+// "not_contains": "لا يحتوي",
+// "starts_with": "يبدأ بـ",
+// "ends_with": "ينتهي بـ",
+// "is_empty": "فارغ",
+// "is_not_empty": "ليس فارغ"
+
 const TEXT_OPERATORS = [
   { value: "equals", label: "Equals" },
   { value: "contains", label: "Contains" },
@@ -37,20 +47,20 @@ const TEXT_OPERATORS = [
 
 const NUMBER_OPERATORS = [
   { value: "equals", label: "Equals" },
-  { value: "greaterThan", label: "Greater than" },
-  { value: "lessThan", label: "Less than" },
+  { value: "greater_than", label: "Greater than" },
+  { value: "less_than", label: "Less than" },
   { value: "between", label: "Between" },
-  { value: "isEmpty", label: "Is empty" },
-  { value: "isNotEmpty", label: "Is not empty" },
+  { value: "is_empty", label: "Is empty" },
+  { value: "is_not_empty", label: "Is not empty" },
 ];
 
 const DATE_OPERATORS = [
   { value: "equals", label: "Equals" },
   { value: "before", label: "Before" },
   { value: "after", label: "After" },
-  { value: "between", label: "Between" },
-  { value: "isEmpty", label: "Is empty" },
-  { value: "isNotEmpty", label: "Is not empty" },
+  // { value: "between", label: "Between" },
+  { value: "is_empty", label: "Is empty" },
+  { value: "is_not_empty", label: "Is not empty" },
 ];
 
 // Saved filter presets
@@ -236,7 +246,9 @@ export default function FilterPopover({
               updateFilterCondition(
                 id,
                 "value",
-                date ? date.toDate(getLocalTimeZone()).toISOString().split("T")[0] : "",
+                date
+                  ? `${date.year}-${String(date.month).padStart(2, "0")}-${String(date.day).padStart(2, "0")}`
+                  : "",
               );
             }}
           />

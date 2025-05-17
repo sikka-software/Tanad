@@ -148,7 +148,12 @@
       "starts_with": "يبدأ بـ",
       "ends_with": "ينتهي بـ",
       "is_empty": "فارغ",
-      "is_not_empty": "ليس فارغ"
+      "is_not_empty": "ليس فارغ",
+      "greater_than": "أكبر من",
+      "less_than": "أصغر من",
+      "between": "بين",
+      "before": "قبل",
+      "after": "بعد"
     },
     "sidebar_search": "ابحث عن صفحة",
     "saving": "جاري الحفظ...",
