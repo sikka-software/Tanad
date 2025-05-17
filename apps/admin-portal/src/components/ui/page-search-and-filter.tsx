@@ -7,6 +7,7 @@ import { StoreApi, useStore } from "zustand";
 import { cn } from "@/lib/utils";
 
 import { FilterableField, SortableColumn, FilterCondition } from "@/types/common.type";
+import { BaseActions, BaseStates } from "@/types/generic-store-types";
 
 import { Button } from "./button";
 import ColumnViewPopover from "./column-view-popover";
@@ -36,6 +37,8 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
     setSortNullsFirst: (sortNullsFirst: boolean) => void;
     clearSelection: () => void;
     setSelectedRows: (ids: string[]) => void;
+    columnVisibility: BaseStates<any>["columnVisibility"];
+    setColumnVisibility: BaseActions<any>["setColumnVisibility"];
   }>;
   title?: string;
   onAddClick?: () => void;
@@ -45,8 +48,6 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
   filterableFields?: FilterableField[];
   hideOptions?: boolean;
   columns?: ExtendedColumnDef<any>[];
-  columnVisibility?: VisibilityState;
-  onColumnVisibilityChange?: (updater: any) => void;
 }
 
 const PageSearchAndFilter = ({
@@ -60,24 +61,31 @@ const PageSearchAndFilter = ({
   filterableFields,
   hideOptions = false,
   columns,
-  columnVisibility,
-  onColumnVisibilityChange,
   ...props
 }: PageSearchAndFilterProps) => {
   const viewMode = useStore(store, (state) => state.viewMode);
   const setViewMode = useStore(store, (state) => state.setViewMode);
+
   const searchQuery = useStore(store, (state) => state.searchQuery);
   const setSearchQuery = useStore(store, (state) => state.setSearchQuery);
+
   const filterConditions = useStore(store, (state) => state.filterConditions);
   const onFilterConditionsChange = useStore(store, (state) => state.setFilterConditions);
+
   const filterCaseSensitive = useStore(store, (state) => state.filterCaseSensitive);
   const onFilterCaseSensitiveChange = useStore(store, (state) => state.setFilterCaseSensitive);
+
   const sortRules = useStore(store, (state) => state.sortRules);
   const onSortRulesChange = useStore(store, (state) => state.setSortRules);
+
   const sortCaseSensitive = useStore(store, (state) => state.sortCaseSensitive);
   const setSortCaseSensitive = useStore(store, (state) => state.setSortCaseSensitive);
+
   const sortNullsFirst = useStore(store, (state) => state.sortNullsFirst);
   const setSortNullsFirst = useStore(store, (state) => state.setSortNullsFirst);
+
+  const columnVisibility = useStore(store, (state) => state.columnVisibility);
+  const onColumnVisibilityChange = useStore(store, (state) => state.setColumnVisibility);
 
   const t = useTranslations();
   return (

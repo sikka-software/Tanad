@@ -47,6 +47,8 @@ import { useJobs } from "@/job/job.hooks";
 export default function EmployeesPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  // This is unique to employees page. Not all modules index pages fetch secondary modules.
   const { data: jobs } = useJobs();
 
   const columns = useEmployeeColumns();
@@ -56,7 +58,6 @@ export default function EmployeesPage() {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<EmployeeUpdateData | null>(null);
   const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
-  const [isApplyingClientFilter, setIsApplyingClientFilter] = useState(false);
 
   // Permissions
   const canRead = moduleHooks.useCanRead();
@@ -71,9 +72,7 @@ export default function EmployeesPage() {
   const selectedRows = moduleHooks.useSelectedRows();
   const setSelectedRows = moduleHooks.useSetSelectedRows();
   const clearSelection = moduleHooks.useClearSelection();
-  // Column Visibility
-  const columnVisibility = moduleHooks.useColumnVisibility();
-  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
   // Sorting
   const sortRules = moduleHooks.useSortRules();
   const setSortRules = moduleHooks.useSetSortRules();
@@ -157,14 +156,6 @@ export default function EmployeesPage() {
     [columnFiltersConfigForTable, setFilterConditions],
   );
 
-  useEffect(() => {
-    setIsApplyingClientFilter(true);
-    const timer = setTimeout(() => {
-      setIsApplyingClientFilter(false);
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [filterConditions, searchQuery]);
-
   const filteredDataForCards = useMemo(() => {
     return getFilteredDataClient(storeData);
   }, [storeData, getFilteredDataClient, searchQuery, filterConditions]);
@@ -205,13 +196,6 @@ export default function EmployeesPage() {
     [searchQuery, setSearchQuery],
   );
 
-  const handleColumnVisibilityChange = useCallback(
-    (updater: VisibilityState | TableUpdater<VisibilityState>) => {
-      setColumnVisibility((prev) => (typeof updater === "function" ? updater(prev) : updater));
-    },
-    [setColumnVisibility],
-  );
-
   const handleSetIsDeleteDialogOpenForSelection = useCallback(
     (open: boolean) => {
       if (open) setPendingDeleteIds(selectedRows);
@@ -239,25 +223,18 @@ export default function EmployeesPage() {
       <CustomPageMeta title={t("Pages.Employees.title")} />
       <DataPageLayout count={employeesFromHook?.length} itemsText={t("Pages.Employees.title")}>
         {selectedRows.length > 0 ? (
-          <SelectionMode
-            selectedRows={selectedRows}
-            clearSelection={clearSelection}
-            isDeleting={isDeleting}
-            setIsDeleteDialogOpen={handleSetIsDeleteDialogOpenForSelection}
-          />
+          <SelectionMode store={useEmployeeStore} isDeleting={isDeleting} />
         ) : (
           <PageSearchAndFilter
             store={useEmployeeStore}
+            title={t("Pages.Employees.title")}
+            createLabel={t("Pages.Employees.add")}
+            searchPlaceholder={t("Pages.Employees.search")}
             columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Pages.Employees.title")}
             onAddClick={canCreate ? handleAddClickForEmptyList : undefined}
-            createLabel={t("Pages.Employees.add")}
-            searchPlaceholder={t("Pages.Employees.search")}
             hideOptions={employeesFromHook?.length === 0}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={handleColumnVisibilityChange}
           />
         )}
         <div>

@@ -1,20 +1,27 @@
 import { Trash2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { StoreApi, useStore } from "zustand";
+
+import { BaseActions, BaseStates } from "@/types/generic-store-types";
 
 import { Button } from "./button";
 
-const SelectionMode = ({
-  selectedRows,
-  clearSelection,
-  isDeleting,
-  setIsDeleteDialogOpen,
-}: {
-  selectedRows: string[];
-  clearSelection: () => void;
+export interface SelectionModeProps extends React.HTMLAttributes<HTMLDivElement> {
+  store: StoreApi<{
+    selectedRows: BaseStates<any>["selectedRows"];
+    setIsDeleteDialogOpen: BaseActions<any>["setIsDeleteDialogOpen"];
+    clearSelection: BaseActions<any>["clearSelection"];
+    // setSelectedRows: BaseActions<any>["setSelectedRows"];
+  }>;
   isDeleting: boolean;
-  setIsDeleteDialogOpen: (open: boolean) => void;
-}) => {
+}
+
+const SelectionMode = ({ store, isDeleting }: SelectionModeProps) => {
   const t = useTranslations();
+
+  const selectedRows = useStore(store, (state) => state.selectedRows);
+  const clearSelection = useStore(store, (state) => state.clearSelection);
+  const setIsDeleteDialogOpen = useStore(store, (state) => state.setIsDeleteDialogOpen);
 
   return (
     <div className="bg-background sticky top-0 z-10 flex !min-h-12 items-center justify-between gap-4 border-b px-2">

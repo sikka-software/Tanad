@@ -5,27 +5,35 @@ import { FilterCondition, SortRule } from "@/types/common.type";
 import useUserStore from "@/stores/use-user-store";
 
 export interface ModuleStoreBase {
+  viewMode: string;
+
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
+
   isDeleteDialogOpen: boolean;
   setIsDeleteDialogOpen: (open: boolean) => void;
-  selectedRows: any[]; // Replace `any` with your row type if possible
-  setSelectedRows: (rows: any[]) => void;
+
   columnVisibility: VisibilityState;
   setColumnVisibility: (columnVisibility: VisibilityState | Updater<VisibilityState>) => void;
-  viewMode: string;
+
+  selectedRows: any[];
+  setSelectedRows: (rows: any[]) => void;
   clearSelection: () => void;
-  sortRules: SortRule[]; // Replace with your actual type
+
+  sortRules: SortRule[];
   setSortRules: (sortRules: SortRule[]) => void;
+  getSortedData: (data: any[]) => any[];
+
   sortCaseSensitive: boolean;
   sortNullsFirst: boolean;
+
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  filterConditions: FilterCondition[]; // Replace with your actual type
-  setFilterConditions: (conditions: FilterCondition[]) => void;
+
+  filterConditions: FilterCondition[];
   filterCaseSensitive: boolean;
-  getFilteredData: (data: any[]) => any[]; // Adjust as needed
-  getSortedData: (data: any[]) => any[]; // Adjust as needed
+  setFilterConditions: (conditions: FilterCondition[]) => void;
+  getFilteredData: (data: any[]) => any[];
 }
 
 export function createModuleStoreHooks<T extends ModuleStoreBase>(
