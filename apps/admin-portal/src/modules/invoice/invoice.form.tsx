@@ -7,15 +7,19 @@ import { FieldError, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
 import CodeInput from "@/ui/inputs/code-input";
 import { DateInput } from "@/ui/inputs/date-input";
 import NumberInput from "@/ui/inputs/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Switch } from "@/ui/switch";
 
 import NotesSection from "@/components/forms/notes-section";
 import ProductsFormSection from "@/components/forms/products-form-section";
+import { Input } from "@/components/ui/inputs/input";
+import { ZatcaQRCode } from "@/components/zatca/ZatcaQRCode";
 
 import { getNotesValue, validateYearRange } from "@/lib/utils";
 import { calculateVAT } from "@/lib/zatca/zatca-utils";
@@ -153,9 +157,14 @@ export function InvoiceForm({
 
   const taxAmount = calculateVAT(form.watch("subtotal") || 0, form.watch("tax_rate") || 0);
 
-  const [zatcaEnabled, setZatcaEnabled] = useState<boolean>(false);
-  const [sellerName, setSellerName] = useState<string>("Mashreq Bank");
-  const [vatNumber, setVatNumber] = useState<string>("123456789012345");
+  const [zatcaEnabled, setZatcaEnabled] = useState<boolean>(defaultValues?.zatca_enabled || false);
+  const [sellerName, setSellerName] = useState<string>(
+    defaultValues?.seller_name || "Mansour Company",
+  );
+  const [vatNumber, setVatNumber] = useState<string>(
+    defaultValues?.vat_number || "310122393500003",
+  );
+  const [showZatcaPreview, setShowZatcaPreview] = useState<boolean>(false);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -440,6 +449,86 @@ export function InvoiceForm({
               />
             </div>
           </div>
+
+          {/* ZATCA Testing Section */}
+          <Card className="mt-6 mb-6 border-blue-200 bg-blue-50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-blue-800">ZATCA Testing Configuration</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between space-x-2">
+                  <FormLabel htmlFor="zatca-enabled" className="flex flex-col space-y-1">
+                    <span>Enable ZATCA Compliance</span>
+                    <span className="text-muted-foreground text-sm font-normal">
+                      Enable ZATCA Phase 1 compliance for this invoice
+                    </span>
+                  </FormLabel>
+                  <Switch
+                    id="zatca-enabled"
+                    checked={zatcaEnabled}
+                    onCheckedChange={setZatcaEnabled}
+                  />
+                </div>
+
+                {zatcaEnabled && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <FormLabel htmlFor="seller-name">Seller Name</FormLabel>
+                        <Input
+                          id="seller-name"
+                          value={sellerName}
+                          onChange={(e: any) => setSellerName(e.target.value)}
+                          placeholder="Enter seller name as registered with ZATCA"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <FormLabel htmlFor="vat-number">VAT Registration Number</FormLabel>
+                        <Input
+                          id="vat-number"
+                          value={vatNumber}
+                          onChange={(e: any) => setVatNumber(e.target.value)}
+                          placeholder="15-digit VAT number"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <div>
+                        <FormLabel className="mb-1 block">ZATCA QR Code Preview</FormLabel>
+                        <div className="flex flex-col items-start gap-2">
+                          <Switch
+                            id="show-preview"
+                            checked={showZatcaPreview}
+                            onCheckedChange={setShowZatcaPreview}
+                          />
+                          <span className="text-xs text-gray-500">Show/hide QR code preview</span>
+                        </div>
+                      </div>
+
+                      {showZatcaPreview && form.watch("issue_date") && (
+                        <div className="flex flex-col items-center gap-2">
+                          <ZatcaQRCode
+                            sellerName={sellerName}
+                            vatNumber={vatNumber}
+                            invoiceTimestamp={form.watch("issue_date").toISOString()}
+                            invoiceTotal={form.watch("subtotal") + taxAmount}
+                            vatAmount={taxAmount}
+                            size={140}
+                          />
+                          <span className="text-xs text-gray-500">
+                            Preview updates as you edit values
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
           <ProductsFormSection
             control={form.control as any}

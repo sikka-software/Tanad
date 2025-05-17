@@ -1,4 +1,4 @@
-import Image from "next/image";
+import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 
 import { generateZatcaQRString } from "@/lib/zatca/zatca-utils";
@@ -22,7 +22,7 @@ export function ZatcaQRCode({
   size = 128,
   className,
 }: ZatcaQRCodeProps) {
-  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,13 +36,20 @@ export function ZatcaQRCode({
         vatAmount,
       });
 
-      // Generate QR code URL using Google Charts API
-      const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=${size}x${size}&chl=${encodeURIComponent(
-        qrContent,
-      )}&choe=UTF-8`;
-
-      setQrCodeUrl(qrUrl);
-      setError(null);
+      // Generate QR code as data URL using local QRCode library
+      QRCode.toDataURL(qrContent, {
+        width: size,
+        margin: 1,
+        errorCorrectionLevel: "M",
+      })
+        .then((dataUrl: any) => {
+          setQrCodeDataUrl(dataUrl);
+          setError(null);
+        })
+        .catch((err: any) => {
+          console.error("Error generating QR code:", err);
+          setError("Failed to generate QR code");
+        });
     } catch (err) {
       console.error("Error generating ZATCA QR code:", err);
       setError("Failed to generate QR code");
@@ -55,7 +62,7 @@ export function ZatcaQRCode({
     );
   }
 
-  if (!qrCodeUrl) {
+  if (!qrCodeDataUrl) {
     return (
       <div className="animate-pulse rounded-md bg-gray-200" style={{ width: size, height: size }} />
     );
@@ -63,8 +70,8 @@ export function ZatcaQRCode({
 
   return (
     <div className={className}>
-      <Image
-        src={qrCodeUrl}
+      <img
+        src={qrCodeDataUrl}
         alt="ZATCA QR Code"
         width={size}
         height={size}
