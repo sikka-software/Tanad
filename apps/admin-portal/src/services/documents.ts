@@ -2,10 +2,13 @@ import { DocumentFile } from "@/ui/documents-uploader";
 
 import { createClient } from "@/utils/supabase/component";
 
+import useUserStore from "@/stores/use-user-store";
+
 const supabase = createClient();
 
 export async function uploadDocument(document: DocumentFile) {
   const { data: userData, error: userError } = await supabase.auth.getUser();
+  const enterprise = useUserStore((state) => state.enterprise);
 
   if (userError || !userData?.user?.id) {
     throw userError || new Error("Could not get user");
@@ -43,7 +46,7 @@ export async function uploadDocument(document: DocumentFile) {
       entity_type: document.entity_type,
       file_path: fileName,
       user_id: user_id,
-      enterprise_id: enterprise_id,
+      enterprise_id: enterprise?.id || "",
     })
     .select()
     .single();

@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data: profiles } = await supabase
       .from("profiles")
       .select("*, cancel_at_period_end, cancel_at")
-      .eq("stripe_customer_id", customerId)
+      .eq("stripe_customer_id", customerId as string)
       .limit(1);
 
     const profile = profiles && profiles.length > 0 ? profiles[0] : null;

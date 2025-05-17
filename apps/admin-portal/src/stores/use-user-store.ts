@@ -8,6 +8,7 @@ import { Database } from "@/lib/database.types";
 
 export type Enterprise = Database["public"]["Tables"]["enterprises"]["Row"];
 export type Membership = Database["public"]["Tables"]["memberships"]["Row"];
+export type Permission = Database["public"]["Tables"]["permissions"]["Row"];
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
   user_settings: {
@@ -169,7 +170,12 @@ const useUserStore = create<UserState>((set, get) => ({
       // console.log("[UserStore] Profile data:", profileData);
 
       if (profileData) {
-        set({ profile: profileData });
+        set({
+          profile: {
+            ...profileData,
+            user_settings: profileData.user_settings as Profile["user_settings"],
+          },
+        });
         // console.log("[UserStore] Fetching membership for user", session.user.id);
         const { data: membershipData, error: membershipError } = await supabase
           .from("memberships")
@@ -186,7 +192,7 @@ const useUserStore = create<UserState>((set, get) => ({
           const { data: enterpriseData, error: enterpriseError } = await supabase
             .from("enterprises")
             .select("*")
-            .eq("id", membershipData.enterprise_id)
+            .eq("id", membershipData.enterprise_id || "")
             .single();
           if (enterpriseError) {
             console.error("[UserStore] Enterprise fetch error:", enterpriseError);
@@ -197,7 +203,7 @@ const useUserStore = create<UserState>((set, get) => ({
               const { data: imageData } = await supabase.storage
                 .from("enterprise-images")
                 .createSignedUrl(enterpriseData.logo, 60 * 60);
-              enterpriseData.logo = imageData?.signedUrl;
+              enterpriseData.logo = imageData?.signedUrl ?? null;
             }
             set({ enterprise: enterpriseData });
           }
@@ -206,13 +212,15 @@ const useUserStore = create<UserState>((set, get) => ({
             .from("user_permissions_view")
             .select("permission_name")
             .eq("user_id", session.user.id)
-            .eq("enterprise_id", membershipData.enterprise_id);
+            .eq("enterprise_id", membershipData.enterprise_id || "");
           if (permissionsError) {
             console.error("[UserStore] Permissions fetch error:", permissionsError);
           }
           // console.log("[UserStore] Permissions data:", permissionsData);
           if (permissionsData) {
-            const permissions = permissionsData.map((p) => p.permission_name);
+            const permissions = permissionsData
+              .map((p) => p.permission_name)
+              .filter((name): name is string => name !== null);
             set({ permissions });
           }
         }

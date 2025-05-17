@@ -6,6 +6,8 @@ import { createClient } from "@/utils/supabase/component";
 import { sendEmailViaWebhook } from "@/lib/email";
 import { getStripeInstance } from "@/lib/stripe-admin";
 
+import { Profile } from "@/stores/use-user-store";
+
 export const config = {
   api: {
     bodyParser: false,
@@ -102,7 +104,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Safely fetch customer and price details with error handling
       let customer;
       let price;
-      let profile;
+      let profile: Profile | null = null;
 
       try {
         customer = await stripe.customers.retrieve(customerId);
@@ -146,7 +148,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (error) {
           console.warn("No profile found for customer ID:", customerId, error);
         } else {
-          profile = data;
+          profile = data as Profile;
           console.log("Retrieved profile:", { id: profile.id });
         }
       } catch (profileError) {
