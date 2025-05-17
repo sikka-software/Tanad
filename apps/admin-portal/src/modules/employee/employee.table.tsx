@@ -9,7 +9,7 @@ import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateEmployee } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
-import { Employee, EmployeeUpdateData } from "@/employee/employee.types";
+import { Employee } from "@/employee/employee.types";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -57,14 +57,7 @@ const EmployeesTable = ({
   const canArchiveEmployee = useUserStore((state) => state.hasPermission("employees.archive"));
   const canDeleteEmployee = useUserStore((state) => state.hasPermission("employees.delete"));
 
-  const [currentData, setCurrentData] = useState<Employee[]>(data);
-  const [pendingUpdates, setPendingUpdates] = useState<Record<string, EmployeeUpdateData>>({});
-
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  useEffect(() => {
-    setCurrentData(data);
-  }, [data]);
 
   const handleRowSelectionChange = useCallback(
     (rows: Employee[]) => {

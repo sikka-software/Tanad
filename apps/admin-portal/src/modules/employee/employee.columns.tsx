@@ -74,7 +74,7 @@ const dateTableFilterFn: FilterFn<Employee> = (
   }
 };
 
-const useCompanyColumns = (
+const useEmployeeColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
@@ -207,4 +207,4 @@ const useCompanyColumns = (
   return columns;
 };
 
-export default useCompanyColumns;
+export default useEmployeeColumns;
