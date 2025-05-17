@@ -1,3 +1,5 @@
+import { ColumnFiltersState } from "@tanstack/react-table";
+
 import { currencies } from "@/lib/constants/currencies";
 import { locales } from "@/lib/constants/locales";
 
@@ -70,6 +72,12 @@ export interface ModuleTableProps<T> {
   onActionClicked: (action: string, rowId: string) => void;
   sorting?: any;
   onSortingChange?: (updater: any) => void;
+  columnFilters?: ColumnFiltersState;
+  globalFilter?: string;
+  onColumnFiltersChange?: (
+    updater: ColumnFiltersState | ((old: ColumnFiltersState) => ColumnFiltersState),
+  ) => void;
+  onGlobalFilterChange?: (updater: string | ((old: string) => string)) => void;
 }
 
 export interface ModuleFormProps<T> {

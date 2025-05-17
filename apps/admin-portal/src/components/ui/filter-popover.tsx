@@ -3,7 +3,7 @@
 import { parseDate, getLocalTimeZone, CalendarDate } from "@internationalized/date";
 import { Filter, Plus, Trash2, Save, Clock, Check, Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
@@ -106,6 +106,16 @@ export default function FilterPopover({
 
   const [activeTab, setActiveTab] = useState("filters");
 
+  // Memoize fields into a map for quicker lookups if `fields` array is large
+  const fieldsMap = useMemo(() => {
+    const map = new Map<
+      string,
+      { id: string; translationKey: string; type: "text" | "number" | "date" }
+    >();
+    fields.forEach((field) => map.set(field.id, field));
+    return map;
+  }, [fields]);
+
   useEffect(() => {
     if (!open) {
       setStagedFilterConditions(
@@ -129,10 +139,10 @@ export default function FilterPopover({
         ).length,
       );
     }
-  }, [externalConditions, caseSensitive, open, fields]);
+  }, [externalConditions, caseSensitive, open, fieldsMap]);
 
   const getOperatorsForField = (fieldId: string) => {
-    const field = fields.find((f) => f.id === fieldId);
+    const field = fieldsMap.get(fieldId);
     if (!field) return TEXT_OPERATORS;
 
     switch (field.type) {
@@ -146,7 +156,7 @@ export default function FilterPopover({
   };
 
   const getFieldType = (fieldId: string): "text" | "number" | "date" => {
-    const field = fields.find((f) => f.id === fieldId);
+    const field = fieldsMap.get(fieldId);
     return field?.type || "text";
   };
 

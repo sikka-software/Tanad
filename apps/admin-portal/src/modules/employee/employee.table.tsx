@@ -5,14 +5,11 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { ModuleTableProps, FilterCondition } from "@/types/common.type";
-import { ColumnFiltersState } from "@tanstack/react-table";
+import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateEmployee } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
 import { Employee, EmployeeUpdateData } from "@/employee/employee.types";
-
-import { useDepartments } from "@/department/department.hooks";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -29,24 +26,22 @@ const EmployeesTable = ({
   onGlobalFilterChange,
   sorting,
   onSortingChange,
-}: ModuleTableProps<Employee> & {
-  columnFilters?: ColumnFiltersState;
-  globalFilter?: string;
-  onColumnFiltersChange?: (updater: ColumnFiltersState | ((old: ColumnFiltersState) => ColumnFiltersState)) => void;
-  onGlobalFilterChange?: (updater: string | ((old: string) => string)) => void;
-  sorting?: any;
-  onSortingChange?: (updater: any) => void;
-}) => {
+}: ModuleTableProps<Employee>) => {
   const t = useTranslations();
   const { mutateAsync: updateEmployee } = useUpdateEmployee();
 
   const setData = useEmployeeStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateEmployee({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = useCallback(
+    async (rowId: string, columnId: string, value: unknown) => {
+      if (columnId === "id") return;
+      setData?.(
+        (data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)),
+      );
+      await updateEmployee({ id: rowId, data: { [columnId]: value } });
+    },
+    [data, setData, updateEmployee],
+  );
 
   const columns = useEmployeeColumns(handleEdit);
 
