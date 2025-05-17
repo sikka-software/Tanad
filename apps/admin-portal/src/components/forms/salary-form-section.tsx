@@ -60,7 +60,7 @@ const SalaryFormSection: React.FC<SalaryFormSectionProps> = ({
         {/* <FormLabel>{t("Employees.form.salary.label")}</FormLabel> */}
         {fields.map((field, index) => (
           <div key={field.id} className="relative mt-2 flex items-start gap-2">
-            <div className="flex w-[calc(100%-3rem)]  flex-row items-start gap-2">
+            <div className="flex w-[calc(100%-3rem)] flex-row items-start gap-2">
               <FormField
                 control={control}
                 name={`salary.${index}.type`}
