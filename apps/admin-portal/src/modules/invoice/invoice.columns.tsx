@@ -9,6 +9,7 @@ import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
+import { useFormatDate } from "@/lib/date-utils";
 
 import { Invoice } from "@/invoice/invoice.type";
 import { InvoiceStatus } from "@/invoice/invoice.type";
@@ -70,7 +71,7 @@ const useInvoiceColumns = (
       accessorKey: "issue_date",
       header: t("Invoices.form.issue_date.label"),
       validationSchema: z.string().min(1, t("Invoices.form.issue_date.required")),
-      cell: ({ row }) => row.original.issue_date,
+      cell: ({ row }) => useFormatDate(row.original.issue_date),
     },
     //due_date
     {
@@ -78,7 +79,7 @@ const useInvoiceColumns = (
       accessorKey: "due_date",
       header: t("Invoices.form.due_date.label"),
       validationSchema: z.string().min(1, t("Invoices.form.due_date.required")),
-      cell: ({ row }) => row.original.due_date,
+      cell: ({ row }) => useFormatDate(row.original.due_date),
     },
     //total
     {

@@ -41,6 +41,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
+    useUserStore.getState().fetchUserAndProfile();
     const handleScroll = () => {
       if (window.scrollY > 0 && router.pathname.includes("/app")) {
         setShowScrollTop(true);
