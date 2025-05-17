@@ -50,21 +50,26 @@ import useJobStore from "@/job/job.store";
 import { employees } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
-const salaryComponentSchema = z.object({
-  type: z.string().min(1, "Type is required"),
-  amount: z.coerce
-    .number({
-      invalid_type_error: "Amount must be a number",
-    })
-    .min(0, "Amount must be non-negative")
-    .default(0),
-});
-
 export const createEmployeeFormSchema = (t: (key: string) => string) => {
+  const salaryComponentSchema = z.object({
+    type: z.string().min(1, "Type is required"),
+    amount: z.coerce
+      .number({
+        invalid_type_error: "Amount must be a number",
+      })
+      .min(0, "Amount must be non-negative")
+      .default(0),
+  });
   const EmployeeSelectSchema = createInsertSchema(employees, {
-    first_name: z.string().min(1, t("Employees.form.first_name.required")),
-    last_name: z.string().min(1, t("Employees.form.last_name.required")),
-    email: z.string().email(t("Employees.form.email.invalid")),
+    first_name: z
+      .string({ required_error: t("Employees.form.first_name.required") })
+      .min(1, t("Employees.form.first_name.required")),
+    last_name: z
+      .string({ required_error: t("Employees.form.last_name.required") })
+      .min(1, t("Employees.form.last_name.required")),
+    email: z
+      .string({ required_error: t("Employees.form.email.required") })
+      .email(t("Employees.form.email.invalid")),
     phone: z.string().optional(),
     job_id: z.string().min(1, t("Employees.form.job.required")),
 
@@ -150,7 +155,7 @@ export function EmployeeForm({
       salary: creatingNewStandalone
         ? defaultValues?.salary && (defaultValues.salary as any[]).length > 0
           ? (defaultValues.salary as { type: string; amount: number }[])
-          : [{ type: "", amount: 0 }]
+          : [{ type: "base", amount: 0 }]
         : (defaultValues?.salary as { type: string; amount: number }[] | undefined) || undefined,
       notes: getNotesValue(defaultValues) || "",
       nationality: defaultValues?.nationality || "",

@@ -41,7 +41,7 @@ const SalaryFormSection: React.FC<SalaryFormSectionProps> = ({
 
   useEffect(() => {
     if (fields.length === 0 && !inDialog) {
-      append({ type: "", amount: 0 });
+      append({ type: "base", amount: 0 });
     }
   }, [fields, append, inDialog]);
 
