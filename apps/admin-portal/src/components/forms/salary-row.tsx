@@ -89,16 +89,18 @@ const SalaryRowComponent: React.FC<SalaryRowProps> = ({
           )}
         />
       </div>
-      <Button
-        type="button"
-        variant="outline"
-        className="absolute end-0 top-6 w-9"
-        onClick={onRemoveItem}
-        disabled={isSaving}
-        aria-label={t("General.remove")}
-      >
-        <Trash2Icon className="h-4 w-4" />
-      </Button>
+      {index > 0 && (
+        <Button
+          type="button"
+          variant="outline"
+          className="absolute end-0 top-6 w-9"
+          onClick={onRemoveItem}
+          disabled={isSaving}
+          aria-label={t("General.remove")}
+        >
+          <Trash2Icon className="h-4 w-4" />
+        </Button>
+      )}
     </div>
   );
 };
