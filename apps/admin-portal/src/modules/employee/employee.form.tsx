@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
 import { createInsertSchema } from "drizzle-zod";
-import { Loader2, Trash2Icon } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -9,11 +9,9 @@ import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
 import * as z from "zod";
 
-import { Button } from "@/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
 import CountryInput from "@/ui/inputs/country-input";
-import { CurrencyInput, MoneyFormatter } from "@/ui/inputs/currency-input";
 import { DateInput } from "@/ui/inputs/date-input";
 import DigitsInput from "@/ui/inputs/digits-input";
 import { Input } from "@/ui/inputs/input";
@@ -22,8 +20,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 import { createClient } from "@/utils/supabase/component";
 
-import FormSectionHeader from "@/components/forms/form-section-header";
 import NotesSection from "@/components/forms/notes-section";
+import SalaryFormSection from "@/components/forms/salary-form-section";
 
 import { addressSchema } from "@/lib/schemas/address.schema";
 import { metadataSchema } from "@/lib/schemas/metadata.schema";
@@ -34,7 +32,6 @@ import { ModuleFormProps } from "@/types/common.type";
 
 import { useCreateEmployee } from "@/employee/employee.hooks";
 import { useUpdateEmployee } from "@/employee/employee.hooks";
-import { SALARY_COMPONENT_TYPES } from "@/employee/employee.options";
 import useEmployeeStore from "@/employee/employee.store";
 import {
   EmployeeStatus,
@@ -663,95 +660,15 @@ export function EmployeeForm({
             </div>
           </div>
 
-          <FormSectionHeader
-            title={t("Employees.salary_section_title")}
-            onCreate={() => append({ type: "", amount: 0 })}
-            onCreateText={t("Employees.form.salary.add_component")}
-            onCreateDisabled={isEmployeeSaving}
-            isError={false}
+          <SalaryFormSection
+            control={form.control}
+            fields={fields}
+            append={append}
+            remove={remove}
+            isSaving={isEmployeeSaving}
+            totalSalary={totalSalary}
             inDialog={editMode || nestedForm}
           />
-
-          <div className="form-container">
-            <FormLabel>{t("Employees.form.salary.label")}</FormLabel>
-            {fields.map((field, index) => (
-              <div key={field.id} className="flex items-end gap-2">
-                <FormField
-                  control={form.control}
-                  name={`salary.${index}.type`}
-                  render={({ field: typeField }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel className="text-xs">
-                        {t("Employees.form.salary.type_label")}
-                      </FormLabel>
-                      <Select
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        onValueChange={typeField.onChange}
-                        defaultValue={typeField.value}
-                        disabled={isEmployeeSaving}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue
-                              placeholder={t("Employees.form.salary.type_placeholder")}
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {SALARY_COMPONENT_TYPES.map((typeOpt) => (
-                            <SelectItem key={typeOpt.value} value={typeOpt.value}>
-                              {t(`Employees.salary_types.${typeOpt.value}`, {
-                                defaultValue: typeOpt.label,
-                              })}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`salary.${index}.amount`}
-                  render={({ field: amountField }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel className="text-xs">
-                        {t("Employees.form.salary.amount_label")}
-                      </FormLabel>
-                      <FormControl>
-                        <CurrencyInput
-                          placeholder={t("Employees.form.salary.amount_placeholder")}
-                          disabled={isEmployeeSaving}
-                          {...amountField}
-                          showCommas={true}
-                          value={
-                            amountField.value ? parseFloat(String(amountField.value)) : undefined
-                          }
-                          onChange={(value) => amountField.onChange(value?.toString() || "")}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-9"
-                  onClick={() => remove(index)}
-                  disabled={isEmployeeSaving}
-                  aria-label={t("General.remove")}
-                >
-                  <Trash2Icon className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-
-            <div className="mt-4 text-end font-medium">
-              {t("Employees.form.salary.total")}: {MoneyFormatter(totalSalary)}
-            </div>
-          </div>
 
           <NotesSection
             inDialog={editMode || nestedForm}
