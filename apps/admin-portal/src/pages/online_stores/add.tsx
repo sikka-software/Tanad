@@ -9,8 +9,8 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyOnlineStore } from "@/lib/dummy-factory";
 
-import { OnlineStoreForm } from "@/modules/online-store/online-store.form";
-import useOnlineStoreStore from "@/modules/online-store/online-store.store";
+import { OnlineStoreForm } from "@/online-store/online-store.form";
+import useOnlineStoreStore from "@/online-store/online-store.store";
 
 export default function AddOnlineStorePage() {
   const router = useRouter();

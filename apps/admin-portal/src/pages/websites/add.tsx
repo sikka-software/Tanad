@@ -9,8 +9,8 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyWebsite } from "@/lib/dummy-factory";
 
-import { WebsiteForm } from "@/modules/website/website.form";
-import useWebsiteStore from "@/modules/website/website.store";
+import { WebsiteForm } from "@/website/website.form";
+import useWebsiteStore from "@/website/website.store";
 
 export default function AddWebsitePage() {
   const router = useRouter();

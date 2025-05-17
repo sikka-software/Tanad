@@ -9,8 +9,8 @@ import {
   fetchTrucks,
   updateTruck,
   duplicateTruck,
-} from "@/modules/truck/truck.service";
-import type { TruckCreateData, TruckUpdateData } from "@/modules/truck/truck.type";
+} from "@/truck/truck.service";
+import type { TruckCreateData, TruckUpdateData } from "@/truck/truck.type";
 
 export const truckKeys = {
   all: ["trucks"] as const,

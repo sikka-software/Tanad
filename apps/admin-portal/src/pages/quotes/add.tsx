@@ -8,8 +8,7 @@ import PageTitle from "@/ui/page-title";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { QuoteForm } from "@/quote/quote.form";
-
-import useQuoteStore from "@/modules/quote/quote.store";
+import useQuoteStore from "@/quote/quote.store";
 
 export default function AddQuotePage() {
   const router = useRouter();

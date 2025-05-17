@@ -13,6 +13,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
+import { useCompanies } from "@/company/company.hooks";
+import { Company } from "@/company/company.type";
+
 import ClientCard from "@/client/client.card";
 import { useClients } from "@/client/client.hooks";
 import { Client } from "@/client/client.type";
@@ -20,9 +23,6 @@ import { Client } from "@/client/client.type";
 import VendorCard from "@/vendor/vendor.card";
 import { useVendors } from "@/vendor/vendor.hooks";
 import { Vendor } from "@/vendor/vendor.type";
-
-import { useCompanies } from "@/modules/company/company.hooks";
-import { Company } from "@/modules/company/company.type";
 
 export default function ContactsPage() {
   const t = useTranslations();

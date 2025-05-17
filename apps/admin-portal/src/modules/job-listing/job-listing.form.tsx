@@ -26,15 +26,19 @@ import useJobListingsStore from "@/job-listing/job-listing.store";
 import useJobListingStore from "@/job-listing/job-listing.store";
 import { JobListingUpdateData, JobListingCreateData } from "@/job-listing/job-listing.type";
 
+import { useOffices } from "@/office/office.hooks";
+
+import { useWarehouses } from "@/warehouse/warehouse.hooks";
+
+import { useBranches } from "@/branch/branch.hooks";
+
+import { useDepartments } from "@/department/department.hooks";
+
 import JobForm from "@/job/job.form";
 import { useJobs } from "@/job/job.hooks";
 import useJobStore from "@/job/job.store";
 
 import { job_listings, offices } from "@/db/schema";
-import { useBranches } from "@/modules/branch/branch.hooks";
-import { useDepartments } from "@/modules/department/department.hooks";
-import { useOffices } from "@/modules/office/office.hooks";
-import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 const createJobListingSchema = (t: (key: string) => string) => {

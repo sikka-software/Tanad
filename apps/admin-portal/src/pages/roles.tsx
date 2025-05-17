@@ -19,7 +19,6 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Role } from "@/modules/role/role.type";
 import RoleCard from "@/role/role.card";
 import { RoleForm } from "@/role/role.form";
 import {
@@ -30,6 +29,7 @@ import {
 } from "@/role/role.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/role/role.options";
 import useRoleStore from "@/role/role.store";
+import { Role } from "@/role/role.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function RolesPage() {

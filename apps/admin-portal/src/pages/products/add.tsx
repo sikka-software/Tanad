@@ -10,8 +10,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { generateDummyProduct } from "@/lib/dummy-factory";
 
 import { ProductForm } from "@/product/product.form";
-
-import useProductStore from "@/modules/product/product.store";
+import useProductStore from "@/product/product.store";
 
 export default function AddProductPage() {
   const router = useRouter();

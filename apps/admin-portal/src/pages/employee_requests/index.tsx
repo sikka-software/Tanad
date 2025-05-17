@@ -20,6 +20,8 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { useEmployees } from "@/employee/employee.hooks";
+
 import EmployeeRequestCard from "@/employee-request/employee-request.card";
 import useEmployeeRequestColumns from "@/employee-request/employee-request.columns";
 import { EmployeeRequestForm } from "@/employee-request/employee-request.form";
@@ -36,8 +38,6 @@ import {
   EmployeeRequest,
   EmployeeRequestUpdateData,
 } from "@/employee-request/employee-request.type";
-
-import { useEmployees } from "@/modules/employee/employee.hooks";
 
 export default function EmployeeRequestsPage() {
   const t = useTranslations();

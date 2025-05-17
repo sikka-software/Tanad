@@ -20,6 +20,8 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { useEmployees } from "@/employee/employee.hooks";
+
 import SalaryCard from "@/salary/salary.card";
 import useSalaryColumns from "@/salary/salary.columns";
 import { SalaryForm } from "@/salary/salary.form";
@@ -28,8 +30,6 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/salary/salary.options";
 import useSalaryStore from "@/salary/salary.store";
 import SalariesTable from "@/salary/salary.table";
 import { Salary, SalaryUpdateData } from "@/salary/salary.type";
-
-import { useEmployees } from "@/modules/employee/employee.hooks";
 
 export default function SalariesPage() {
   const t = useTranslations();

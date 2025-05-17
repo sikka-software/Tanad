@@ -48,9 +48,9 @@ const createClientSchema = (t: (key: string) => string) => {
   return ClientSelectSchema;
 };
 
-export type ClientFormValues = z.input<ReturnType<typeof createClientSchema>>;
+type ClientFormValues = z.input<ReturnType<typeof createClientSchema>>;
 
-export function ClientForm({
+export default function ClientForm({
   formHtmlId,
   onSuccess,
   defaultValues,

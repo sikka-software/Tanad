@@ -8,8 +8,8 @@ import {
   fetchServers,
   updateServer,
   duplicateServer,
-} from "@/modules/server/server.service";
-import type { ServerCreateData, ServerUpdateData } from "@/modules/server/server.type";
+} from "@/server/server.service";
+import type { ServerCreateData, ServerUpdateData } from "@/server/server.type";
 
 // Query keys for servers
 export const serverKeys = {

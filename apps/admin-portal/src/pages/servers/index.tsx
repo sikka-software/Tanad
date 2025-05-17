@@ -20,18 +20,14 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import ServerCard from "@/modules/server/server.card";
-import useServerColumns from "@/modules/server/server.columns";
-import { ServerForm } from "@/modules/server/server.form";
-import {
-  useServers,
-  useBulkDeleteServers,
-  useDuplicateServer,
-} from "@/modules/server/server.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/server/server.options";
-import useServerStore from "@/modules/server/server.store";
-import ServersTable from "@/modules/server/server.table";
-import { ServerUpdateData } from "@/modules/server/server.type";
+import ServerCard from "@/server/server.card";
+import useServerColumns from "@/server/server.columns";
+import { ServerForm } from "@/server/server.form";
+import { useServers, useBulkDeleteServers, useDuplicateServer } from "@/server/server.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/server/server.options";
+import useServerStore from "@/server/server.store";
+import ServersTable from "@/server/server.table";
+import { ServerUpdateData } from "@/server/server.type";
 
 export default function ServersPage() {
   const t = useTranslations();

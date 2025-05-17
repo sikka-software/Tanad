@@ -25,7 +25,7 @@ import { Company } from "@/company/company.type";
 
 import ClientCard from "@/client/client.card";
 import useClientColumns from "@/client/client.columns";
-import { ClientForm } from "@/client/client.form";
+import ClientForm from "@/client/client.form";
 import { useClients, useBulkDeleteClients, useDuplicateClient } from "@/client/client.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/client/client.options";
 import useClientStore from "@/client/client.store";

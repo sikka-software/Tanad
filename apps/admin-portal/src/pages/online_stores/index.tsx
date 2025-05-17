@@ -20,18 +20,18 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import OnlineStoreCard from "@/modules/online-store/online-store.card";
-import useOnlineStoreColumns from "@/modules/online-store/online-store.columns";
-import { OnlineStoreForm } from "@/modules/online-store/online-store.form";
+import OnlineStoreCard from "@/online-store/online-store.card";
+import useOnlineStoreColumns from "@/online-store/online-store.columns";
+import { OnlineStoreForm } from "@/online-store/online-store.form";
 import {
   useBulkDeleteOnlineStores,
   useOnlineStores,
   useDuplicateOnlineStore,
-} from "@/modules/online-store/online-store.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/online-store/online-store.options";
-import useOnlineStoreStore from "@/modules/online-store/online-store.store";
-import OnlineStoresTable from "@/modules/online-store/online-store.table";
-import { OnlineStore, OnlineStoreUpdateData } from "@/modules/online-store/online-store.type";
+} from "@/online-store/online-store.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/online-store/online-store.options";
+import useOnlineStoreStore from "@/online-store/online-store.store";
+import OnlineStoresTable from "@/online-store/online-store.table";
+import { OnlineStore, OnlineStoreUpdateData } from "@/online-store/online-store.type";
 
 export default function OnlineStoresPage() {
   const t = useTranslations();

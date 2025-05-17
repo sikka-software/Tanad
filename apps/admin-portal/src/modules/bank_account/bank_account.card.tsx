@@ -2,7 +2,7 @@ import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { Car } from "@/modules/car/car.type";
+import { Car } from "@/car/car.type";
 
 const BankAccountCard = ({ car }: { car: Car }) => {
   const t = useTranslations("Cars");

@@ -13,7 +13,7 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import useBankAccountStore from "@/modules/bank_account/bank_account.store";
+import useBankAccountStore from "@/bank_account/bank_account.store";
 
 import { Button } from "../components/ui/button";
 import PageTitle from "../components/ui/page-title";

@@ -1,4 +1,4 @@
-import { Domain, DomainCreateData, DomainUpdateData } from "@/modules/domain/domain.type";
+import { Domain, DomainCreateData, DomainUpdateData } from "@/domain/domain.type";
 
 export async function fetchDomains(): Promise<Domain[]> {
   try {

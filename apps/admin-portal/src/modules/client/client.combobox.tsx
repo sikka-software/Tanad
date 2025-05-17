@@ -7,9 +7,9 @@ import { FormItem, FormLabel } from "@/ui/form";
 import { FormField } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
 
-import { ClientForm } from "./client.form";
-import useClientStore from "./client.store";
-import { Client } from "./client.type";
+import ClientForm from "@/client/client.form";
+import useClientStore from "@/client/client.store";
+import { Client } from "@/client/client.type";
 
 interface ClientComboboxProps {
   label: string;

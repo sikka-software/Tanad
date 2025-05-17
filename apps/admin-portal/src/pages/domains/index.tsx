@@ -20,18 +20,14 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import DomainCard from "@/modules/domain/domain.card";
-import useDomainColumns from "@/modules/domain/domain.columns";
-import { DomainForm } from "@/modules/domain/domain.form";
-import {
-  useDomains,
-  useBulkDeleteDomains,
-  useDuplicateDomain,
-} from "@/modules/domain/domain.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/domain/domain.options";
-import useDomainStore from "@/modules/domain/domain.store";
-import DomainsTable from "@/modules/domain/domain.table";
-import { DomainUpdateData } from "@/modules/domain/domain.type";
+import DomainCard from "@/domain/domain.card";
+import useDomainColumns from "@/domain/domain.columns";
+import { DomainForm } from "@/domain/domain.form";
+import { useDomains, useBulkDeleteDomains, useDuplicateDomain } from "@/domain/domain.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/domain/domain.options";
+import useDomainStore from "@/domain/domain.store";
+import DomainsTable from "@/domain/domain.table";
+import { DomainUpdateData } from "@/domain/domain.type";
 
 export default function DomainsPage() {
   const t = useTranslations();

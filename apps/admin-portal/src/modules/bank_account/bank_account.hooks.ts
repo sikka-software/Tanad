@@ -6,11 +6,11 @@ import {
   fetchBankAccountById,
   fetchBankAccounts,
   updateBankAccount,
-} from "@/modules/bank_account/bank_account.service";
+} from "@/bank_account/bank_account.service";
 import type {
   BankAccountCreateData,
   BankAccountUpdateData,
-} from "@/modules/bank_account/bank_account.type";
+} from "@/bank_account/bank_account.type";
 
 // Query keys for cars
 export const bankAccountKeys = {

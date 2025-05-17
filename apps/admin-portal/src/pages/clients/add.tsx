@@ -9,7 +9,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyClient } from "@/lib/dummy-factory";
 
-import { ClientForm } from "@/client/client.form";
+import ClientForm from "@/client/client.form";
 import useClientStore from "@/client/client.store";
 
 export default function AddClientPage() {

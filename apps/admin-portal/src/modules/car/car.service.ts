@@ -1,4 +1,4 @@
-import { Car, CarCreateData, CarUpdateData } from "@/modules/car/car.type";
+import { Car, CarCreateData, CarUpdateData } from "@/car/car.type";
 
 export async function fetchCars(): Promise<Car[]> {
   try {

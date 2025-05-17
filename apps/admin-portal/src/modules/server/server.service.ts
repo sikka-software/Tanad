@@ -1,4 +1,4 @@
-import { Server, ServerCreateData, ServerUpdateData } from "@/modules/server/server.type";
+import { Server, ServerCreateData, ServerUpdateData } from "@/server/server.type";
 
 export async function fetchServers(): Promise<Server[]> {
   try {

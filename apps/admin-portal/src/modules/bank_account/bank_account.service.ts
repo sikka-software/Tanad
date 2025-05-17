@@ -2,7 +2,7 @@ import {
   BankAccount,
   BankAccountCreateData,
   BankAccountUpdateData,
-} from "@/modules/bank_account/bank_account.type";
+} from "@/bank_account/bank_account.type";
 
 export async function fetchBankAccounts(): Promise<BankAccount[]> {
   try {

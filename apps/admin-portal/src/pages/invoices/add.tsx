@@ -8,8 +8,7 @@ import PageTitle from "@/ui/page-title";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { InvoiceForm } from "@/invoice/invoice.form";
-
-import useInvoiceStore from "@/modules/invoice/invoice.store";
+import useInvoiceStore from "@/invoice/invoice.store";
 
 export default function AddInvoicePage() {
   const t = useTranslations();

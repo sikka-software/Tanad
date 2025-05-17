@@ -8,8 +8,8 @@ import {
   fetchDomains,
   updateDomain,
   duplicateDomain,
-} from "@/modules/domain/domain.service";
-import type { DomainCreateData, DomainUpdateData } from "@/modules/domain/domain.type";
+} from "@/domain/domain.service";
+import type { DomainCreateData, DomainUpdateData } from "@/domain/domain.type";
 
 export const domainKeys = {
   all: ["domains"] as const,

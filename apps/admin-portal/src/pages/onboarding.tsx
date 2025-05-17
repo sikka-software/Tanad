@@ -12,7 +12,7 @@ import ThemeSwitcher from "@/ui/theme-switcher";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { OnboardingForm } from "@/modules/onboarding/onboarding.form";
+import { OnboardingForm } from "@/onboarding/onboarding.form";
 
 export default function OnboardingPage() {
   const t = useTranslations();

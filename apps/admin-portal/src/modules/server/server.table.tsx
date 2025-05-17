@@ -7,8 +7,8 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useServerStore from "@/modules/server/server.store";
-import { Server } from "@/modules/server/server.type";
+import useServerStore from "@/server/server.store";
+import { Server } from "@/server/server.type";
 import useUserStore from "@/stores/use-user-store";
 
 import useServerColumns from "./server.columns";

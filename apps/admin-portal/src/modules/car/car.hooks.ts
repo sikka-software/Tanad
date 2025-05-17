@@ -2,14 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
 
-import {
-  createCar,
-  fetchCarById,
-  fetchCars,
-  updateCar,
-  duplicateCar,
-} from "@/modules/car/car.service";
-import type { CarCreateData, CarUpdateData } from "@/modules/car/car.type";
+import { createCar, fetchCarById, fetchCars, updateCar, duplicateCar } from "@/car/car.service";
+import type { CarCreateData, CarUpdateData } from "@/car/car.type";
 
 export const carKeys = {
   all: ["cars"] as const,
