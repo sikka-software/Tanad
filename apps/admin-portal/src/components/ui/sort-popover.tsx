@@ -115,7 +115,7 @@ function SortPopover({
                     value={rule.field}
                     onValueChange={(value) => updateSortRule(index, "field", value)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger isolated>
                       <SelectValue placeholder={t("General.select_field")} />
                     </SelectTrigger>
                     <SelectContent>

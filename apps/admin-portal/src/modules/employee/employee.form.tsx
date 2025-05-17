@@ -120,14 +120,12 @@ export function EmployeeForm({
   const enterprise = useUserStore((state) => state.enterprise);
 
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
-  const { data: departments, isLoading: departmentsLoading } = useDepartments();
   const isDepartmentSaving = useDepartmentStore((state) => state.isLoading);
   const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
 
   const [isJobDialogOpen, setIsJobDialogOpen] = useState(false);
   const { data: jobs, isLoading: isFetchingJobs } = useJobs();
   const isJobSaving = useJobStore((state) => state.isLoading);
-  const setIsJobSaving = useJobStore((state) => state.setIsLoading);
 
   const { mutateAsync: updateEmployeeMutate } = useUpdateEmployee();
   const { mutateAsync: createEmployeeMutate } = useCreateEmployee();
@@ -135,34 +133,31 @@ export function EmployeeForm({
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
 
-  // const [email, setEmail] = useState(defaultValues?.email || "");
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const actualEmployeeId = editMode ? defaultValues?.id : undefined;
   const initialEmail = editMode ? defaultValues?.email : undefined;
+
+  const creatingNewStandalone = !editMode && !nestedForm;
 
   const form = useForm<z.input<ReturnType<typeof createEmployeeFormSchema>>>({
     resolver: zodResolver(createEmployeeFormSchema(t)),
     mode: "onChange",
     defaultValues: {
-      first_name: defaultValues?.first_name || "",
-      last_name: defaultValues?.last_name || "",
-      email: defaultValues?.email || "",
-      created_at: defaultValues?.created_at || undefined,
-      updated_at: defaultValues?.updated_at || undefined,
-      user_id: defaultValues?.user_id || undefined,
-      enterprise_id: defaultValues?.enterprise_id || undefined,
-      id: defaultValues?.id || undefined,
+      ...defaultValues,
       status: defaultValues?.status || "active",
       job_id: defaultValues?.job_id || "",
       phone: defaultValues?.phone || "",
-      salary:
-        (defaultValues?.salary as { type: string; amount: number }[] | undefined) || undefined,
+      salary: creatingNewStandalone
+        ? defaultValues?.salary && (defaultValues.salary as any[]).length > 0
+          ? (defaultValues.salary as { type: string; amount: number }[])
+          : [{ type: "", amount: 0 }]
+        : (defaultValues?.salary as { type: string; amount: number }[] | undefined) || undefined,
       notes: getNotesValue(defaultValues) || "",
       nationality: defaultValues?.nationality || "",
-      hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
-      birth_date: defaultValues?.birth_date ? new Date(defaultValues.birth_date) : undefined,
+      hire_date: defaultValues?.hire_date ? parseDate(defaultValues.hire_date) : undefined,
+      birth_date: defaultValues?.birth_date ? parseDate(defaultValues.birth_date) : undefined,
       termination_date: defaultValues?.termination_date
-        ? new Date(defaultValues.termination_date)
+        ? parseDate(defaultValues.termination_date)
         : undefined,
       national_id: defaultValues?.national_id || "",
       eqama_id: defaultValues?.eqama_id || "",
@@ -441,11 +436,7 @@ export function EmployeeForm({
                     <FormControl>
                       <DateInput
                         placeholder={t("Employees.form.hire_date.placeholder")}
-                        value={
-                          typeof field.value === "string"
-                            ? parseDate(field.value)
-                            : (field.value ?? null)
-                        }
+                        value={field.value ?? null}
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
                         disabled={isEmployeeSaving}
@@ -488,11 +479,7 @@ export function EmployeeForm({
                     <FormControl>
                       <DateInput
                         placeholder={t("Employees.form.birth_date.placeholder")}
-                        value={
-                          typeof field.value === "string"
-                            ? parseDate(field.value)
-                            : (field.value ?? null)
-                        }
+                        value={field.value ?? null}
                         onChange={field.onChange}
                         onSelect={(e) => field.onChange(e)}
                         disabled={isEmployeeSaving}
