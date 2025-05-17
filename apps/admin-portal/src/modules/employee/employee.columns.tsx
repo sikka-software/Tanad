@@ -22,80 +22,54 @@ const dateTableFilterFn: FilterFn<Employee> = (
   columnId: string,
   filterValueWithOperator: { filterValue: string; operator: string; type: string },
 ) => {
-  // console.log(`[dateTableFilterFn TEMPORARY TEST] Reached for Row ID: ${row.id}, Column: ${columnId}`);
-  // return true; // Always pass the filter for now
-
-  // Previous logic restored
   const { filterValue, operator, type } = filterValueWithOperator;
   const rowValue = row.getValue(columnId) as string | Date | null;
 
-  console.log(
-    `[dateTableFilterFn] Col: ${columnId}, RowID: ${row.id}, Operator: ${operator}, Type: ${type}`,
-    "\n  Raw Row Value:", rowValue,
-    "\n  Filter Value (YYYY-MM-DD from popover):", filterValue
-  );
-
-  // Handle operators that don't require a filterValue first
   if (operator === "is_empty") return !rowValue;
   if (operator === "is_not_empty") return !!rowValue;
 
-  // If type is not date, or if it is a date operation that requires a value but none is provided, bail out.
   if (type !== "date" || !filterValue) {
-    console.log("[dateTableFilterFn] Bailing out: type not date or no filterValue for date op.");
     return false; 
   }
 
-  // If row has no date, it can't match specific date filters like equals, before, after
   if (!rowValue) {
-    console.log("[dateTableFilterFn] Bailing out: no rowValue.");
     return false;
   }
 
   let rowDate: CalendarDate;
   try {
-    // Assuming rowValue is a string like "YYYY-MM-DD" or a full ISO string, or a Date object
     const jsDate = new Date(rowValue);
     if (isNaN(jsDate.getTime())) {
-      console.log("[dateTableFilterFn] Invalid JSDate from rowValue:", rowValue);
-      return false; // Invalid date in row
+      return false; 
     }
-    // Convert to CalendarDate by taking local parts to avoid timezone shifts in comparison logic
     rowDate = parseDate(`${jsDate.getFullYear()}-${String(jsDate.getMonth() + 1).padStart(2, '0')}-${String(jsDate.getDate()).padStart(2, '0')}`);
-    console.log("[dateTableFilterFn] Parsed Row Date (CalendarDate):", rowDate?.toString());
   } catch (e) {
-    console.error("[dateTableFilterFn] Error parsing row date for filtering:", rowValue, e);
     return false;
   }
 
   let filterCalendarDate: CalendarDate;
   try {
-    filterCalendarDate = parseDate(filterValue); // filterValue is YYYY-MM-DD
-    console.log("[dateTableFilterFn] Parsed Filter Date (CalendarDate):", filterCalendarDate?.toString());
+    filterCalendarDate = parseDate(filterValue); 
   } catch (e) {
-    console.error("[dateTableFilterFn] Error parsing filter date for filtering:", filterValue, e);
     return false;
   }
 
   switch (operator) {
     case "equals":
       const isEqual = rowDate.compare(filterCalendarDate) === 0;
-      console.log("[dateTableFilterFn] Comparison 'equals':", isEqual);
       return isEqual;
     case "before":
       const isBefore = rowDate.compare(filterCalendarDate) < 0;
-      console.log("[dateTableFilterFn] Comparison 'before':", isBefore);
       return isBefore;
     case "after":
       const isAfter = rowDate.compare(filterCalendarDate) > 0;
-      console.log("[dateTableFilterFn] Comparison 'after':", isAfter);
       return isAfter;
-    case "is_empty": // Should be handled by the check at the beginning
+    case "is_empty": 
       return !rowValue;
-    case "is_not_empty": // Should be handled by the check at the beginning
+    case "is_not_empty": 
       return !!rowValue;
     default:
-      console.log("[dateTableFilterFn] Unknown operator or no match:", operator);
-      return false; // Default to false if operator is unknown or not handled yet
+      return false; 
   }
 };
 

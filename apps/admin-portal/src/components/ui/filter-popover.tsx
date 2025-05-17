@@ -25,17 +25,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 
 import { FilterCondition } from "@/types/common.type";
 
-// Define filter operators for different field types
-
-// "equals": "يساوي",
-// "not_equals": "لا يساوي",
-// "contains": "يحتوي",
-// "not_contains": "لا يحتوي",
-// "starts_with": "يبدأ بـ",
-// "ends_with": "ينتهي بـ",
-// "is_empty": "فارغ",
-// "is_not_empty": "ليس فارغ"
-
 const TEXT_OPERATORS = [
   { value: "equals", label: "Equals" },
   { value: "contains", label: "Contains" },
@@ -95,19 +84,23 @@ export default function FilterPopover({
   const locale = useLocale();
   const [open, setOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState(
-    (externalConditions || []).filter(c => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty").length
+    (externalConditions || []).filter(
+      (c) => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty",
+    ).length,
   );
   const [stagedFilterConditions, setStagedFilterConditions] = useState<FilterCondition[]>(
-    externalConditions ? JSON.parse(JSON.stringify(externalConditions)) : [
-      {
-        id: 1,
-        field: fields[0]?.id || "name",
-        operator: "contains",
-        value: "",
-        type: fields[0]?.type || "text",
-        conjunction: "and",
-      },
-    ],
+    externalConditions
+      ? JSON.parse(JSON.stringify(externalConditions))
+      : [
+          {
+            id: 1,
+            field: fields[0]?.id || "name",
+            operator: "contains",
+            value: "",
+            type: fields[0]?.type || "text",
+            conjunction: "and",
+          },
+        ],
   );
   const [stagedCaseSensitive, setStagedCaseSensitive] = useState(caseSensitive);
 
@@ -115,18 +108,26 @@ export default function FilterPopover({
 
   useEffect(() => {
     if (!open) {
-      setStagedFilterConditions(externalConditions ? JSON.parse(JSON.stringify(externalConditions)) : [
-        {
-          id: 1,
-          field: fields[0]?.id || "name",
-          operator: "contains",
-          value: "",
-          type: fields[0]?.type || "text",
-          conjunction: "and",
-        },
-      ]);
+      setStagedFilterConditions(
+        externalConditions
+          ? JSON.parse(JSON.stringify(externalConditions))
+          : [
+              {
+                id: 1,
+                field: fields[0]?.id || "name",
+                operator: "contains",
+                value: "",
+                type: fields[0]?.type || "text",
+                conjunction: "and",
+              },
+            ],
+      );
       setStagedCaseSensitive(caseSensitive);
-      setActiveFilters((externalConditions || []).filter(c => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty").length);
+      setActiveFilters(
+        (externalConditions || []).filter(
+          (c) => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty",
+        ).length,
+      );
     }
   }, [externalConditions, caseSensitive, open, fields]);
 
@@ -161,23 +162,27 @@ export default function FilterPopover({
     };
     const newConditions = [...stagedFilterConditions, newCondition];
     setStagedFilterConditions(newConditions);
-    setActiveFilters(newConditions.filter(c => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty").length);
+    setActiveFilters(
+      newConditions.filter(
+        (c) => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty",
+      ).length,
+    );
   };
 
   const removeFilterCondition = (id: number) => {
     const newConditions = stagedFilterConditions.filter((condition) => condition.id !== id);
     setStagedFilterConditions(newConditions);
-    setActiveFilters(newConditions.filter(c => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty").length);
+    setActiveFilters(
+      newConditions.filter(
+        (c) => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty",
+      ).length,
+    );
   };
 
   const updateFilterCondition = (id: number, field: string, value: string) => {
     const newConditions = stagedFilterConditions.map((condition) => {
       if (condition.id === id) {
         const updatedCondition = { ...condition, [field]: value };
-
-        if (field === "value" && condition.type === "date") {
-          console.log("[FilterPopover] updateFilterCondition (date value) - ID:", id, "New Value:", value);
-        }
 
         if (field === "field") {
           const fieldType = getFieldType(value);
@@ -207,14 +212,17 @@ export default function FilterPopover({
     });
 
     setStagedFilterConditions(newConditions);
-    setActiveFilters(newConditions.filter(c => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty").length);
+    setActiveFilters(
+      newConditions.filter(
+        (c) => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty",
+      ).length,
+    );
   };
 
   const applyFilters = () => {
     const validConditions = stagedFilterConditions.filter(
       (c) => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty",
     );
-    console.log("[FilterPopover] applyFilters - Staged Conditions:", stagedFilterConditions, "Valid Conditions to apply:", validConditions);
     onConditionsChange?.(validConditions);
     if (onCaseSensitiveChange) {
       onCaseSensitiveChange(stagedCaseSensitive);
@@ -236,7 +244,7 @@ export default function FilterPopover({
     ];
     setStagedFilterConditions(defaultStagedConditions);
     setStagedCaseSensitive(false);
-    
+
     onConditionsChange?.([]);
     if (onCaseSensitiveChange) {
       onCaseSensitiveChange(false);
@@ -256,25 +264,23 @@ export default function FilterPopover({
       let calendarDateValue: CalendarDate | null = null;
       if (value) {
         try {
-          calendarDateValue = parseDate(value.split("T")[0]); 
+          calendarDateValue = parseDate(value.split("T")[0]);
         } catch (e) {
-          console.error("[FilterPopover] Error parsing date for DateInput:", value, e);
+          // console.error("[FilterPopover] Error parsing date for DateInput:", value, e);
         }
       }
-      console.log("[FilterPopover] renderValueInput (date) - Input Value:", value, "Parsed CalendarDate:", calendarDateValue);
+      // console.log("[FilterPopover] renderValueInput (date) - Input Value:", value, "Parsed CalendarDate:", calendarDateValue);
       return (
         <div className="mt-2">
           <DateInput
             isolated
             value={calendarDateValue}
             onChange={(date) => {
-              const formattedDate = date ? `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}` : "";
-              console.log("[FilterPopover] DateInput onChange - Selected CalendarDate:", date, "Formatted YYYY-MM-DD:", formattedDate);
-              updateFilterCondition(
-                id,
-                "value",
-                formattedDate,
-              );
+              const formattedDate = date
+                ? `${date.year}-${String(date.month).padStart(2, "0")}-${String(date.day).padStart(2, "0")}`
+                : "";
+              // console.log("[FilterPopover] DateInput onChange - Selected CalendarDate:", date, "Formatted YYYY-MM-DD:", formattedDate);
+              updateFilterCondition(id, "value", formattedDate);
             }}
           />
         </div>
@@ -481,9 +487,7 @@ export default function FilterPopover({
                   {t("General.reset_all")}
                 </Button>
                 <Button onClick={applyFilters} className="flex-1" disabled={isApplying}>
-                  {isApplying ? (
-                    <Loader2 className="me-2 h-4 w-4 animate-spin" />
-                  ) : null}
+                  {isApplying ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : null}
                   {t("General.apply_filters")}
                 </Button>
               </div>

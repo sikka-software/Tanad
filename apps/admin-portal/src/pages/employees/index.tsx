@@ -187,16 +187,6 @@ export default function EmployeesPage() {
     [sortRules],
   );
 
-  console.log("[EmployeesPage] storeData to be passed to table:", storeData);
-  console.log(
-    "[EmployeesPage] columnFiltersTanStack to be passed to table:",
-    columnFiltersTanStack,
-  );
-  console.log(
-    "[EmployeesPage] globalFilter (zustandSearchQuery) to be passed to table:",
-    zustandSearchQuery,
-  );
-
   const handleTanstackSortingChange = (
     updater:
       | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
