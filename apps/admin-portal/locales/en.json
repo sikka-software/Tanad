@@ -484,9 +484,10 @@
       "reset_selections": "Reset Selections",
       "discount": "Discount",
       "total_monthly_price": "Total Monthly Price",
-      "billing_cycle": {
-        "monthly": "Monthly",
-        "annually": "Annually"
+
+      "billing_history": {
+        "title": "Billing History",
+        "description": "View your billing history"
       },
       "offices": {
         "title": "Offices",
@@ -1104,7 +1105,13 @@
     "enterprise_plan": "Enterprise Plan",
     "update_plan": "Update Plan",
     "need_custom_solution": "Need a custom solution?",
-
+    "amount": "Amount",
+    "billing_cycle": "Billing Cycle",
+    "next_billing_date": "Next Billing Date",
+    "next_billing": {
+      "title": "Next Billing",
+      "description": "The date of the next billing cycle"
+    },
     "Invoices": {
       "title": "Invoices",
       "description": "Manage all your invoices"
@@ -1123,8 +1130,12 @@
       "canceling": "Canceling",
       "cancelled": "Cancelled",
       "expired": "Expired",
-      "pending": "Pending"
+      "pending": "Pending",
+      "failed": "Failed",
+      "refunded": "Refunded",
+      "canceled": "Canceled"
     },
+    "available_plans": "Available Plans",
     "service_end": {
       "title": "Service End",
       "description": "Your service will end on",
@@ -1132,10 +1143,25 @@
       "hours": "hours",
       "minutes": "minutes",
       "seconds": "seconds",
-      "message": "All features will remain available until the end of the current billing period."
+      "date": "date",
+      "days_remaining": "days remaining",
+      "message_canceling": "All features will remain available until the end of the current billing period.",
+      "message_already_canceled": "Your subscription has been canceled, and your account will be converted to the free plan on the specified date.",
+      "message_refunded": "Your subscription has been refunded, and your account will be converted to the free plan on the specified date.",
+      "message_failed": "Your subscription has failed, and your account will be converted to the free plan on the specified date.",
+      "message_pending": "Your subscription is pending, and your account will be converted to the free plan on the specified date.",
+      "message_expired": "Your subscription has expired, and your account will be converted to the free plan on the specified date.",
+      "message_canceled": "Your subscription has been canceled, and your account will be converted to the free plan on the specified date."
     },
     "most_popular": "Most Popular",
-    "reactivate_subscription": "Reactivate Subscription",
+    "reactivate_subscription": {
+      "title": "Reactivate Subscription",
+      "description": "Reactivate your subscription to get advanced features",
+      "button": "Reactivate Subscription",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "processing": "Processing"
+    },
     "usage": {
       "title": "Usage",
       "description": "View your usage and billing information",
@@ -1203,7 +1229,11 @@
       "description": "Are you sure you want to cancel your subscription?",
       "cancel": "Cancel",
       "confirm": "Confirm",
-      "features_end_notice": "All features will remain available until the end of the current billing period."
+      "features_end_notice": "All features will remain available until the end of the current billing period.",
+      "cancel_at_period_end": "Cancel at the end of the current billing period",
+      "immediate_cancellation_notice": "Your subscription will be canceled immediately and you will lose access to advanced features.",
+      "alternative_option": "Or you can cancel your subscription at the specified date.",
+      "immediate_option": "Immediate Option"
     },
     "manage_description": "Manage your billing information and payment methods",
     "billing_history": {
@@ -1279,6 +1309,8 @@
       "unlimited_access": "Unlimited access",
       "premium_support": "Premium support",
       "ai_analytics": "AI Analytics",
+      "multiple_payment_gateways": "Multiple Payment Gateways",
+      "biometric_auth": "Biometric Authentication",
       "advanced_permissions": "Advanced Permissions",
       "unlimited_api": "Unlimited API",
       "advanced_sso": "Advanced Automation",

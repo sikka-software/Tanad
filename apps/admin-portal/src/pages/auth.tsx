@@ -3,6 +3,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import getConfig from "next/config";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -35,6 +36,9 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const { publicRuntimeConfig } = getConfig();
+  const version = publicRuntimeConfig?.version;
 
   const profile = useUserStore((state) => state.profile);
   const user = useUserStore((state) => state.user);
@@ -386,6 +390,8 @@ export default function Auth() {
           </Card>
           <div className="flex flex-row justify-between">
             <LanguageSwitcher />
+            <div className="text-muted-foregrond text-xs">v{version}</div>
+
             <ThemeSwitcher />
           </div>
         </div>

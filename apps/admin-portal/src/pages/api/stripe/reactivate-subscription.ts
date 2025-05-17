@@ -41,11 +41,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Special case for profile-based subscriptions
     if (subscriptionId === "profile-based") {
       // For profile-based subscriptions, we just update the cancel flags in the database
+
+      // Determine the plan to restore based on the price_id or previous subscription data
+      let planToRestore = user.price_id ? user.price_id.replace("price_", "tanad_") : null;
+
+      // Default to business plan if we can't determine the original plan
+      if (!planToRestore || planToRestore === "tanad_free") {
+        planToRestore = "tanad_business";
+      }
+
+      console.log(`Reactivating profile-based subscription with plan: ${planToRestore}`);
+
       const { error: updateError } = await supabase
         .from("profiles")
         .update({
           cancel_at_period_end: false,
           cancel_at: null,
+          subscribed_to: planToRestore,
         })
         .eq("id", userId);
 
@@ -116,12 +128,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Reactivate the subscription - handle both cases
     let updatedSubscription;
+    let planLookupKey = null;
+
     if (subscription.status === "canceled") {
       // For actually canceled subscriptions, create a new subscription with the same price
-      const items = subscription.items.data.map((item) => ({
-        price: item.price.id,
-        quantity: item.quantity,
-      }));
+      const items = subscription.items.data.map((item) => {
+        // Get the plan lookup key if available
+        if (item.price.lookup_key) {
+          planLookupKey = item.price.lookup_key;
+        }
+        return {
+          price: item.price.id,
+          quantity: item.quantity,
+        };
+      });
 
       updatedSubscription = await stripe.subscriptions.create({
         customer: customerId,
@@ -133,6 +153,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       updatedSubscription = await stripe.subscriptions.update(subscriptionId, {
         cancel_at_period_end: false,
       });
+
+      // Try to get the plan lookup key
+      if (subscription.items?.data?.length > 0 && subscription.items.data[0].price?.lookup_key) {
+        planLookupKey = subscription.items.data[0].price.lookup_key;
+      }
+    }
+
+    // If no specific plan was found, try to detect it from the price ID
+    if (!planLookupKey && updatedSubscription.items?.data?.length > 0) {
+      const priceId = updatedSubscription.items.data[0].price.id;
+      if (priceId.includes("standard")) {
+        planLookupKey = "tanad_standard";
+      } else if (priceId.includes("pro")) {
+        planLookupKey = "tanad_pro";
+      } else if (priceId.includes("business")) {
+        planLookupKey = "tanad_business";
+      } else if (priceId.includes("enterprise")) {
+        planLookupKey = "tanad_enterprise";
+      } else {
+        planLookupKey = "tanad_business"; // Default to business plan
+      }
+    }
+
+    // Update the user's profile with the reactivated subscription details
+    if (planLookupKey) {
+      await supabase
+        .from("profiles")
+        .update({
+          subscribed_to: planLookupKey,
+          cancel_at_period_end: false,
+          cancel_at: null,
+        })
+        .eq("id", user.id);
     }
 
     // Log the reactivation

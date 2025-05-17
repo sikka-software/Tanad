@@ -2,6 +2,7 @@ import * as reactSpring from "@react-spring/three";
 import { ShaderGradientCanvas, ShaderGradient } from "@shadergradient/react";
 import { useLocale, useTranslations } from "next-intl";
 import { ThemeProvider, useTheme } from "next-themes";
+import getConfig from "next/config";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
@@ -16,6 +17,8 @@ import ThemeSwitcher from "../ui/theme-switcher";
 
 const SoonLayout = () => {
   const t = useTranslations();
+  const { publicRuntimeConfig } = getConfig();
+  const version = publicRuntimeConfig?.version;
 
   const lang = useLocale();
   const { resolvedTheme } = useTheme();
@@ -109,6 +112,7 @@ const SoonLayout = () => {
                 </Link>
               </Button>
             </div>
+            <div className="text-muted-foregrond text-xs">v{version}</div>
           </div>
         </div>
         <div className="bg-background absolute z-0 h-full w-full [mask-image:radial-gradient(circle_at_center,#D1D4DC_5%,transparent_100%)]"></div>

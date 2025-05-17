@@ -70,6 +70,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             ? (price.product as Stripe.Product).metadata?.lookup_key
             : null);
       }
+
+      // Add cancel_at information to the response for clarity
+      return res.status(200).json({
+        subscription: latestSubscription,
+        cancel_at: latestSubscription.cancel_at,
+        cancel_at_period_end: latestSubscription.cancel_at_period_end,
+        current_period_end: (latestSubscription as any).current_period_end || null,
+      });
     }
     return res.status(200).json({
       subscription: latestSubscription,

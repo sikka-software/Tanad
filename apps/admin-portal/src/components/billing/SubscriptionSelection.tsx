@@ -172,18 +172,6 @@ export default function SubscriptionSelection({
     ) {
       setCurrentPlan(newCurrentPlan);
     }
-
-    // Debug logging
-    console.log("SubscriptionSelection: Current plan data", {
-      priceId: currentPlan.priceId,
-      lookup_key: currentPlan.lookup_key,
-      subscriptionStatus,
-      cancelAt: subscriptionCancelAt,
-      profile: {
-        price_id: profile?.price_id,
-        subscribed_to: profile?.subscribed_to,
-      },
-    });
   }, [pricesLoading, profile?.price_id, profile?.subscribed_to, freePlan, plans]);
 
   // Function to update the selected plan with debounce protection
