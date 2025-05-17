@@ -1,13 +1,14 @@
 import { CellContext } from "@tanstack/react-table";
-import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
+import { MoneyFormatter } from "@/ui/inputs/currency-input";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
 import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
+import { useAppCurrencySymbol } from "@/lib/currency-utils";
 import { useFormatDate } from "@/lib/date-utils";
 
 import { Quote, QuoteStatus } from "@/quote/quote.type";
@@ -53,8 +54,14 @@ const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string)
       accessorKey: "subtotal",
       header: t("Quotes.form.subtotal.label"),
       validationSchema: z.number().min(0, t("Quotes.form.subtotal.required")),
-      cell: (props: CellContext<Quote, unknown>) =>
-        `$${Number(props.row.original.subtotal || 0).toFixed(2)}`,
+      cell: ({ row }) => {
+        return (
+          <span className="flex flex-row items-center gap-1 text-sm font-medium">
+            {MoneyFormatter(row.getValue("subtotal"))}
+            {useAppCurrencySymbol().symbol}
+          </span>
+        );
+      },
     },
     {
       accessorKey: "tax_rate",

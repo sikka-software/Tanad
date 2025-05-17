@@ -2,24 +2,20 @@ import { CellContext } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import SelectCell from "@/components/tables/select-cell";
-import StatusCell from "@/components/tables/status-cell";
-import TimestampCell from "@/components/tables/timestamp-cell";
-import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { MoneyFormatter } from "@/ui/inputs/currency-input";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { getCurrencySymbol, useAppCurrencySymbol } from "@/lib/currency-utils";
+import SelectCell from "@/tables/select-cell";
+import StatusCell from "@/tables/status-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { useAppCurrencySymbol } from "@/lib/currency-utils";
 import { useFormatDate } from "@/lib/date-utils";
-
-import useUserStore from "@/stores/use-user-store";
 
 import { Job } from "./job.type";
 
 const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unknown) => void) => {
   const t = useTranslations();
-  const currency = useAppCurrencySymbol({
-    usd: { className: "-ms-1" },
-  }).symbol;
 
   const columns: ExtendedColumnDef<Job>[] = [
     {
@@ -65,7 +61,7 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
         props.row.original.salary ? (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
             {MoneyFormatter(props.row.original.salary)}
-            {currency}
+            {useAppCurrencySymbol({ usd: { className: "-ms-1" } }).symbol}
           </span>
         ) : (
           "N/A"

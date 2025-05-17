@@ -1,15 +1,16 @@
-import { format, isValid } from 'date-fns';
-import useUserStore from '@/stores/use-user-store';
+import { format, isValid } from "date-fns";
 
-export type DateFormatSetting = 'ymd' | 'dmy' | 'mdy';
+import useUserStore from "@/stores/use-user-store";
+
+export type DateFormatSetting = "ymd" | "dmy" | "mdy";
 
 const dateFormatMap: Record<DateFormatSetting, string> = {
-  ymd: 'yyyy/MM/dd',
-  dmy: 'dd/MM/yyyy',
-  mdy: 'MM/dd/yyyy',
+  ymd: "yyyy/MM/dd",
+  dmy: "dd/MM/yyyy",
+  mdy: "MM/dd/yyyy",
 };
 
-const DEFAULT_DATE_FORMAT: DateFormatSetting = 'ymd'; // Default to YYYY/MM/DD
+const DEFAULT_DATE_FORMAT: DateFormatSetting = "ymd"; // Default to YYYY/MM/DD
 
 /**
  * Custom hook to format a date based on the user's date_format setting.
@@ -19,24 +20,25 @@ const DEFAULT_DATE_FORMAT: DateFormatSetting = 'ymd'; // Default to YYYY/MM/DD
 export const useFormatDate = (dateToFormat: Date | string | number | null | undefined): string => {
   const userDateFormat = useUserStore((state) => state.profile?.user_settings.date_format);
 
-  if (dateToFormat === null || typeof dateToFormat === 'undefined') {
-    return '';
+  if (dateToFormat === null || typeof dateToFormat === "undefined") {
+    return "";
   }
 
   const dateObj = new Date(dateToFormat);
   if (!isValid(dateObj)) {
-    console.warn('useFormatDate: Invalid date provided', dateToFormat);
-    return ''; // Or return original input, or throw error, based on desired behavior
+    console.warn("useFormatDate: Invalid date provided", dateToFormat);
+    return ""; // Or return original input, or throw error, based on desired behavior
   }
 
-  const formatString = dateFormatMap[userDateFormat as DateFormatSetting] || dateFormatMap[DEFAULT_DATE_FORMAT];
+  const formatString =
+    dateFormatMap[userDateFormat as DateFormatSetting] || dateFormatMap[DEFAULT_DATE_FORMAT];
 
   try {
     return format(dateObj, formatString);
   } catch (error) {
-    console.error('useFormatDate: Error formatting date', error);
+    console.error("useFormatDate: Error formatting date", error);
     // Fallback to a default format or return an error indicator
-    return format(dateObj, dateFormatMap[DEFAULT_DATE_FORMAT]); 
+    return format(dateObj, dateFormatMap[DEFAULT_DATE_FORMAT]);
   }
 };
 
@@ -47,5 +49,7 @@ export const useFormatDate = (dateToFormat: Date | string | number | null | unde
  * @returns The date-fns compatible format string.
  */
 export const getDateFormatString = (dateFormatSetting?: DateFormatSetting): string => {
-  return dateFormatMap[dateFormatSetting || DEFAULT_DATE_FORMAT] || dateFormatMap[DEFAULT_DATE_FORMAT];
+  return (
+    dateFormatMap[dateFormatSetting || DEFAULT_DATE_FORMAT] || dateFormatMap[DEFAULT_DATE_FORMAT]
+  );
 };

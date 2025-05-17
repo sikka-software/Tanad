@@ -18,7 +18,6 @@ const useInvoiceColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
-  const currency = useAppCurrencySymbol().symbol;
 
   const columns: ExtendedColumnDef<Invoice>[] = [
     //invoice_number
@@ -91,7 +90,7 @@ const useInvoiceColumns = (
         return (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
             {MoneyFormatter(row.getValue("total"))}
-            {currency}
+            {useAppCurrencySymbol().symbol}
           </span>
         );
       },
