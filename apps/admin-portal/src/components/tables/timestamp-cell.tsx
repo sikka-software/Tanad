@@ -1,14 +1,18 @@
 import { format } from "date-fns";
 
+import { useFormatDate } from "@/lib/date-utils";
+
 const TimestampCell = ({ timestamp }: { timestamp: string }) => {
-  let formattedDate = timestamp;
+  const formattedDate = useFormatDate(timestamp);
   let formattedTime = "";
   if (timestamp) {
     try {
       const dateObj = new Date(timestamp);
-      formattedDate = format(dateObj, "dd/MM/yyyy");
       formattedTime = format(dateObj, "hh:mm:ss a");
-    } catch {}
+    } catch (error) {
+      console.error("Error formatting time in TimestampCell:", error);
+      formattedTime = "Invalid time";
+    }
   }
   return (
     <span dir="ltr" className="flex flex-col px-2 text-gray-500">

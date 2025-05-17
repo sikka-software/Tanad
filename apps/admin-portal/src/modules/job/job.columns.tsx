@@ -9,6 +9,7 @@ import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { getCurrencySymbol, useAppCurrencySymbol } from "@/lib/currency-utils";
+import { useFormatDate } from "@/lib/date-utils";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -93,12 +94,12 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
     {
       accessorKey: "start_date",
       header: t("Jobs.form.start_date.label"),
-      validationSchema: z.string().min(1, t("Jobs.form.start_date.required")),
+      cell: ({ row }) => useFormatDate(row.original.start_date),
     },
     {
       accessorKey: "end_date",
       header: t("Jobs.form.end_date.label"),
-      validationSchema: z.string().min(1, t("Jobs.form.end_date.required")),
+      cell: ({ row }) => useFormatDate(row.original.end_date),
     },
 
     {

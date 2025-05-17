@@ -9,6 +9,8 @@ import CurrencyCell from "@/tables/currency-cell";
 import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
+import { useFormatDate } from "@/lib/date-utils";
+
 import { EmployeeRequest, EmployeeRequestStatus } from "@/employee-request/employee-request.type";
 
 import useUserStore from "@/stores/use-user-store";
@@ -39,14 +41,12 @@ const useEmployeeRequestColumns = (
     {
       accessorKey: "start_date",
       header: t("EmployeeRequests.form.date_range.start"),
-      cell: ({ row }: { row: { original: EmployeeRequest } }) =>
-        row.original.start_date ? format(new Date(row.original.start_date), "PP") : "-",
+      cell: ({ row }) => useFormatDate(row.original.start_date),
     },
     {
       accessorKey: "end_date",
       header: t("EmployeeRequests.form.date_range.end"),
-      cell: ({ row }: { row: { original: EmployeeRequest } }) =>
-        row.original.end_date ? format(new Date(row.original.end_date), "PP") : "-",
+      cell: ({ row }) => useFormatDate(row.original.end_date),
     },
     {
       accessorKey: "amount",

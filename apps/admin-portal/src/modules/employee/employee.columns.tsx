@@ -8,6 +8,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
+import { useFormatDate } from "@/lib/date-utils";
+
 import { useJobs } from "@/job/job.hooks";
 
 import { Employee, EmployeeStatus } from "@/employee/employee.types";
@@ -44,12 +46,12 @@ const useCompanyColumns = (
     {
       accessorKey: "birth_date",
       header: t("Employees.form.birth_date.label"),
-      validationSchema: z.string().optional(),
+      cell: ({ row }) => useFormatDate(row.original.birth_date),
     },
     {
       accessorKey: "hire_date",
       header: t("Employees.form.hire_date.label"),
-      validationSchema: z.string().optional(),
+      cell: ({ row }) => useFormatDate(row.original.hire_date),
     },
     {
       accessorKey: "job_id",

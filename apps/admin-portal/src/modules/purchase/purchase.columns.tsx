@@ -7,6 +7,8 @@ import CurrencyCell from "@/tables/currency-cell";
 import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
+import { useFormatDate } from "@/lib/date-utils";
+
 import { Purchase, PurchaseStatus } from "@/purchase/purchase.type";
 
 import useUserStore from "@/stores/use-user-store";
@@ -42,7 +44,7 @@ const usePurchaseColumns = (
     {
       accessorKey: "due_date",
       header: t("Purchases.form.due_date.label"),
-      validationSchema: z.string().nullable(),
+      cell: ({ row }) => useFormatDate(row.original.due_date),
     },
 
     {

@@ -8,6 +8,7 @@ import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
+import { useFormatDate } from "@/lib/date-utils";
 
 import { Expense } from "@/expense/expense.type";
 
@@ -26,12 +27,12 @@ const useExpenseColumns = (
     {
       accessorKey: "issue_date",
       header: t("Expenses.form.issue_date.label"),
-      validationSchema: z.string().min(1, t("Expenses.form.issue_date.required")),
+      cell: ({ row }) => useFormatDate(row.original.issue_date),
     },
     {
       accessorKey: "due_date",
       header: t("Expenses.form.due_date.label"),
-      validationSchema: z.string().min(1, t("Expenses.form.due_date.required")),
+      cell: ({ row }) => useFormatDate(row.original.due_date),
     },
 
     {

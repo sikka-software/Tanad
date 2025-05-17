@@ -8,6 +8,8 @@ import { ExtendedColumnDef } from "@/ui/sheet-table";
 import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
+import { useFormatDate } from "@/lib/date-utils";
+
 import { Quote, QuoteStatus } from "@/quote/quote.type";
 
 const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string) => void) => {
@@ -40,24 +42,12 @@ const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string)
     {
       accessorKey: "issue_date",
       header: t("Quotes.form.issue_date.label"),
-      cell: (props: CellContext<Quote, unknown>) => {
-        try {
-          return format(new Date(props.row.original.issue_date), "MMM dd, yyyy");
-        } catch (e) {
-          return t("General.invalid_date");
-        }
-      },
+      cell: ({ row }) => useFormatDate(row.original.issue_date),
     },
     {
       accessorKey: "expiry_date",
       header: t("Quotes.form.expiry_date.label"),
-      cell: (props: CellContext<Quote, unknown>) => {
-        try {
-          return format(new Date(props.row.original.expiry_date), "MMM dd, yyyy");
-        } catch (e) {
-          return t("General.invalid_date");
-        }
-      },
+      cell: ({ row }) => useFormatDate(row.original.expiry_date),
     },
     {
       accessorKey: "subtotal",

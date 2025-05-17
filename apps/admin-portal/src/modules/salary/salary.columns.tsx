@@ -9,6 +9,8 @@ import StatusCell from "@/components/tables/status-cell";
 import CurrencyCell from "@/tables/currency-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
+import { useFormatDate } from "@/lib/date-utils";
+
 import { useEmployees } from "@/employee/employee.hooks";
 
 import { useUpdateSalary } from "@/salary/salary.hooks";
@@ -74,7 +76,7 @@ const useSalaryColumns = (
     {
       accessorKey: "payment_date",
       header: t("Salaries.form.payment_date.label"),
-      cell: ({ getValue }) => getValue() as string,
+      cell: ({ row }) => useFormatDate(row.original.payment_date),
     },
 
     {
