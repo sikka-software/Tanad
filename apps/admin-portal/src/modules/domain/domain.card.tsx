@@ -1,29 +1,60 @@
-import { User } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Card, CardContent, CardHeader } from "@/ui/card";
+import ModuleCard from "@/components/cards/module-card";
+import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 
-import { Domain } from "@/modules/domain/domain.type";
+import { getCurrencySymbol } from "@/lib/currency-utils";
 
-const DomainCard = ({ domain }: { domain: Domain }) => {
-  const t = useTranslations("Domains");
+import { CommonStatus } from "@/types/common.type";
+import { CommonStatusProps } from "@/types/common.type";
+
+import { useUpdateDomain } from "@/domain/domain.hooks";
+import useDomainStore from "@/domain/domain.store";
+import { Domain } from "@/domain/domain.type";
+import useUserStore from "@/stores/use-user-store";
+
+const DomainCard = ({
+  domain,
+  onActionClicked,
+}: {
+  domain: Domain;
+  onActionClicked: (action: string, rowId: string) => void;
+}) => {
+  const t = useTranslations();
+  const { mutate: updateDomain } = useUpdateDomain();
+  const data = useDomainStore((state) => state.data);
+  const setData = useDomainStore((state) => state.setData);
+  const currency = useUserStore((state) => state.profile?.user_settings.currency);
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateDomain({ id: rowId, data: { [columnId]: value } });
+  };
+
+  let recurringCost =
+    domain.payment_cycle === "monthly" ? domain.monthly_payment : domain.annual_payment;
+
   return (
-    <Card key={domain.id} className="transition-shadow hover:shadow-lg">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold">{domain.domain_name}</h3>
-            <p className="text-sm text-gray-500">Registrar: {domain.registrar}</p>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500">Status: {domain.status}</p>
-          <p className="text-sm text-gray-500">Expires: {domain.payment_cycle}</p>
-        </div>
-      </CardContent>
-    </Card>
+    <ModuleCard
+      id={domain.id}
+      title={domain.domain_name}
+      subtitle={domain.registrar || ""}
+      currentStatus={domain.status as CommonStatusProps}
+      statuses={Object.values(CommonStatus) as CommonStatusProps[]}
+      onStatusChange={(status: CommonStatusProps) => handleEdit(domain.id, "status", status)}
+      onEdit={() => onActionClicked("edit", domain.id)}
+      onDelete={() => onActionClicked("delete", domain.id)}
+      onDuplicate={() => onActionClicked("duplicate", domain.id)}
+    >
+      <div className="flex items-center justify-end">
+        <span className="money">
+          {MoneyFormatter(recurringCost || 0)} {getCurrencySymbol(currency || "sar").symbol}
+          <span className="text-sm text-gray-500">
+            {" \\ " + t(`PaymentCycles.${domain.payment_cycle}`)}
+          </span>
+        </span>
+      </div>
+    </ModuleCard>
   );
 };
 

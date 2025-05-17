@@ -23,7 +23,7 @@ export default function Eror404Page() {
   );
 }
 
-Eror404Page.messages = ["Pages", "General", "404"];
+Eror404Page.messages = ["Metadata", "Pages", "General", "404"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

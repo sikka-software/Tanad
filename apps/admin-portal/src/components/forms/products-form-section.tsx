@@ -11,11 +11,12 @@ import type {
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { Button } from "@/ui/button";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { FormField, FormItem, FormControl, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
+
+import { CurrencyInput, MoneyFormatter } from "@/components/ui/inputs/currency-input";
+import { Input } from "@/components/ui/inputs/input";
 
 import { getCurrencySymbol } from "@/lib/currency-utils";
 
@@ -33,7 +34,8 @@ interface ProductFormSectionProps {
   onAddNewProduct: () => void;
   handleProductSelection: (index: number, productId: string) => void; // Function to handle product selection
   title: string;
-  isLoading?: boolean;
+  disabled?: boolean;
+  isFetching?: boolean;
   isError?: FieldError;
 }
 
@@ -54,7 +56,6 @@ interface ProductRowProps {
   control: Control<FormValues>;
   remove: UseFieldArrayRemove;
   locale: string;
-  productOptions: { label: string; value: string; price?: number }[] | undefined;
   isLoading?: boolean;
   productsLoading?: boolean;
   productsData: Product[] | undefined;
@@ -72,7 +73,6 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
     control,
     remove,
     locale,
-    productOptions,
     isLoading,
     productsLoading,
     productsData,
@@ -85,6 +85,17 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
     const currency = useUserStore((state) => state.profile?.user_settings?.currency);
     const quantity = useWatch({ control, name: `items.${index}.quantity` });
     const unitPrice = useWatch({ control, name: `items.${index}.unit_price` });
+
+    // Memoize the mapped products data for the combobox
+    const comboboxProductsData = useMemo(() => {
+      return (
+        productsData?.map((product) => ({
+          label: product.name,
+          value: product.id,
+          price: product.price,
+        })) || []
+      );
+    }, [productsData]);
 
     const subtotalNumber =
       typeof quantity === "number" && typeof unitPrice === "number" ? quantity * unitPrice : 0;
@@ -102,7 +113,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                 <FormControl>
                   <ComboboxAdd
                     dir={locale === "ar" ? "rtl" : "ltr"}
-                    data={productOptions || []}
+                    data={comboboxProductsData}
                     disabled={isLoading}
                     containerClassName="min-w-[150px] w-full"
                     isLoading={productsLoading}
@@ -123,13 +134,13 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                       handleProductSelection(index, value as string);
                     }}
                     renderOption={(option) => (
-                      <div className="flex w-full flex-row items-center justify-between gap-2">
+                      <div className="flex w-full flex-col">
                         <span>{option.label}</span>
-                        <div className="flex flex-row items-center gap-1 text-sm text-gray-500">
+                        <div className="flex flex-row items-center gap-1 text-sm font-medium !text-black">
                           <span>{MoneyFormatter(option.price)}</span>
                           {
                             getCurrencySymbol(currency || "sar", {
-                              sarClassName: "!size-2.5",
+                              sar: { className: "!size-2.5 text-black", strokeWidth: 28 },
                             }).symbol
                           }
                         </div>
@@ -151,7 +162,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
         </TableCell>
 
         {/* Quantity */}
-        <TableCell>
+        <TableCell className="w-[120px] max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap">
           <FormField
             control={control}
             name={`items.${index}.quantity`}
@@ -165,6 +176,15 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                     {...formField}
                     className="w-24"
                     disabled={isLoading}
+                    onChange={(e) => {
+                      const rawValue = e.target.value;
+                      if (rawValue === "") {
+                        formField.onChange(undefined);
+                      } else {
+                        const numValue = parseFloat(rawValue);
+                        formField.onChange(isNaN(numValue) ? undefined : numValue);
+                      }
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -191,10 +211,9 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                       } else if (typeof valueFromInput === "number") {
                         numValue = valueFromInput;
                       } else {
-                        // Handles undefined, null, etc. by setting numValue to undefined effectively leading to NaN check
-                        numValue = parseFloat(valueFromInput as any); // Let parseFloat produce NaN for undefined/null
+                        numValue = parseFloat(valueFromInput as any);
                       }
-                      formField.onChange(isNaN(numValue as number) ? undefined : numValue);
+                      formField.onChange(isNaN(numValue as number) ? 0 : numValue);
                     }}
                     placeholder={t("ProductsFormSection.unit_price.placeholder")}
                     disabled={isLoading}
@@ -227,7 +246,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
         </TableCell>
 
         {/* Subtotal */}
-        <TableCell>
+        <TableCell className="w-[150px] max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap">
           <div className="flex flex-row items-center gap-1 text-right">
             {MoneyFormatter(subtotalNumber)}
             {getCurrencySymbol(currency || "sar").symbol}
@@ -235,19 +254,19 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
         </TableCell>
 
         {/* Actions */}
-        <TableCell>
-          {canDelete && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => remove(index)}
-              className="size-8 p-0"
-              disabled={isLoading}
-            >
-              <Trash2 className="size-4 text-red-500" />
-            </Button>
-          )}
+        <TableCell className="w-[50px] max-w-[50px] overflow-hidden text-ellipsis whitespace-nowrap">
+          {/* {canDelete && ( */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => remove(index)}
+            className="size-8 p-0"
+            disabled={isLoading}
+          >
+            <Trash2 className="size-4 text-red-500" />
+          </Button>
+          {/* )} */}
         </TableCell>
       </TableRow>
     );
@@ -257,7 +276,7 @@ ProductRow.displayName = "ProductRow"; // Add display name for easier debugging
 
 // --- Main Products Form Section Component ---
 
-export function ProductsFormSection({
+function ProductsFormSection({
   control,
   fields,
   append,
@@ -265,23 +284,15 @@ export function ProductsFormSection({
   onAddNewProduct,
   handleProductSelection,
   title,
-  isLoading = false,
+  disabled,
+  isFetching,
   isError,
 }: ProductFormSectionProps) {
   const t = useTranslations();
+
   const { setValue } = useFormContext<FormValues>();
   const locale = useLocale();
   const { data: productsData, isLoading: productsLoading } = useProducts();
-
-  const productOptions = useMemo(
-    () =>
-      productsData?.map((product) => ({
-        label: product.name,
-        value: product.id,
-        price: product.price,
-      })),
-    [productsData],
-  );
 
   return (
     <div>
@@ -291,7 +302,7 @@ export function ProductsFormSection({
           append({ product_id: undefined, description: "", quantity: 1, unit_price: 0 })
         }
         onCreateText={t("ProductsFormSection.add_product")}
-        onCreateDisabled={isLoading}
+        onCreateDisabled={disabled}
         isError={isError}
         onErrorText={t("ProductsFormSection.required")}
       />
@@ -302,11 +313,16 @@ export function ProductsFormSection({
             <TableHeader>
               <TableRow>
                 <TableHead>{t("ProductsFormSection.product")}</TableHead>
-                <TableHead>{t("ProductsFormSection.quantity.label")}</TableHead>
+                <TableHead className="w-[120px] max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap">
+                  {t("ProductsFormSection.quantity.label")}
+                </TableHead>
                 <TableHead>{t("ProductsFormSection.unit_price.label")}</TableHead>
                 <TableHead>{t("ProductsFormSection.description.label")}</TableHead>
-                <TableHead>{t("ProductsFormSection.subtotal")}</TableHead>
-                <TableHead></TableHead> {/* Action column header */}
+                <TableHead className="w-[150px] max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap">
+                  {t("ProductsFormSection.subtotal")}
+                </TableHead>
+                <TableHead className="w-[50px] max-w-[50px] overflow-hidden text-ellipsis whitespace-nowrap"></TableHead>{" "}
+                {/* Action column header */}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -321,8 +337,7 @@ export function ProductsFormSection({
                       control={control}
                       remove={remove}
                       locale={locale}
-                      productOptions={productOptions}
-                      isLoading={isLoading}
+                      isLoading={isFetching}
                       productsLoading={productsLoading}
                       productsData={productsData}
                       setValue={setValue}
@@ -348,3 +363,5 @@ export function ProductsFormSection({
     </div>
   );
 }
+
+export default ProductsFormSection;

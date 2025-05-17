@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -8,13 +8,13 @@ import * as z from "zod";
 
 import BooleanTabs from "@/ui/boolean-tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { FormDialog } from "@/ui/form-dialog";
-import { Input } from "@/ui/input";
+import FormDialog from "@/ui/form-dialog";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
-import { createAddressSchema } from "@root/src/lib/schemas/address.schema";
 import NotesSection from "@/components/forms/notes-section";
-import PhoneInput from "@/components/ui/phone-input";
+import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
+import { Input } from "@/components/ui/inputs/input";
+import PhoneInput from "@/components/ui/inputs/phone-input";
 
 import { getNotesValue } from "@/lib/utils";
 
@@ -26,13 +26,13 @@ import { ClientCreateData, ClientUpdateData } from "@/client/client.type";
 
 import { CompanyForm } from "@/company/company.form";
 import { useCompanies } from "@/company/company.hooks";
+import useCompanyStore from "@/company/company.store";
 
+import { clients } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
-import useCompanyStore from "../company/company.store";
-
-export const createClientSchema = (t: (key: string) => string) => {
-  const baseClientSchema = z.object({
+const createClientSchema = (t: (key: string) => string) => {
+  const ClientSelectSchema = createInsertSchema(clients, {
     name: z.string().min(1, t("Clients.form.validation.name_required")),
     email: z
       .string()
@@ -45,10 +45,7 @@ export const createClientSchema = (t: (key: string) => string) => {
     }),
     notes: z.any().optional().nullable(),
   });
-
-  const addressSchema = createAddressSchema(t);
-
-  return baseClientSchema.merge(addressSchema);
+  return ClientSelectSchema;
 };
 
 export type ClientFormValues = z.input<ReturnType<typeof createClientSchema>>;
@@ -63,14 +60,17 @@ export function ClientForm({
   const t = useTranslations();
   const locale = useLocale();
 
-  const { user, membership } = useUserStore();
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+
   const { mutateAsync: createClient } = useCreateClient();
   const { mutateAsync: updateClient } = useUpdateClient();
 
-  const isLoading = useClientStore((state) => state.isLoading);
-  const setIsLoading = useClientStore((state) => state.setIsLoading);
+  const isSavingClient = useClientStore((state) => state.isLoading);
+  const setIsSavingClient = useClientStore((state) => state.setIsLoading);
 
-  const { data: companies, isLoading: companiesLoading } = useCompanies();
+  const { data: companies, isLoading: isFetchingCompanies } = useCompanies();
+
   const setIsCompanySaving = useCompanyStore((state) => state.setIsLoading);
   const isCompanySaving = useCompanyStore((state) => state.isLoading);
   const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
@@ -100,7 +100,7 @@ export function ClientForm({
   });
 
   const handleSubmit = async (data: ClientFormValues) => {
-    setIsLoading(true);
+    setIsSavingClient(true);
     if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
@@ -142,6 +142,9 @@ export function ClientForm({
       } else {
         await createClient(
           {
+            user_id: user?.id || "",
+            enterprise_id: enterprise?.id || "",
+
             name: data.name.trim(),
             email: data.email.trim(),
             phone: data.phone.trim(),
@@ -158,8 +161,6 @@ export function ClientForm({
             status: data.status,
             notes: data.notes,
             additional_number: null,
-            user_id: user?.id || "",
-            enterprise_id: membership?.enterprise_id || "",
           },
           {
             onSuccess: async (response) => {
@@ -171,7 +172,7 @@ export function ClientForm({
         );
       }
     } catch (error) {
-      setIsLoading(false);
+      setIsSavingClient(false);
       console.error("Failed to save client:", error);
       toast.error(t("General.error_operation"), {
         description: t("Clients.error.create"),
@@ -183,6 +184,8 @@ export function ClientForm({
     companies?.map((company) => ({
       label: company.name,
       value: company.id,
+      email: company.email,
+      website: company.website,
     })) || [];
 
   if (typeof window !== "undefined") {
@@ -193,6 +196,8 @@ export function ClientForm({
     <>
       <Form {...form}>
         <form id={formHtmlId || "client-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="form-fields-cols-1">
               <FormField
@@ -205,7 +210,7 @@ export function ClientForm({
                       <Input
                         placeholder={t("Clients.form.name.placeholder")}
                         {...field}
-                        disabled={isLoading}
+                        disabled={isSavingClient}
                       />
                     </FormControl>
                     <FormMessage />
@@ -226,6 +231,7 @@ export function ClientForm({
                         type="email"
                         dir="ltr"
                         placeholder={t("Clients.form.email.placeholder")}
+                        disabled={isSavingClient}
                         {...field}
                       />
                     </FormControl>
@@ -243,7 +249,7 @@ export function ClientForm({
                       <PhoneInput
                         value={field.value || ""}
                         onChange={field.onChange}
-                        ariaInvalid={form.formState.errors.phone !== undefined}
+                        disabled={isSavingClient}
                       />
                     </FormControl>
                     <FormMessage />
@@ -260,8 +266,10 @@ export function ClientForm({
                       <ComboboxAdd
                         dir={locale === "ar" ? "rtl" : "ltr"}
                         data={companyOptions}
-                        isLoading={companiesLoading}
+                        isLoading={isFetchingCompanies}
                         defaultValue={field.value || ""}
+                        disabled={isSavingClient}
+                        valueKey="value"
                         onChange={(value) => field.onChange(value || null)}
                         texts={{
                           placeholder: t("Clients.form.company.placeholder"),
@@ -270,6 +278,14 @@ export function ClientForm({
                         }}
                         addText={t("Pages.Companies.add")}
                         onAddClick={() => setIsCompanyDialogOpen(true)}
+                        renderOption={(item) => (
+                          <div>
+                            <p>{item.label}</p>
+                            <p className="text-muted-foreground text-xs">
+                              {item.email ? item.email : item.website}
+                            </p>
+                          </div>
+                        )}
                       />
                     </FormControl>
                     <FormMessage />
@@ -284,6 +300,7 @@ export function ClientForm({
                     <FormLabel>{t("Clients.form.status.label")}</FormLabel>
                     <FormControl>
                       <BooleanTabs
+                        disabled={isSavingClient}
                         trueText={t("Clients.form.status.active")}
                         falseText={t("Clients.form.status.inactive")}
                         value={field.value === "active"}
@@ -305,7 +322,7 @@ export function ClientForm({
             inDialog={editMode || nestedForm}
             title={t("Clients.form.address.label")}
             control={form.control}
-            isLoading={isLoading}
+            disabled={isSavingClient}
           />
           <NotesSection
             inDialog={editMode || nestedForm}

@@ -2,7 +2,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "./button";
-import { Input } from "./input";
+import { Input } from "./inputs/input";
 
 const PasswordInput = (props: React.ComponentProps<"input">) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,7 +14,7 @@ const PasswordInput = (props: React.ComponentProps<"input">) => {
         type="button"
         variant="ghost"
         size="icon"
-        className="absolute end-0 top-0 size-8 m-0.5 px-3 py-2"
+        className="absolute end-0 top-0 m-0.5 size-8 px-3 py-2"
         onClick={() => setShowPassword(!showPassword)}
         tabIndex={-1}
       >

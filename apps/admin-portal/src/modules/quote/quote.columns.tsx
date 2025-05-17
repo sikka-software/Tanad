@@ -1,14 +1,14 @@
-import SelectCell from "@root/src/components/tables/select-cell";
-import StatusCell from "@root/src/components/tables/status-cell";
 import { CellContext } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { InvoiceStatus } from "../invoice/invoice.type";
-import { Quote, QuoteStatus } from "./quote.type";
+import SelectCell from "@/tables/select-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { Quote, QuoteStatus } from "@/quote/quote.type";
 
 const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string) => void) => {
   const t = useTranslations();
@@ -19,10 +19,23 @@ const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string)
       header: t("Quotes.form.quote_number.label"),
       validationSchema: z.string().min(1, t("Quotes.form.quote_number.required")),
     },
+    //client.name
     {
-      accessorKey: "client_id",
+      enableEditing: false,
+      accessorKey: "client.name",
+      id: "client.name",
       header: t("Quotes.form.client.label"),
-      cell: (props: CellContext<Quote, unknown>) => props.row.original.client?.company || "N/A",
+      cell: ({ row }) => {
+        const client = row.original.client;
+        if (!client) return "N/A";
+        // Display name and email if available
+        return (
+          <div>
+            <div className="text-sm font-medium">{client.name || "-"}</div>
+            {/* {client.email && <div className="text-muted-foreground text-xs">{client.email}</div>} */}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "issue_date",
@@ -58,6 +71,26 @@ const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string)
       header: t("Quotes.form.tax_rate.label"),
       validationSchema: z.number().min(0, t("Quotes.form.tax_rate.required")),
       cell: (props: CellContext<Quote, unknown>) => `${props.row.original.tax_rate || 0}%`,
+    },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "status",

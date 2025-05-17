@@ -1,16 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import CodeInput from "@/ui/code-input";
-import { CurrencyInput } from "@/ui/currency-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
 import NotesSection from "@/components/forms/notes-section";
+import CodeInput from "@/components/ui/inputs/code-input";
+import { CurrencyInput } from "@/components/ui/inputs/currency-input";
+import { Input } from "@/components/ui/inputs/input";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -18,10 +19,11 @@ import { useCreateProduct, useUpdateProduct, useProducts } from "@/product/produ
 import useProductStore from "@/product/product.store";
 import { ProductUpdateData, ProductCreateData } from "@/product/product.type";
 
+import { products } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
-export const createProductSchema = (t: (key: string) => string) =>
-  z.object({
+const createProductSchema = (t: (key: string) => string) => {
+  const ProductSelectSchema = createInsertSchema(products, {
     name: z.string().min(1, t("Products.form.name.required")),
     description: z.string().optional(),
     price: z
@@ -41,6 +43,8 @@ export const createProductSchema = (t: (key: string) => string) =>
         t("Products.form.stock_quantity.invalid"),
       ),
   });
+  return ProductSelectSchema;
+};
 
 export type ProductFormValues = z.input<ReturnType<typeof createProductSchema>>;
 
@@ -52,9 +56,11 @@ export function ProductForm({
 }: ModuleFormProps<ProductUpdateData | ProductCreateData>) {
   const t = useTranslations();
 
-  const { profile, membership } = useUserStore();
-  const { mutateAsync: createProduct, isPending: isCreating } = useCreateProduct();
-  const { mutateAsync: updateProduct, isPending: isUpdating } = useUpdateProduct();
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+
+  const { mutateAsync: createProduct } = useCreateProduct();
+  const { mutateAsync: updateProduct } = useUpdateProduct();
 
   const { data: products } = useProducts();
 
@@ -75,13 +81,7 @@ export function ProductForm({
 
   const handleSubmit = async (data: ProductFormValues) => {
     setIsLoading(true);
-    if (!profile?.id) {
-      toast.error(t("General.unauthorized"), {
-        description: t("General.must_be_logged_in"),
-      });
-      return;
-    }
-    if (!membership?.enterprise_id) {
+    if (!user?.id || !enterprise?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
@@ -121,6 +121,8 @@ export function ProductForm({
       } else {
         await createProduct(
           {
+            user_id: user.id,
+            enterprise_id: enterprise.id,
             name: data.name.trim(),
             description: data.description?.trim() || null,
             price: parseFloat(data.price?.trim() || "0"),
@@ -128,8 +130,6 @@ export function ProductForm({
             stock_quantity: data.stock_quantity?.trim()
               ? parseInt(data.stock_quantity.trim())
               : undefined,
-            user_id: profile?.id || "",
-            enterprise_id: membership.enterprise_id,
           },
           {
             onSuccess: async (response) => {
@@ -156,10 +156,10 @@ export function ProductForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
         <div className="form-container">
-          <input type="submit" hidden />
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="name"
@@ -201,13 +201,12 @@ export function ProductForm({
                         }
                         form.setValue("sku", `SKU-${randomCode}`);
                       }}
-                    >
-                      <Input
-                        placeholder={t("Products.form.sku.placeholder")}
-                        {...field}
-                        disabled={isLoading}
-                      />
-                    </CodeInput>
+                      inputProps={{
+                        placeholder: t("Products.form.sku.placeholder"),
+                        disabled: isLoading,
+                        ...field,
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

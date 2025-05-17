@@ -1,5 +1,5 @@
-import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
+import { Building, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -7,10 +7,12 @@ import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
+
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
@@ -42,31 +44,35 @@ export default function DepartmentsPage() {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<DepartmentUpdateData | null>(null);
 
+  // Permissions
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
-
+  // Loading
   const loadingSave = moduleHooks.useIsLoading();
   const setLoadingSave = moduleHooks.useSetIsLoading();
-
+  // Delete Dialog
   const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
   const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
-
+  // Selected Rows
   const selectedRows = moduleHooks.useSelectedRows();
   const setSelectedRows = moduleHooks.useSetSelectedRows();
-
+  const clearSelection = moduleHooks.useClearSelection();
+  // Column Visibility
   const columnVisibility = moduleHooks.useColumnVisibility();
   const setColumnVisibility = moduleHooks.useSetColumnVisibility();
-
-  const viewMode = moduleHooks.useViewMode();
-  const clearSelection = moduleHooks.useClearSelection();
+  // Sorting
   const sortRules = moduleHooks.useSortRules();
   const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
   const sortNullsFirst = moduleHooks.useSortNullsFirst();
-  const searchQuery = moduleHooks.useSearchQuery();
+  const setSortRules = moduleHooks.useSetSortRules();
+  // Filtering
   const filterConditions = moduleHooks.useFilterConditions();
   const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
   const getFilteredData = moduleHooks.useGetFilteredData();
   const getSortedData = moduleHooks.useGetSortedData();
+  // Misc
+  const searchQuery = moduleHooks.useSearchQuery();
+  const viewMode = moduleHooks.useViewMode();
 
   const { data: departments, isLoading, error } = useDepartments();
   const { mutateAsync: deleteDepartments, isPending: isDeleting } = useBulkDeleteDepartments();
@@ -109,6 +115,23 @@ export default function DepartmentsPage() {
   const sortedData = useMemo(() => {
     return getSortedData(filteredData);
   }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  const tanstackSorting = useMemo(
+    () => sortRules.map((rule) => ({ id: rule.field, desc: rule.direction === "desc" })),
+    [sortRules],
+  );
+  const handleTanstackSortingChange = (
+    updater:
+      | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
+      | { id: string; desc: boolean }[],
+  ) => {
+    let nextSorting = typeof updater === "function" ? updater(tanstackSorting) : updater;
+    const newSortRules = nextSorting.map((s: { id: string; desc: boolean }) => ({
+      field: s.id,
+      direction: (s.desc ? "desc" : "asc") as "asc" | "desc",
+    }));
+    setSortRules(newSortRules);
+  };
 
   if (!canRead) {
     return <NoPermission />;
@@ -155,6 +178,8 @@ export default function DepartmentsPage() {
               isLoading={isLoading}
               error={error}
               onActionClicked={onActionClicked}
+              sorting={tanstackSorting}
+              onSortingChange={handleTanstackSortingChange}
             />
           ) : (
             <div className="p-4">
@@ -162,9 +187,15 @@ export default function DepartmentsPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Departments.no_departments_found")}
+                empty={{
+                  title: t("Departments.create_first.title"),
+                  description: t("Departments.create_first.description"),
+                  add: t("Pages.Departments.add"),
+                  icons: [Building, Plus, Building],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(department) => (
-                  <DepartmentCard key={department.id} department={department} />
+                  <DepartmentCard department={department} onActionClicked={onActionClicked} />
                 )}
                 gridCols="3"
               />
@@ -199,15 +230,16 @@ export default function DepartmentsPage() {
           title={t("Departments.confirm_delete", { count: selectedRows.length })}
           description={t("Departments.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}
+          onCancel={() => selectedRows.length === 1 && viewMode === "cards" && setSelectedRows([])}
         />
       </DataPageLayout>
     </div>
   );
 }
 
-DepartmentsPage.messages = ["Notes", "Pages", "Departments", "General"];
+DepartmentsPage.messages = ["Metadata", "Notes", "Pages", "Departments", "General", "CommonStatus"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

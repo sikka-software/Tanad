@@ -17,7 +17,6 @@ import {
   DialogTrigger,
 } from "@/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Switch } from "@/ui/switch";
 import { Table, TableHeader, TableRow, TableHead, TableCell, TableBody } from "@/ui/table";
@@ -25,6 +24,7 @@ import { Textarea } from "@/ui/textarea";
 
 import ProtectedRoute from "@/components/app/ProtectedRoute";
 import TemplateEditor from "@/components/app/TemplateEditor";
+import { Input } from "@/components/ui/inputs/input";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -346,5 +346,3 @@ export default function TemplatesPage() {
     </ProtectedRoute>
   );
 }
-
-

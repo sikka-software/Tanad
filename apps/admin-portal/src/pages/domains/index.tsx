@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { Globe, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -6,7 +7,7 @@ import { useMemo, useState, useEffect } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
@@ -44,31 +45,35 @@ export default function DomainsPage() {
   const [actionableItem, setActionableItem] = useState<DomainUpdateData | null>(null);
   const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
+  // Permissions
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
-
+  // Loading
   const loadingSave = moduleHooks.useIsLoading();
   const setLoadingSave = moduleHooks.useSetIsLoading();
-
+  // Delete Dialog
   const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
   const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
-
+  // Selected Rows
   const selectedRows = moduleHooks.useSelectedRows();
   const setSelectedRows = moduleHooks.useSetSelectedRows();
-
+  const clearSelection = moduleHooks.useClearSelection();
+  // Column Visibility
   const columnVisibility = moduleHooks.useColumnVisibility();
   const setColumnVisibility = moduleHooks.useSetColumnVisibility();
-
-  const viewMode = moduleHooks.useViewMode();
-  const clearSelection = moduleHooks.useClearSelection();
+  // Sorting
   const sortRules = moduleHooks.useSortRules();
   const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
   const sortNullsFirst = moduleHooks.useSortNullsFirst();
-  const searchQuery = moduleHooks.useSearchQuery();
+  const setSortRules = moduleHooks.useSetSortRules();
+  // Filtering
   const filterConditions = moduleHooks.useFilterConditions();
   const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
   const getFilteredData = moduleHooks.useGetFilteredData();
   const getSortedData = moduleHooks.useGetSortedData();
+  // Misc
+  const searchQuery = moduleHooks.useSearchQuery();
+  const viewMode = moduleHooks.useViewMode();
 
   const { data: domains, isLoading, error } = useDomains();
   const { mutateAsync: deleteDomains, isPending: isDeleting } = useBulkDeleteDomains();
@@ -113,6 +118,23 @@ export default function DomainsPage() {
   const sortedData = useMemo(() => {
     return getSortedData(filteredData);
   }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  const tanstackSorting = useMemo(
+    () => sortRules.map((rule) => ({ id: rule.field, desc: rule.direction === "desc" })),
+    [sortRules],
+  );
+  const handleTanstackSortingChange = (
+    updater:
+      | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
+      | { id: string; desc: boolean }[],
+  ) => {
+    let nextSorting = typeof updater === "function" ? updater(tanstackSorting) : updater;
+    const newSortRules = nextSorting.map((s: { id: string; desc: boolean }) => ({
+      field: s.id,
+      direction: (s.desc ? "desc" : "asc") as "asc" | "desc",
+    }));
+    setSortRules(newSortRules);
+  };
 
   if (!canRead) {
     return <NoPermission />;
@@ -162,6 +184,8 @@ export default function DomainsPage() {
               isLoading={isLoading}
               error={error}
               onActionClicked={onActionClicked}
+              sorting={tanstackSorting}
+              onSortingChange={handleTanstackSortingChange}
             />
           ) : (
             <div className="p-4">
@@ -169,8 +193,16 @@ export default function DomainsPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Domains.no_domains_found")}
-                renderItem={(domain) => <DomainCard key={domain.id} domain={domain} />}
+                empty={{
+                  title: t("Domains.create_first.title"),
+                  description: t("Domains.create_first.description"),
+                  add: t("Pages.Domains.add"),
+                  icons: [Globe, Plus, Globe],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
+                renderItem={(domain) => (
+                  <DomainCard key={domain.id} domain={domain} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>
@@ -204,15 +236,24 @@ export default function DomainsPage() {
           title={t("Domains.confirm_delete", { count: selectedRows.length })}
           description={t("Domains.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}
+          onCancel={() => selectedRows.length === 1 && viewMode === "cards" && setSelectedRows([])}
         />
       </DataPageLayout>
     </div>
   );
 }
 
-DomainsPage.messages = ["Pages", "Domains", "Notes", "General"];
+DomainsPage.messages = [
+  "Metadata",
+  "Pages",
+  "Domains",
+  "Notes",
+  "CommonStatus",
+  "PaymentCycles",
+  "General",
+];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

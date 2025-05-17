@@ -11,11 +11,10 @@ import { useDepartments } from "@/department/department.hooks";
 
 import { useUpdateEmployee } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
-import { Employee, EmployeeStatusProps, EmployeeUpdateData } from "@/employee/employee.types";
+import { Employee, EmployeeUpdateData } from "@/employee/employee.types";
 
 import useUserStore from "@/stores/use-user-store";
 
-import useOfficeStore from "../office/office.store";
 import useEmployeeColumns from "./employee.columns";
 
 const EmployeesTable = ({
@@ -70,7 +69,7 @@ const EmployeesTable = ({
 
   if (isLoading) {
     return (
-      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
+      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={12} />
     );
   }
 

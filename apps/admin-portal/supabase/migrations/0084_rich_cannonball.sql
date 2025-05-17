@@ -1,0 +1,2 @@
+ALTER TABLE "trucks" ALTER COLUMN "ownership_status" SET DEFAULT 'owned'::"public"."vehicle_ownership_status";--> statement-breakpoint
+ALTER TABLE "trucks" ALTER COLUMN "ownership_status" SET DATA TYPE "public"."vehicle_ownership_status" USING "ownership_status"::"public"."vehicle_ownership_status";

@@ -1,5 +1,7 @@
 import { Check, Zap } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
+
+import { Button } from "@/ui/button";
 //  UI
 import {
   DialogTitle,
@@ -9,7 +11,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/ui/dialog";
-import { Button } from "@/ui/button";
 
 type UpgradeDialogProps = {
   open: boolean;
@@ -17,37 +18,28 @@ type UpgradeDialogProps = {
   onUpgrade: () => void;
 };
 
-const UpgradeDialog = ({
-  open,
-  onOpenChange,
-  onUpgrade,
-}: UpgradeDialogProps) => {
+const UpgradeDialog = ({ open, onOpenChange, onUpgrade }: UpgradeDialogProps) => {
   const t = useTranslations();
   const lang = useLocale();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="sm:max-w-[425px]"
-        dir={lang === "ar" ? "rtl" : "ltr"}
-      >
+      <DialogContent className="sm:max-w-[425px]" dir={lang === "ar" ? "rtl" : "ltr"}>
         <DialogHeader>
           <DialogTitle>{t("Billing.upgrade_dialog.title")}</DialogTitle>
-          <DialogDescription>
-            {t("Billing.upgrade_dialog.description")}
-          </DialogDescription>
+          <DialogDescription>{t("Billing.upgrade_dialog.description")}</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-[25px_1fr] items-start gap-2 text-sm">
-            <Check className="h-5 w-5 text-primary" />
+            <Check className="text-primary h-5 w-5" />
             <span>{t("Billing.upgrade_dialog.unlimited_puklas")}</span>
           </div>
           <div className="grid grid-cols-[25px_1fr] items-start gap-2 text-sm">
-            <Check className="h-5 w-5 text-primary" />
+            <Check className="text-primary h-5 w-5" />
             <span>{t("Billing.upgrade_dialog.custom_design_and_colors")}</span>
           </div>
           <div className="grid grid-cols-[25px_1fr] items-start gap-2 text-sm">
-            <Check className="h-5 w-5 text-primary" />
+            <Check className="text-primary h-5 w-5" />
             <span>{t("Billing.upgrade_dialog.advanced_analytics")}</span>
           </div>
         </div>

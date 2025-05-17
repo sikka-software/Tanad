@@ -78,35 +78,3 @@ export async function updateSalary(id: string, data: SalaryUpdateData): Promise<
     throw new Error("Failed to update salary");
   }
 }
-
-export async function deleteSalary(id: string): Promise<void> {
-  try {
-    const response = await fetch(`/api/resource/salaries/${id}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to delete salary");
-    }
-  } catch (error) {
-    console.error("Error deleting salary:", error);
-    throw new Error("Failed to delete salary");
-  }
-}
-
-export async function bulkDeleteSalaries(ids: string[]): Promise<void> {
-  try {
-    const response = await fetch("/api/resource/salaries/bulk-delete", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ids }),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to delete salaries");
-    }
-  } catch (error) {
-    console.error("Error deleting salaries:", error);
-    throw new Error("Failed to delete salaries");
-  }
-}

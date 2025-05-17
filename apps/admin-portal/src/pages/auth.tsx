@@ -1,9 +1,9 @@
-import type { Session } from "@supabase/supabase-js";
 import { pick } from "lodash";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import getConfig from "next/config";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -11,7 +11,6 @@ import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
-import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import LanguageSwitcher from "@/ui/language-switcher";
 import ThemeSwitcher from "@/ui/theme-switcher";
@@ -19,6 +18,7 @@ import ThemeSwitcher from "@/ui/theme-switcher";
 import { createClient } from "@/utils/supabase/component";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import { Input } from "@/components/ui/inputs/input";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -36,25 +36,23 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const { publicRuntimeConfig } = getConfig();
+  const version = publicRuntimeConfig?.version;
+
+  const profile = useUserStore((state) => state.profile);
   const user = useUserStore((state) => state.user);
-  const loadingUser = useUserStore((state) => state.loading);
-  const [supabaseSession, setSupabaseSession] = useState<Session | null>(null);
+  const enterprise = useUserStore((state) => state.enterprise);
 
   useEffect(() => {
-    // Always check session directly from Supabase
-    supabase.auth.getSession().then(({ data }) => {
-      setSupabaseSession(data.session);
-    });
-  }, [user, loadingUser]);
+    if (user?.id && profile?.id && enterprise?.id) {
+      router.push("/dashboard");
+    }
+  }, [user, profile, enterprise]);
 
   useEffect(() => {
     setIsSignUp(router.asPath.includes("#signup"));
-    if (user && !loadingUser && supabaseSession && router.pathname === "/auth") {
-      const redirectPath = sessionStorage.getItem("redirectAfterAuth") || "/dashboard";
-      sessionStorage.removeItem("redirectAfterAuth");
-      window.location.href = redirectPath;
-    }
-  }, [user, loadingUser, supabaseSession, router]);
+  }, [router]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -392,6 +390,8 @@ export default function Auth() {
           </Card>
           <div className="flex flex-row justify-between">
             <LanguageSwitcher />
+            <div className="text-muted-foregrond text-xs">v{version}</div>
+
             <ThemeSwitcher />
           </div>
         </div>
@@ -400,9 +400,9 @@ export default function Auth() {
   );
 }
 
-Auth.messages = ["Pages", "Auth", "General", "SEO"];
+Auth.messages = ["Metadata", "Pages", "Auth", "General", "SEO"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Auth.messages),

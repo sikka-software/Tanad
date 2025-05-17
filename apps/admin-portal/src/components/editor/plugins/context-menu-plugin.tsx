@@ -56,7 +56,7 @@ export class ContextMenuOption extends MenuOption {
 
 export function ContextMenuPlugin(): JSX.Element {
   const t = useTranslations();
-  const locale = useLocale();
+  const lang = useLocale();
   const [editor] = useLexicalComposerContext();
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -211,7 +211,7 @@ export function ContextMenuPlugin(): JSX.Element {
                   }}
                 />
                 <PopoverContent
-                  dir={locale === "ar" ? "rtl" : "ltr"}
+                  dir={lang === "ar" ? "rtl" : "ltr"}
                   className="w-[100px] p-1"
                   onWheel={(e) => e.stopPropagation()}
                 >

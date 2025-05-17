@@ -1,83 +1,99 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import { getNotesValue } from "@root/src/lib/utils";
+import { parseDate } from "@internationalized/date";
+import { createInsertSchema } from "drizzle-zod";
 import { useTranslations, useLocale } from "next-intl";
-import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import { useForm, useFieldArray, FieldValues, FieldError } from "react-hook-form";
+import { useState, useEffect, useCallback } from "react";
+import React from "react";
+import { useForm, useFieldArray, FieldError, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { FormDialog } from "@/ui/form-dialog";
-import { Input } from "@/ui/input";
+import FormDialog from "@/ui/form-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
-import { createClient } from "@/utils/supabase/component";
+import NotesSection from "@/components/forms/notes-section";
+import ProductsFormSection from "@/components/forms/products-form-section";
+import CodeInput from "@/components/ui/inputs/code-input";
+import { DateInput } from "@/components/ui/inputs/date-input";
+import NumberInput from "@/components/ui/inputs/number-input";
 
-import { ProductsFormSection } from "@/components/forms/products-form-section";
-import CodeInput from "@/components/ui/code-input";
+import { getNotesValue, validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
-import { ClientForm } from "@/client/client.form";
+import ClientCombobox from "@/client/client.combobox";
+import { useClients } from "@/client/client.hooks";
+import useClientStore from "@/client/client.store";
 
-import { useInvoices } from "@/modules/invoice/invoice.hooks";
+import { useInvoices } from "@/invoice/invoice.hooks";
+import { useCreateInvoice, useUpdateInvoice } from "@/invoice/invoice.hooks";
+import useInvoiceStore from "@/invoice/invoice.store";
 import {
   InvoiceUpdateData,
   InvoiceCreateData,
   InvoiceItem,
   InvoiceStatus,
-} from "@/modules/invoice/invoice.type";
+} from "@/invoice/invoice.type";
+
+import { ProductForm } from "@/product/product.form";
+import { useProducts } from "@/product/product.hooks";
+import useProductStore from "@/product/product.store";
+
+import { invoices } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
-import { useClients } from "../client/client.hooks";
-import useClientStore from "../client/client.store";
-import { useCreateInvoice, useUpdateInvoice } from "../invoice/invoice.hooks";
-import useInvoiceStore from "../invoice/invoice.store";
-import { ProductForm } from "../product/product.form";
-import { useProducts } from "../product/product.hooks";
-import useProductStore from "../product/product.store";
-
-const createInvoiceSchema = (t: (key: string) => string) =>
-  z.object({
-    client_id: z.string().min(1, t("Invoices.form.client.required")),
+const createInvoiceSchema = (t: (key: string) => string) => {
+  const InvoiceSelectSchema = createInsertSchema(invoices, {
+    client_id: z
+      .string({
+        message: t("Invoices.form.client.required"),
+      })
+      .min(1, t("Invoices.form.client.required")),
     invoice_number: z.string().min(1, t("Invoices.form.invoice_number.required")),
-    issue_date: z.date({
-      required_error: t("Invoices.form.issue_date.required"),
-    }),
-    due_date: z.date({
-      required_error: t("Invoices.form.due_date.required"),
-    }),
+
+    issue_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Invoices.form.issue_date.invalid")),
+    due_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Invoices.form.due_date.invalid")),
+
     status: z.enum(InvoiceStatus, {
       message: t("Invoices.form.status.required"),
     }),
     subtotal: z.number().min(0, t("Invoices.form.subtotal.required")),
     tax_rate: z.number().min(0, t("Invoices.form.tax_rate.required")),
     notes: z.any().optional().nullable(),
-    items: z
-      .array(
-        z.object({
-          product_id: z.string().optional(),
-          description: z.string(),
-          quantity: z
-            .number({ invalid_type_error: t("ProductsFormSection.quantity.invalid") })
-            .min(1, t("ProductsFormSection.quantity.required")),
-          unit_price: z
-            .number({ invalid_type_error: t("ProductsFormSection.unit_price.invalid") })
-            .min(0, t("ProductsFormSection.unit_price.required")),
-        }),
-      )
-      .min(1, t("ProductsFormSection.items.required"))
-      .refine(
-        (items) => items.every((item) => item.description?.trim() !== "" || item.product_id),
-        t("ProductsFormSection.items.required"),
-      ),
   });
 
-export type InvoiceFormValues = z.infer<ReturnType<typeof createInvoiceSchema>>;
+  const InvoiceItemsSchema = z
+    .array(
+      z.object({
+        product_id: z.string().optional(),
+        description: z.string(),
+        quantity: z
+          .number({ invalid_type_error: t("ProductsFormSection.quantity.invalid") })
+          .min(1, t("ProductsFormSection.quantity.required")),
+        unit_price: z
+          .number({ invalid_type_error: t("ProductsFormSection.unit_price.invalid") })
+          .min(0, t("ProductsFormSection.unit_price.required")),
+      }),
+    )
+    .min(1, t("ProductsFormSection.items.required"))
+    .refine(
+      (items) => items.every((item) => item.description?.trim() !== "" || item.product_id),
+      t("ProductsFormSection.items.required"),
+    );
+
+  return InvoiceSelectSchema.extend({
+    items: InvoiceItemsSchema,
+  });
+};
+
+export type InvoiceFormValues = z.input<ReturnType<typeof createInvoiceSchema>>;
 
 export function InvoiceForm({
   formHtmlId,
@@ -88,35 +104,35 @@ export function InvoiceForm({
 }: ModuleFormProps<InvoiceUpdateData | InvoiceCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
-  const { profile, membership } = useUserStore();
+
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+
   const { mutateAsync: createInvoice } = useCreateInvoice();
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
 
-  const isProductSaving = useProductStore((state) => state.isLoading);
-  const setIsProductSaving = useProductStore((state) => state.setIsLoading);
+  const isSavingInvoice = useInvoiceStore((state) => state.isLoading);
+  const setIsSavingInvoice = useInvoiceStore((state) => state.setIsLoading);
 
-  const isClientSaving = useClientStore((state) => state.isLoading);
-  const setIsClientSaving = useClientStore((state) => state.setIsLoading);
+  const isSavingProduct = useProductStore((state) => state.isLoading);
+  const setIsSavingProduct = useProductStore((state) => state.setIsLoading);
+
+  const isSavingClient = useClientStore((state) => state.isLoading);
+  const setIsSavingClient = useClientStore((state) => state.setIsLoading);
 
   const { data: invoices } = useInvoices();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
 
-  const { data: products, isLoading: productsLoading } = useProducts();
-  const { data: clients, isLoading: clientsLoading } = useClients();
-
-  const isLoading = useInvoiceStore((state) => state.isLoading);
-  const setIsLoading = useInvoiceStore((state) => state.setIsLoading);
+  const { data: products, isLoading: isFetchingProducts } = useProducts();
+  const { data: clients, isLoading: isFetchingClients } = useClients();
 
   const formDefaultValues = {
+    // ...defaultValues,
     client_id: defaultValues?.client_id || "",
     invoice_number: defaultValues?.invoice_number || "",
-    issue_date: defaultValues?.issue_date
-      ? new Date(defaultValues.issue_date as string)
-      : new Date(),
-    due_date: defaultValues?.due_date
-      ? new Date(defaultValues.due_date as string)
-      : new Date(new Date().setDate(new Date().getDate() + 30)),
+    issue_date: defaultValues?.issue_date ? new Date(defaultValues.issue_date) : undefined,
+    due_date: defaultValues?.due_date ? new Date(defaultValues.due_date) : undefined,
     status: defaultValues?.status || "draft",
     subtotal: defaultValues?.subtotal || 0,
     tax_rate: defaultValues?.tax_rate || 0,
@@ -128,7 +144,7 @@ export function InvoiceForm({
           quantity: item.quantity,
           unit_price: item.unit_price,
         }))
-      : [{ product_id: "", description: "", quantity: 1, unit_price: 0 }],
+      : [{ product_id: "", description: "", quantity: 1, unit_price: 0.0 }],
   };
 
   const form = useForm<InvoiceFormValues>({
@@ -141,23 +157,30 @@ export function InvoiceForm({
     name: "items",
   });
 
-  // Add this new function to calculate subtotal
-  const calculateSubtotal = (items: InvoiceFormValues["items"]) => {
+  const watchedItems = useWatch({
+    control: form.control,
+    name: "items",
+    defaultValue: form.getValues("items"),
+  });
+
+  const calculateSubtotal = useCallback((items: InvoiceFormValues["items"]) => {
     return items.reduce((sum, item) => {
       const quantity = item.quantity || 0;
       const price = item.unit_price || 0;
-      return sum + quantity * price;
+      const numericQuantity = Number(quantity);
+      const numericPrice = Number(price);
+      if (isNaN(numericQuantity) || isNaN(numericPrice)) {
+        return sum;
+      }
+      return sum + numericQuantity * numericPrice;
     }, 0);
-  };
-
-  // Watch items and tax_rate for changes to update totals
-  const watchedItems = form.watch("items");
-  const watchedTaxRate = form.watch("tax_rate");
+  }, []);
 
   useEffect(() => {
-    const subtotal = calculateSubtotal(watchedItems);
-    form.setValue("subtotal", subtotal);
-  }, [watchedItems, form]);
+    const itemsToCalculate = Array.isArray(watchedItems) ? watchedItems : [];
+    const newSubtotal = calculateSubtotal(itemsToCalculate);
+    form.setValue("subtotal", newSubtotal, { shouldValidate: true, shouldDirty: true });
+  }, [watchedItems, calculateSubtotal, form.setValue]);
 
   const handleProductSelection = (index: number, product_id: string) => {
     const selectedProduct = products?.find((product) => product.id === product_id);
@@ -168,12 +191,12 @@ export function InvoiceForm({
   };
 
   const handleSubmit = async (data: InvoiceFormValues) => {
-    setIsLoading(true);
-    if (!profile?.id) {
+    setIsSavingInvoice(true);
+    if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
-      setIsLoading(false);
+      setIsSavingInvoice(false);
       return;
     }
 
@@ -240,7 +263,7 @@ export function InvoiceForm({
         description: editMode ? t("Invoices.error.update") : t("Invoices.error.create"),
       });
     } finally {
-      setIsLoading(false);
+      setIsSavingInvoice(false);
     }
   };
 
@@ -248,44 +271,50 @@ export function InvoiceForm({
     (window as any).invoiceForm = form;
   }
 
-  // Format clients for ComboboxAdd
-  const clientOptions = clients?.map((client) => ({
-    label: client.company ? `${client.name} (${client.company})` : client.name,
-    value: client.id,
-  }));
-
   return (
     <>
       <Form {...form}>
-        <form id={formHtmlId || "invoice-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+        <form
+          id={formHtmlId || "invoice-form"}
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit(handleSubmit)(e);
+          }}
+        >
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
-                name="client_id"
+                name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Invoices.form.client.label")} *</FormLabel>
-                    <FormControl>
-                      <ComboboxAdd
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={clientOptions || []}
-                        isLoading={clientsLoading}
-                        defaultValue={field.value}
-                        onChange={(value) => field.onChange(value || null)}
-                        texts={{
-                          placeholder: t("Invoices.form.client.select_client"),
-                          searchPlaceholder: t("Invoices.form.client.search_clients"),
-                          noItems: t("Invoices.form.client.no_clients"),
-                        }}
-                        addText={t("Invoices.form.client.add_new_client")}
-                        onAddClick={() => setIsDialogOpen(true)}
-                      />
-                    </FormControl>
+                    <FormLabel>{t("Invoices.form.status.label")} *</FormLabel>
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Invoices.form.status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        {InvoiceStatus.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`Invoices.form.status.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="invoice_number"
@@ -309,57 +338,10 @@ export function InvoiceForm({
                           }
                           form.setValue("invoice_number", `INV-${randomCode}`);
                         }}
-                      >
-                        <Input
-                          placeholder={t("Invoices.form.invoice_number.placeholder")}
-                          {...field}
-                          disabled={isLoading}
-                        />
-                      </CodeInput>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="subtotal"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Invoices.form.subtotal.label")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={field.value.toFixed(2)}
-                        readOnly
-                        disabled
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="tax_rate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Invoices.form.tax_rate.label")} (%)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        max="100"
-                        {...field}
-                        onChange={(e) => {
-                          const value = parseFloat(e.target.value);
-                          field.onChange(isNaN(value) ? 0 : value);
+                        inputProps={{
+                          placeholder: t("Invoices.form.invoice_number.placeholder"),
+                          disabled: isSavingInvoice,
+                          ...field,
                         }}
                       />
                     </FormControl>
@@ -367,21 +349,50 @@ export function InvoiceForm({
                   </FormItem>
                 )}
               />
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <ClientCombobox
+                label={t("Invoices.form.client.label")}
+                control={form.control}
+                clients={clients || []}
+                loadingCombobox={isFetchingClients}
+                isSaving={isSavingClient}
+                isDialogOpen={isDialogOpen}
+                setIsDialogOpen={setIsDialogOpen}
+              />
+              <FormField
+                control={form.control}
+                name="tax_rate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Invoices.form.tax_rate.label")} (%)</FormLabel>
+                    <FormControl>
+                      <NumberInput
+                        disabled={isSavingInvoice}
+                        placeholder={t("Forms.zip_code.placeholder")}
+                        {...field}
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="issue_date"
-                render={({ field: { value, onChange, ...field } }) => (
-                  <FormItem>
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
                     <FormLabel>{t("Invoices.form.issue_date.label")} *</FormLabel>
                     <FormControl>
-                      <DatePicker
-                        date={value}
-                        onSelect={onChange}
+                      <DateInput
                         placeholder={t("Invoices.form.issue_date.placeholder")}
-                        ariaInvalid={form.formState.errors.issue_date !== undefined}
+                        value={
+                          typeof field.value === "string"
+                            ? parseDate(field.value)
+                            : (field.value ?? null)
+                        }
+                        onChange={field.onChange}
+                        onSelect={(e) => field.onChange(e)}
+                        disabled={isSavingInvoice}
                       />
                     </FormControl>
                     <FormMessage />
@@ -392,15 +403,20 @@ export function InvoiceForm({
               <FormField
                 control={form.control}
                 name="due_date"
-                render={({ field: { value, onChange, ...field } }) => (
-                  <FormItem>
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
                     <FormLabel>{t("Invoices.form.due_date.label")} *</FormLabel>
                     <FormControl>
-                      <DatePicker
-                        date={value}
-                        onSelect={onChange}
+                      <DateInput
                         placeholder={t("Invoices.form.due_date.placeholder")}
-                        ariaInvalid={form.formState.errors.due_date !== undefined}
+                        value={
+                          typeof field.value === "string"
+                            ? parseDate(field.value)
+                            : (field.value ?? null)
+                        }
+                        onChange={field.onChange}
+                        onSelect={(e) => field.onChange(e)}
+                        disabled={isSavingInvoice}
                       />
                     </FormControl>
                     <FormMessage />
@@ -408,36 +424,6 @@ export function InvoiceForm({
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Invoices.form.status.label")} *</FormLabel>
-                  <Select
-                    defaultValue={field.value}
-                    onValueChange={field.onChange}
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("Invoices.form.status.placeholder")} />
-                      </SelectTrigger>
-                    </FormControl>
-
-                    <SelectContent>
-                      {InvoiceStatus.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {t(`Invoices.form.status.${status}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
 
           <ProductsFormSection
@@ -448,8 +434,9 @@ export function InvoiceForm({
             onAddNewProduct={() => setIsNewProductDialogOpen(true)}
             handleProductSelection={handleProductSelection}
             title={t("ProductsFormSection.title")}
-            isLoading={isLoading}
+            isFetching={isFetchingProducts}
             isError={form.formState.errors.items as FieldError}
+            disabled={isSavingInvoice}
           />
           <NotesSection
             inDialog={editMode || nestedForm}
@@ -459,7 +446,7 @@ export function InvoiceForm({
         </form>
       </Form>
 
-      <FormDialog
+      {/* <FormDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         title={t("Pages.Clients.add")}
@@ -476,7 +463,7 @@ export function InvoiceForm({
             setIsClientSaving(false);
           }}
         />
-      </FormDialog>
+      </FormDialog> */}
       <FormDialog
         open={isNewProductDialogOpen}
         onOpenChange={setIsNewProductDialogOpen}
@@ -484,14 +471,14 @@ export function InvoiceForm({
         formId="product-form"
         cancelText={t("cancel")}
         submitText={t("save")}
-        loadingSave={isProductSaving}
+        loadingSave={isSavingProduct}
       >
         <ProductForm
           formHtmlId="product-form"
           nestedForm
           onSuccess={() => {
             setIsNewProductDialogOpen(false);
-            setIsProductSaving(false);
+            setIsSavingProduct(false);
           }}
         />
       </FormDialog>

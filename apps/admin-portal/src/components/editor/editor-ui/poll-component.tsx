@@ -19,7 +19,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, JSX } from "react";
 import type { Option, Options, PollNode } from "@/components/editor/nodes/poll-node";
 import { $isPollNode, createPollOption } from "@/components/editor/nodes/poll-node";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 
 function getTotalVotes(options: Options): number {
   return options.reduce((totalVotes, next) => {
@@ -74,7 +74,7 @@ function PollOptionComponent({
           className="transition-width bg-accent absolute top-0 left-0 z-0 h-full duration-1000 ease-in-out"
           style={{ width: `${votes === 0 ? 0 : (votes / totalVotes) * 100}%` }}
         />
-        <span className="text-primary absolute top-1.5 end-4 text-xs">
+        <span className="text-primary absolute end-4 top-1.5 text-xs">
           {votes > 0 && (votes === 1 ? "1 vote" : `${votes} votes`)}
         </span>
         <Input

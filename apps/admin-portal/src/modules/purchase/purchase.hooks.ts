@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createPurchase,
-  deletePurchase,
   fetchPurchaseById,
   fetchPurchases,
   updatePurchase,
-  bulkDeletePurchases,
   duplicatePurchase,
 } from "@/purchase/purchase.service";
 import type { Purchase, PurchaseCreateData, PurchaseUpdateData } from "@/purchase/purchase.type";
@@ -40,19 +40,10 @@ export function usePurchase(id: string) {
 // Hook for creating a new purchase
 export function useCreatePurchase() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (newPurchase: PurchaseCreateData & { user_id: string }) => {
-      // Map user_id to user_id for the service function
-      const { user_id, ...rest } = newPurchase;
-      const purchaseData: PurchaseCreateData = {
-        ...rest,
-        user_id: user_id,
-      };
-      return createPurchase(purchaseData);
-    },
+    mutationFn: (newPurchase: PurchaseCreateData) => createPurchase(newPurchase),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() }),
-    meta: { toast: { success: "Offices.success.create", error: "Offices.error.create" } },
+    meta: { toast: { success: "Purchases.success.create", error: "Purchases.error.create" } },
   });
 }
 
@@ -133,7 +124,7 @@ export function useDeletePurchase() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deletePurchase(id),
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/purchases/${id}`),
     onSuccess: (_, variables) => {
       // Invalidate the list and remove the specific detail query from cache
       queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() });
@@ -148,7 +139,7 @@ export function useBulkDeletePurchases() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: bulkDeletePurchases,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/purchases", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() }),
     meta: { toast: { success: "Purchases.success.delete", error: "Purchases.error.delete" } },
   });

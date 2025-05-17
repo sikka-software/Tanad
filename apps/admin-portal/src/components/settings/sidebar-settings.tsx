@@ -26,7 +26,7 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card";
 import { Switch } from "@/ui/switch";
 
-import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
+import { useUpdateProfile } from "@/hooks/use-profile";
 
 import { getMenuList, applyCustomMenuOrder, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
@@ -123,14 +123,9 @@ const SidebarSettings = ({
   const [isDirty, setIsDirty] = useState(false);
   const [menuList, setMenuList] = useState(getMenuList(pathname));
 
-  // Get user from the existing store to get profile_id
-  const { user } = useUserStore();
-  const profile_id = user?.id || "";
+  const user = useUserStore((state) => state.user);
+  const profile = useUserStore((state) => state.profile);
 
-  // Use the profile hook to fetch data
-  const { data: profile } = useProfile(profile_id);
-
-  // Initialize the update mutation
   const updateProfileMutation = useUpdateProfile();
 
   const sensors = useSensors(
@@ -307,8 +302,8 @@ const SidebarSettings = ({
       const currentUserSettings = profile?.user_settings || {};
 
       // Save menu configuration to profile
-      const result = await updateProfileMutation.mutateAsync({
-        profile_id,
+      await updateProfileMutation.mutateAsync({
+        id: user?.id || "",
         data: {
           user_settings: {
             ...currentUserSettings,

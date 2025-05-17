@@ -1,7 +1,9 @@
 import { pick } from "lodash";
+import { Plus, User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
 
 import { buttonVariants } from "@/ui/button";
@@ -19,10 +21,15 @@ import VendorCard from "@/vendor/vendor.card";
 import { useVendors } from "@/vendor/vendor.hooks";
 import { Vendor } from "@/vendor/vendor.type";
 
+import { useCompanies } from "@/modules/company/company.hooks";
+import { Company } from "@/modules/company/company.type";
+
 export default function ContactsPage() {
   const t = useTranslations();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"clients" | "vendors">("clients");
 
+  const { data: companies } = useCompanies();
   const { data: clients, isLoading: clientsLoading, error: clientsError } = useClients();
   const { data: vendors, isLoading: vendorsLoading, error: vendorsError } = useVendors();
 
@@ -64,8 +71,20 @@ export default function ContactsPage() {
               data={clients as Client[]}
               isLoading={clientsLoading}
               error={clientsError instanceof Error ? clientsError : null}
-              emptyMessage={t("Clients.no_clients_found")}
-              renderItem={(client) => <ClientCard client={client} />}
+              empty={{
+                title: t("Clients.create_first.title"),
+                description: t("Clients.create_first.description"),
+                add: t("Pages.Clients.add"),
+                icons: [User, Plus, User],
+                onClick: () => router.push(router.pathname + "/add"),
+              }}
+              renderItem={(client) => (
+                <ClientCard
+                  client={client}
+                  company={companies?.find((company) => company.id === client.company) as Company}
+                  onActionClicked={() => console.log("TODO")}
+                />
+              )}
               gridCols="3"
             />
           </TabsContent>
@@ -75,8 +94,16 @@ export default function ContactsPage() {
               data={vendors as Vendor[]}
               isLoading={vendorsLoading}
               error={vendorsError instanceof Error ? vendorsError : null}
-              emptyMessage={t("Vendors.no_vendors")}
-              renderItem={(vendor) => <VendorCard vendor={vendor} />}
+              empty={{
+                title: t("Vendors.create_first.title"),
+                description: t("Vendors.create_first.description"),
+                add: t("Pages.Vendors.add"),
+                icons: [User, Plus, User],
+                onClick: () => router.push(router.pathname + "/add"),
+              }}
+              renderItem={(vendor) => (
+                <VendorCard vendor={vendor} onActionClicked={() => console.log("TODO")} />
+              )}
               gridCols="3"
             />
           </TabsContent>
@@ -86,9 +113,9 @@ export default function ContactsPage() {
   );
 }
 
-ContactsPage.messages = ["Pages", "General", "Contacts"];
+ContactsPage.messages = ["Metadata", "Pages", "General", "Contacts"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, ContactsPage.messages),

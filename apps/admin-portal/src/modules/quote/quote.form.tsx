@@ -1,21 +1,23 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { format } from "date-fns";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { FieldError, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import CodeInput from "@/ui/code-input";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { FormDialog } from "@/ui/form-dialog";
-import { Input } from "@/ui/input";
+import FormDialog from "@/ui/form-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
-import NotesSection from "@/components/forms/notes-section";
-import { ProductsFormSection } from "@/components/forms/products-form-section";
+import CodeInput from "@/components/ui/inputs/code-input";
+import { Input } from "@/components/ui/inputs/input";
+
+import NotesSection from "@/forms/notes-section";
+import ProductsFormSection from "@/forms/products-form-section";
 
 import { getNotesValue } from "@/lib/utils";
 
@@ -38,10 +40,13 @@ import {
   QuoteStatus,
 } from "@/quote/quote.type";
 
+import { quotes } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
-const createQuoteFormSchema = (t: (key: string) => string) =>
-  z.object({
+import ClientCombobox from "../client/client.combobox";
+
+const createQuoteSchema = (t: (key: string) => string) => {
+  const QuoteSelectSchema = createInsertSchema(quotes, {
     client_id: z.string().min(1, t("Quotes.validation.client_required")),
     quote_number: z.string().min(1, t("Quotes.validation.quote_number_required")),
     issue_date: z.string().min(1, t("Quotes.validation.issue_date_required")),
@@ -51,24 +56,30 @@ const createQuoteFormSchema = (t: (key: string) => string) =>
     }),
     tax_rate: z.number().min(0, t("Quotes.validation.tax_rate_positive")),
     notes: z.any().optional().nullable(),
-    items: z
-      .array(
-        z.object({
-          product_id: z.string().optional(),
-          description: z.string().optional(),
-          quantity: z
-            .number({ invalid_type_error: t("Quotes.validation.item_quantity_invalid") })
-            .min(1, t("Quotes.validation.item_quantity_positive")),
-          unit_price: z
-            .number({ invalid_type_error: t("Quotes.validation.item_price_invalid") })
-            .min(0, t("Quotes.validation.item_price_positive")),
-          id: z.string().optional(),
-        }),
-      )
-      .min(1, t("Quotes.validation.items_required")),
   });
 
-export type QuoteFormValues = z.input<ReturnType<typeof createQuoteFormSchema>>;
+  const QuoteItemsSchema = z
+    .array(
+      z.object({
+        product_id: z.string().optional(),
+        description: z.string().optional(),
+        quantity: z
+          .number({ invalid_type_error: t("Quotes.validation.item_quantity_invalid") })
+          .min(1, t("Quotes.validation.item_quantity_positive")),
+        unit_price: z
+          .number({ invalid_type_error: t("Quotes.validation.item_price_invalid") })
+          .min(0, t("Quotes.validation.item_price_positive")),
+        id: z.string().optional(),
+      }),
+    )
+    .min(1, t("Quotes.validation.items_required"));
+
+  return QuoteSelectSchema.extend({
+    items: QuoteItemsSchema,
+  });
+};
+
+export type QuoteFormValues = z.input<ReturnType<typeof createQuoteSchema>>;
 
 export function QuoteForm({
   formHtmlId,
@@ -79,8 +90,8 @@ export function QuoteForm({
   const t = useTranslations();
   const locale = useLocale();
 
-  const profile = useUserStore((state) => state.profile);
-  const membership = useUserStore((state) => state.membership);
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
 
   const { data: clients = [], isLoading: clientsLoading } = useClients();
 
@@ -93,15 +104,15 @@ export function QuoteForm({
 
   const setIsLoading = useQuoteStore((state) => state.setIsLoading);
   const isLoading = useQuoteStore((state) => state.isLoading);
-  const setIsClientSaving = useClientStore((state) => state.setIsLoading);
-  const isClientSaving = useClientStore((state) => state.isLoading);
+  const setIsSavingClient = useClientStore((state) => state.setIsLoading);
+  const isSavingClient = useClientStore((state) => state.isLoading);
   const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
 
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
   const [productsLoading, setProductsLoading] = useState(true);
 
   const form = useForm<QuoteFormValues>({
-    resolver: zodResolver(createQuoteFormSchema(t)),
+    resolver: zodResolver(createQuoteSchema(t)),
     defaultValues: {
       client_id: defaultValues?.client_id || "",
       quote_number: defaultValues?.quote_number || "",
@@ -141,11 +152,6 @@ export function QuoteForm({
     }, 0);
   }, [watchedItems]);
 
-  const clientOptions = clients.map((client) => ({
-    value: client.id,
-    label: `${client.name}${client.company ? ` (${client.company})` : ""}`,
-  }));
-
   const handleProductSelection = (index: number, product_id: string | undefined) => {
     if (!product_id) return;
     const product = products.find((p) => p.id === product_id);
@@ -157,7 +163,7 @@ export function QuoteForm({
 
   const handleSubmit = async (formData: QuoteFormValues) => {
     setIsLoading(true);
-    if (!profile?.id || !membership?.enterprise_id) {
+    if (!user?.id || !enterprise?.id) {
       toast.error(t("Authentication.login_required_enterprise"));
       setIsLoading(false);
       return;
@@ -183,6 +189,8 @@ export function QuoteForm({
     try {
       if (editMode && defaultValues && "id" in defaultValues && defaultValues.id) {
         const updatePayload: QuoteUpdateData = {
+          user_id: user.id,
+          enterprise_id: enterprise.id,
           id: defaultValues.id,
           client_id: formData.client_id,
           quote_number: formData.quote_number,
@@ -191,8 +199,6 @@ export function QuoteForm({
           status: formData.status,
           tax_rate: formData.tax_rate,
           notes: formData.notes,
-          user_id: profile.id,
-          enterprise_id: membership.enterprise_id,
           items: itemsToSubmitForUpdate,
         };
 
@@ -208,6 +214,8 @@ export function QuoteForm({
         );
       } else {
         const createPayload: QuoteCreateData = {
+          user_id: user.id,
+          enterprise_id: enterprise.id,
           client_id: formData.client_id,
           quote_number: formData.quote_number,
           issue_date: formData.issue_date,
@@ -215,8 +223,6 @@ export function QuoteForm({
           status: formData.status,
           tax_rate: formData.tax_rate,
           notes: formData.notes,
-          user_id: profile.id,
-          enterprise_id: membership.enterprise_id,
           items: itemsToSubmitForCreate,
         };
         await createQuote(createPayload, {
@@ -243,32 +249,19 @@ export function QuoteForm({
     <>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
+
           <div className="form-container">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <FormField
+              <ClientCombobox
+                label={t("Quotes.form.client.label")}
                 control={form.control}
-                name="client_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Quotes.form.client.label")} *</FormLabel>
-                    <FormControl>
-                      <ComboboxAdd
-                        data={clientOptions}
-                        isLoading={clientsLoading}
-                        defaultValue={field.value}
-                        onChange={(value) => field.onChange(value || null)}
-                        texts={{
-                          placeholder: t("Quotes.form.client.placeholder"),
-                          searchPlaceholder: t("Quotes.clients.search_clients"),
-                          noItems: t("Quotes.clients.no_clients"),
-                        }}
-                        addText={t("Pages.Clients.add")}
-                        onAddClick={() => setIsDialogOpen(true)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                clients={clients || []}
+                loadingCombobox={clientsLoading}
+                isSaving={isSavingClient}
+                isDialogOpen={isDialogOpen}
+                setIsDialogOpen={setIsDialogOpen}
               />
 
               <FormField
@@ -294,13 +287,12 @@ export function QuoteForm({
                           }
                           form.setValue("quote_number", `QT-${randomCode}`);
                         }}
-                      >
-                        <Input
-                          placeholder={t("Quotes.form.quote_number.placeholder")}
-                          {...field}
-                          disabled={isLoading}
-                        />
-                      </CodeInput>
+                        inputProps={{
+                          placeholder: t("Quotes.form.quote_number.placeholder"),
+                          disabled: isLoading,
+                          ...field,
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -498,7 +490,7 @@ export function QuoteForm({
           nestedForm
           formHtmlId="client-form-quote"
           onSuccess={() => {
-            setIsClientSaving(false);
+            setIsSavingClient(false);
             setIsClientDialogOpen(false);
           }}
         />

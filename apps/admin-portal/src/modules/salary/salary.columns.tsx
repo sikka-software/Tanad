@@ -1,16 +1,24 @@
-import CurrencyCell from "@root/src/components/tables/currency-cell";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import useUserStore from "@root/src/stores/use-user-store";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { useEmployees } from "../employee/employee.hooks";
-import { useUpdateSalary } from "./salary.hooks";
-import { Salary } from "./salary.type";
+import StatusCell from "@/components/tables/status-cell";
 
-const useSalaryColumns = () => {
+import CurrencyCell from "@/tables/currency-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { useEmployees } from "@/employee/employee.hooks";
+
+import { useUpdateSalary } from "@/salary/salary.hooks";
+import { Salary } from "@/salary/salary.type";
+
+import useUserStore from "@/stores/use-user-store";
+
+const useSalaryColumns = (
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
   const currency = useUserStore((state) => state.profile?.user_settings?.currency);
 
@@ -54,20 +62,60 @@ const useSalaryColumns = () => {
               noItems: t("Salaries.form.employee_name.no_employees"),
             }}
             addText={t("Pages.Employees.add")}
-            ariaInvalid={false}
           />
         );
       },
     },
     {
       accessorKey: "amount",
-      header: t("Salaries.form.gross_amount.label"),
+      header: t("Salaries.form.amount.label"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
     {
       accessorKey: "payment_date",
       header: t("Salaries.form.payment_date.label"),
       cell: ({ getValue }) => getValue() as string,
+    },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "status",
+      maxSize: 80,
+      header: t("CommonStatus.label"),
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
   return columns;

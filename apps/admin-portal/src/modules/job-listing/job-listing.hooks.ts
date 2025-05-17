@@ -1,8 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { bulkDeleteResource } from "@/lib/api";
+
 import {
   fetchJobListings,
-  bulkDeleteJobListings,
   createJobListing,
   updateJobListing,
   duplicateJobListing,
@@ -36,7 +37,6 @@ export function useJobListing(id: string) {
 
 export function useCreateJobListing() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (data: JobListingCreateData) => createJobListing(data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() }),
@@ -56,17 +56,6 @@ export function useDuplicateJobListing() {
   });
 }
 
-export function useBulkDeleteJobListings() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (ids: string[]) => bulkDeleteJobListings(ids),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() }),
-    meta: {
-      toast: { success: "JobListings.success.delete", error: "JobListings.error.delete" },
-    },
-  });
-}
-
 export function useUpdateJobListing() {
   const queryClient = useQueryClient();
 
@@ -80,5 +69,15 @@ export function useUpdateJobListing() {
     meta: {
       toast: { success: "JobListings.success.update", error: "JobListings.error.update" },
     },
+  });
+}
+
+// Hook to bulk delete job listings
+export function useBulkDeleteJobListings() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/job-listings", ids),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() }),
+    meta: { toast: { success: "JobListings.success.delete", error: "JobListings.error.delete" } },
   });
 }

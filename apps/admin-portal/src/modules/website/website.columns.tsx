@@ -1,45 +1,56 @@
-import StatusCell from "@root/src/components/tables/status-cell";
-import { useLocale, useTranslations } from "next-intl";
-import { z } from "zod";
+import { SquareArrowOutUpRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import IconButton from "@/ui/icon-button";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { Website } from "./website.type";
+import StatusCell from "@/tables/status-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { Website } from "@/website/website.type";
 
 const useWebsiteColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
-  const locale = useLocale();
 
   const columns: ExtendedColumnDef<Website>[] = [
     {
       accessorKey: "domain_name",
       header: t("Websites.form.domain_name.label"),
-      validationSchema: z.string().min(1, t("Websites.form.domain_name.required")),
+      endIcon: ({ domain_name }) => (
+        <IconButton
+          size="icon_sm"
+          variant="ghost"
+          className="absolute -end-0.5 -top-1.5 z-10 cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+          onClick={() => window.open(`https://${domain_name}`, "_blank")}
+          icon={<SquareArrowOutUpRight className="size-4" />}
+        />
+      ),
     },
+
     {
       accessorKey: "created_at",
-      header: t("Websites.form.created_at.label"),
+      maxSize: 95,
       enableEditing: false,
-      cell: ({ row }) => {
-        const date = row.original.created_at;
-        return date ? new Date(date).toLocaleDateString(locale) : "-";
-      },
+
+      header: t("Metadata.created_at.label"),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "updated_at",
-      header: t("Websites.form.updated_at.label"),
+      maxSize: 95,
       enableEditing: false,
-      cell: ({ row }) => {
-        const date = row.original.updated_at;
-        return date ? new Date(date).toLocaleDateString(locale) : "-";
-      },
+
+      header: t("Metadata.updated_at.label"),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Websites.form.status.label"),
+      header: t("CommonStatus.label"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -49,8 +60,8 @@ const useWebsiteColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Websites.form.status.active"), value: "active" },
-              { label: t("Websites.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

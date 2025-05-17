@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import { convertToPascalCase } from "@root/src/lib/utils";
+import { createInsertSchema } from "drizzle-zod";
 import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -9,12 +8,17 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
 import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
 
+import NotesSection from "@/components/forms/notes-section";
+import { Input } from "@/components/ui/inputs/input";
+
+import { convertToPascalCase } from "@/lib/utils";
+
 import { ModuleFormProps } from "@/types/common.type";
 
+import { departments } from "@/db/schema";
 import { useBranches } from "@/modules/branch/branch.hooks";
 import { useCreateDepartment, useUpdateDepartment } from "@/modules/department/department.hooks";
 import useDepartmentStore from "@/modules/department/department.store";
@@ -36,22 +40,27 @@ type LocationValue = {
 type LocationOption = MultiSelectOption<LocationValue> & {
   metadata: { type: LocationValue["type"] };
 };
-
-export const createDepartmentSchema = (t: (key: string) => string) =>
-  z.object({
+const createDepartmentSchema = (t: (key: string) => string) => {
+  const DepartmentSelectSchema = createInsertSchema(departments, {
     name: z.string().min(1, t("Departments.form.validation.name_required")),
     description: z.string().optional(),
-    locations: z
-      .array(
-        z.object({
-          id: z.string(),
-          type: z.enum(["office", "branch", "warehouse"]),
-        }),
-      )
-      .min(1, t("Departments.form.validation.locations_required")),
   });
 
-export type DepartmentFormValues = z.infer<ReturnType<typeof createDepartmentSchema>>;
+  const locationsSchema = z
+    .array(
+      z.object({
+        id: z.string(),
+        type: z.enum(["office", "branch", "warehouse"]),
+      }),
+    )
+    .min(1, t("Departments.form.validation.locations_required"));
+
+  return DepartmentSelectSchema.extend({
+    locations: locationsSchema,
+  });
+};
+
+export type DepartmentFormValues = z.input<ReturnType<typeof createDepartmentSchema>>;
 
 export default function DepartmentForm({
   formHtmlId,
@@ -230,6 +239,8 @@ export default function DepartmentForm({
   return (
     <Form {...form}>
       <form id={formHtmlId || "department-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
         <div className="form-container">
           <FormField
             control={form.control}

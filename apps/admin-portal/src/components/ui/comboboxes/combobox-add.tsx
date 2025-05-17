@@ -18,6 +18,7 @@ import { Skeleton } from "@/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 import { Button } from "../button";
+import { useFormField } from "../form";
 
 type ComboboxAddTypes<T> = {
   labelKey?: keyof T | any;
@@ -51,7 +52,6 @@ type ComboboxAddTypes<T> = {
   addText?: string;
   onAddClick?: () => void;
   containerClassName?: string;
-  ariaInvalid?: boolean;
   inCell?: boolean;
   buttonClassName?: string;
 };
@@ -70,7 +70,6 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
       renderOption,
       renderSelected,
       addText = "Add New",
-      ariaInvalid,
       inCell = false,
       buttonClassName,
       ...props
@@ -80,6 +79,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
     const [open, setOpen] = React.useState(false);
     const [selectedValue, setSelectedValue] = React.useState(defaultValue);
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const { error } = useFormField();
 
     React.useEffect(() => {
       setSelectedValue(defaultValue);
@@ -129,10 +129,10 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
                   type="button"
                   aria-expanded={open}
                   className={cn(
-                    "ring-offset-background focus-visible:ring-ring inline-flex h-9 w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
-                    "bg-background px-3",
-                    ariaInvalid &&
-                      "ring-destructive/20 dark:ring-destructive/40 border-destructive",
+                    "ring-offset-background focus-visible:ring-ring inline-flex h-9 w-full items-center justify-between rounded-md border py-2 text-sm font-normal shadow-xs transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+                    "bg-input-background px-3",
+                    error &&
+                      "ring-destructive/20 dark:ring-destructive/40 border-destructive rounded-b-none",
                     inCell && "h-10 rounded-none border-none",
                     buttonClassName,
                   )}
@@ -250,7 +250,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
                       >
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      <span className="truncate w-full">
+                      <span className="w-full truncate">
                         {renderOption ? renderOption(item) : getProperty(item, labelKey)}
                       </span>
                     </CommandItem>

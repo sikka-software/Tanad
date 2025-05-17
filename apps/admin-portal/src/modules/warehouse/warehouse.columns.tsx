@@ -1,13 +1,16 @@
-import CodeCell from "@root/src/components/tables/code-cell";
-import StatusCell from "@root/src/components/tables/status-cell";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { useEmployees } from "../employee/employee.hooks";
-import { Warehouse } from "./warehouse.type";
+import CodeCell from "@/tables/code-cell";
+import StatusCell from "@/tables/status-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { useEmployees } from "@/employee/employee.hooks";
+
+import { Warehouse } from "@/warehouse/warehouse.type";
 
 const useWarehouseColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
@@ -64,6 +67,10 @@ const useWarehouseColumns = (
       validationSchema: z.string().nullable(),
     },
     {
+      accessorKey: "area",
+      header: t("Warehouses.form.area.label"),
+    },
+    {
       accessorKey: "capacity",
       header: t("Warehouses.form.capacity.label"),
       validationSchema: z.number().min(0, t("Warehouses.form.capacity.invalid")),
@@ -94,7 +101,6 @@ const useWarehouseColumns = (
               return <p className="pe-2 text-start">{value.label}</p>;
             }}
             addText={t("Pages.Employees.add")}
-            ariaInvalid={false}
           />
         );
       },
@@ -117,9 +123,28 @@ const useWarehouseColumns = (
     },
 
     {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Warehouses.form.status.label"),
+      header: t("CommonStatus.label"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -129,8 +154,8 @@ const useWarehouseColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Warehouses.form.status.active"), value: "active" },
-              { label: t("Warehouses.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

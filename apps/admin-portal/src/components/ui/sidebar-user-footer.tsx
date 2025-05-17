@@ -28,11 +28,11 @@ import {
 } from "@/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/ui/sidebar";
 
-import useUserStore, { ProfileType } from "@/stores/use-user-store";
+import useUserStore, { Profile } from "@/stores/use-user-store";
 
 import { FeedbackDialog } from "../app/FeedbackDialog";
 
-export function SidebarUserFooter({ user }: { user: ProfileType }) {
+export function SidebarUserFooter({ user }: { user: Profile }) {
   const { isMobile } = useSidebar();
   const t = useTranslations();
   const lang = useLocale();

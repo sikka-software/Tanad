@@ -1,15 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { Pukla } from "@/lib/types";
-
 interface MainStoreState {
   openCommandMenu: boolean;
   setOpenCommandMenu: (openCommandMenu: boolean) => void;
-  puklas: Pukla[];
-  setPuklas: (puklas: Pukla[]) => void;
-  selectedPukla: Pukla | null;
-  setSelectedPukla: (pukla: Pukla) => void;
   itemAction: {
     id: string;
     action: string | null;
@@ -28,12 +22,7 @@ export const useMainStore = create<MainStoreState>()(
     (set) => ({
       openCommandMenu: false,
       setOpenCommandMenu: (openCommandMenu: boolean) => set({ openCommandMenu }),
-      puklas: [],
-      setPuklas: (puklas: Pukla[]) => set({ puklas }),
-      selectedPukla: null,
-      setSelectedPukla: (pukla: Pukla) => {
-        set({ selectedPukla: pukla });
-      },
+
       itemAction: null,
       setItemAction: (id, action) => set({ itemAction: { id, action } }),
       urlTooLong: false,
@@ -45,9 +34,7 @@ export const useMainStore = create<MainStoreState>()(
     }),
     {
       name: "main-store",
-      partialize: (state) => ({
-        selectedPukla: state.selectedPukla,
-      }),
+      partialize: (state) => ({}),
       // onRehydrateStorage: () => (state) => {
       //   console.log('Rehydrated main store:', state); // Debug log
       // },

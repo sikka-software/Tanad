@@ -9,12 +9,12 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
-import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 
 import { createClient } from "@/utils/supabase/component";
 
+import { Input } from "@/components/ui/inputs/input";
 import PasswordInput from "@/components/ui/password-input";
 
 interface ProfileFormValues {
@@ -299,9 +299,9 @@ export default function Account() {
   // );
 }
 
-Account.messages = ["Pages", "Profile", "General"];
+Account.messages = ["Metadata", "Pages", "Profile", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Account.messages),

@@ -2,13 +2,15 @@ import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { toast } from "sonner";
+
+import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import PageTitle from "@/components/ui/page-title";
 
-import { WarehouseForm } from "@/modules/warehouse/warehouse.form";
-import useWarehouseStore from "@/modules/warehouse/warehouse.store";
+import { generateDummyWarehouse } from "@/lib/dummy-factory";
+
+import { WarehouseForm } from "@/warehouse/warehouse.form";
+import useWarehouseStore from "@/warehouse/warehouse.store";
 
 export default function AddWarehousePage() {
   const t = useTranslations();
@@ -16,27 +18,6 @@ export default function AddWarehousePage() {
 
   const setIsLoading = useWarehouseStore((state) => state.setIsLoading);
   const isLoading = useWarehouseStore((state) => state.isLoading);
-
-  const handleDummyData = () => {
-    const form = (window as any).warehouseForm;
-    if (form) {
-      // code randomly
-      form.setValue("code", "WR-" + Math.random().toString(36).substring(2, 5).toUpperCase());
-      form.setValue("name", "Warehouse 1");
-      form.setValue("address", "123 Main St");
-      form.setValue("city", "Anytown");
-      form.setValue("state", "CA");
-      form.setValue("zip_code", "12345");
-      form.setValue("phone", "123-456-7890");
-      form.setValue("email", "warehouse@example.com");
-      form.setValue("notes", "This is a dummy warehouse");
-    }
-  };
-
-  const onAddSuccess = () => {
-    router.push("/warehouses");
-    setIsLoading(false);
-  };
 
   return (
     <div>
@@ -51,17 +32,24 @@ export default function AddWarehousePage() {
           submit_form: t("Pages.Warehouses.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyWarehouse}
       />
 
-      <WarehouseForm formHtmlId="warehouse-form" onSuccess={onAddSuccess} />
+      <WarehouseForm
+        formHtmlId="warehouse-form"
+        onSuccess={() => {
+          router.push("/warehouses").then(() => {
+            setIsLoading(false);
+          });
+        }}
+      />
     </div>
   );
 }
 
-AddWarehousePage.messages = ["Notes", "Pages", "Warehouses", "Forms", "General"];
+AddWarehousePage.messages = ["Metadata", "Notes", "Pages", "Warehouses", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -108,7 +108,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-8 ps-1.5"
+                  className="h-8 ps-1.5 select-none"
                   onClick={() => setOpenCommandMenu(true)}
                 >
                   <kbd className="bg-muted rounded-inner-1 pointer-events-none hidden h-5 items-center gap-1 border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex">
@@ -122,9 +122,11 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
               </div>
             </div>
             <div className="relative mx-auto">
-              <div className="block border-b p-2 md:hidden">
-                <AppBreadcrumb />
-              </div>
+              {!router.pathname.includes("dashboard") && (
+                <div className="block border-b p-2 md:hidden">
+                  <AppBreadcrumb />
+                </div>
+              )}
               <div className="relative">
                 <div ref={mainContentRef}>{children}</div>
                 <AnimatePresence mode="wait">

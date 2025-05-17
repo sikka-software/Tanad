@@ -232,9 +232,9 @@ const SettingsPage = () => {
 
 export default SettingsPage;
 
-SettingsPage.messages = ["Pages", "Settings", "General"];
+SettingsPage.messages = ["Metadata", "Pages", "Settings", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, SettingsPage.messages),

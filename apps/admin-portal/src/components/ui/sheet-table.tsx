@@ -57,6 +57,8 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
 
   onSerial?: (row: TData, rowIndex: number) => void;
   onRandom?: (row: TData, rowIndex: number) => void;
+
+  endIcon?: (row: TData) => React.ReactNode;
 };
 
 /**
@@ -214,6 +216,8 @@ export interface SheetTableProps<T extends object> extends FooterProps {
   // --- Column visibility ---
   columnVisibility?: Record<string, boolean>;
   onColumnVisibilityChange?: (updater: any) => void;
+  sorting?: any;
+  onSortingChange?: (updater: any) => void;
 }
 
 /**
@@ -356,6 +360,8 @@ function SheetTable<
     columnVisibility,
     onColumnVisibilityChange,
     tableOptions,
+    sorting,
+    onSortingChange,
   } = props;
 
   const t = useTranslations();
@@ -420,6 +426,7 @@ function SheetTable<
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: onColumnVisibilityChange,
+    onSortingChange,
     ...(tableOptions || {}),
     state: {
       ...tableOptions?.state,
@@ -427,6 +434,7 @@ function SheetTable<
       columnVisibility,
       globalFilter,
       expanded,
+      sorting,
       pagination: {
         pageSize: data.length,
         pageIndex: 0,
@@ -738,7 +746,7 @@ function SheetTable<
               <TableCell
                 key={rowId + colKey + String(cell.getValue() ?? "")}
                 className={cn(
-                  "tiny-scrollbar relative overflow-scroll border",
+                  "tiny-scrollbar group relative overflow-scroll border",
                   {
                     "bg-muted": isDisabled,
                     "bg-destructive/25": errorMsg,
@@ -767,7 +775,10 @@ function SheetTable<
                 onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
                 onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
               >
-                {cellContent}
+                <div className="relative">
+                  {cellContent}
+                  {colDef.endIcon && colDef.endIcon(rowData)}
+                </div>
               </TableCell>
             );
           })}

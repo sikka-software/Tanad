@@ -1,12 +1,18 @@
-import CurrencyCell from "@root/src/components/tables/currency-cell";
-import SelectCell from "@root/src/components/tables/select-cell";
-import useUserStore from "@root/src/stores/use-user-store";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { Car } from "./car.type";
+import StatusCell from "@/components/tables/status-cell";
+
+import CurrencyCell from "@/tables/currency-cell";
+import SelectCell from "@/tables/select-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { VehicleStatus } from "@/types/common.type";
+
+import { Car } from "@/car/car.type";
+import useUserStore from "@/stores/use-user-store";
 
 const useCarColumns = (handleEdit?: (rowId: string, columnId: string, value: unknown) => void) => {
   const t = useTranslations();
@@ -76,10 +82,51 @@ const useCarColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
       ),
     },
     {
+      accessorKey: "payment_cycle",
+      header: t("PaymentCycles.label"),
+    },
+    {
       accessorKey: "monthly_payment",
-      header: t("Cars.form.monthly_payment.label"),
-      validationSchema: z.number().min(0, "Required"),
+      header: t("PaymentCycles.monthly_payment.label"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
+    },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    //status
+    {
+      accessorKey: "status",
+      header: t("Vehicles.form.status.label"),
+      validationSchema: z.string().min(1, t("Vehicles.form.status.required")),
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => (
+        <SelectCell
+          onChange={(value) => handleEdit?.(row.id, "status", value)}
+          cellValue={getValue()}
+          options={VehicleStatus.map((status) => ({
+            label: t(`Vehicles.form.status.${status}`),
+            value: status,
+          }))}
+        />
+      ),
     },
   ];
   return columns;

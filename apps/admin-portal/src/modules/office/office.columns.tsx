@@ -1,13 +1,17 @@
-import CodeCell from "@root/src/components/tables/code-cell";
-import StatusCell from "@root/src/components/tables/status-cell";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
+import { format } from "date-fns";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { useEmployees } from "../employee/employee.hooks";
-import { Office } from "./office.type";
+import CodeCell from "@/components/tables/code-cell";
+import StatusCell from "@/components/tables/status-cell";
+import TimestampCell from "@/components/tables/timestamp-cell";
+
+import { Office } from "@/office/office.type";
+
+import { useEmployees } from "@/employee/employee.hooks";
 
 const useOfficeColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
@@ -15,7 +19,7 @@ const useOfficeColumns = (
   const t = useTranslations();
   const locale = useLocale();
   // Employees for manager combobox
-  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const { data: employees = [], isLoading: isFetchingEmployees } = useEmployees();
   const employeeOptions = employees.map((emp) => ({
     label: `${emp.first_name} ${emp.last_name}`,
     value: emp.id,
@@ -75,7 +79,7 @@ const useOfficeColumns = (
             dir={locale === "ar" ? "rtl" : "ltr"}
             inCell
             data={employeeOptions}
-            isLoading={employeesLoading}
+            isLoading={isFetchingEmployees}
             buttonClassName="bg-transparent"
             defaultValue={office.manager || ""}
             onChange={async (value) => {
@@ -87,32 +91,56 @@ const useOfficeColumns = (
               noItems: t("Offices.form.manager.no_employees"),
             }}
             addText={t("Pages.Employees.add")}
-            ariaInvalid={false}
           />
         );
       },
     },
 
+    // {
+    //   accessorKey: "city",
+    //   header: t("Forms.city.label"),
+    //   validationSchema: z.string().min(1, t("Forms.city.required")),
+    // },
+    // {
+    //   accessorKey: "region",
+    //   header: t("Forms.region.label"),
+    //   validationSchema: z.string().min(1, t("Forms.region.required")),
+    // },
+    // {
+    //   accessorKey: "zip_code",
+    //   header: t("Forms.zip_code.label"),
+    //   validationSchema: z.string().min(1, t("Forms.zip_code.required")),
+    // },
     {
-      accessorKey: "city",
-      header: t("Forms.city.label"),
-      validationSchema: z.string().min(1, t("Forms.city.required")),
+      accessorKey: "area",
+      header: t("Offices.form.area.label"),
+      validationSchema: z.string().min(1, t("Offices.form.area.required")),
+    },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
-      accessorKey: "region",
-      header: t("Forms.region.label"),
-      validationSchema: z.string().min(1, t("Forms.region.required")),
-    },
-    {
-      accessorKey: "zip_code",
-      header: t("Forms.zip_code.label"),
-      validationSchema: z.string().min(1, t("Forms.zip_code.required")),
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
 
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Offices.form.status.label"),
+      header: t("CommonStatus.label"),
       validationSchema: z.enum(["active", "inactive"]),
       noPadding: true,
       enableEditing: false,
@@ -123,8 +151,8 @@ const useOfficeColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Offices.form.status.active"), value: "active" },
-              { label: t("Offices.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

@@ -1,14 +1,16 @@
-import CodeCell from "@root/src/components/tables/code-cell";
 import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import StatusCell from "@/components/tables/status-cell";
+import CodeCell from "@/tables/code-cell";
+import StatusCell from "@/tables/status-cell";
+import TimestampCell from "@/tables/timestamp-cell";
 
-import { useEmployees } from "../employee/employee.hooks";
-import { Branch } from "./branch.type";
+import { Branch } from "@/branch/branch.type";
+
+import { useEmployees } from "@/employee/employee.hooks";
 
 const useBranchColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
@@ -16,7 +18,7 @@ const useBranchColumns = (
   const t = useTranslations();
   const locale = useLocale();
 
-  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const { data: employees = [], isLoading: isFetchingEmployees } = useEmployees();
   const employeeOptions = employees.map((emp) => ({
     label: `${emp.first_name} ${emp.last_name}`,
     value: emp.id,
@@ -76,7 +78,7 @@ const useBranchColumns = (
             dir={locale === "ar" ? "rtl" : "ltr"}
             inCell
             data={employeeOptions}
-            isLoading={employeesLoading}
+            isLoading={isFetchingEmployees}
             buttonClassName="bg-transparent"
             defaultValue={branch.manager || ""}
             onChange={async (value) => handleEdit?.(branch.id, "manager", value)}
@@ -86,7 +88,6 @@ const useBranchColumns = (
               noItems: t("Branches.form.manager.no_employees"),
             }}
             addText={t("Pages.Employees.add")}
-            ariaInvalid={false}
           />
         );
       },
@@ -112,10 +113,31 @@ const useBranchColumns = (
       header: t("Forms.zip_code.label"),
       validationSchema: z.string().min(1, t("Forms.zip_code.required")),
     },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Branches.form.status.label"),
+      header: t("CommonStatus.label"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -125,8 +147,8 @@ const useBranchColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Branches.form.status.active"), value: "active" },
-              { label: t("Branches.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

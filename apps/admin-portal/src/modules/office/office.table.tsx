@@ -15,7 +15,14 @@ import useUserStore from "@/stores/use-user-store";
 
 import useOfficeColumns from "./office.columns";
 
-const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Office>) => {
+const OfficesTable = ({
+  data,
+  isLoading,
+  error,
+  onActionClicked,
+  sorting,
+  onSortingChange,
+}: ModuleTableProps<Office>) => {
   const t = useTranslations();
 
   const { mutate: updateOffice } = useUpdateOffice();
@@ -56,7 +63,7 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
 
   if (isLoading) {
     return (
-      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
+      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={12} />
     );
   }
 
@@ -95,6 +102,8 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       onActionClicked={onActionClicked}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={setColumnVisibility}
+      sorting={sorting}
+      onSortingChange={onSortingChange}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

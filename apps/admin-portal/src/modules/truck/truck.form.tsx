@@ -1,29 +1,32 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import CountryInput from "@root/src/components/ui/country-input";
-import { CurrencyInput } from "@root/src/components/ui/currency-input";
-import { getNotesValue } from "@root/src/lib/utils";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import DigitsInput from "@/ui/digits-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
-import NumberInput from "@/ui/number-input";
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/ui/select";
 
-import { ModuleFormProps, VehicleStatus } from "@/types/common.type";
+import CountryInput from "@/components/ui/inputs/country-input";
+import { CurrencyInput } from "@/components/ui/inputs/currency-input";
+import DigitsInput from "@/components/ui/inputs/digits-input";
+import { Input } from "@/components/ui/inputs/input";
+import NumberInput from "@/components/ui/inputs/number-input";
 
+import { getNotesValue } from "@/lib/utils";
+
+import { ModuleFormProps, PaymentCycle, VehicleStatus } from "@/types/common.type";
+import { VehicleOwnershipStatus } from "@/types/vehicle.types";
+
+import { trucks } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
-
-import { VEHICLE_OWNERSHIP_STATUSES } from "../employee/employee.options";
-import { useCreateTruck, useUpdateTruck } from "./truck.hooks";
-import useTruckStore from "./truck.store";
-import { TruckUpdateData, TruckCreateData } from "./truck.type";
+import { useCreateTruck, useUpdateTruck } from "@/truck/truck.hooks";
+import useTruckStore from "@/truck/truck.store";
+import { TruckUpdateData, TruckCreateData } from "@/truck/truck.type";
 
 export const createTruckSchema = (t: (key: string) => string) => {
-  const baseTruckSchema = z.object({
+  const TruckSelectSchema = createInsertSchema(trucks, {
     name: z.string().min(1, t("Trucks.form.name.required")),
     make: z.string().optional().or(z.literal("")),
     model: z.string().optional().or(z.literal("")),
@@ -36,14 +39,17 @@ export const createTruckSchema = (t: (key: string) => string) => {
     code: z.string().optional().or(z.literal("")),
     license_country: z.string().optional().or(z.literal("")),
     license_plate: z.string().optional().or(z.literal("")),
-    ownership_status: z.string().optional().or(z.literal("")),
+    ownership_status: z.enum(VehicleOwnershipStatus).default("owned"),
     monthly_payment: z.string().optional().or(z.literal("")),
-
-    status: z.enum(VehicleStatus).optional().or(z.literal("")),
+    daily_payment: z.string().optional().or(z.literal("")),
+    weekly_payment: z.string().optional().or(z.literal("")),
+    annual_payment: z.string().optional().or(z.literal("")),
+    payment_cycle: z.enum(PaymentCycle).default("monthly"),
+    status: z.enum(VehicleStatus).optional(),
     notes: z.any().optional().nullable(),
   });
 
-  return baseTruckSchema;
+  return TruckSelectSchema;
 };
 
 export type TruckFormValues = z.input<ReturnType<typeof createTruckSchema>>;
@@ -85,9 +91,13 @@ export function TruckForm({
       code: defaultValues?.code || "",
       license_country: defaultValues?.license_country || "",
       license_plate: defaultValues?.license_plate || "",
-      ownership_status: defaultValues?.ownership_status || "",
+      ownership_status: defaultValues?.ownership_status || "owned",
       monthly_payment: defaultValues?.monthly_payment?.toString() || "",
-      status: defaultValues?.status || "",
+      daily_payment: defaultValues?.daily_payment?.toString() || "",
+      weekly_payment: defaultValues?.weekly_payment?.toString() || "",
+      annual_payment: defaultValues?.annual_payment?.toString() || "",
+      payment_cycle: defaultValues?.payment_cycle || "monthly",
+      status: defaultValues?.status || "active",
       notes: getNotesValue(defaultValues),
     },
   });
@@ -114,11 +124,11 @@ export function TruckForm({
               color: data.color?.trim() || "",
               vin: data.vin?.trim() || "",
               code: data.code?.trim() || "",
-              status: data.status === "" ? null : data.status,
+              status: data.status,
               notes: data.notes || "",
               license_country: data.license_country?.trim() || "",
               license_plate: data.license_plate?.trim() || "",
-              ownership_status: data.ownership_status?.trim() || "",
+              ownership_status: data.ownership_status,
               monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
             },
           },
@@ -142,9 +152,9 @@ export function TruckForm({
             code: data.code?.trim() || "",
             license_country: data.license_country?.trim() || "",
             license_plate: data.license_plate?.trim() || "",
-            ownership_status: data.ownership_status?.trim() || "",
+            ownership_status: data.ownership_status,
             monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
-            status: data.status === "" ? null : data.status,
+            status: data.status || "active",
             notes: data.notes || "",
             user_id: user?.id || "",
             enterprise_id: enterprise?.id || "",
@@ -176,8 +186,44 @@ export function TruckForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
         <div className="form-container">
           <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.status.label")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isLoading}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Vehicles.form.status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(VehicleStatus).map((typeOpt) => (
+                          <SelectItem key={typeOpt} value={typeOpt}>
+                            {t(`Vehicles.form.status.${typeOpt}`, {
+                              defaultValue: typeOpt,
+                            })}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="code"
@@ -213,6 +259,166 @@ export function TruckForm({
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="ownership_status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Vehicles.form.ownership_status.label")}</FormLabel>
+                  <FormControl>
+                    <Select
+                      key={field.value}
+                      value={field.value}
+                      onValueChange={(val) => field.onChange(val)}
+                      dir={lang === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
+                          <SelectValue
+                            placeholder={t("Vehicles.form.ownership_status.placeholder")}
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {VehicleOwnershipStatus.map((typeOpt) => (
+                          <SelectItem key={typeOpt} value={typeOpt}>
+                            {t(`Vehicles.form.ownership_status.${typeOpt}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {(form.watch("ownership_status") === "financed" ||
+              form.watch("ownership_status") === "rented") && (
+              <FormField
+                control={form.control}
+                name="payment_cycle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("PaymentCycles.label")}</FormLabel>
+                    <FormControl>
+                      <Select
+                        dir={lang === "ar" ? "rtl" : "ltr"}
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={isLoading}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("PaymentCycles.placeholder")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="daily">{t("PaymentCycles.daily")}</SelectItem>
+                          <SelectItem value="weekly">{t("PaymentCycles.weekly")}</SelectItem>
+                          <SelectItem value="monthly">{t("PaymentCycles.monthly")}</SelectItem>
+                          <SelectItem value="annual">{t("PaymentCycles.annual")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            {(form.watch("ownership_status") === "financed" ||
+              form.watch("ownership_status") === "rented") &&
+              form.watch("payment_cycle") === "daily" && (
+                <FormField
+                  control={form.control}
+                  name="daily_payment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("PaymentCycles.daily_payment.label")}</FormLabel>
+                      <FormControl>
+                        <CurrencyInput
+                          placeholder={t("PaymentCycles.daily_payment.placeholder")}
+                          disabled={isLoading}
+                          {...field}
+                          showCommas={true}
+                          value={field.value ? parseFloat(String(field.value)) : undefined}
+                          onChange={(value) => field.onChange(value?.toString() || "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            {(form.watch("ownership_status") === "financed" ||
+              form.watch("ownership_status") === "rented") &&
+              form.watch("payment_cycle") === "weekly" && (
+                <FormField
+                  control={form.control}
+                  name="weekly_payment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("PaymentCycles.weekly_payment.label")}</FormLabel>
+                      <FormControl>
+                        <CurrencyInput
+                          placeholder={t("PaymentCycles.weekly_payment.placeholder")}
+                          disabled={isLoading}
+                          {...field}
+                          showCommas={true}
+                          value={field.value ? parseFloat(String(field.value)) : undefined}
+                          onChange={(value) => field.onChange(value?.toString() || "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            {(form.watch("ownership_status") === "financed" ||
+              form.watch("ownership_status") === "rented") &&
+              form.watch("payment_cycle") === "monthly" && (
+                <FormField
+                  control={form.control}
+                  name="monthly_payment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("PaymentCycles.monthly_payment.label")}</FormLabel>
+                      <FormControl>
+                        <CurrencyInput
+                          placeholder={t("PaymentCycles.monthly_payment.placeholder")}
+                          disabled={isLoading}
+                          {...field}
+                          showCommas={true}
+                          value={field.value ? parseFloat(String(field.value)) : undefined}
+                          onChange={(value) => field.onChange(value?.toString() || "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            {(form.watch("ownership_status") === "financed" ||
+              form.watch("ownership_status") === "rented") &&
+              form.watch("payment_cycle") === "annual" && (
+                <FormField
+                  control={form.control}
+                  name="annual_payment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("PaymentCycles.annual_payment.label")}</FormLabel>
+                      <FormControl>
+                        <CurrencyInput
+                          placeholder={t("PaymentCycles.annual_payment.placeholder")}
+                          disabled={isLoading}
+                          {...field}
+                          showCommas={true}
+                          value={field.value ? parseFloat(String(field.value)) : undefined}
+                          onChange={(value) => field.onChange(value?.toString() || "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             <FormField
               control={form.control}
               name="make"
@@ -339,97 +545,6 @@ export function TruckForm({
                       disabled={isLoading}
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="ownership_status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.ownership_status.label")}</FormLabel>
-                  <FormControl>
-                    <Select
-                      dir={lang === "ar" ? "rtl" : "ltr"}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={isLoading}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue
-                            placeholder={t("Vehicles.form.ownership_status.placeholder")}
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {VEHICLE_OWNERSHIP_STATUSES.map((typeOpt) => (
-                          <SelectItem key={typeOpt.value} value={typeOpt.value}>
-                            {t(`Vehicles.form.ownership_status.${typeOpt.value}`, {
-                              defaultValue: typeOpt.label,
-                            })}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {form.watch("ownership_status") === "financed" && (
-              <FormField
-                control={form.control}
-                name="monthly_payment"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Cars.form.monthly_payment.label")}</FormLabel>
-                    <FormControl>
-                      <CurrencyInput
-                        placeholder={t("Cars.form.monthly_payment.placeholder")}
-                        disabled={isLoading}
-                        {...field}
-                        showCommas={true}
-                        value={field.value ? parseFloat(String(field.value)) : undefined}
-                        onChange={(value) => field.onChange(value?.toString() || "")}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vehicles.form.status.label")}</FormLabel>
-                  <FormControl>
-                    <Select
-                      dir={lang === "ar" ? "rtl" : "ltr"}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={isLoading}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t("Vehicles.form.status.placeholder")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.values(VehicleStatus).map((typeOpt) => (
-                          <SelectItem key={typeOpt} value={typeOpt}>
-                            {t(`Vehicles.form.status.${typeOpt}`, {
-                              defaultValue: typeOpt,
-                            })}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

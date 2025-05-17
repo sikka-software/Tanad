@@ -4,12 +4,13 @@ import { RotateCcw } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/ui/button";
-import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { Slider } from "@/ui/slider";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/ui/tooltip";
 
 import { useSliderWithInput } from "@/hooks/use-slider-with-input";
+
+import { Input } from "@/components/ui/inputs/input";
 
 interface SliderWithInputProps {
   value: number[];

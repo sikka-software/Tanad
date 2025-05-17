@@ -1,43 +1,65 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import { getNotesValue } from "@root/src/lib/utils";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
 
-import { AddressFormSection } from "@/components/forms/address-form-section";
-import { createAddressSchema } from "@root/src/lib/schemas/address.schema";
-import CodeInput from "@/components/ui/code-input";
-import PhoneInput from "@/components/ui/phone-input";
+import CodeInput from "@/components/ui/inputs/code-input";
+import { Input } from "@/components/ui/inputs/input";
+import PhoneInput from "@/components/ui/inputs/phone-input";
+import UnitsInput from "@/components/ui/inputs/units-input";
 
-import { ModuleFormProps } from "@/types/common.type";
+import { AddressFormSection } from "@/forms/address-form-section";
+import NotesSection from "@/forms/notes-section";
 
+import { addressSchema } from "@/lib/schemas/address.schema";
+import { getNotesValue } from "@/lib/utils";
+
+import { CommonStatus, ModuleFormProps } from "@/types/common.type";
+
+import { useCreateWarehouse, useUpdateWarehouse, useWarehouses } from "@/warehouse/warehouse.hooks";
+import useWarehouseStore from "@/warehouse/warehouse.store";
+import { WarehouseCreateData, WarehouseUpdateData } from "@/warehouse/warehouse.type";
+
+import { warehouses } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
-import { useCreateWarehouse, useUpdateWarehouse, useWarehouses } from "./warehouse.hooks";
-import useWarehouseStore from "./warehouse.store";
-import { WarehouseCreateData, WarehouseUpdateData } from "./warehouse.type";
-
-export const createWarehouseFormSchema = (t: (key: string) => string) => {
-  const baseWarehouseFormSchema = z.object({
+const createWarehouseSchema = (t: (key: string) => string) => {
+  const WarehouseSelectSchema = createInsertSchema(warehouses, {
     name: z.string().min(1, t("Warehouses.form.name.required")),
     code: z.string().min(1, t("Warehouses.form.code.required")),
     phone: z.string().optional(),
-    capacity: z.string().optional(),
-    status: z.string().default("active"),
+    email: z
+      .string()
+      .email({ message: t("Warehouses.form.email.invalid") })
+      .optional(),
+    manager: z
+      .string({ invalid_type_error: t("Warehouses.form.manager.invalid_uuid") })
+      .optional()
+      .nullable(),
+    status: z.enum(CommonStatus, {
+      message: t("CommonStatus.required"),
+    }),
+    capacity: z.number().optional().nullable(),
+
+    // working_hours: z.string().optional().nullable(),
+
+    area: z.string().optional().nullable(),
     notes: z.any().optional().nullable(),
+    operating_hours: z.string().optional().nullable(),
+    temperature_control: z.boolean().optional().nullable(),
+    warehouse_type: z.string().optional().nullable(),
+    safety_compliance: z.string().optional().nullable(),
+    ...addressSchema,
   });
-
-  const addressSchema = createAddressSchema(t);
-
-  return baseWarehouseFormSchema.merge(addressSchema);
+  return WarehouseSelectSchema;
 };
 
-export type WarehouseFormValues = z.input<ReturnType<typeof createWarehouseFormSchema>>;
+export type WarehouseFormValues = z.input<ReturnType<typeof createWarehouseSchema>>;
 
 export function WarehouseForm({
   formHtmlId,
@@ -48,7 +70,9 @@ export function WarehouseForm({
 }: ModuleFormProps<WarehouseUpdateData | WarehouseCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
-  const { profile, membership } = useUserStore();
+
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
 
   const { mutateAsync: createWarehouse, isPending: isCreating } = useCreateWarehouse();
   const { mutateAsync: updateWarehouse, isPending: isUpdating } = useUpdateWarehouse();
@@ -59,7 +83,7 @@ export function WarehouseForm({
   const setIsLoading = useWarehouseStore((state) => state.setIsLoading);
 
   const form = useForm<WarehouseFormValues>({
-    resolver: zodResolver(createWarehouseFormSchema(t)),
+    resolver: zodResolver(createWarehouseSchema(t)),
     defaultValues: {
       name: defaultValues?.name || "",
       code: defaultValues?.code || "",
@@ -70,7 +94,7 @@ export function WarehouseForm({
       region: defaultValues?.region || "",
       country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
-      capacity: defaultValues?.capacity ? String(defaultValues.capacity) : "",
+      capacity: defaultValues?.capacity,
       status: defaultValues?.status || "active",
       notes: getNotesValue(defaultValues),
     },
@@ -78,7 +102,7 @@ export function WarehouseForm({
 
   const handleSubmit = async (data: WarehouseFormValues) => {
     setIsLoading(true);
-    if (!profile?.id) {
+    if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
@@ -99,7 +123,7 @@ export function WarehouseForm({
             data: {
               name: data.name.trim(),
               code: data.code.trim(),
-              capacity: data.capacity ? parseInt(data.capacity) : null,
+              capacity: data.capacity,
               status: data.status as "active" | "inactive" | "draft" | "archived" | null,
               notes: data.notes,
               short_address: data.short_address?.trim() || undefined,
@@ -109,6 +133,7 @@ export function WarehouseForm({
               region: data.region?.trim() || undefined,
               country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
+              area: data.area,
               additional_number: data.additional_number?.trim() || undefined,
             },
           },
@@ -123,13 +148,13 @@ export function WarehouseForm({
       } else {
         await createWarehouse(
           {
-            enterprise_id: membership?.enterprise_id || "",
+            user_id: user?.id || "",
+            enterprise_id: enterprise?.id || "",
             name: data.name.trim(),
             code: data.code.trim(),
-            capacity: data.capacity ? parseInt(data.capacity) : null,
+            capacity: data.capacity,
             notes: data.notes,
             status: data.status as "active" | "inactive" | "draft" | "archived" | null,
-            user_id: profile?.id || "",
             short_address: data.short_address?.trim() || undefined,
             building_number: data.building_number?.trim() || undefined,
             street_name: data.street_name?.trim() || undefined,
@@ -137,6 +162,7 @@ export function WarehouseForm({
             region: data.region?.trim() || undefined,
             country: data.country?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
+            area: data.area,
             additional_number: data.additional_number?.trim() || undefined,
           },
           {
@@ -163,7 +189,16 @@ export function WarehouseForm({
 
   return (
     <Form {...form}>
-      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+      <form
+        id={formHtmlId}
+        onSubmit={(e) => {
+          e.preventDefault();
+          console.log("form errors ", form.formState.errors);
+          form.handleSubmit(handleSubmit)(e);
+        }}
+      >
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
         <div className="form-container">
           <div className="form-fields-cols-2">
             <FormField
@@ -206,13 +241,12 @@ export function WarehouseForm({
                         }
                         form.setValue("code", `WH-${randomCode}`);
                       }}
-                    >
-                      <Input
-                        placeholder={t("Warehouses.form.code.placeholder")}
-                        {...field}
-                        disabled={isLoading}
-                      />
-                    </CodeInput>
+                      inputProps={{
+                        placeholder: t("Warehouses.form.code.placeholder"),
+                        disabled: isLoading,
+                        ...field,
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -228,7 +262,6 @@ export function WarehouseForm({
                     <PhoneInput
                       value={field.value || ""}
                       onChange={field.onChange}
-                      ariaInvalid={form.formState.errors.phone !== undefined}
                       disabled={isLoading}
                     />
                   </FormControl>
@@ -255,6 +288,61 @@ export function WarehouseForm({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="area"
+              render={({ field }) => {
+                const [unit, setUnit] = useState("sqm");
+                const initialNumber = (() => {
+                  if (typeof field.value === "string") {
+                    const match = field.value.match(/^(sqm|sqft)\s*(\d+(?:\.\d+)?)$/);
+                    if (match) return match[2];
+                  }
+                  return "";
+                })();
+                const [areaValue, setAreaValue] = useState(initialNumber);
+                return (
+                  <FormItem>
+                    <FormLabel>{t("Warehouses.form.area.label")}</FormLabel>
+                    <FormControl>
+                      <UnitsInput
+                        label={undefined}
+                        inputProps={{
+                          type: "number",
+                          placeholder: t("Warehouses.form.area.placeholder"),
+                          value: areaValue,
+                          onChange: (e) => {
+                            setAreaValue(e.target.value);
+                          },
+                          onBlur: () => {
+                            if (areaValue === "") {
+                              field.onChange(undefined);
+                            } else {
+                              field.onChange(unit + " " + areaValue);
+                            }
+                          },
+                          disabled: isLoading,
+                        }}
+                        selectProps={{
+                          options: [
+                            { value: "sqm", label: "m²" },
+                            { value: "sqft", label: "ft²" },
+                          ],
+                          value: unit,
+                          onValueChange: (newUnit) => {
+                            setUnit(newUnit);
+                            if (areaValue !== "") {
+                              field.onChange(newUnit + " " + areaValue);
+                            }
+                          },
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
+            />
           </div>
         </div>
         <AddressFormSection
@@ -262,7 +350,7 @@ export function WarehouseForm({
           inDialog={editMode || nestedForm}
           title={t("Warehouses.form.address.label")}
           control={form.control}
-          isLoading={isLoading}
+          disabled={isLoading}
         />
 
         <NotesSection

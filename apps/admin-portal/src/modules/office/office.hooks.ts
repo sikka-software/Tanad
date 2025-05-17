@@ -1,16 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
+
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
 
 import {
   createOffice,
-  deleteOffice,
-  bulkDeleteOffices,
   fetchOfficeById,
   fetchOffices,
   updateOffice,
   duplicateOffice,
 } from "@/office/office.service";
-import type { Office, OfficeCreateData, OfficeUpdateData } from "@/office/office.type";
+import type { OfficeCreateData, OfficeUpdateData } from "@/office/office.type";
 
 // Query keys for offices
 export const officeKeys = {
@@ -41,16 +40,9 @@ export function useOffice(id: string) {
 // Hook to create a office
 export function useCreateOffice() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
   return useMutation({
     mutationFn: (office: OfficeCreateData) => createOffice(office),
-    onSuccess: (newOffice: Office) => {
-      const previousOffices = queryClient.getQueryData(officeKeys.lists()) || [];
-      queryClient.setQueryData(officeKeys.lists(), [
-        ...(Array.isArray(previousOffices) ? previousOffices : []),
-        newOffice,
-      ]);
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: officeKeys.lists() }),
     meta: { toast: { success: "Offices.success.create", error: "Offices.error.create" } },
   });
 }
@@ -84,7 +76,7 @@ export function useDuplicateOffice() {
 export function useDeleteOffice() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteOffice,
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/offices/${id}`),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
       queryClient.removeQueries({ queryKey: officeKeys.detail(variables) });
@@ -97,7 +89,7 @@ export function useDeleteOffice() {
 export function useBulkDeleteOffices() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteOffices,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/offices", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: officeKeys.lists() }),
     meta: { toast: { success: "Offices.success.delete", error: "Offices.error.delete" } },
   });

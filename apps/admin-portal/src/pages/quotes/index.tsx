@@ -1,5 +1,5 @@
-import useOfficeStore from "@root/src/modules/office/office.store";
 import { pick } from "lodash";
+import { FileClock, Plus, Quote } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -7,10 +7,12 @@ import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
+
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
@@ -24,10 +26,9 @@ import { QuoteForm } from "@/quote/quote.form";
 import { useQuotes, useBulkDeleteQuotes, useDuplicateQuote } from "@/quote/quote.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/quote/quote.options";
 import useQuotesStore from "@/quote/quote.store";
+import useQuoteStore from "@/quote/quote.store";
 import QuotesTable from "@/quote/quote.table";
 import { QuoteUpdateData } from "@/quote/quote.type";
-
-import useUserStore from "@/stores/use-user-store";
 
 export default function QuotesPage() {
   const t = useTranslations();
@@ -35,35 +36,41 @@ export default function QuotesPage() {
 
   const columns = useQuoteColumns();
 
-  const canReadQuotes = useUserStore((state) => state.hasPermission("quotes.read"));
-  const canCreateQuotes = useUserStore((state) => state.hasPermission("quotes.create"));
+  const moduleHooks = createModuleStoreHooks(useQuoteStore, "quotes");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableQuote, setActionableQuote] = useState<QuoteUpdateData | null>(null);
   const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
-  const loadingSaveQuote = useQuotesStore((state) => state.isLoading);
-  const setLoadingSaveQuote = useQuotesStore((state) => state.setIsLoading);
-
-  const isDeleteDialogOpen = useQuotesStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useQuotesStore((state) => state.setIsDeleteDialogOpen);
-
-  const selectedRows = useQuotesStore((state) => state.selectedRows);
-  const setSelectedRows = useQuotesStore((state) => state.setSelectedRows);
-
-  const columnVisibility = useQuotesStore((state) => state.columnVisibility);
-  const setColumnVisibility = useQuotesStore((state) => state.setColumnVisibility);
-
-  const viewMode = useQuotesStore((state) => state.viewMode);
-  const clearSelection = useQuotesStore((state) => state.clearSelection);
-  const sortRules = useQuotesStore((state) => state.sortRules);
-  const sortCaseSensitive = useQuotesStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useQuotesStore((state) => state.sortNullsFirst);
-  const searchQuery = useQuotesStore((state) => state.searchQuery);
-  const filterConditions = useQuotesStore((state) => state.filterConditions);
-  const filterCaseSensitive = useQuotesStore((state) => state.filterCaseSensitive);
-  const getFilteredQuotes = useQuotesStore((state) => state.getFilteredData);
-  const getSortedQuotes = useQuotesStore((state) => state.getSortedData);
+  // Permissions
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
+  // Loading
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+  // Delete Dialog
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+  // Selected Rows
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+  const clearSelection = moduleHooks.useClearSelection();
+  // Column Visibility
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+  // Sorting
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const setSortRules = moduleHooks.useSetSortRules();
+  // Filtering
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
+  // Misc
+  const searchQuery = moduleHooks.useSearchQuery();
+  const viewMode = moduleHooks.useViewMode();
 
   const { data: quotes, isLoading, error } = useQuotes();
   const { mutateAsync: deleteQuotes, isPending: isDeleting } = useBulkDeleteQuotes();
@@ -103,14 +110,31 @@ export default function QuotesPage() {
   }, [quotes, setData]);
 
   const filteredQuotes = useMemo(() => {
-    return getFilteredQuotes(storeData);
-  }, [storeData, getFilteredQuotes, searchQuery, filterConditions, filterCaseSensitive]);
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedQuotes = useMemo(() => {
-    return getSortedQuotes(filteredQuotes);
+    return getSortedData(filteredQuotes);
   }, [filteredQuotes, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  if (!canReadQuotes) {
+  const tanstackSorting = useMemo(
+    () => sortRules.map((rule) => ({ id: rule.field, desc: rule.direction === "desc" })),
+    [sortRules],
+  );
+  const handleTanstackSortingChange = (
+    updater:
+      | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
+      | { id: string; desc: boolean }[],
+  ) => {
+    let nextSorting = typeof updater === "function" ? updater(tanstackSorting) : updater;
+    const newSortRules = nextSorting.map((s: { id: string; desc: boolean }) => ({
+      field: s.id,
+      direction: (s.desc ? "desc" : "asc") as "asc" | "desc",
+    }));
+    setSortRules(newSortRules);
+  };
+
+  if (!canRead) {
     return <NoPermission />;
   }
 
@@ -135,7 +159,7 @@ export default function QuotesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Quotes.title")}
-            onAddClick={canCreateQuotes ? () => router.push(router.pathname + "/add") : undefined}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Quotes.add")}
             searchPlaceholder={t("Pages.Quotes.search")}
             hideOptions={quotes?.length === 0}
@@ -155,6 +179,8 @@ export default function QuotesPage() {
               isLoading={isLoading}
               error={error}
               onActionClicked={onActionClicked}
+              sorting={tanstackSorting}
+              onSortingChange={handleTanstackSortingChange}
             />
           ) : (
             <div className="p-4">
@@ -162,9 +188,16 @@ export default function QuotesPage() {
                 data={sortedQuotes}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Quotes.no_quotes")}
-                addFirstItemMessage={t("Quotes.add_first_quote")}
-                renderItem={(quote) => <QuoteCard key={quote.id} quote={quote} />}
+                empty={{
+                  title: t("Quotes.create_first.title"),
+                  description: t("Quotes.create_first.description"),
+                  add: t("Pages.Quotes.add"),
+                  icons: [FileClock, Plus, FileClock],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
+                renderItem={(quote) => (
+                  <QuoteCard quote={quote} onActionClicked={onActionClicked} />
+                )}
                 gridCols="2"
               />
             </div>
@@ -176,14 +209,14 @@ export default function QuotesPage() {
           onOpenChange={setIsFormDialogOpen}
           title={actionableQuote ? t("Pages.Quotes.edit") : t("Pages.Quotes.add")}
           formId="quote-form"
-          loadingSave={loadingSaveQuote}
+          loadingSave={loadingSave}
         >
           <QuoteForm
             formHtmlId="quote-form"
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableQuote(null);
-              setLoadingSaveQuote(false);
+              setLoadingSave(false);
             }}
             defaultValues={actionableQuote}
             editMode={true}
@@ -198,14 +231,15 @@ export default function QuotesPage() {
           title={t("Quotes.confirm_delete", { count: selectedRows.length })}
           description={t("Quotes.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}
+          onCancel={() => selectedRows.length === 1 && viewMode === "cards" && setSelectedRows([])}
         />
       </DataPageLayout>
     </div>
   );
 }
 
-QuotesPage.messages = ["Notes", "Pages", "Quotes", "General"];
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+QuotesPage.messages = ["Metadata", "Notes", "Pages", "Quotes", "General", "ProductsFormSection"];
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

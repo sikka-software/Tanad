@@ -71,25 +71,3 @@ export async function duplicateOnlineStore(id: string): Promise<OnlineStore> {
 
   return response.json();
 }
-
-export async function deleteOnlineStore(id: string): Promise<void> {
-  const response = await fetch(`/api/resource/online_stores/${id}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to delete online store with id ${id}`);
-  }
-}
-
-export async function bulkDeleteOnlineStores(ids: string[]): Promise<void> {
-  const response = await fetch("/api/resource/online_stores", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ids }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete online stores");
-  }
-}

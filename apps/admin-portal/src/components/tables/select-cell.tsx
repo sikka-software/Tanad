@@ -1,18 +1,19 @@
-import { useLocale, useTranslations } from "next-intl";
-import { ChangeEvent } from "react";
+import { useLocale } from "next-intl";
 
-import CodeInput from "../ui/code-input";
-import { CommandSelect } from "../ui/command-select";
-import { Input } from "../ui/input";
+import { CommandSelect } from "@/ui/command-select";
 
 const SelectCell = ({
   options,
   onChange,
   cellValue,
+  renderOption,
+  renderSelected,
 }: {
   options: any[];
   onChange: (value: any) => void;
   cellValue: any;
+  renderOption?: (item: any) => React.ReactNode;
+  renderSelected?: (item: any) => React.ReactNode;
 }) => {
   const lang = useLocale();
   return (
@@ -23,13 +24,14 @@ const SelectCell = ({
         inCell
         isLoading={false}
         defaultValue={String(cellValue)}
-        popoverClassName="w-full max-w-full"
+        popoverClassName="w-full  w-[var(--radix-select-trigger-width)] max-w-[500px]"
         buttonClassName="bg-transparent w-full max-w-full"
         valueKey="value"
         labelKey="label"
         onChange={onChange}
         texts={{ placeholder: ". . ." }}
-        renderOption={(item) => <div>{item.label}</div>}
+        renderOption={renderOption}
+        renderSelected={renderSelected}
         ariaInvalid={false}
       />
     </div>

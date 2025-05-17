@@ -13,6 +13,7 @@ interface BooleanTabsProps {
   buttonClassName?: string; // Common className for both buttons
   trueButtonClassName?: string; // Additional className for the "true" button
   falseButtonClassName?: string; // Additional className for the "false" button
+  disabled?: boolean;
 }
 
 const BooleanTabs = ({
@@ -26,6 +27,7 @@ const BooleanTabs = ({
   buttonClassName,
   trueButtonClassName,
   falseButtonClassName,
+  disabled,
 }: BooleanTabsProps) => {
   const [internalActiveValue, setInternalActiveValue] = React.useState(defaultValue);
 
@@ -43,16 +45,17 @@ const BooleanTabs = ({
     "inline-flex cursor-pointer items-center size-full justify-center whitespace-nowrap rounded-sm px-2 py-1 text-sm font-medium ring-offset-background transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-primary-foreground data-[state=active]:bg-primary z-[1]";
 
   return (
-    <div className={cn("", containerClassName)}>
+    <div className={cn("bg-input-background", containerClassName)}>
       <div
         className={cn(
-          "border-input border text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-md p-[4px]",
+          "border-input text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-md border p-[4px]",
           listClassName,
         )}
       >
         <div className="size-full">
           <button
             type="button"
+            disabled={disabled}
             onClick={() => handleValueChange(true)}
             data-state={activeValue === true ? "active" : "inactive"}
             className={cn(baseButtonStyles, buttonClassName, trueButtonClassName)}
@@ -63,6 +66,7 @@ const BooleanTabs = ({
         <div className="size-full">
           <button
             type="button"
+            disabled={disabled}
             onClick={() => handleValueChange(false)}
             data-state={activeValue === false ? "active" : "inactive"}
             className={cn(baseButtonStyles, buttonClassName, falseButtonClassName)}

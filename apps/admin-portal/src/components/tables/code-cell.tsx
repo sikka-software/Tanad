@@ -1,8 +1,8 @@
 import { useLocale, useTranslations } from "next-intl";
 import { ChangeEvent } from "react";
 
-import CodeInput from "../ui/code-input";
-import { Input } from "../ui/input";
+import CodeInput from "../ui/inputs/code-input";
+import { Input } from "../ui/inputs/input";
 
 const CodeCell = ({
   code,
@@ -22,14 +22,18 @@ const CodeCell = ({
   const cellValue = code;
   return (
     <div>
-      <CodeInput inCell onSerial={onSerial} onRandom={onRandom}>
-        <Input
-          inCell
-          value={cellValue || ""}
-          // disabled={isDisabled}
-          style={{ minHeight: 36 }}
-          // onFocus={(e) => handleCellFocus(e, groupKey, rowData, colDef)}
-          // onKeyDown={(e) => {
+      <CodeInput
+        inCell
+        onSerial={onSerial}
+        onRandom={onRandom}
+        inputProps={{
+          // inCell: true,
+          value: cellValue || "",
+          onChange: onChange,
+          // disabled: isDisabled,
+          style: { minHeight: 36 },
+          // onFocus: (e) => handleCellFocus(e, groupKey, rowData, colDef),
+          // onKeyDown: (e) => {
           //   if (
           //     (e.ctrlKey || e.metaKey) &&
           //     ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
@@ -37,13 +41,12 @@ const CodeCell = ({
           //     return;
           //   }
           //   handleKeyDown(e, colDef);
-          // }}
-          // onPaste={(e) => handlePaste(e, colDef)}
-          // onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
-          // onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
-          onChange={onChange}
-        />
-      </CodeInput>
+          // },
+          // onPaste: (e) => handlePaste(e, colDef),
+          // onInput: (e) => handleCellInput(e, groupKey, rowData, colDef),
+          // onBlur: (e) => handleCellBlur(e, groupKey, rowData, colDef),
+        }}
+      />
     </div>
   );
 };

@@ -29,9 +29,9 @@ const CustomPricingPage = () => {
 
 export default CustomPricingPage;
 
-CustomPricingPage.messages = ["Pages", "Pricing", "General"];
+CustomPricingPage.messages = ["Metadata", "Pages", "Pricing", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

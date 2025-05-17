@@ -1,19 +1,23 @@
-import { getCurrencySymbol } from "@root/src/lib/currency-utils";
-import { cn } from "@root/src/lib/utils";
-import useUserStore from "@root/src/stores/use-user-store";
-import { Search } from "lucide-react";
+import { Briefcase, Plus, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useMemo } from "react";
 import { FieldError, UseFormReturn } from "react-hook-form";
 
-import FormSectionHeader from "@/components/forms/form-section-header";
-import { FormField, FormItem } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { FormField, FormItem } from "@/ui/form";
 
-import { JobListingFormValues } from "@/modules/job-listing/job-listing.form";
-import { Job } from "@/modules/job/job.type";
+import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
+import { Input } from "@/components/ui/inputs/input";
 
-import { MoneyFormatter } from "../ui/currency-input";
+import FormSectionHeader from "@/forms/form-section-header";
+
+import { getCurrencySymbol } from "@/lib/currency-utils";
+import { cn } from "@/lib/utils";
+
+import { Job } from "@/job/job.type";
+
+import { JobListingFormValues } from "@/job-listing/job-listing.form";
+
+import { EmptyState } from "../ui/empty-state";
 
 interface JobListingJobsSelectionProps {
   editMode?: boolean;
@@ -62,7 +66,12 @@ const JobListingJobsSelection = ({
         isError={form.formState.errors.jobs as FieldError}
         onErrorText={t("JobListings.form.jobs.required")}
       />
-      <div className={cn("bg-background sticky top-[129px] z-10 mx-auto border-b")}>
+      <div
+        className={cn(
+          "bg-background sticky z-10 mx-auto border-b",
+          editMode ? "top-[81px]" : "top-[129px]",
+        )}
+      >
         <div className="form-container py-2">
           <div className="relative">
             <Input
@@ -75,14 +84,14 @@ const JobListingJobsSelection = ({
           </div>
         </div>
       </div>
-      <div className="form-container">
+      <div className="form-container bg--300 @container/jobs-section max-w-full">
         <FormField
           control={form.control}
           name="jobs"
           render={() => (
             <FormItem>
-              <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
-                {filteredJobs.length > 0 ? (
+              <div className="grid gap-4 md:grid-cols-1 @min-[500px]/jobs-section:grid-cols-3 @min-[800px]/jobs-section:grid-cols-4">
+                {filteredJobs.length > 0 &&
                   filteredJobs.map((job: Job) => (
                     <div
                       key={job.id}
@@ -93,8 +102,10 @@ const JobListingJobsSelection = ({
                       }`}
                       onClick={() => handleJobSelect(job.id)}
                     >
-                      <div className="flex flex-row justify-between mb-2">
-                        <span className="text-sm text-gray-500">0/10</span>
+                      <div className="mb-2 flex flex-row justify-between">
+                        <span className="text-sm text-gray-500">
+                          {job.occupied_positions}/{job.total_positions}
+                        </span>
                         {selectedJobs.includes(job.id) && (
                           <div className="bg-primary size-3 rounded-full" />
                         )}
@@ -118,11 +129,19 @@ const JobListingJobsSelection = ({
                         )}
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <p className="py-4 text-center text-gray-500">
-                    {t("JobListings.jobs_section.no_jobs_found")}
-                  </p>
+                  ))}
+                {filteredJobs.length === 0 && (
+                  <div className="col-span-full">
+                    <EmptyState
+                      title={t("Jobs.create_first.title")}
+                      description={t("Jobs.create_first.description")}
+                      icons={[Briefcase, Plus, Briefcase]}
+                      action={{
+                        label: t("Pages.Jobs.add"),
+                        onClick: () => setIsJobDialogOpen(true),
+                      }}
+                    />
+                  </div>
                 )}
               </div>
             </FormItem>

@@ -26,7 +26,7 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     await updateSalary({ id: rowId, data: { [columnId]: value } });
   };
 
-  const columns = useSalaryColumns();
+  const columns = useSalaryColumns(handleEdit);
 
   const selectedRows = useSalaryStore((state) => state.selectedRows);
   const setSelectedRows = useSalaryStore((state) => state.setSelectedRows);
@@ -61,7 +61,7 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
         columns={columns
           .map((col) => col.accessorKey || col.id)
           .filter((key): key is string => !!key)}
-        rows={5}
+        rows={12}
       />
     );
   }

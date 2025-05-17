@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { Plus, User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -6,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
@@ -20,14 +21,16 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import ClientCard from "@/client/client.card";
+import useClientColumns from "@/client/client.columns";
 import { ClientForm } from "@/client/client.form";
 import { useClients, useBulkDeleteClients, useDuplicateClient } from "@/client/client.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/client/client.options";
 import useClientStore from "@/client/client.store";
 import ClientsTable from "@/client/client.table";
-import { ClientUpdateData } from "@/client/client.type";
+import { ClientUpdateData, Client } from "@/client/client.type";
 
-import useClientColumns from "@/modules/client/client.columns";
+import { useCompanies } from "@/company/company.hooks";
+import { Company } from "@/company/company.type";
 
 export default function ClientsPage() {
   const t = useTranslations();
@@ -41,32 +44,37 @@ export default function ClientsPage() {
   const [actionableItem, setActionableItem] = useState<ClientUpdateData | null>(null);
   const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
+  // Permissions
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
-
+  // Loading
   const loadingSave = moduleHooks.useIsLoading();
   const setLoadingSave = moduleHooks.useSetIsLoading();
-
+  // Delete Dialog
   const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
   const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
-
+  // Selected Rows
   const selectedRows = moduleHooks.useSelectedRows();
   const setSelectedRows = moduleHooks.useSetSelectedRows();
-
+  const clearSelection = moduleHooks.useClearSelection();
+  // Column Visibility
   const columnVisibility = moduleHooks.useColumnVisibility();
   const setColumnVisibility = moduleHooks.useSetColumnVisibility();
-
-  const viewMode = moduleHooks.useViewMode();
-  const clearSelection = moduleHooks.useClearSelection();
+  // Sorting
   const sortRules = moduleHooks.useSortRules();
   const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
   const sortNullsFirst = moduleHooks.useSortNullsFirst();
-  const searchQuery = moduleHooks.useSearchQuery();
+  const setSortRules = moduleHooks.useSetSortRules();
+  // Filtering
   const filterConditions = moduleHooks.useFilterConditions();
   const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
   const getFilteredData = moduleHooks.useGetFilteredData();
   const getSortedData = moduleHooks.useGetSortedData();
+  // Misc
+  const searchQuery = moduleHooks.useSearchQuery();
+  const viewMode = moduleHooks.useViewMode();
 
+  const { data: companies } = useCompanies();
   const { data: clients, isLoading, error } = useClients();
   const { mutateAsync: deleteClients, isPending: isDeleting } = useBulkDeleteClients();
   const { mutate: duplicateClient } = useDuplicateClient();
@@ -110,6 +118,23 @@ export default function ClientsPage() {
   const sortedData = useMemo(() => {
     return getSortedData(filteredData);
   }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  const tanstackSorting = useMemo(
+    () => sortRules.map((rule) => ({ id: rule.field, desc: rule.direction === "desc" })),
+    [sortRules],
+  );
+  const handleTanstackSortingChange = (
+    updater:
+      | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
+      | { id: string; desc: boolean }[],
+  ) => {
+    let nextSorting = typeof updater === "function" ? updater(tanstackSorting) : updater;
+    const newSortRules = nextSorting.map((s: { id: string; desc: boolean }) => ({
+      field: s.id,
+      direction: (s.desc ? "desc" : "asc") as "asc" | "desc",
+    }));
+    setSortRules(newSortRules);
+  };
 
   if (!canRead) {
     return <NoPermission />;
@@ -159,15 +184,29 @@ export default function ClientsPage() {
               isLoading={isLoading}
               error={error}
               onActionClicked={onActionClicked}
+              sorting={tanstackSorting}
+              onSortingChange={handleTanstackSortingChange}
             />
           ) : (
             <div className="p-4">
-              <DataModelList
+              <DataModelList<Client>
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Clients.no_clients_found")}
-                renderItem={(client) => <ClientCard client={client} />}
+                empty={{
+                  title: t("Clients.create_first.title"),
+                  description: t("Clients.create_first.description"),
+                  add: t("Pages.Clients.add"),
+                  icons: [User, Plus, User],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
+                renderItem={(client) => (
+                  <ClientCard
+                    client={client}
+                    company={companies?.find((company) => company.id === client.company) as Company}
+                    onActionClicked={onActionClicked}
+                  />
+                )}
                 gridCols="3"
               />
             </div>
@@ -201,15 +240,25 @@ export default function ClientsPage() {
           title={t("Clients.confirm_delete", { count: selectedRows.length })}
           description={t("Clients.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}
+          onCancel={() => selectedRows.length === 1 && viewMode === "cards" && setSelectedRows([])}
         />
       </DataPageLayout>
     </div>
   );
 }
 
-ClientsPage.messages = ["Notes", "Pages", "Clients", "Companies", "General", "Forms"];
+ClientsPage.messages = [
+  "Metadata",
+  "Notes",
+  "Pages",
+  "Clients",
+  "Companies",
+  "General",
+  "Forms",
+  "CommonStatus",
+];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -1,6 +1,4 @@
-import { useProfile } from "@root/src/hooks/use-profile";
-import { getCurrencySymbol } from "@root/src/lib/currency-utils";
-import { currencies } from "@root/tanad.config";
+import { currencies } from "@tanad.config";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -12,21 +10,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+} from "@/ui/form";
+import { MultiSelect } from "@/ui/multi-select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Switch } from "@/ui/switch";
 
-import { Skeleton } from "../ui/skeleton";
-// Assuming you have a multi-select component or will use checkboxes
-// import MultiSelect from "@/components/ui/multi-select";
-// import { Checkbox } from "@/components/ui/checkbox";
+import { getCurrencySymbol } from "@/lib/currency-utils";
 
 import FormSectionHeader from "./form-section-header";
 
@@ -63,6 +52,8 @@ const JobListingOptionsSection = ({
             <FormItem>
               <FormLabel>{t("JobListings.options.currencyLabel")}</FormLabel>
               <Select
+                // TODO: this will be enabled when we have currency conversion
+                disabled
                 dir={lang === "ar" ? "rtl" : "ltr"}
                 onValueChange={(val) => {
                   field.onChange(val);
@@ -94,7 +85,7 @@ const JobListingOptionsSection = ({
         {/* Enable Search & Filtering */}
         <FormField
           control={form.control}
-          name="enableSearchFiltering" // Ensure this name matches your form schema
+          name="enable_search_filtering" // Ensure this name matches your form schema
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">

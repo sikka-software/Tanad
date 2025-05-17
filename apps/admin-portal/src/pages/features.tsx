@@ -1,4 +1,3 @@
-import settings from "@root/landing.config";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -7,6 +6,8 @@ import BottomCTA from "@/components/landing/BottomCTA";
 import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import FeatureCard from "@/components/landing/FeatureCard";
+
+import settings from "../../landing.config";
 
 export default function FeaturesPage() {
   const t = useTranslations();
@@ -49,9 +50,9 @@ export default function FeaturesPage() {
   );
 }
 
-FeaturesPage.messages = ["Pages", "General", "Features"];
+FeaturesPage.messages = ["Metadata", "Pages", "General", "Features"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, FeaturesPage.messages),

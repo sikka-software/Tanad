@@ -1,19 +1,22 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@root/src/components/ui/select";
-import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
+
+import DigitsInput from "@/components/ui/inputs/digits-input";
+import { Input } from "@/components/ui/inputs/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import { getNotesValue } from "@/lib/utils";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
@@ -258,6 +261,8 @@ export function BankAccountForm({
                 </FormItem>
               )}
             />
+          </div>
+          <div className="form-fields-cols-1">
             <FormField
               control={form.control}
               name="iban"
@@ -265,16 +270,32 @@ export function BankAccountForm({
                 <FormItem>
                   <FormLabel>{t("BankAccounts.form.iban.label")} *</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder={t("BankAccounts.form.iban.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
+                    <DigitsInput maxLength={24} disabled={isLoading} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="routing_number"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("BankAccounts.form.routing_number.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t("BankAccounts.form.routing_number.placeholder")}
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="swift_bic"
@@ -284,23 +305,6 @@ export function BankAccountForm({
                   <FormControl>
                     <Input
                       placeholder={t("BankAccounts.form.swift_bic.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="routing_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("BankAccounts.form.routing_number.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("BankAccounts.form.routing_number.placeholder")}
                       {...field}
                       disabled={isLoading}
                     />
@@ -323,7 +327,7 @@ export function BankAccountForm({
                       disabled={isLoading}
                     >
                       <FormControl>
-                        <SelectTrigger onClear={() => field.onChange("")}>
+                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
                           <SelectValue placeholder={t("BankAccounts.form.status.placeholder")} />
                         </SelectTrigger>
                       </FormControl>

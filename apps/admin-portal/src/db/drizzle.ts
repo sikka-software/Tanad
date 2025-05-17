@@ -11,9 +11,7 @@ if (!process.env.DATABASE_URL) {
 
 // Parse the connection string to handle SSL
 const connectionString = process.env.DATABASE_URL;
-const ssl = connectionString.includes("sslmode=require")
-  ? { rejectUnauthorized: false }
-  : false;
+const ssl = connectionString.includes("sslmode=require") ? { rejectUnauthorized: false } : false;
 
 const pool = new Pool({
   connectionString,

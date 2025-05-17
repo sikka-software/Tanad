@@ -1,5 +1,3 @@
-import { SERVER_OS } from "@root/src/lib/constants";
-import { SERVER_PROVIDERS } from "@root/src/lib/constants";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -9,10 +7,10 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyServer } from "@/lib/dummy-factory";
 
-import { ServerForm } from "@/modules/server/server.form";
-import useServerStore from "@/modules/server/server.store";
+import { ServerForm } from "@/server/server.form";
+import useServerStore from "@/server/server.store";
 
 export default function AddServerPage() {
   const router = useRouter();
@@ -20,19 +18,6 @@ export default function AddServerPage() {
 
   const setIsLoading = useServerStore((state) => state.setIsLoading);
   const isLoading = useServerStore((state) => state.isLoading);
-
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).serverForm;
-    if (form) {
-      form.setValue("name", dummyData.full_name);
-      form.setValue("ip_address", dummyData.random_ip_address);
-      form.setValue("location", dummyData.locations);
-      form.setValue("provider", dummyData.randomPicker(SERVER_PROVIDERS).value);
-      form.setValue("os", dummyData.randomPicker(SERVER_OS).value);
-      form.setValue("notes", dummyData.randomString);
-    }
-  };
 
   return (
     <div>
@@ -47,23 +32,32 @@ export default function AddServerPage() {
           submit_form: t("Pages.Servers.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyServer}
       />
 
       <ServerForm
         formHtmlId="server-form"
         onSuccess={() => {
-          router.push("/servers");
-          setIsLoading(false);
+          router.push("/servers").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>
   );
 }
 
-AddServerPage.messages = ["Notes", "Forms", "Pages", "Servers", "General"];
+AddServerPage.messages = [
+  "Metadata",
+  "Notes",
+  "Forms",
+  "Pages",
+  "Servers",
+  "General",
+  "PaymentCycles",
+];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
@@ -148,7 +148,6 @@ export default function UsersPage() {
                 data={sortedUsers}
                 isLoading={isLoading}
                 error={error as Error | null}
-                emptyMessage={t("Pages.Users.no_users_found")}
                 renderItem={(user) => <UserCard key={user.id} user={user} />}
                 gridCols="3"
               />
@@ -183,15 +182,16 @@ export default function UsersPage() {
           title={t("Users.confirm_delete", { count: selectedRows.length })}
           description={t("Users.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}
+          onCancel={() => selectedRows.length === 1 && viewMode === "cards" && setSelectedRows([])}
         />
       </DataPageLayout>
     </div>
   );
 }
 
-UsersPage.messages = ["Notes", "Pages", "Users", "Roles", "General"];
+UsersPage.messages = ["Metadata", "Notes", "Pages", "Users", "Roles", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../../locales/${locale}.json`)).default, UsersPage.messages),

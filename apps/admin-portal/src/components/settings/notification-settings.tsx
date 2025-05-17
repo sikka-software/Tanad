@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/ui/
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/ui/form";
 import { Switch } from "@/ui/switch";
 
-import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
+import { useUpdateProfile } from "@/hooks/use-profile";
+
 import useUserStore from "@/stores/use-user-store";
 
 const formSchema = z.object({
@@ -40,12 +41,12 @@ const NotificationSettings = ({
   const t = useTranslations();
   const lang = useLocale();
 
+  const user = useUserStore((state) => state.user);
+  const profile = useUserStore((state) => state.profile);
   // Get user from the existing store to get profile_id
-  const { user } = useUserStore();
   const profile_id = user?.id || "";
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   // Use the profile hook to fetch data
-  const { data: profile } = useProfile(profile_id);
 
   useEffect(() => {
     setTimeout(() => {
@@ -94,11 +95,17 @@ const NotificationSettings = ({
   const onSubmit = async (data: FormValues) => {
     onSave();
     try {
+      if (!profile?.id) {
+        throw new Error("Profile ID is required");
+      }
+
+      const currentUserSettings = profile.user_settings || {};
+
       await updateProfileMutation.mutateAsync({
-        profile_id,
+        id: profile.id,
         data: {
           user_settings: {
-            ...(profile?.user_settings || {}),
+            ...currentUserSettings,
             notifications: data,
           },
         },

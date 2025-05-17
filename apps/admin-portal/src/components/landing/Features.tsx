@@ -1,22 +1,13 @@
+import { BarChart3, Sparkle, Paintbrush, MonitorSmartphone } from "lucide-react";
 import { useTranslations } from "next-intl";
-import {
-  BarChart3,
-  Sparkle,
-  Paintbrush,
-  MonitorSmartphone,
-} from "lucide-react";
+
 import { BentoCard, BentoGrid } from "@/ui/bento-grid";
-import { FakeChart } from "@/components/landing/FakeChart";
 import { Marquee } from "@/ui/marquee";
+
+import { FakeChart } from "@/components/landing/FakeChart";
 import ThumbnailImage from "@/components/landing/ThumbnailImage";
-import {
-  cn,
-  appIcons1,
-  appIcons2,
-  appIcons3,
-  appIcons4,
-  thumbnails,
-} from "@/lib/utils";
+
+import { cn, appIcons1, appIcons2, appIcons3, appIcons4, thumbnails } from "@/lib/utils";
 
 export default function Features() {
   const t = useTranslations();
@@ -33,7 +24,7 @@ export default function Features() {
         <Marquee
           dir="ltr"
           pauseOnHover={false}
-          className="absolute top-10 [--duration:20s] [mask-image:linear-gradient(to_top,transparent_30%,#000_100%)] "
+          className="absolute top-10 [mask-image:linear-gradient(to_top,transparent_30%,#000_100%)] [--duration:20s]"
         >
           {thumbnails.map((thumb, i) => {
             return (
@@ -61,7 +52,7 @@ export default function Features() {
       background: (
         <div
           dir="ltr"
-          className="flex  absolute top-0 flex-col gap-0 [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)]"
+          className="absolute top-0 flex flex-col gap-0 [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)]"
         >
           <Marquee pauseOnHover={false}>
             {appIcons1.map((thumb, i) => {
@@ -138,7 +129,7 @@ export default function Features() {
       className: "col-span-2 md:col-span-2 lg:col-span-2",
       cta: t("General.get_started"),
       background: (
-        <div className="h-[300px] w-full absolute top-10 [--duration:20s] [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)]">
+        <div className="absolute top-10 h-[300px] w-full [mask-image:linear-gradient(to_top,transparent_40%,#000_100%)] [--duration:20s]">
           <FakeChart />
         </div>
       ),
@@ -147,24 +138,19 @@ export default function Features() {
   ];
 
   return (
-    <div className="relative py-24 pt-0 sm:py-32 bg-background" id="features">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 z-[100]">
+    <div className="bg-background relative py-24 pt-0 sm:py-32" id="features">
+      <div className="z-[100] mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-base font-semibold leading-7 text-primary">
-            {t("Features.title")}
-          </h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-primary sm:text-4xl">
+          <h2 className="text-primary text-base leading-7 font-semibold">{t("Features.title")}</h2>
+          <p className="text-primary mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
             {t("Features.subtitle")}
           </p>
         </div>
         <div className="mx-auto mt-16 sm:mt-20 lg:mt-24 lg:max-w-4xl">
-          <BentoGrid className="lg:grid-rows-2 md:grid-cols-4 grid-cols-1">
+          <BentoGrid className="grid-cols-1 md:grid-cols-4 lg:grid-rows-2">
             {features.map((feature) => (
               <BentoCard
-                className={cn(
-                  feature.className,
-                  "z-10 dark:!border-white/20 min-h-[350px] ",
-                )}
+                className={cn(feature.className, "z-10 min-h-[350px] dark:!border-white/20")}
                 cta={feature.cta}
                 href={feature.goto}
                 background={feature.background}

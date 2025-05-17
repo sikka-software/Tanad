@@ -1,10 +1,15 @@
-import SelectCell from "@root/src/components/tables/select-cell";
-import StatusCell from "@root/src/components/tables/status-cell";
-import { E_COMMERCE_PLATFORMS } from "@root/src/lib/constants";
+import { SquareArrowOutUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import IconButton from "@/ui/icon-button";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
+
+import SelectCell from "@/tables/select-cell";
+import StatusCell from "@/tables/status-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { E_COMMERCE_PLATFORMS } from "@/lib/constants";
 
 import { OnlineStore } from "./online-store.type";
 
@@ -17,7 +22,15 @@ const useOnlineStoreColumns = (
     {
       accessorKey: "domain_name",
       header: t("OnlineStores.form.domain_name.label"),
-      validationSchema: z.string().min(1, "Required"),
+      endIcon: ({ domain_name }) => (
+        <IconButton
+          size="icon_sm"
+          variant="ghost"
+          className="absolute -end-0.5 -top-1.5 z-10 cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+          onClick={() => window.open(`https://${domain_name}`, "_blank")}
+          icon={<SquareArrowOutUpRight className="size-4" />}
+        />
+      ),
     },
     {
       accessorKey: "platform",
@@ -30,13 +43,35 @@ const useOnlineStoreColumns = (
           onChange={(value) => handleEdit?.(row.id, "platform", value)}
           cellValue={getValue()}
           options={E_COMMERCE_PLATFORMS}
+          renderSelected={(item) => <div>{t(item.label)}</div>}
+          renderOption={(item) => <div>{t(item.label)}</div>}
         />
       ),
+    },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("OnlineStores.form.status.label"),
+      header: t("CommonStatus.label"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -46,8 +81,8 @@ const useOnlineStoreColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("OnlineStores.form.status.active"), value: "active" },
-              { label: t("OnlineStores.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

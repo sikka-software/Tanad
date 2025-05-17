@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+import { Input } from "../ui/inputs/input";
 
 const WaitlistSection = () => {
   const t = useTranslations();

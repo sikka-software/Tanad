@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { Button } from "@/ui/button";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -10,8 +11,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@root/src/components/ui/dialogs/alert-dialog";
-import { Button } from "@/components/ui/button";
+} from "@/ui/dialogs/alert-dialog";
 
 export interface ConfirmReactivateSubscriptionProps {
   open: boolean;

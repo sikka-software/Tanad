@@ -1,36 +1,41 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import { FormDialog } from "@root/src/components/ui/form-dialog";
-import { offices } from "@root/src/db/schema";
-import { getNotesValue } from "@root/src/lib/utils";
-import { createSelectSchema } from "drizzle-zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import BooleanTabs from "@/ui/boolean-tabs";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
+import FormDialog from "@/ui/form-dialog";
+import CodeInput from "@/ui/inputs/code-input";
+import { Input } from "@/ui/inputs/input";
+import PhoneInput from "@/ui/inputs/phone-input";
+import UnitsInput from "@/ui/inputs/units-input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
-import BooleanTabs from "@/components/ui/boolean-tabs";
-import CodeInput from "@/components/ui/code-input";
-import PhoneInput from "@/components/ui/phone-input";
+import NotesSection from "@/components/forms/notes-section";
+
+import { addressSchema } from "@/lib/schemas/address.schema";
+import { getNotesValue } from "@/lib/utils";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
+import { useCreateOffice, useOffices, useUpdateOffice } from "@/office/office.hooks";
+import useOfficeStore from "@/office/office.store";
+import { OfficeCreateData, OfficeUpdateData } from "@/office/office.type";
+
+import { EmployeeForm } from "@/employee/employee.form";
+import { useEmployees } from "@/employee/employee.hooks";
+import useEmployeeStore from "@/employee/employee.store";
+
+import { offices } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
-import { EmployeeForm } from "../employee/employee.form";
-import { useEmployees } from "../employee/employee.hooks";
-import useEmployeeStore from "../employee/employee.store";
-import { useCreateOffice, useOffices, useUpdateOffice } from "./office.hooks";
-import useOfficeStore from "./office.store";
-import { OfficeCreateData, OfficeUpdateData } from "./office.type";
-
 const createOfficeSchema = (t: (key: string) => string) => {
-  const OfficeSelectSchema = createSelectSchema(offices, {
+  const OfficeSelectSchema = createInsertSchema(offices, {
     name: z.string().min(1, t("Offices.form.name.required")),
     code: z.string().optional().or(z.literal("")),
     email: z
@@ -44,9 +49,14 @@ const createOfficeSchema = (t: (key: string) => string) => {
       .optional()
       .nullable(),
     status: z.enum(CommonStatus, {
-      message: t("Offices.form.status.required"),
+      message: t("CommonStatus.required"),
     }),
+    capacity: z.number().optional().nullable(),
+    working_hours: z.string().optional().nullable(),
+
+    area: z.string().optional().nullable(),
     notes: z.any().optional().nullable(),
+    ...addressSchema,
   });
   return OfficeSelectSchema;
 };
@@ -62,15 +72,17 @@ export function OfficeForm({
 }: ModuleFormProps<OfficeCreateData | OfficeUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
-  const { data: offices } = useOffices();
-  const { mutateAsync: createOffice, isPending: isCreating } = useCreateOffice();
-  const { mutateAsync: updateOffice, isPending: isUpdating } = useUpdateOffice();
+
   const user = useUserStore((state) => state.user);
-  const membership = useUserStore((state) => state.membership);
+  const enterprise = useUserStore((state) => state.enterprise);
+
+  const { data: offices } = useOffices();
+  const { mutateAsync: createOffice } = useCreateOffice();
+  const { mutateAsync: updateOffice } = useUpdateOffice();
   const isLoading = useOfficeStore((state) => state.isLoading);
   const setIsLoading = useOfficeStore((state) => state.setIsLoading);
 
-  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const { data: employees = [], isLoading: isFetchingEmployees } = useEmployees();
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
   const isEmployeeFormDialogOpen = useEmployeeStore((state) => state.isFormDialogOpen);
@@ -91,6 +103,9 @@ export function OfficeForm({
       country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
       manager: defaultValues?.manager || "",
+      area: defaultValues?.area || "",
+      working_hours: (defaultValues?.working_hours as string) || "",
+
       status: defaultValues?.status || "active",
       notes: getNotesValue(defaultValues),
     },
@@ -125,6 +140,7 @@ export function OfficeForm({
               region: data.region?.trim() || undefined,
               country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
+              area: data.area || undefined,
               status: data.status,
               notes: data.notes,
             },
@@ -136,7 +152,7 @@ export function OfficeForm({
           },
         );
       } else {
-        if (!membership?.enterprise_id) {
+        if (!enterprise?.id) {
           toast.error(t("General.error_operation"), {
             description: t("Offices.error.no_enterprise"),
           });
@@ -146,6 +162,8 @@ export function OfficeForm({
 
         await createOffice(
           {
+            user_id: user.id,
+            enterprise_id: enterprise.id,
             name: data.name.trim(),
             code: data.code?.trim() || undefined,
             short_address: data.short_address?.trim() || undefined,
@@ -155,9 +173,8 @@ export function OfficeForm({
             region: data.region?.trim() || undefined,
             country: data.country?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
-            enterprise_id: membership.enterprise_id,
+            area: data.area || undefined,
             status: data.status,
-            user_id: user.id,
             notes: data.notes,
           },
           {
@@ -189,6 +206,8 @@ export function OfficeForm({
     <div>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="form-fields-cols-2">
               <FormField
@@ -232,13 +251,11 @@ export function OfficeForm({
                           }
                           form.setValue("code", `OF-${randomCode}`);
                         }}
-                      >
-                        <Input
-                          {...field}
-                          disabled={isLoading}
-                          placeholder={t("Offices.form.code.placeholder")}
-                        />
-                      </CodeInput>
+                        inputProps={{
+                          disabled: isLoading,
+                          placeholder: t("Offices.form.code.placeholder"),
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -273,7 +290,6 @@ export function OfficeForm({
                       <PhoneInput
                         value={field.value || ""}
                         onChange={field.onChange}
-                        ariaInvalid={form.formState.errors.phone !== undefined}
                         disabled={isLoading}
                       />
                     </FormControl>
@@ -292,7 +308,7 @@ export function OfficeForm({
                       <ComboboxAdd
                         dir={locale === "ar" ? "rtl" : "ltr"}
                         data={employeeOptions}
-                        isLoading={employeesLoading}
+                        isLoading={isFetchingEmployees}
                         defaultValue={field.value || ""}
                         onChange={(value) => {
                           field.onChange(value || null);
@@ -304,7 +320,6 @@ export function OfficeForm({
                         }}
                         addText={t("Pages.Employees.add")}
                         onAddClick={() => setIsEmployeeFormDialogOpen(true)}
-                        ariaInvalid={!!form.formState.errors.manager}
                       />
                     </FormControl>
                     <FormMessage />
@@ -316,11 +331,12 @@ export function OfficeForm({
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Offices.form.status.label")}</FormLabel>
+                    <FormLabel>{t("CommonStatus.label")}</FormLabel>
                     <FormControl>
                       <BooleanTabs
-                        trueText={t("Offices.form.status.active")}
-                        falseText={t("Offices.form.status.inactive")}
+                        disabled={isLoading}
+                        trueText={t("CommonStatus.active")}
+                        falseText={t("CommonStatus.inactive")}
                         value={field.value === "active"}
                         onValueChange={(newValue) => {
                           field.onChange(newValue ? "active" : "inactive");
@@ -332,6 +348,61 @@ export function OfficeForm({
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="area"
+                render={({ field }) => {
+                  const [unit, setUnit] = useState("sqm");
+                  const initialNumber = (() => {
+                    if (typeof field.value === "string") {
+                      const match = field.value.match(/^(sqm|sqft)\s*(\d+(?:\.\d+)?)$/);
+                      if (match) return match[2];
+                    }
+                    return "";
+                  })();
+                  const [areaValue, setAreaValue] = useState(initialNumber);
+                  return (
+                    <FormItem>
+                      <FormLabel>{t("Offices.form.area.label")}</FormLabel>
+                      <FormControl>
+                        <UnitsInput
+                          label={undefined}
+                          inputProps={{
+                            type: "number",
+                            placeholder: t("Offices.form.area.placeholder"),
+                            value: areaValue,
+                            onChange: (e) => {
+                              setAreaValue(e.target.value);
+                            },
+                            onBlur: () => {
+                              if (areaValue === "") {
+                                field.onChange(undefined);
+                              } else {
+                                field.onChange(unit + " " + areaValue);
+                              }
+                            },
+                            disabled: isLoading,
+                          }}
+                          selectProps={{
+                            options: [
+                              { value: "sqm", label: "m²" },
+                              { value: "sqft", label: "ft²" },
+                            ],
+                            value: unit,
+                            onValueChange: (newUnit) => {
+                              setUnit(newUnit);
+                              if (areaValue !== "") {
+                                field.onChange(newUnit + " " + areaValue);
+                              }
+                            },
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
             </div>
           </div>
           <AddressFormSection
@@ -339,7 +410,7 @@ export function OfficeForm({
             inDialog={editMode || nestedForm}
             title={t("Offices.form.address.label")}
             control={form.control}
-            isLoading={isLoading}
+            disabled={isLoading}
           />
           <NotesSection
             inDialog={editMode || nestedForm}

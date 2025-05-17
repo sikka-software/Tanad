@@ -1,11 +1,10 @@
 "use client";
 
-import { Asterisk, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Input } from "@/ui/input";
 import {
   Sidebar,
   SidebarContent,
@@ -15,9 +14,11 @@ import {
   useSidebar,
 } from "@/ui/sidebar";
 
+import { Input } from "@/components/ui/inputs/input";
+
 import { applyCustomMenuOrder, getMenuList, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
-import useUserStore, { ProfileType } from "@/stores/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 
 import { EnterpriseSwitcher } from "./enterprise-switcher";
 import { NavMain } from "./sidebar-menu";
@@ -205,6 +206,9 @@ export function AppSidebar() {
       Accounting: filterGroup(items.Accounting),
       HumanResources: filterGroup(items.HumanResources),
       Settings: filterGroup(items.Settings),
+      Internet: filterGroup(items.Internet),
+      Fleet: filterGroup(items.Fleet),
+      SystemAdmin: filterGroup(items.SystemAdmin),
     };
   };
 
@@ -271,7 +275,7 @@ export function AppSidebar() {
         )}
       </SidebarContent>
       <SidebarFooter className="border-t">
-        {profile && <SidebarUserFooter user={profile as ProfileType} />}
+        {profile && <SidebarUserFooter user={profile} />}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

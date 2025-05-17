@@ -1,14 +1,17 @@
-import CurrencyCell from "@root/src/components/tables/currency-cell";
-import SelectCell from "@root/src/components/tables/select-cell";
-import StatusCell from "@root/src/components/tables/status-cell";
-import { SERVER_OS, SERVER_PROVIDERS } from "@root/src/lib/constants";
-import useUserStore from "@root/src/stores/use-user-store";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { Server } from "./server.type";
+import CurrencyCell from "@/tables/currency-cell";
+import SelectCell from "@/tables/select-cell";
+import StatusCell from "@/tables/status-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { SERVER_OS, SERVER_PROVIDERS } from "@/lib/constants";
+
+import { Server } from "@/server/server.type";
+import useUserStore from "@/stores/use-user-store";
 
 const useServerColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
@@ -36,6 +39,8 @@ const useServerColumns = (
           onChange={(value) => handleEdit?.(row.id, "provider", value)}
           cellValue={getValue()}
           options={SERVER_PROVIDERS}
+          renderSelected={(item) => <div>{t(item.label)}</div>}
+          renderOption={(item) => <div>{t(item.label)}</div>}
         />
       ),
     },
@@ -53,14 +58,14 @@ const useServerColumns = (
       ),
     },
     {
-      accessorKey: "monthly_cost",
-      header: t("Servers.form.monthly_cost.label"),
+      accessorKey: "monthly_payment",
+      header: t("PaymentCycles.monthly_payment.label"),
       validationSchema: z.number().min(0, "Required"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
     {
-      accessorKey: "annual_cost",
-      header: t("Servers.form.annual_cost.label"),
+      accessorKey: "annual_payment",
+      header: t("PaymentCycles.annual_payment.label"),
       validationSchema: z.number().min(0, "Required"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
@@ -68,24 +73,44 @@ const useServerColumns = (
       accessorKey: "payment_cycle",
       noPadding: true,
       enableEditing: false,
-      header: t("Servers.form.payment_cycle.label"),
+      header: t("PaymentCycles.label"),
       validationSchema: z.string().min(1, "Required"),
       cell: ({ getValue, row }) => (
         <SelectCell
           onChange={(value) => handleEdit?.(row.id, "payment_cycle", value)}
           cellValue={getValue()}
           options={[
-            { label: t("Servers.form.payment_cycle.monthly"), value: "monthly" },
-            { label: t("Servers.form.payment_cycle.annual"), value: "annual" },
+            { label: t("PaymentCycles.monthly"), value: "monthly" },
+            { label: t("PaymentCycles.annual"), value: "annual" },
           ]}
         />
       ),
     },
     { accessorKey: "tags", header: t("Servers.form.tags.label") },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Servers.form.status.label"),
+      header: t("CommonStatus.label"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -95,8 +120,8 @@ const useServerColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Servers.form.status.active"), value: "active" },
-              { label: t("Servers.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

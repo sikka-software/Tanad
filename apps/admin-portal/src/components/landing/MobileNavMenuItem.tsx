@@ -1,13 +1,9 @@
-import React, { MouseEventHandler } from "react";
 import { MotionProps, motion } from "motion/react";
 import Link from "next/link";
+import React, { MouseEventHandler } from "react";
+
 // UI
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/ui/accordion";
 
 type CustomMotionDivProps = MotionProps &
   React.HTMLAttributes<HTMLDivElement> & {
@@ -37,18 +33,18 @@ const MobileNavMenuItem: React.FC<CustomMotionDivProps> = (props) => {
               // unstyled hideArrow
               className="w-full text-start"
             >
-              <div className="cursor-pointer rounded-md p-6 text-3xl font-bold transition-all  hover:bg-primary/10">
+              <div className="hover:bg-primary/10 cursor-pointer rounded-md p-6 text-3xl font-bold transition-all">
                 {props.trigger}
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="flex flex-col gap-2 ">
+              <div className="flex flex-col gap-2">
                 {props.item.subitems.map((s: any, i: number) => (
                   <div
                     key={i}
-                    className="flex cursor-pointer flex-row items-center gap-2 rounded-md px-4 transition-all hover:bg-primary/10"
+                    className="hover:bg-primary/10 flex cursor-pointer flex-row items-center gap-2 rounded-md px-4 transition-all"
                   >
-                    <div className="h-[1px] w-[10px] bg-primary"></div>
+                    <div className="bg-primary h-[1px] w-[10px]"></div>
                     <div className="p-2 text-lg">{s}</div>
                   </div>
                 ))}
@@ -72,7 +68,7 @@ const MobileNavMenuItem: React.FC<CustomMotionDivProps> = (props) => {
           }}
           {...props}
         >
-          <div className="cursor-pointer rounded-md p-6 text-3xl font-bold transition-all hover:bg-primary/10">
+          <div className="hover:bg-primary/10 cursor-pointer rounded-md p-6 text-3xl font-bold transition-all">
             {props.trigger}
           </div>
         </motion.div>

@@ -53,22 +53,3 @@ export async function duplicateExpense(id: string): Promise<Expense> {
   }
   return response.json();
 }
-export async function deleteExpense(id: string): Promise<void> {
-  const response = await fetch(`/api/resource/expenses/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) {
-    throw new Error(`Failed to delete expense with id ${id}`);
-  }
-}
-
-export async function bulkDeleteExpenses(ids: string[]): Promise<void> {
-  const response = await fetch("/api/resource/expenses", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ids }),
-  });
-  if (!response.ok) {
-    throw new Error("Failed to delete expenses");
-  }
-}

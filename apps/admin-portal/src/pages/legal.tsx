@@ -9,9 +9,9 @@ export default function LegalPage() {
   );
 }
 
-LegalPage.messages = ["Pages", "General", "Legal"];
+LegalPage.messages = ["Metadata", "Pages", "General", "Legal"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, LegalPage.messages),

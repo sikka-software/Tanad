@@ -1,6 +1,5 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
 import maxmind from "maxmind";
+import type { NextApiRequest, NextApiResponse } from "next";
 import path from "path";
 import { UAParser } from "ua-parser-js";
 

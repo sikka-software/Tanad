@@ -13,13 +13,14 @@ import {
   DropdownMenuTrigger,
 } from "@/ui/dropdown-menu";
 import IconButton from "@/ui/icon-button";
-import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Separator } from "@/ui/separator";
 import { Switch } from "@/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
+
+import { Input } from "@/components/ui/inputs/input";
 
 import { FilterCondition } from "@/types/common.type";
 

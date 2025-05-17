@@ -1,17 +1,23 @@
-import SelectCell from "@root/src/components/tables/select-cell";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
-import { useJobs } from "../job/job.hooks";
-import { Employee, EmployeeStatus } from "./employee.types";
+import SelectCell from "@/tables/select-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { useJobs } from "@/job/job.hooks";
+
+import { Employee, EmployeeStatus } from "@/employee/employee.types";
 
 const useCompanyColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
-  const { data: jobs } = useJobs();
+  const { data: jobs, isLoading: isFetchingJobs } = useJobs();
+  const locale = useLocale();
 
   const columns: ExtendedColumnDef<Employee>[] = [
     {
@@ -36,13 +42,72 @@ const useCompanyColumns = (
       validationSchema: z.string().optional(),
     },
     {
+      accessorKey: "birth_date",
+      header: t("Employees.form.birth_date.label"),
+      validationSchema: z.string().optional(),
+    },
+    {
+      accessorKey: "hire_date",
+      header: t("Employees.form.hire_date.label"),
+      validationSchema: z.string().optional(),
+    },
+    {
       accessorKey: "job_id",
       header: t("Employees.form.job.label"),
       validationSchema: z.string().min(1, t("Employees.form.job.required")),
+      // cell: ({ row }) => {
+      //   const jobId = row.original.job_id;
+      //   const job = jobs?.find((j) => j.id === jobId);
+      //   return job ? job.title : jobId || "-";
+      // },
+
+      noPadding: true,
+
       cell: ({ row }) => {
-        const jobId = row.original.job_id;
-        const job = jobs?.find((j) => j.id === jobId);
-        return job ? job.title : jobId || "-";
+        const employee = row.original;
+        return (
+          <ComboboxAdd
+            dir={locale === "ar" ? "rtl" : "ltr"}
+            inCell
+            data={jobs || []}
+            labelKey="title"
+            valueKey="id"
+            isLoading={isFetchingJobs}
+            buttonClassName="bg-transparent"
+            defaultValue={employee.job_id || ""}
+            onChange={async (value) => {
+              handleEdit?.(employee.id, "job_id", value);
+            }}
+            texts={{
+              placeholder: ". . .",
+              searchPlaceholder: t("Pages.Employees.search"),
+              noItems: t("Offices.form.manager.no_employees"),
+            }}
+            addText={t("Pages.Employees.add")}
+            renderOption={(option) => {
+              return (
+                <div className="flex flex-row items-center justify-between gap-2">
+                  <div className="flex flex-col">
+                    <span>{option.title}</span>
+                    <span className="text-xs text-gray-500">{option.department}</span>
+                  </div>
+                  <Tooltip delayDuration={500}>
+                    <TooltipTrigger>
+                      <span className="text-xs text-gray-500">
+                        {option.occupied_positions} / {option.total_positions}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {t("Jobs.form.occupied_positions.label") +
+                        " / " +
+                        t("Jobs.form.total_positions.label")}
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              );
+            }}
+          />
+        );
       },
     },
     {
@@ -50,6 +115,26 @@ const useCompanyColumns = (
       header: t("Employees.form.nationality.label"),
       maxSize: 100,
       validationSchema: z.string().min(1, t("Employees.form.nationality.required")),
+    },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
 
     {

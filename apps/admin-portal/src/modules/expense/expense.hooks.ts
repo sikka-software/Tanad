@@ -1,15 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createExpense,
-  deleteExpense,
-  bulkDeleteExpenses,
   fetchExpenseById,
   fetchExpenses,
   updateExpense,
   duplicateExpense,
 } from "@/expense/expense.service";
-import type { Expense, ExpenseCreateData, ExpenseUpdateData } from "@/expense/expense.type";
+import type { ExpenseCreateData, ExpenseUpdateData } from "@/expense/expense.type";
 
 // Query keys for expenses
 export const expenseKeys = {
@@ -37,18 +37,11 @@ export function useExpense(id: string) {
   });
 }
 
-// Hook to create a expense
 export function useCreateExpense() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (expense: ExpenseCreateData) => createExpense(expense),
-    onSuccess: (newExpense: Expense) => {
-      const previousExpenses = queryClient.getQueryData(expenseKeys.lists()) || [];
-      queryClient.setQueryData(expenseKeys.lists(), [
-        ...(Array.isArray(previousExpenses) ? previousExpenses : []),
-        newExpense,
-      ]);
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: expenseKeys.lists() }),
     meta: { toast: { success: "Expenses.success.create", error: "Expenses.error.create" } },
   });
 }
@@ -83,7 +76,7 @@ export function useDuplicateExpense() {
 export function useDeleteExpense() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteExpense,
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/expenses/${id}`),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
       queryClient.removeQueries({ queryKey: expenseKeys.detail(variables) });
@@ -96,7 +89,7 @@ export function useDeleteExpense() {
 export function useBulkDeleteExpenses() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteExpenses,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/expenses", ids),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
     },

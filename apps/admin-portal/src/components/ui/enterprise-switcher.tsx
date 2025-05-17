@@ -1,25 +1,24 @@
 "use client";
 
-import useUserStore from "@root/src/stores/use-user-store";
-import { Asterisk, ChevronsUpDown, Pen, Plus, Settings } from "lucide-react";
+import { Asterisk, Plus, Settings } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import Image from "next/image";
 import Link from "next/link";
 import * as React from "react";
 
+import { Button } from "@/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/ui/sidebar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
-import { Button } from "./button";
-import IconButton from "./icon-button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
+import useUserStore from "@/stores/use-user-store";
 
 export function EnterpriseSwitcher({
   enterprises,
@@ -51,10 +50,12 @@ export function EnterpriseSwitcher({
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground aspect-squre flex size-8 !max-w-8 min-w-8 items-center justify-center overflow-hidden rounded-lg p-0">
                 {enterprise?.logo ? (
-                  <img
+                  <Image
                     src={enterprise?.logo}
                     alt={enterprise?.name || ""}
                     className="w-8 object-cover object-center"
+                    width={100}
+                    height={100}
                   />
                 ) : (
                   <Asterisk className="size-4" />

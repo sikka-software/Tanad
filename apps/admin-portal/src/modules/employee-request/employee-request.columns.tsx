@@ -1,14 +1,17 @@
-import CurrencyCell from "@root/src/components/tables/currency-cell";
-import SelectCell from "@root/src/components/tables/select-cell";
-import { Badge } from "@root/src/components/ui/badge";
-import useUserStore from "@root/src/stores/use-user-store";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { Badge } from "@/ui/badge";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { EmployeeRequest, EmployeeRequestStatus } from "./employee-request.type";
+import CurrencyCell from "@/tables/currency-cell";
+import SelectCell from "@/tables/select-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { EmployeeRequest, EmployeeRequestStatus } from "@/employee-request/employee-request.type";
+
+import useUserStore from "@/stores/use-user-store";
 
 const useEmployeeRequestColumns = (
   handleEdit?: (id: string, field: string, value: string) => void,
@@ -54,6 +57,26 @@ const useEmployeeRequestColumns = (
       accessorKey: "description",
       header: t("EmployeeRequests.form.description.label"),
       validationSchema: z.string().nullable(),
+    },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "status",

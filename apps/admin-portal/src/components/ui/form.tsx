@@ -2,6 +2,7 @@
 
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
+import { AnimatePresence, motion } from "motion/react";
 import * as React from "react";
 import {
   Controller,
@@ -75,7 +76,7 @@ function FormItem({ className, ...props }: React.ComponentProps<"div">) {
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div data-slot="form-item" className={cn("grid gap-2", className)} {...props} />
+      <div data-slot="form-item" className={cn("grid", className)} {...props} />
     </FormItemContext.Provider>
   );
 }
@@ -87,7 +88,7 @@ function FormLabel({ className, ...props }: React.ComponentProps<typeof LabelPri
     <Label
       data-slot="form-label"
       data-error={!!error}
-      className={cn("data-[error=true]:text-destructive", className)}
+      className={cn("data-[error=true]:text-destructive mb-2", className)}
       htmlFor={formItemId}
       {...props}
     />
@@ -121,23 +122,35 @@ function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
   );
 }
 
-function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
+function FormMessage({ className, children, ...rest }: React.ComponentProps<"p">) {
   const { error, formMessageId } = useFormField();
-  const body = error ? String(error?.message ?? "") : props.children;
-
-  if (!body) {
-    return null;
-  }
+  const body = error ? String(error?.message ?? "") : children;
 
   return (
-    <p
-      data-slot="form-message"
-      id={formMessageId}
-      className={cn("text-destructive text-sm", className)}
-      {...props}
-    >
-      {body}
-    </p>
+    <AnimatePresence presenceAffectsLayout={true} mode="wait">
+      <motion.p
+        layout="position"
+        key={formMessageId}
+        animate={{ opacity: 1, y: -0, height: error ? 26 : 0 }}
+        data-slot="form-message"
+        id={formMessageId}
+        className={cn(
+          body &&
+            "border-destructive bg-destructive/20 dark:bg-destructive/90 relative -z-1 overflow-hidden rounded-md !rounded-t-none border border-t-0 text-xs",
+          // "border-destructive bg-destructive/20 dark:bg-destructive/90 relative -z-1 overflow-hidden rounded-md !rounded-t-none border border-t-0 text-xs",
+          className,
+        )}
+        {...(rest as any)}
+      >
+        <span
+          className="absolute start-2 top-[4px]"
+          // "absolute start-2 top-[19px] -translate-y-[4px]"
+        >
+          {" "}
+          {body}
+        </span>
+      </motion.p>
+    </AnimatePresence>
   );
 }
 

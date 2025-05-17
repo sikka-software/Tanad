@@ -1,13 +1,16 @@
-import SelectCell from "@root/src/components/tables/select-cell";
-import StatusCell from "@root/src/components/tables/status-cell";
-import { MoneyFormatter } from "@root/src/components/ui/currency-input";
-import { getCurrencySymbol } from "@root/src/lib/currency-utils";
-import useUserStore from "@root/src/stores/use-user-store";
 import { CellContext } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
+import SelectCell from "@/components/tables/select-cell";
+import StatusCell from "@/components/tables/status-cell";
+import TimestampCell from "@/components/tables/timestamp-cell";
+import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+
+import { getCurrencySymbol } from "@/lib/currency-utils";
+
+import useUserStore from "@/stores/use-user-store";
 
 import { Job } from "./job.type";
 
@@ -61,7 +64,7 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
             {MoneyFormatter(props.row.original.salary)}
             {
               getCurrencySymbol(currency || "sar", {
-                usdClassName: "-ms-1",
+                usd: { className: "-ms-1" },
               }).symbol
             }
           </span>
@@ -90,9 +93,39 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
       },
     },
     {
+      accessorKey: "start_date",
+      header: t("Jobs.form.start_date.label"),
+      validationSchema: z.string().min(1, t("Jobs.form.start_date.required")),
+    },
+    {
+      accessorKey: "end_date",
+      header: t("Jobs.form.end_date.label"),
+      validationSchema: z.string().min(1, t("Jobs.form.end_date.required")),
+    },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+
+      enableEditing: false,
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Jobs.form.status.label"),
+      header: t("CommonStatus.label"),
       validationSchema: z.enum(["active", "inactive"]),
       noPadding: true,
       enableEditing: false,
@@ -103,8 +136,8 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Jobs.form.status.active"), value: "active" },
-              { label: t("Jobs.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

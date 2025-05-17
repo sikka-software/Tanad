@@ -747,7 +747,6 @@ function PaymentFormContent({
         message:
           "Payment setup error: Could not find your payment profile. Please try refreshing the page. If the problem persists, please contact support.",
         type: "general",
-        
       });
       setIsProcessing(false);
       return;

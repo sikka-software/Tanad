@@ -23,9 +23,9 @@ export default function TermsPage() {
   );
 }
 
-TermsPage.messages = ["Pages", "Terms", "General"];
+TermsPage.messages = ["Metadata", "Pages", "Terms", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, TermsPage.messages),

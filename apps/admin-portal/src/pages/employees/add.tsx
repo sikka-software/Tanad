@@ -7,7 +7,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyEmployee } from "@/lib/dummy-factory";
 
 import { EmployeeForm } from "@/employee/employee.form";
 import useEmployeesStore from "@/employee/employee.store";
@@ -18,21 +18,6 @@ export default function AddEmployeePage() {
 
   const setLoadingSave = useEmployeesStore((state) => state.setIsLoading);
   const loadingSave = useEmployeesStore((state) => state.isLoading);
-
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).employeeForm;
-    if (form) {
-      form.setValue("first_name", dummyData.first_name);
-      form.setValue("last_name", dummyData.last_name);
-      form.setValue("email", dummyData.randomNumber(3) + dummyData.email);
-      form.setValue("phone", dummyData.phone);
-      form.setValue("position", dummyData.employee_position);
-      form.setValue("hire_date", dummyData.employee_hire_date);
-      form.setValue("status", dummyData.employee_status);
-      form.setValue("notes", dummyData.employee_notes);
-    }
-  };
 
   return (
     <div>
@@ -47,21 +32,22 @@ export default function AddEmployeePage() {
           submit_form: t("Pages.Employees.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyEmployee}
       />
       <EmployeeForm
         formHtmlId="employee-form"
-        onSuccess={() =>
+        onSuccess={() => {
           router.push("/employees").then(() => {
             setLoadingSave(false);
-          })
-        }
+          });
+        }}
       />
     </div>
   );
 }
 
 AddEmployeePage.messages = [
+  "Metadata",
   "Employees",
   "Jobs",
   "Departments",
@@ -71,7 +57,7 @@ AddEmployeePage.messages = [
   "Forms",
 ];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

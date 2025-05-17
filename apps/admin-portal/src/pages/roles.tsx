@@ -1,13 +1,15 @@
 import { pick } from "lodash";
+import { User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/ui/badge";
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
@@ -162,8 +164,8 @@ export default function RolesPage() {
                 return undefined;
               }
             }}
-            createLabel={t("Roles.create_role")}
-            searchPlaceholder={t("Roles.search_roles")}
+            createLabel={t("Pages.Roles.create")}
+            searchPlaceholder={t("Pages.Roles.search")}
             hideOptions={allRoles?.length === 0}
           />
         )}
@@ -181,7 +183,6 @@ export default function RolesPage() {
             data={filteredRoles}
             isLoading={isLoading}
             error={error as Error | null}
-            emptyMessage={t("Roles.no_roles_found")}
             renderItem={(role) => (
               <RoleCard
                 key={role.id}
@@ -227,9 +228,9 @@ export default function RolesPage() {
   );
 }
 
-RolesPage.messages = ["Pages", "Roles", "Notes", "General"];
+RolesPage.messages = ["Metadata", "Pages", "Roles", "Notes", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, RolesPage.messages),

@@ -28,7 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import IconButton from "@/components/ui/icon-button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/components/ui/label";
 import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -42,8 +42,6 @@ import {
 
 import { downloadCSV } from "@/lib/csv-utils";
 import { cn } from "@/lib/utils";
-
-import { ProfileType } from "@/stores/use-user-store";
 
 import { useUsers } from "../user/user.hooks";
 import { ActivityLogPDFDocument } from "./activity.pdf";

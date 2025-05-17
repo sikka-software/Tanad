@@ -1,16 +1,12 @@
-import { useState, useEffect } from "react";
-import { TransitionPanel } from "@/ui/transition-panel";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/ui/dialog";
-import { Button } from "@/ui/button";
-import useMeasure from "react-use-measure";
-import { useLocale } from "next-intl";
 import { Loader2 } from "lucide-react";
+import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
+import { useState, useEffect } from "react";
+import useMeasure from "react-use-measure";
+
+import { Button } from "@/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/ui/dialog";
+import { TransitionPanel } from "@/ui/transition-panel";
 
 interface AdjustableDialogProps {
   items: { id: string; content: React.ReactNode }[];
@@ -124,11 +120,7 @@ const AdjustableDialog = ({
         </TransitionPanel>
         <div className="flex flex-row justify-between">
           {!shouldHidePrevious ? (
-            <Button
-              variant="secondary"
-              onClick={handlePrev}
-              disabled={isFirstItem}
-            >
+            <Button variant="secondary" onClick={handlePrev} disabled={isFirstItem}>
               {t("General.previous")}
             </Button>
           ) : (
@@ -141,7 +133,7 @@ const AdjustableDialog = ({
             className={shouldHidePrevious ? "" : ""}
           >
             {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : isLastItem ? (
               t("General.done")
             ) : (

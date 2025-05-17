@@ -1,6 +1,5 @@
-import useTruckColumns from "@root/src/modules/truck/truck.columns";
-import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
+import { Car, Plus, Truck } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -8,10 +7,12 @@ import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
+
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
@@ -19,13 +20,14 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import TruckCard from "@/modules/truck/truck.card";
-import { TruckForm } from "@/modules/truck/truck.form";
-import { useTrucks, useBulkDeleteTrucks, useDuplicateTruck } from "@/modules/truck/truck.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/truck/truck.options";
-import useTruckStore from "@/modules/truck/truck.store";
-import TrucksTable from "@/modules/truck/truck.table";
-import { TruckUpdateData } from "@/modules/truck/truck.type";
+import TruckCard from "@/truck/truck.card";
+import useTruckColumns from "@/truck/truck.columns";
+import { TruckForm } from "@/truck/truck.form";
+import { useTrucks, useBulkDeleteTrucks, useDuplicateTruck } from "@/truck/truck.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/truck/truck.options";
+import useTruckStore from "@/truck/truck.store";
+import TrucksTable from "@/truck/truck.table";
+import { TruckUpdateData } from "@/truck/truck.type";
 
 export default function TrucksPage() {
   const t = useTranslations();
@@ -39,33 +41,37 @@ export default function TrucksPage() {
   const [actionableItem, setActionableItem] = useState<TruckUpdateData | null>(null);
   const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
+  // Permissions
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
-
+  // Loading
   const loadingSave = moduleHooks.useIsLoading();
   const setLoadingSave = moduleHooks.useSetIsLoading();
-
+  // Delete Dialog
   const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
   const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
-
+  // Selected Rows
   const selectedRows = moduleHooks.useSelectedRows();
   const setSelectedRows = moduleHooks.useSetSelectedRows();
-
+  const clearSelection = moduleHooks.useClearSelection();
+  // Column Visibility
   const columnVisibility = moduleHooks.useColumnVisibility();
   const setColumnVisibility = moduleHooks.useSetColumnVisibility();
-
-  const viewMode = moduleHooks.useViewMode();
-  const clearSelection = moduleHooks.useClearSelection();
+  // Sorting
   const sortRules = moduleHooks.useSortRules();
   const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
   const sortNullsFirst = moduleHooks.useSortNullsFirst();
-  const searchQuery = moduleHooks.useSearchQuery();
+  const setSortRules = moduleHooks.useSetSortRules();
+  // Filtering
   const filterConditions = moduleHooks.useFilterConditions();
   const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
   const getFilteredData = moduleHooks.useGetFilteredData();
   const getSortedData = moduleHooks.useGetSortedData();
+  // Misc
+  const searchQuery = moduleHooks.useSearchQuery();
+  const viewMode = moduleHooks.useViewMode();
 
-  const { data: trucks, isLoading, error } = useTrucks();
+  const { data: trucks, isLoading: isFetchingTrucks, error } = useTrucks();
   const { mutateAsync: deleteTrucks, isPending: isDeleting } = useBulkDeleteTrucks();
   const { mutate: duplicateTruck } = useDuplicateTruck();
   const { createDeleteHandler } = useDeleteHandler();
@@ -109,6 +115,23 @@ export default function TrucksPage() {
     return getSortedData(filteredData);
   }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
 
+  const tanstackSorting = useMemo(
+    () => sortRules.map((rule) => ({ id: rule.field, desc: rule.direction === "desc" })),
+    [sortRules],
+  );
+  const handleTanstackSortingChange = (
+    updater:
+      | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
+      | { id: string; desc: boolean }[],
+  ) => {
+    let nextSorting = typeof updater === "function" ? updater(tanstackSorting) : updater;
+    const newSortRules = nextSorting.map((s: { id: string; desc: boolean }) => ({
+      field: s.id,
+      direction: (s.desc ? "desc" : "asc") as "asc" | "desc",
+    }));
+    setSortRules(newSortRules);
+  };
+
   if (!canRead) {
     return <NoPermission />;
   }
@@ -151,18 +174,28 @@ export default function TrucksPage() {
           {viewMode === "table" ? (
             <TrucksTable
               data={sortedData}
-              isLoading={isLoading}
+              isLoading={isFetchingTrucks}
               error={error}
               onActionClicked={onActionClicked}
+              sorting={tanstackSorting}
+              onSortingChange={handleTanstackSortingChange}
             />
           ) : (
             <div className="p-4">
               <DataModelList
                 data={sortedData}
-                isLoading={isLoading}
+                isLoading={isFetchingTrucks}
                 error={error}
-                emptyMessage={t("Trucks.no_trucks_found")}
-                renderItem={(truck) => <TruckCard key={truck.id} truck={truck} />}
+                empty={{
+                  title: t("Trucks.create_first.title"),
+                  description: t("Trucks.create_first.description"),
+                  add: t("Pages.Trucks.add"),
+                  icons: [Truck, Plus, Truck],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
+                renderItem={(truck) => (
+                  <TruckCard truck={truck} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>
@@ -196,15 +229,25 @@ export default function TrucksPage() {
           title={t("Trucks.confirm_delete", { count: selectedRows.length })}
           description={t("Trucks.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}
+          onCancel={() => selectedRows.length === 1 && viewMode === "cards" && setSelectedRows([])}
         />
       </DataPageLayout>
     </div>
   );
 }
 
-TrucksPage.messages = ["Pages", "Trucks", "Vehicles", "Notes", "Forms", "General"];
+TrucksPage.messages = [
+  "Metadata",
+  "Pages",
+  "Trucks",
+  "Vehicles",
+  "Notes",
+  "Forms",
+  "General",
+  "PaymentCycles",
+];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

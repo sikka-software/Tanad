@@ -10,11 +10,14 @@ import DebugTools from "@/ui/debug-tools";
 import { LoadingBar } from "@/ui/loading-bar";
 
 import ScrollToTop from "@/components/app/scroll-to-top";
+import SoonPage from "@/components/landing/soon-page";
 import AppLayout from "@/components/layouts/app-layout";
 import AuthLayout from "@/components/layouts/auth-layout";
-import LandingLayout from "@/components/layouts/landing-layout";
+
+// import LandingLayout from "@/components/layouts/landing-layout";
 
 import { QueryProvider } from "@/providers/QueryProvider";
+import { SupabaseProvider } from "@/providers/SupabaseProvider";
 import useUserStore from "@/stores/use-user-store";
 import "@/styles/globals.css";
 
@@ -91,9 +94,11 @@ function AppContent({ Component, pageProps, router }: AppProps) {
           timeZone="Asia/Riyadh"
           now={new Date()}
         >
-          <QueryProvider>
-            <AuthLayout>{<Component {...pageProps} />}</AuthLayout>
-          </QueryProvider>
+          <SupabaseProvider>
+            <QueryProvider>
+              <AuthLayout>{<Component {...pageProps} />}</AuthLayout>
+            </QueryProvider>
+          </SupabaseProvider>
         </NextIntlClientProvider>
       </div>
     );
@@ -109,7 +114,8 @@ function AppContent({ Component, pageProps, router }: AppProps) {
           timeZone="Asia/Riyadh"
           now={new Date()}
         >
-          <LandingLayout>{<Component {...pageProps} />}</LandingLayout>
+          <SoonPage />
+          {/* <LandingLayout>{<Component {...pageProps} />}</LandingLayout> */}
         </NextIntlClientProvider>
       </div>
     );
@@ -154,23 +160,16 @@ function AppContent({ Component, pageProps, router }: AppProps) {
         timeZone="Asia/Riyadh"
         now={new Date()}
       >
-        <QueryProvider>
-          <AppLayout>
-            <ScrollToTop />
-            <Component {...pageProps} />
-          </AppLayout>
-        </QueryProvider>
+        <SupabaseProvider>
+          <QueryProvider>
+            <AppLayout>
+              <ScrollToTop />
+              <Component {...pageProps} />
+            </AppLayout>
+          </QueryProvider>
+        </SupabaseProvider>
       </NextIntlClientProvider>
     </div>
-  );
-}
-
-export default function App(props: AppProps) {
-  return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <AppContent {...props} />
-      {process.env.NODE_ENV === "development" && <DebugTools />}
-    </ThemeProvider>
   );
 }
 
@@ -193,3 +192,12 @@ const JobListingPage = ({ children }: { children: React.ReactNode }) => {
     </ThemeProvider>
   );
 };
+
+export default function App(props: AppProps) {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <AppContent {...props} />
+      {process.env.NODE_ENV === "development" && <DebugTools />}
+    </ThemeProvider>
+  );
+}

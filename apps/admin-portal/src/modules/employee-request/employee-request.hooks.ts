@@ -1,16 +1,14 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
-import { departmentKeys } from "../department/department.hooks";
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createEmployeeRequest,
-  deleteEmployeeRequest,
   fetchEmployeeRequestById,
   fetchEmployeeRequests,
   updateEmployeeRequest,
-  bulkDeleteEmployeeRequests,
   duplicateEmployeeRequest,
 } from "./employee-request.service";
 import {
@@ -57,18 +55,28 @@ export const useCreateEmployeeRequest = () => {
 
       queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
     },
+    meta: {
+      toast: { success: "EmployeeRequests.success.create", error: "EmployeeRequests.error.create" },
+    },
   });
 };
 
 export function useDuplicateEmployeeRequest() {
   const queryClient = useQueryClient();
-  const t = useTranslations();
-
   return useMutation({
     mutationFn: (id: string) => duplicateEmployeeRequest(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: employeeRequestKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
+    },
+    meta: {
+      toast: {
+        success: "EmployeeRequests.success.duplicate",
+        error: "EmployeeRequests.error.duplicate",
+      },
+    },
   });
 }
-
 export function useUpdateEmployeeRequest() {
   const queryClient = useQueryClient();
   const t = useTranslations();
@@ -159,16 +167,22 @@ export function useUpdateEmployeeRequest() {
         queryClient.setQueryData(employeeRequestKeys.detail(id), context.previousEmployeeRequest);
       }
     },
+    meta: {
+      toast: { success: "EmployeeRequests.success.update", error: "EmployeeRequests.error.update" },
+    },
   });
 }
 
 export function useDeleteEmployeeRequest() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteEmployeeRequest,
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/employee-requests/${id}`),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
       queryClient.removeQueries({ queryKey: employeeRequestKeys.detail(variables) });
+    },
+    meta: {
+      toast: { success: "EmployeeRequests.success.delete", error: "EmployeeRequests.error.delete" },
     },
   });
 }
@@ -176,9 +190,10 @@ export function useDeleteEmployeeRequest() {
 export function useBulkDeleteEmployeeRequests() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteEmployeeRequests,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/employee-requests", ids),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() }),
+    meta: {
+      toast: { success: "EmployeeRequests.success.delete", error: "EmployeeRequests.error.delete" },
     },
   });
 }

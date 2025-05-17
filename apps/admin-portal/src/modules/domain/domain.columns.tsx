@@ -1,13 +1,17 @@
-import CurrencyCell from "@root/src/components/tables/currency-cell";
-import SelectCell from "@root/src/components/tables/select-cell";
-import StatusCell from "@root/src/components/tables/status-cell";
-import useUserStore from "@root/src/stores/use-user-store";
+import { SquareArrowOutUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import IconButton from "@/ui/icon-button";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { Domain } from "./domain.type";
+import CurrencyCell from "@/tables/currency-cell";
+import SelectCell from "@/tables/select-cell";
+import StatusCell from "@/tables/status-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { Domain } from "@/domain/domain.type";
+import useUserStore from "@/stores/use-user-store";
 
 const useDomainColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
@@ -18,7 +22,15 @@ const useDomainColumns = (
     {
       accessorKey: "domain_name",
       header: t("Domains.form.domain_name.label"),
-      validationSchema: z.string().min(1, "Required"),
+      endIcon: ({ domain_name }) => (
+        <IconButton
+          size="icon_sm"
+          variant="ghost"
+          className="absolute -end-0.5 -top-1.5 z-10 cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+          onClick={() => window.open(`https://${domain_name}`, "_blank")}
+          icon={<SquareArrowOutUpRight className="size-4" />}
+        />
+      ),
     },
     {
       accessorKey: "registrar",
@@ -26,14 +38,14 @@ const useDomainColumns = (
       validationSchema: z.string().min(1, "Required"),
     },
     {
-      accessorKey: "monthly_cost",
-      header: t("Domains.form.monthly_cost.label"),
+      accessorKey: "monthly_payment",
+      header: t("PaymentCycles.monthly_payment.label"),
       validationSchema: z.number().min(0, "Required"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
     {
-      accessorKey: "annual_cost",
-      header: t("Domains.form.annual_cost.label"),
+      accessorKey: "annual_payment",
+      header: t("PaymentCycles.annual_payment.label"),
       validationSchema: z.number().min(0, "Required"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
@@ -46,18 +58,38 @@ const useDomainColumns = (
           onChange={(value) => handleEdit?.(row.id, "payment_cycle", value)}
           cellValue={getValue()}
           options={[
-            { label: t("Domains.form.payment_cycle.monthly"), value: "monthly" },
-            { label: t("Domains.form.payment_cycle.annual"), value: "annual" },
+            { label: t("PaymentCycles.monthly"), value: "monthly" },
+            { label: t("PaymentCycles.annual"), value: "annual" },
           ]}
         />
       ),
-      header: t("Domains.form.payment_cycle.label"),
+      header: t("PaymentCycles.label"),
       validationSchema: z.string().min(1, "Required"),
+    },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("Domains.form.status.label"),
+      header: t("CommonStatus.label"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -67,8 +99,8 @@ const useDomainColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("Domains.form.status.active"), value: "active" },
-              { label: t("Domains.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

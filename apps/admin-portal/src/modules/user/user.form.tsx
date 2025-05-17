@@ -1,59 +1,51 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { FormDialog } from "@/ui/form-dialog";
-import { Input } from "@/ui/input";
+import FormDialog from "@/ui/form-dialog";
+import PasswordInput from "@/ui/password-input";
 
-import PasswordInput from "@/components/ui/password-input";
+import { Input } from "@/components/ui/inputs/input";
 
 import { ModuleFormProps } from "@/types/common.type";
 
+import { RoleForm } from "@/role/role.form";
+import { useCustomRoles, useSystemRoles } from "@/role/role.hooks";
+import { predefinedRoles } from "@/role/role.options";
+import useRoleStore from "@/role/role.store";
+import type { Role } from "@/role/role.type";
+
+import { useCreateUser, useUpdateUser } from "@/user/user.hooks";
+import useEnterpriseUsersStore from "@/user/user.store";
+import type { UserCreateData, UserUpdateData, UserType } from "@/user/user.type";
+
 import useUserStore from "@/stores/use-user-store";
 
-import { RoleForm } from "../role/role.form";
-// Import store for loading state
+const createUserFormSchema = (t: (key: string) => string) => {
+  const UserFormSchema = z.object({
+    first_name: z.string().min(1, { message: t("Users.form.first_name.required") }),
+    last_name: z.string().min(1, { message: t("Users.form.last_name.required") }),
+    email: z.string().email({ message: t("Users.form.email.invalid") }),
+    role: z.string().min(1, { message: t("Users.form.role.required") }),
+    password: z.string().min(8, { message: t("Users.form.password.required") }),
+  });
+  return UserFormSchema;
+};
 
-import { useCustomRoles, useSystemRoles } from "../role/role.hooks";
-import { predefinedRoles } from "../role/role.options";
-import useRoleStore from "../role/role.store";
-import type { Role } from "../role/role.type";
-// Import hooks for create/update
-import { useCreateUser, useUpdateUser } from "./user.hooks";
-import useEnterpriseUsersStore from "./user.store";
-// Add User type
-import type { UserCreateData, UserUpdateData, UserType } from "./user.type";
-
-// Import RoleForm
-
-// Adjust schema: make password optional for updates
-const baseUserFormSchema = z.object({
-  first_name: z.string().min(1, { message: "First name is required." }),
-  last_name: z.string().min(1, { message: "Last name is required." }),
-  email: z.string().email({ message: "Invalid email address." }),
-  role: z.string().min(1, { message: "Role is required." }),
-});
-
-const createUserFormSchema = baseUserFormSchema.extend({
-  password: z.string().min(8, { message: "Password must be at least 8 characters." }),
-});
-
-const updateUserFormSchema = baseUserFormSchema.extend({
-  // Password is optional for update, validation happens server-side if provided
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters." })
-    .optional()
-    .or(z.literal("")),
-});
+// Password is optional for update, validation happens server-side if provided
+// password: z
+//   .string()
+//   .min(8, { message: "Password must be at least 8 characters." })
+//   .optional()
+//   .or(z.literal("")),
 
 // Infer the type from the base schema, specific validation handled conditionally
-type UserFormData = z.infer<typeof baseUserFormSchema> & { password?: string };
+export type UserFormValues = z.input<ReturnType<typeof createUserFormSchema>>;
 
 export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormProps<UserType>) {
   const t = useTranslations();
@@ -110,10 +102,10 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
   const rolesError = customRolesError || systemRolesError;
 
   const isEditing = !!defaultValues;
-  const currentSchema = isEditing ? updateUserFormSchema : createUserFormSchema;
+  // const currentSchema = isEditing ? updateUserFormSchema : createUserFormSchema;
 
-  const form = useForm<UserFormData>({
-    resolver: zodResolver(currentSchema),
+  const form = useForm<UserFormValues>({
+    resolver: zodResolver(createUserFormSchema(t)),
     defaultValues: useMemo(() => {
       // Revert to splitting full_name
       const [firstName = "", lastName = ""] = (defaultValues?.full_name || "").split(" ", 2);
@@ -168,7 +160,7 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
     [t, setIsRoleDialogOpen, form],
   );
 
-  const onSubmit = async (values: UserFormData) => {
+  const onSubmit = async (values: UserFormValues) => {
     if (!enterprise?.id) {
       toast.error(t("Users.error.missing_enterprise"));
       return;
@@ -357,8 +349,8 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
                     onChange={(value) => field.onChange(value || null)} // Update form value
                     texts={{
                       placeholder: t("Users.form.role.placeholder"),
-                      searchPlaceholder: t("Users.form.role.search_placeholder"),
-                      noItems: t("Roles.no_roles_available"),
+                      searchPlaceholder: t("Pages.Roles.search"),
+                      noItems: t("Pages.Roles.no_roles_available"),
                     }}
                     addText={t("Pages.Roles.add")} // Use Role translation
                     onAddClick={() => setIsRoleDialogOpen(true)} // Open dialog

@@ -65,27 +65,3 @@ export async function duplicateClient(id: string): Promise<Client> {
 
   return response.json();
 }
-
-export async function deleteClient(id: string): Promise<void> {
-  const response = await fetch(`/api/resource/clients/${id}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to delete client with id ${id}`);
-  }
-}
-
-export async function bulkDeleteClients(ids: string[]): Promise<void> {
-  const response = await fetch("/api/resource/clients", {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ ids }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete clients");
-  }
-}

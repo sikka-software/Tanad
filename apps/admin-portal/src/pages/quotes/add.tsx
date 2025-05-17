@@ -36,17 +36,18 @@ export default function AddQuotePage() {
       <QuoteForm
         formHtmlId="quote-form"
         onSuccess={() => {
-          router.push("/quotes");
-          setIsLoading(false);
+          router.push("/quotes").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>
   );
 }
 
-AddQuotePage.messages = ["Notes", "Pages", "Quotes", "General"];
+AddQuotePage.messages = ["Metadata", "Notes", "Pages", "Quotes", "General", "ProductsFormSection"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

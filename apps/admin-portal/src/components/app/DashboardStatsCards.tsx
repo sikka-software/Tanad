@@ -1,7 +1,7 @@
-import { ModulesOptions } from "@root/tanad.config";
+import { ModulesOptions, TanadModules } from "@tanad.config";
 import { useTranslations } from "next-intl";
 
-import { StatCard } from "@/components/ui/stat-card";
+import { StatCard } from "@/ui/stat-card";
 
 import { convertToPascalCase } from "@/lib/utils";
 
@@ -36,7 +36,7 @@ const DashboardCards = ({
               acc[category].push({ ...module, key });
               return acc;
             },
-            {} as Record<string, Array<(typeof ModulesOptions)[string] & { key: string }>>,
+            {} as Record<string, Array<(typeof ModulesOptions)[TanadModules] & { key: string }>>,
           ),
         ).map(([categoryName, modulesInCategory]) => {
           // Filter modules that are not skipped and for which the user has permission

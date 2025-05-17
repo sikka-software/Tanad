@@ -23,9 +23,9 @@ export default function PrivacyPage() {
   );
 }
 
-PrivacyPage.messages = ["Pages", "General", "Privacy"];
+PrivacyPage.messages = ["Metadata", "Pages", "General", "Privacy"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, PrivacyPage.messages),

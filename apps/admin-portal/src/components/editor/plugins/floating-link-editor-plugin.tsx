@@ -33,7 +33,7 @@ import { getSelectedNode } from "@/components/editor/utils/get-selected-node";
 import { setFloatingElemPositionForLinkEditor } from "@/components/editor/utils/set-floating-elem-position-for-link-editor";
 import { sanitizeUrl } from "@/components/editor/utils/url";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 
 function FloatingLinkEditor({
   editor,
@@ -212,7 +212,7 @@ function FloatingLinkEditor({
   return (
     <div
       ref={editorRef}
-      className="absolute top-0 start-0 w-full max-w-sm rounded-md opacity-0 shadow-md"
+      className="absolute start-0 top-0 w-full max-w-sm rounded-md opacity-0 shadow-md"
     >
       {!isLink ? null : isLinkEditMode ? (
         <div className="flex items-center gap-1 rounded-md border p-1">

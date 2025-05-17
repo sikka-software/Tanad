@@ -1,5 +1,5 @@
-import { createModuleStoreHooks } from "@root/src/utils/module-hooks";
 import { pick } from "lodash";
+import { Briefcase, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -8,30 +8,31 @@ import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import FormDialog from "@/ui/form-dialog";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
+
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { FormDialog } from "@/components/ui/form-dialog";
-import NoPermission from "@/components/ui/no-permission";
 
 import JobListingCard from "@/job-listing/job-listing.card";
+import useJobListingColumns from "@/job-listing/job-listing.columns";
+import { JobListingForm } from "@/job-listing/job-listing.form";
 import {
   useJobListings,
-  useBulkDeleteJobListings,
   useDuplicateJobListing,
+  useBulkDeleteJobListings,
 } from "@/job-listing/job-listing.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/job-listing/job-listing.options";
 import useJobListingsStore from "@/job-listing/job-listing.store";
 import JobListingsTable from "@/job-listing/job-listing.table";
 import { JobListingUpdateData, JobListingWithJobs } from "@/job-listing/job-listing.type";
-
-import useJobListingColumns from "@/modules/job-listing/job-listing.columns";
-import { JobListingForm } from "@/modules/job-listing/job-listing.form";
 
 export default function JobListingsPage() {
   const t = useTranslations();
@@ -43,32 +44,35 @@ export default function JobListingsPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<JobListingUpdateData | null>(null);
-
+  // Permissions
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
-
+  // Loading
   const loadingSave = moduleHooks.useIsLoading();
   const setLoadingSave = moduleHooks.useSetIsLoading();
-
+  // Delete Dialog
   const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
   const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
-
+  // Selected Rows
   const selectedRows = moduleHooks.useSelectedRows();
   const setSelectedRows = moduleHooks.useSetSelectedRows();
-
+  const clearSelection = moduleHooks.useClearSelection();
+  // Column Visibility
   const columnVisibility = moduleHooks.useColumnVisibility();
   const setColumnVisibility = moduleHooks.useSetColumnVisibility();
-
-  const viewMode = moduleHooks.useViewMode();
-  const clearSelection = moduleHooks.useClearSelection();
+  // Sorting
   const sortRules = moduleHooks.useSortRules();
   const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
   const sortNullsFirst = moduleHooks.useSortNullsFirst();
-  const searchQuery = moduleHooks.useSearchQuery();
+  const setSortRules = moduleHooks.useSetSortRules();
+  // Filtering
   const filterConditions = moduleHooks.useFilterConditions();
   const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
   const getFilteredData = moduleHooks.useGetFilteredData();
   const getSortedData = moduleHooks.useGetSortedData();
+  // Misc
+  const searchQuery = moduleHooks.useSearchQuery();
+  const viewMode = moduleHooks.useViewMode();
 
   const { data: jobListings, isLoading, error } = useJobListings();
   const { mutateAsync: deleteJobListings, isPending: isDeleting } = useBulkDeleteJobListings();
@@ -115,9 +119,27 @@ export default function JobListingsPage() {
     return getSortedData(filteredData);
   }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
 
+  const tanstackSorting = useMemo(
+    () => sortRules.map((rule) => ({ id: rule.field, desc: rule.direction === "desc" })),
+    [sortRules],
+  );
+  const handleTanstackSortingChange = (
+    updater:
+      | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
+      | { id: string; desc: boolean }[],
+  ) => {
+    let nextSorting = typeof updater === "function" ? updater(tanstackSorting) : updater;
+    const newSortRules = nextSorting.map((s: { id: string; desc: boolean }) => ({
+      field: s.id,
+      direction: (s.desc ? "desc" : "asc") as "asc" | "desc",
+    }));
+    setSortRules(newSortRules);
+  };
+
   if (!canRead) {
     return <NoPermission />;
   }
+
   return (
     <div>
       <CustomPageMeta
@@ -159,6 +181,8 @@ export default function JobListingsPage() {
               isLoading={isLoading}
               error={error}
               onActionClicked={onActionClicked}
+              sorting={tanstackSorting}
+              onSortingChange={handleTanstackSortingChange}
             />
           ) : (
             <div className="p-4">
@@ -166,9 +190,15 @@ export default function JobListingsPage() {
                 data={sortedData}
                 isLoading={isLoading}
                 error={error}
-                emptyMessage={t("Pages.JobListings.no_listings_found")}
+                empty={{
+                  title: t("JobListings.create_first.title"),
+                  description: t("JobListings.create_first.description"),
+                  add: t("Pages.JobListings.add"),
+                  icons: [Briefcase, Plus, Briefcase],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
                 renderItem={(listing: JobListingWithJobs) => (
-                  <JobListingCard key={listing.id} jobListing={listing} />
+                  <JobListingCard jobListing={listing} onActionClicked={onActionClicked} />
                 )}
                 gridCols="3"
               />
@@ -189,9 +219,6 @@ export default function JobListingsPage() {
               setIsFormDialogOpen(false);
               setActionableItem(null);
               setLoadingSave(false);
-              toast.success(t("General.successful_operation"), {
-                description: t("JobListings.success.update"),
-              });
             }}
             defaultValues={actionableItem}
             editMode={true}
@@ -206,15 +233,25 @@ export default function JobListingsPage() {
           title={t("JobListings.confirm_delete", { count: selectedRows.length })}
           description={t("JobListings.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}
+          onCancel={() => selectedRows.length === 1 && viewMode === "cards" && setSelectedRows([])}
         />
       </DataPageLayout>
     </div>
   );
 }
 
-JobListingsPage.messages = ["Notes", "Pages", "JobListings", "Settings", "Jobs", "General"];
+JobListingsPage.messages = [
+  "Metadata",
+  "Notes",
+  "Pages",
+  "JobListings",
+  "Settings",
+  "Jobs",
+  "General",
+  "CommonStatus",
+];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

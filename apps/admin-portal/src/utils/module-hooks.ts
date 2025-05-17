@@ -16,6 +16,7 @@ export interface ModuleStoreBase {
   viewMode: string;
   clearSelection: () => void;
   sortRules: SortRule[]; // Replace with your actual type
+  setSortRules: (sortRules: SortRule[]) => void;
   sortCaseSensitive: boolean;
   sortNullsFirst: boolean;
   searchQuery: string;
@@ -50,5 +51,6 @@ export function createModuleStoreHooks<T extends ModuleStoreBase>(
     useFilterCaseSensitive: () => useStore().filterCaseSensitive,
     useGetFilteredData: () => useStore().getFilteredData,
     useGetSortedData: () => useStore().getSortedData,
+    useSetSortRules: () => useStore().setSortRules,
   };
 }

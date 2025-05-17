@@ -1,66 +1,81 @@
-import { Calendar, DollarSign, Tag } from "lucide-react";
+import { parseDate } from "@internationalized/date";
+import { format } from "date-fns";
+import { Calendar, CalendarClock, CalendarPlus, Tag } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useDateFormatter } from "react-aria";
 
-import { Badge } from "@/ui/badge";
-import { Card, CardContent, CardHeader } from "@/ui/card";
+import ModuleCard from "@/components/cards/module-card";
+import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 
-import { Expense } from "@/expense/expense.type";
+import { getCurrencySymbol } from "@/lib/currency-utils";
 
-const ExpenseCard = ({ expense }: { expense: Expense }) => {
+import { useUpdateExpense } from "@/expense/expense.hooks";
+import useExpenseStore from "@/expense/expense.store";
+import { Expense, ExpenseStatus, ExpenseStatusProps } from "@/expense/expense.type";
+
+import useUserStore from "@/stores/use-user-store";
+
+const ExpenseCard = ({
+  expense,
+  onActionClicked,
+}: {
+  expense: Expense;
+  onActionClicked: (action: string, id: string) => void;
+}) => {
   const t = useTranslations();
+  const formatter = useDateFormatter();
+  const { mutate: updateExpense } = useUpdateExpense();
+  const data = useExpenseStore((state) => state.data);
+  const setData = useExpenseStore((state) => state.setData);
+  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "id") return;
+    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
+    await updateExpense({ id: rowId, data: { [columnId]: value } });
+  };
+
   return (
-    <Card key={expense.id} className="transition-shadow hover:shadow-lg">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold">{expense.expense_number}</h3>
-            <p className="text-sm text-gray-500">{expense.category}</p>
-          </div>
-          <Badge
-            variant={
-              expense.status === "paid"
-                ? "default"
-                : expense.status === "rejected"
-                  ? "destructive"
-                  : "secondary"
-            }
-          >
-            {t(`Expenses.form.status.${expense.status}`)}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
+    <ModuleCard
+      id={expense.id}
+      title={expense.expense_number}
+      subtitle={expense.category || ""}
+      currentStatus={expense.status as ExpenseStatusProps}
+      statuses={Object.values(ExpenseStatus) as ExpenseStatusProps[]}
+      parentTranslationKey="Expenses"
+      onStatusChange={(status: ExpenseStatusProps) => handleEdit(expense.id, "status", status)}
+      onEdit={() => onActionClicked("edit", expense.id)}
+      onDelete={() => onActionClicked("delete", expense.id)}
+      onDuplicate={() => onActionClicked("duplicate", expense.id)}
+      // className="justify-start"
+    >
+      <div className="flex h-full flex-col justify-between gap-3">
+        <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <DollarSign className="h-4 w-4" />
-            <span>
-              {new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-              }).format(expense.amount)}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <Calendar className="h-4 w-4" />
+            <CalendarPlus className="h-4 w-4" />
             <span>
               {t("Expenses.form.issue_date.label")}:{" "}
-              {expense.issue_date ? new Date(expense.issue_date).toLocaleDateString() : "N/A"}
+              {expense.issue_date ? format(new Date(expense.issue_date), "dd/MM/yyyy") : "N/A"}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <Calendar className="h-4 w-4" />
-            <span>
-              {t("Expenses.form.due_date.label")}:{" "}
-              {expense.due_date ? new Date(expense.due_date).toLocaleDateString() : "N/A"}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <Tag className="h-4 w-4" />
-            <span>{expense.category}</span>
-          </div>
+          {expense.due_date && (
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <CalendarClock className="h-4 w-4" />
+              <span>
+                {t("Expenses.form.due_date.label")}:{" "}
+                {expense.due_date ? format(new Date(expense.due_date), "dd/MM/yyyy") : "N/A"}
+              </span>
+            </div>
+          )}
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex items-center justify-end gap-2 text-sm">
+          <span className="money text-xl font-bold">
+            {MoneyFormatter(expense.amount)}
+            {getCurrencySymbol(currency || "sar", { sar: { className: "size-4" } }).symbol}
+          </span>
+        </div>
+      </div>
+    </ModuleCard>
   );
 };
 

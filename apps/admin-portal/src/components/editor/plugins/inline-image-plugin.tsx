@@ -32,7 +32,7 @@ import {
 import { CAN_USE_DOM } from "@/components/editor/shared/can-use-dom";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,

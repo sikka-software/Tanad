@@ -1,44 +1,54 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
+import { parseDate } from "@internationalized/date";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { CurrencyInput } from "@/ui/currency-input";
-import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
+import CodeInput from "@/ui/inputs/code-input";
+import { CurrencyInput } from "@/ui/inputs/currency-input";
+import { DateInput } from "@/ui/inputs/date-input";
+import { Input } from "@/ui/inputs/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
-import CodeInput from "@/components/ui/code-input";
+import NotesSection from "@/components/forms/notes-section";
 
 import { getNotesValue } from "@/lib/utils";
+import { validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
+import { useCreateExpense, useUpdateExpense, useExpenses } from "@/expense/expense.hooks";
+import useExpenseStore from "@/expense/expense.store";
+import { ExpenseCreateData, ExpenseStatus, ExpenseUpdateData } from "@/expense/expense.type";
+
+import { expenses } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
-import { useCreateExpense, useUpdateExpense, useExpenses } from "./expense.hooks";
-import useExpenseStore from "./expense.store";
-import {
-  ExpenseCreateData,
-  ExpenseStatus,
-  ExpenseStatusProps,
-  ExpenseUpdateData,
-} from "./expense.type";
-
-export const createExpenseSchema = (t: (key: string) => string) =>
-  z.object({
-    expense_number: z.string().min(1, t("Expenses.form.expense_number.required")),
-    issue_date: z.date({ required_error: t("Expenses.form.issue_date.required") }),
-    due_date: z.date({ required_error: t("Expenses.form.due_date.required") }),
-    status: z.enum(ExpenseStatus).default("draft"),
-    amount: z.number().min(0, t("Expenses.form.amount.required")),
+export const createExpenseSchema = (t: (key: string) => string) => {
+  const ExpenseSelectSchema = createInsertSchema(expenses, {
+    description: z.string().optional(),
+    amount: z.coerce.number().min(0, t("Expenses.form.amount.required")),
+    incurred_at: z.any().optional(),
+    created_by: z.string().optional(),
     category: z.string().min(1, t("Expenses.form.category.required")),
+    due_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Expenses.form.due_date.invalid")),
+    issue_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Expenses.form.issue_date.invalid")),
     notes: z.any().optional().nullable(),
-    client_id: z.string().optional(),
+    expense_number: z.string().min(1, t("Expenses.form.expense_number.required")),
+    status: z.enum(ExpenseStatus).default("draft"),
   });
+
+  return ExpenseSelectSchema;
+};
 
 export type ExpenseFormValues = z.input<ReturnType<typeof createExpenseSchema>>;
 
@@ -63,9 +73,17 @@ export function ExpenseForm({
     resolver: zodResolver(createExpenseSchema(t)),
     defaultValues: {
       expense_number: defaultValues?.expense_number || "",
-      issue_date: defaultValues?.issue_date ? new Date(defaultValues.issue_date) : undefined,
-      due_date: defaultValues?.due_date ? new Date(defaultValues.due_date) : undefined,
-      status: (defaultValues?.status || "draft") as ExpenseStatusProps,
+      issue_date: defaultValues?.issue_date
+        ? typeof defaultValues.issue_date === "string"
+          ? parseDate(defaultValues.issue_date.split("T")[0])
+          : parseDate(new Date(defaultValues.issue_date).toISOString().split("T")[0])
+        : parseDate(new Date().toISOString().split("T")[0]),
+      due_date: defaultValues?.due_date
+        ? typeof defaultValues.due_date === "string"
+          ? parseDate(defaultValues.due_date.split("T")[0])
+          : parseDate(new Date(defaultValues.due_date).toISOString().split("T")[0])
+        : undefined,
+      status: defaultValues?.status || "draft",
       amount: defaultValues?.amount || 0,
       category: defaultValues?.category || "",
       notes: getNotesValue(defaultValues),
@@ -88,23 +106,35 @@ export function ExpenseForm({
           id: defaultValues?.id || "",
           data: {
             ...data,
-            due_date: data.due_date.toISOString(),
-            issue_date: data.issue_date.toISOString(),
+            due_date:
+              data.due_date && typeof data.due_date.toString === "function"
+                ? data.due_date.toString()
+                : undefined,
+            issue_date:
+              data.issue_date && typeof data.issue_date.toString === "function"
+                ? data.issue_date.toString()
+                : undefined,
           },
         });
       } else {
         await createExpense(
           {
-            expense_number: data.expense_number.trim(),
-            issue_date: data.issue_date.toISOString(),
-            due_date: data.due_date.toISOString(),
-            amount: data.amount,
+            user_id: user?.id,
             enterprise_id: enterprise?.id || "",
+            expense_number: data.expense_number.trim(),
+            issue_date:
+              data.issue_date && typeof data.issue_date.toString === "function"
+                ? data.issue_date.toString()
+                : undefined,
+            due_date:
+              data.due_date && typeof data.due_date.toString === "function"
+                ? data.due_date.toString()
+                : undefined,
+            amount: data.amount,
             category: data.category.trim(),
             // ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
             status: data.status || "draft",
             notes: data.notes,
-            user_id: user?.id,
           },
           {
             onSuccess: () => {
@@ -117,9 +147,6 @@ export function ExpenseForm({
       }
     } catch (error) {
       setIsLoading(false);
-      toast.error(t("General.error_operation"), {
-        description: t("Expenses.error.create"),
-      });
     }
   };
 
@@ -130,6 +157,8 @@ export function ExpenseForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
         <div className="form-container">
           <div className="form-fields-cols-2">
             <FormField
@@ -155,13 +184,12 @@ export function ExpenseForm({
                         }
                         form.setValue("expense_number", `EX-${randomCode}`);
                       }}
-                    >
-                      <Input
-                        placeholder={t("Expenses.form.expense_number.placeholder")}
-                        {...field}
-                        disabled={isLoading}
-                      />
-                    </CodeInput>
+                      inputProps={{
+                        placeholder: t("Expenses.form.expense_number.placeholder"),
+                        disabled: isLoading,
+                        ...field,
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -194,11 +222,16 @@ export function ExpenseForm({
                 <FormItem>
                   <FormLabel>{t("Expenses.form.issue_date.label")} *</FormLabel>
                   <FormControl>
-                    <DatePicker
-                      date={field.value ? new Date(field.value) : undefined}
-                      onSelect={field.onChange}
+                    <DateInput
                       placeholder={t("Expenses.form.issue_date.placeholder")}
-                      ariaInvalid={form.formState.errors.issue_date !== undefined}
+                      value={
+                        typeof field.value === "string"
+                          ? parseDate(field.value)
+                          : (field.value ?? null)
+                      }
+                      onChange={field.onChange}
+                      onSelect={(e) => field.onChange(e)}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -211,13 +244,18 @@ export function ExpenseForm({
               name="due_date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Expenses.form.due_date.label")} *</FormLabel>
+                  <FormLabel>{t("Expenses.form.due_date.label")}</FormLabel>
                   <FormControl>
-                    <DatePicker
-                      date={field.value ? new Date(field.value) : undefined}
-                      onSelect={field.onChange}
+                    <DateInput
                       placeholder={t("Expenses.form.due_date.placeholder")}
-                      ariaInvalid={form.formState.errors.due_date !== undefined}
+                      value={
+                        typeof field.value === "string"
+                          ? parseDate(field.value)
+                          : (field.value ?? null)
+                      }
+                      onChange={field.onChange}
+                      onSelect={(e) => field.onChange(e)}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -265,9 +303,11 @@ export function ExpenseForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="pending">{t("Expenses.form.status.pending")}</SelectItem>
-                      <SelectItem value="paid">{t("Expenses.form.status.paid")}</SelectItem>
-                      <SelectItem value="overdue">{t("Expenses.form.status.overdue")}</SelectItem>
+                      {ExpenseStatus.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {t(`Expenses.form.status.${status}`)}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -275,24 +315,6 @@ export function ExpenseForm({
               )}
             />
           </div>
-
-          {/* <FormField
-          control={form.control}
-          name="client_id"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Expenses.form.client_id.label")} *</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder={t("Expenses.form.client_id.placeholder")}
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
         </div>
 
         <NotesSection

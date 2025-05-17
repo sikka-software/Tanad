@@ -1,4 +1,5 @@
 import { Variants } from "motion/react";
+
 import { AnimationType } from "../types";
 
 type AnimationConfig = {

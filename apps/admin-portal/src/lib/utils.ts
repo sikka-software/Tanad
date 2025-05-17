@@ -1,6 +1,7 @@
 import { cva } from "class-variance-authority";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { z } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -152,3 +153,35 @@ export const shouldUseLightContent = (backgroundColor: string): boolean => {
     return true; // Default to light logo on error
   }
 };
+
+/**
+ * Zod superRefine helper for validating a date-like object with a year range.
+ * Accepts a translation function, min/max year, and a translation key for the error message.
+ *
+ * Usage:
+ *   .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.birth_date.invalid"))
+ */
+export function validateYearRange(
+  t: (key: string) => string,
+  minYear: number,
+  maxYear: number,
+  translationKey: string,
+) {
+  return (val: any, ctx: z.RefinementCtx) => {
+    if (val === undefined || val === null) return;
+    if (typeof val === "object" && typeof val.toDate === "function") {
+      const year = val.year;
+      if (year < minYear || year > maxYear) {
+        ctx.addIssue({
+          code: "custom",
+          message: t(translationKey),
+        });
+      }
+      return;
+    }
+    ctx.addIssue({
+      code: "custom",
+      message: t(translationKey),
+    });
+  };
+}

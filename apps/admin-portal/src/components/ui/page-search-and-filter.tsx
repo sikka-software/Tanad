@@ -12,7 +12,7 @@ import { Button } from "./button";
 import ColumnViewPopover from "./column-view-popover";
 import FilterPopover from "./filter-popover";
 import IconButton from "./icon-button";
-import { Input } from "./input";
+import { Input } from "./inputs/input";
 import { ExtendedColumnDef } from "./sheet-table";
 import SortPopover from "./sort-popover";
 
@@ -89,7 +89,7 @@ const PageSearchAndFilter = ({
       {...props}
     >
       <div className="flex flex-1 items-center gap-4">
-        {title && <h2 className="text-xl font-medium">{title}</h2>}
+        {title && <h2 className="hidden text-xl font-medium md:block">{title}</h2>}
 
         {!hideOptions && (
           <div className="relative max-w-md flex-1">
@@ -106,27 +106,27 @@ const PageSearchAndFilter = ({
       </div>
 
       <div className="flex items-center gap-2">
+        {columns && columns.length > 0 && (
+          <ColumnViewPopover
+            columns={columns}
+            columnVisibility={columnVisibility || {}}
+            onColumnVisibilityChange={onColumnVisibilityChange || (() => {})}
+          />
+        )}
+        <IconButton
+          icon={
+            viewMode === "table" ? (
+              <LayoutGrid className="h-4 w-4" />
+            ) : (
+              <Table2 className="h-4 w-4" />
+            )
+          }
+          label={viewMode === "table" ? t("General.cards_view") : t("General.table_view")}
+          onClick={() => setViewMode(viewMode === "table" ? "cards" : "table")}
+        />
+
         {!hideOptions && (
           <>
-            {columns && columns.length > 0 && (
-              <ColumnViewPopover
-                columns={columns}
-                columnVisibility={columnVisibility || {}}
-                onColumnVisibilityChange={onColumnVisibilityChange || (() => {})}
-              />
-            )}
-            <IconButton
-              icon={
-                viewMode === "table" ? (
-                  <LayoutGrid className="h-4 w-4" />
-                ) : (
-                  <Table2 className="h-4 w-4" />
-                )
-              }
-              label={viewMode === "table" ? t("General.cards_view") : t("General.table_view")}
-              onClick={() => setViewMode(viewMode === "table" ? "cards" : "table")}
-            />
-
             <FilterPopover
               fields={filterableFields}
               conditions={filterConditions}
@@ -147,9 +147,9 @@ const PageSearchAndFilter = ({
         )}
 
         {onAddClick && (
-          <Button size="sm" className="h-8 cursor-pointer" onClick={onAddClick}>
+          <Button size="sm" className="h-8 w-8 cursor-pointer md:w-fit" onClick={onAddClick}>
             <Plus className="h-4 w-4" />
-            <span>{createLabel}</span>
+            <span className="hidden md:block">{createLabel}</span>
           </Button>
         )}
       </div>

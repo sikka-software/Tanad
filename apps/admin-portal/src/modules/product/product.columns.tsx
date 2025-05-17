@@ -1,13 +1,17 @@
-import { MoneyFormatter } from "@root/src/components/ui/currency-input";
-import { getCurrencySymbol } from "@root/src/lib/currency-utils";
-import useUserStore from "@root/src/stores/use-user-store";
 import { CellContext } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { MoneyFormatter } from "@/ui/inputs/currency-input";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { Product } from "./product.type";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { getCurrencySymbol } from "@/lib/currency-utils";
+
+import { Product } from "@/product/product.type";
+
+import useUserStore from "@/stores/use-user-store";
 
 const useProductColumns = () => {
   const t = useTranslations();
@@ -49,6 +53,26 @@ const useProductColumns = () => {
         </span>
       ),
       validationSchema: z.number().min(0, t("Products.form.stock_quantity.required")),
+    },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
   ];
 

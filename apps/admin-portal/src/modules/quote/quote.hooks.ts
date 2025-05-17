@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createQuote,
-  deleteQuote,
   fetchQuoteById,
   fetchQuotes,
   updateQuote,
-  bulkDeleteQuotes,
   duplicateQuote,
 } from "@/quote/quote.service";
 import { QuoteCreateData, QuoteUpdateData } from "@/quote/quote.type";
@@ -36,7 +36,6 @@ export function useQuote(id: string) {
   });
 }
 
-// Hook for creating a new quote
 export function useCreateQuote() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -75,7 +74,7 @@ export function useDeleteQuote() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteQuote,
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/quotes/${id}`),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
       queryClient.removeQueries({ queryKey: quoteKeys.detail(variables) });
@@ -89,7 +88,7 @@ export const useBulkDeleteQuotes = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: bulkDeleteQuotes,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/quotes", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: quoteKeys.lists() }),
     meta: { toast: { success: "Quotes.success.delete", error: "Quotes.error.delete" } },
   });

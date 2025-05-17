@@ -1,5 +1,3 @@
-export const PRODUCT_STATUSES = ["active", "inactive"] as const;
-
 export const PRODUCT_CATEGORIES = [
   "design",
   "hosting",

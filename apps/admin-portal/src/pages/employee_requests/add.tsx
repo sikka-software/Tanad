@@ -34,19 +34,19 @@ export default function AddEmployeeRequestPage() {
 
       <EmployeeRequestForm
         formHtmlId="employee-request-form"
-        onSuccess={() =>
+        onSuccess={() => {
           router.push("/employee_requests").then(() => {
             setLoadingSave(false);
-          })
-        }
+          });
+        }}
       />
     </div>
   );
 }
 
-AddEmployeeRequestPage.messages = ["Notes", "Pages", "EmployeeRequests", "General"];
+AddEmployeeRequestPage.messages = ["Metadata", "Notes", "Pages", "EmployeeRequests", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

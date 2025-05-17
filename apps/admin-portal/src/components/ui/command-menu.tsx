@@ -49,7 +49,7 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
     { key: "i", path: "/invoices", metaKey: true },
     { key: "o", path: "/companies", metaKey: true },
     { key: "l", path: "/activity", metaKey: true },
-    { key: "a", path: "/analytics", metaKey: true },
+    // { key: "a", path: "/analytics", metaKey: true },
     { key: "s", path: "/settings", metaKey: true },
   ];
 
@@ -91,8 +91,6 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
     return translationKey.split(".")[1];
   };
 
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
     <Dialog open={openCommandMenu} onOpenChange={setOpenCommandMenu}>
       <DialogContent className="max-w-xl overflow-hidden p-0" dir={locale === "ar" ? "rtl" : "ltr"}>
@@ -114,8 +112,6 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
                         key={item.href}
                         onSelect={() => runCommand(() => router.push(item.href))}
                         value={`${englishLabel} ${arabicLabel}`}
-                        onMouseEnter={() => setIsHovered(true)}
-                        onMouseLeave={() => setIsHovered(false)}
                         className="group flex flex-row items-center justify-between"
                       >
                         <div className="flex flex-row items-center">
@@ -124,16 +120,18 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
                         </div>
                         <div className="flex flex-row items-center gap-2">
                           {item.addHref && (
-                            <Link href={item.addHref}>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                className="relative size-7 translate-x-4 cursor-pointer opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
-                                type="button"
-                              >
-                                <Plus className="size-4" />
-                              </Button>
-                            </Link>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="relative size-7 translate-x-4 cursor-pointer opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                runCommand(() => router.push(item.addHref));
+                              }}
+                            >
+                              <Plus className="size-4" />
+                            </Button>
                           )}
                           <CommandShortcut>{item.shortcut}</CommandShortcut>
                         </div>

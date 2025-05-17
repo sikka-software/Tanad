@@ -1,9 +1,10 @@
-import SheetTable from "@root/src/components/ui/sheet-table";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 
 import ErrorComponent from "@/ui/error-component";
 import TableSkeleton from "@/ui/table-skeleton";
+
+import SheetTable from "@/components/ui/sheet-table";
 
 import { ModuleTableProps } from "@/types/common.type";
 
@@ -54,7 +55,7 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
 
   if (isLoading) {
     return (
-      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
+      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={12} />
     );
   }
 

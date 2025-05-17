@@ -130,7 +130,7 @@ export default function Analytics() {
       return;
     }
 
-    let calType = profile?.user_settings.calendar_type;
+    let calType = profile?.user_settings.calendar;
     if (dataRpc) {
       const formattedChartData = dataRpc.map((item: any) => ({
         label: new Date(item.period_start).toLocaleString(calType === "hijri" ? "ar-SA" : "en-US", {
@@ -320,9 +320,9 @@ export default function Analytics() {
   );
 }
 
-Analytics.messages = ["Pages", "General", "Analytics"];
+Analytics.messages = ["Metadata", "Pages", "General", "Analytics"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Analytics.messages),

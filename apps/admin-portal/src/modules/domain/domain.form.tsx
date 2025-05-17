@@ -1,39 +1,42 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import BooleanTabs from "@root/src/components/ui/boolean-tabs";
-import { CurrencyInput } from "@root/src/components/ui/currency-input";
-import { getNotesValue } from "@root/src/lib/utils";
+import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+
+import BooleanTabs from "@/components/ui/boolean-tabs";
+import { CurrencyInput } from "@/components/ui/inputs/currency-input";
+import { Input } from "@/components/ui/inputs/input";
 
 import NotesSection from "@/forms/notes-section";
 
+import { getNotesValue } from "@/lib/utils";
+
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
+import { domains } from "@/db/schema";
 import { useCreateDomain, useUpdateDomain } from "@/domain/domain.hooks";
 import useDomainStore from "@/domain/domain.store";
 import { DomainUpdateData, DomainCreateData } from "@/domain/domain.type";
 import useUserStore from "@/stores/use-user-store";
 
-export const createDomainSchema = (t: (key: string) => string) => {
-  const baseDomainSchema = z.object({
+const createDomainSchema = (t: (key: string) => string) => {
+  const DomainSelectSchema = createInsertSchema(domains, {
     domain_name: z.string().min(1, t("Domains.form.domain_name.required")),
     registrar: z.string().optional().or(z.literal("")),
-    monthly_cost: z.number().optional().or(z.literal("")),
-    annual_cost: z.number().optional().or(z.literal("")),
+    monthly_payment: z.number().optional().or(z.literal("")),
+    annual_payment: z.number().optional().or(z.literal("")),
     payment_cycle: z.string().min(1, t("Domains.form.payment_cycle.required")),
     status: z.enum(CommonStatus, {
       invalid_type_error: t("Domains.form.status.required"),
     }),
     notes: z.any().optional().nullable(),
   });
-
-  return baseDomainSchema;
+  return DomainSelectSchema;
 };
 
 export type DomainFormValues = z.input<ReturnType<typeof createDomainSchema>>;
@@ -55,7 +58,7 @@ export function DomainForm({
   const lang = useLocale();
 
   const user = useUserStore((state) => state.user);
-  const membership = useUserStore((state) => state.membership);
+  const enterprise = useUserStore((state) => state.enterprise);
 
   const { mutate: createDomain } = useCreateDomain();
   const { mutate: updateDomain } = useUpdateDomain();
@@ -68,8 +71,8 @@ export function DomainForm({
     defaultValues: {
       domain_name: defaultValues?.domain_name || "",
       registrar: defaultValues?.registrar || "",
-      monthly_cost: defaultValues?.monthly_cost || 0,
-      annual_cost: defaultValues?.annual_cost || 0,
+      monthly_payment: defaultValues?.monthly_payment || 0,
+      annual_payment: defaultValues?.annual_payment || 0,
       payment_cycle: defaultValues?.payment_cycle || "monthly",
       status: defaultValues?.status || "active",
       notes: getNotesValue(defaultValues) || "",
@@ -93,8 +96,8 @@ export function DomainForm({
             data: {
               domain_name: data.domain_name.trim(),
               registrar: data.registrar?.trim() || "",
-              monthly_cost: data.monthly_cost || 0,
-              annual_cost: data.annual_cost || 0,
+              monthly_payment: data.monthly_payment || 0,
+              annual_payment: data.annual_payment || 0,
               payment_cycle: data.payment_cycle?.trim() as "monthly" | "annual" | null,
               status: data.status?.trim() as "active" | "inactive" | null,
               notes: data.notes,
@@ -111,16 +114,17 @@ export function DomainForm({
       } else {
         await createDomain(
           {
+            user_id: user?.id,
+            enterprise_id: enterprise?.id || "",
+            updated_at: new Date().toISOString(),
+
             domain_name: data.domain_name.trim(),
             registrar: data.registrar?.trim() || null,
-            monthly_cost: data.monthly_cost || 0,
-            annual_cost: data.annual_cost || 0,
+            monthly_payment: data.monthly_payment || 0,
+            annual_payment: data.annual_payment || 0,
             payment_cycle: data.payment_cycle?.trim() as "monthly" | "annual" | null,
             status: data.status?.trim() as "active" | "inactive" | null,
             notes: data.notes,
-            user_id: user?.id,
-            updated_at: new Date().toISOString(),
-            enterprise_id: membership?.enterprise_id || "",
           },
           {
             onSuccess: async (response) => {
@@ -148,6 +152,8 @@ export function DomainForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
         <div className="form-container">
           <div className="form-fields-cols-2">
             <FormField
@@ -191,7 +197,7 @@ export function DomainForm({
               name="payment_cycle"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Domains.form.payment_cycle.label")}</FormLabel>
+                  <FormLabel>{t("PaymentCycles.label")}</FormLabel>
                   <FormControl>
                     <Select
                       dir={lang === "ar" ? "rtl" : "ltr"}
@@ -200,15 +206,11 @@ export function DomainForm({
                       disabled={isLoading}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder={t("Domains.form.payment_cycle.placeholder")} />
+                        <SelectValue placeholder={t("PaymentCycles.placeholder")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="monthly">
-                          {t("Domains.form.payment_cycle.monthly")}
-                        </SelectItem>
-                        <SelectItem value="annual">
-                          {t("Domains.form.payment_cycle.annual")}
-                        </SelectItem>
+                        <SelectItem value="monthly">{t("PaymentCycles.monthly")}</SelectItem>
+                        <SelectItem value="annual">{t("PaymentCycles.annual")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -219,13 +221,13 @@ export function DomainForm({
             {form.watch("payment_cycle") === "monthly" && (
               <FormField
                 control={form.control}
-                name="monthly_cost"
+                name="monthly_payment"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Domains.form.monthly_cost.label")}</FormLabel>
+                    <FormLabel>{t("PaymentCycles.monthly_payment.label")}</FormLabel>
                     <FormControl>
                       <CurrencyInput
-                        placeholder={t("Domains.form.monthly_cost.placeholder")}
+                        placeholder={t("PaymentCycles.monthly_payment.placeholder")}
                         disabled={isLoading}
                         {...field}
                         showCommas={true}
@@ -241,13 +243,13 @@ export function DomainForm({
             {form.watch("payment_cycle") === "annual" && (
               <FormField
                 control={form.control}
-                name="annual_cost"
+                name="annual_payment"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Domains.form.annual_cost.label")}</FormLabel>
+                    <FormLabel>{t("PaymentCycles.annual_payment.label")}</FormLabel>
                     <FormControl>
                       <CurrencyInput
-                        placeholder={t("Domains.form.annual_cost.placeholder")}
+                        placeholder={t("PaymentCycles.annual_payment.placeholder")}
                         disabled={isLoading}
                         {...field}
                         showCommas={true}

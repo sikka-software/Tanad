@@ -1,25 +1,20 @@
-import { JobListingNotFound } from "@root/src/components/app/job-listing-not-found";
-import JobCard from "@root/src/components/jobs/job-card";
-import JobDetailsModal from "@root/src/components/jobs/job-details-dialog";
-import CustomPageMeta from "@root/src/components/landing/CustomPageMeta";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useLocale, useTranslations } from "next-intl";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/ui/alert";
 import { Badge } from "@/ui/badge";
+import { Input } from "@/ui/inputs/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import { createClient } from "@/utils/supabase/server-props";
 
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { JobListingNotFound } from "@/components/app/job-listing-not-found";
+import JobCard from "@/components/jobs/job-card";
+import JobDetailsModal from "@/components/jobs/job-details-dialog";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 // Assuming server client path
 import { Job } from "@/job/job.type";
@@ -36,7 +31,10 @@ type JobListingWithJobs = Omit<JobListing, "jobs"> & {
 
 interface JobListingPreviewProps {
   jobListing: JobListingWithJobs | null;
-  enterpriseName?: string | null; // Allow null for enterpriseName
+  enterprise?: {
+    name: string;
+    logo: string;
+  } | null; // Allow null for enterpriseName
   error?: string;
 }
 
@@ -62,7 +60,7 @@ const adaptJobForCard = (job: Job): any => ({
 export default function JobListingPreviewPage({
   jobListing,
   error,
-  enterpriseName, // Destructure enterpriseName
+  enterprise, // Destructure enterprise
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const t = useTranslations();
   const locale = useLocale();
@@ -119,84 +117,110 @@ export default function JobListingPreviewPage({
     setSelectedJob(null);
   };
 
+  console.log(jobListing);
   return (
     <main className="bg-background min-h-screen">
       <CustomPageMeta
-        title={`${enterpriseName} | ${jobListing.title}`}
+        title={`${enterprise?.name} | ${jobListing.title}`}
         description={jobListing.description || t("JobListingPreview.meta_description_default")}
       />
 
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8">
-          <h1 className="text-foreground mb-2 text-3xl font-bold">{jobListing.title}</h1>
-          {jobListing.description && (
-            <p className="text-muted-foreground max-w-2xl">{jobListing.description}</p>
-          )}
-          <div className="flex items-center space-x-2 pt-2">
-            <Badge variant={jobListing.status === "active" ? "default" : "outline"}>
-              {jobListing.status === "active" ? t("Status.active") : t("Status.inactive")}
-            </Badge>
-            <Badge variant={jobListing.is_public ? "default" : "outline"}>
-              {jobListing.is_public ? t("Visibility.public") : t("Visibility.private")}
-            </Badge>
+          <div className="flex flex-row items-center gap-4">
+            {enterprise?.logo && (
+              <div>
+                <Image
+                  src={enterprise?.logo || ""}
+                  alt={enterprise?.name || ""}
+                  width={100}
+                  height={100}
+                  className="w-18 rounded-md object-cover object-center"
+                />
+              </div>
+            )}
+            <div className="flex flex-col">
+              <h1 className="text-foreground mb-2 text-3xl font-bold">{jobListing.title}</h1>
+              {jobListing.description && (
+                <p className="text-muted-foreground max-w-2xl">{jobListing.description}</p>
+              )}
+              <div className="flex items-center space-x-2 pt-2">
+                <Badge
+                  className="rounded-md"
+                  variant={jobListing.status === "active" ? "default" : "outline"}
+                >
+                  {jobListing.status === "active" ? t("Status.active") : t("Status.inactive")}
+                </Badge>
+                <Badge
+                  className="rounded-md"
+                  variant={jobListing.is_public ? "default" : "outline"}
+                >
+                  {jobListing.is_public ? t("Visibility.public") : t("Visibility.private")}
+                </Badge>
+              </div>
+            </div>
           </div>
         </header>
 
         {/* Filter UI from job-listings.tsx */}
-        <div className="bg--500 border-border mb-8 rounded-md border p-6 shadow-sm">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div>
-              <Input
-                placeholder={t("Jobs.search_jobs") || "Search jobs..."}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            <div>
-              <Select
-                dir={locale === "ar" ? "rtl" : "ltr"}
-                value={selectedDepartment}
-                onValueChange={setSelectedDepartment}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("Jobs.department_placeholder") || "Department"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    {t("Jobs.all_departments") || "All Departments"}
-                  </SelectItem>
-                  {departments.map((department) => (
-                    <SelectItem key={department} value={department}>
-                      {department}
+        {jobListing.enable_search_filtering && (
+          <div className="bg--500 border-border mb-8 rounded-md border p-6 shadow-sm">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
+              <div>
+                <Input
+                  placeholder={t("Pages.Jobs.search") || "Search jobs..."}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              {/* <div>
+                <Select
+                  dir={locale === "ar" ? "rtl" : "ltr"}
+                  value={selectedDepartment}
+                  onValueChange={setSelectedDepartment}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("Jobs.department_placeholder") || "Department"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      {t("Jobs.all_departments") || "All Departments"}
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Select
-                dir={locale === "ar" ? "rtl" : "ltr"}
-                value={selectedLocation}
-                onValueChange={setSelectedLocation}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("JobListings.location_placeholder") || "Location"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    {t("JobListings.all_locations") || "All Locations"}
-                  </SelectItem>
-                  {locations.map((location) => (
-                    <SelectItem key={location} value={location}>
-                      {location}
+                    {departments.map((department) => (
+                      <SelectItem key={department} value={department}>
+                        {department}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Select
+                  dir={locale === "ar" ? "rtl" : "ltr"}
+                  value={selectedLocation}
+                  onValueChange={setSelectedLocation}
+                >
+                  <SelectTrigger>
+                    <SelectValue
+                      placeholder={t("JobListings.location_placeholder") || "Location"}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      {t("JobListings.all_locations") || "All Locations"}
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    {locations.map((location) => (
+                      <SelectItem key={location} value={location}>
+                        {location}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div> */}
             </div>
           </div>
-        </div>
+        )}
 
         {/* Job Grid UI from job-listings.tsx */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -241,7 +265,10 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
     return { notFound: true };
   }
 
-  let enterpriseName: string | null = null;
+  let enterprise: {
+    name: string;
+    logo: string;
+  } | null = null;
 
   try {
     // Step 1: Fetch the job listing
@@ -273,7 +300,7 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
     if (jobListingData && jobListingData.enterprise_id) {
       const { data: enterpriseData, error: enterpriseError } = await supabase
         .from("enterprises")
-        .select("name")
+        .select("name, logo")
         .eq("id", jobListingData.enterprise_id)
         .single();
 
@@ -284,14 +311,23 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
           enterpriseError.message,
         );
       } else if (enterpriseData) {
-        enterpriseName = enterpriseData.name;
+        let logoUrl = null;
+        if (enterpriseData.logo) {
+          const { data: signedData, error: signedError } = await supabase.storage
+            .from("enterprise-images")
+            .createSignedUrl(enterpriseData.logo, 60 * 60);
+          if (signedData?.signedUrl) {
+            logoUrl = signedData.signedUrl;
+          }
+        }
+        enterprise = { name: enterpriseData.name, logo: logoUrl || "" };
       }
     }
 
     return {
       props: {
         jobListing: jobListingData as JobListingWithJobs,
-        enterpriseName,
+        enterprise,
         messages: (await import(`../../../../locales/${context.locale}.json`)).default,
       },
     };
@@ -300,7 +336,7 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
     return {
       props: {
         jobListing: null,
-        enterpriseName: null,
+        enterprise: null,
         error: error.message || "Failed to load job listing.",
         messages: (await import(`../../../../locales/${context.locale}.json`)).default,
       },

@@ -1,17 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createCompany,
-  deleteCompany,
-  bulkDeleteCompanies,
   fetchCompanyById,
   fetchCompanies,
   updateCompany,
   duplicateCompany,
 } from "@/company/company.service";
-import type { Company, CompanyCreateData, CompanyUpdateData } from "@/company/company.type";
+import type { CompanyCreateData, CompanyUpdateData } from "@/company/company.type";
 
-// Query keys for companies
 export const companyKeys = {
   all: ["companies"] as const,
   lists: () => [...companyKeys.all, "list"] as const,
@@ -20,7 +19,6 @@ export const companyKeys = {
   detail: (id: string) => [...companyKeys.details(), id] as const,
 };
 
-// Hook to fetch all companies
 export function useCompanies() {
   return useQuery({
     queryKey: companyKeys.lists(),
@@ -28,7 +26,6 @@ export function useCompanies() {
   });
 }
 
-// Hook to fetch a single company
 export function useCompany(id: string) {
   return useQuery({
     queryKey: companyKeys.detail(id),
@@ -37,18 +34,12 @@ export function useCompany(id: string) {
   });
 }
 
-// Hook to create a company
 export function useCreateCompany() {
   const queryClient = useQueryClient();
+  // const setData = useCompanyStore((state) => state.setData);
   return useMutation({
     mutationFn: (company: CompanyCreateData) => createCompany(company),
-    onSuccess: (newCompany: Company) => {
-      const previousCompanies = queryClient.getQueryData(companyKeys.lists()) || [];
-      queryClient.setQueryData(companyKeys.lists(), [
-        ...(Array.isArray(previousCompanies) ? previousCompanies : []),
-        newCompany,
-      ]);
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: companyKeys.lists() }),
     meta: { toast: { success: "Companies.success.create", error: "Companies.error.create" } },
   });
 }
@@ -83,7 +74,7 @@ export function useDuplicateCompany() {
 export function useDeleteCompany() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteCompany,
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/companies/${id}`),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
       queryClient.removeQueries({ queryKey: companyKeys.detail(variables) });
@@ -96,7 +87,7 @@ export function useDeleteCompany() {
 export function useBulkDeleteCompanies() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteCompanies,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/companies", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: companyKeys.lists() }),
     meta: {
       toast: { success: "Companies.success.delete", error: "Companies.error.delete" },

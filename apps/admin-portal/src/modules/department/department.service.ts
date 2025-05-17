@@ -1,3 +1,5 @@
+import { bulkDeleteResource, deleteResourceById } from "@/lib/api";
+
 import { Department, DepartmentCreateData } from "@/department/department.type";
 
 export async function fetchDepartmentsWithLocations(): Promise<Department[]> {
@@ -134,26 +136,4 @@ export async function duplicateDepartment(id: string): Promise<Department> {
     throw new Error(`Failed to duplicate department with id ${id}`);
   }
   return response.json();
-}
-
-export async function deleteDepartment(id: string): Promise<void> {
-  const response = await fetch(`/api/resource/departments/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) {
-    throw new Error(`Failed to delete department with id ${id}`);
-  }
-}
-
-export async function bulkDeleteDepartments(ids: string[]): Promise<void> {
-  const response = await fetch("/api/resource/departments", {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ ids }),
-  });
-  if (!response.ok) {
-    throw new Error("Failed to delete departments");
-  }
 }

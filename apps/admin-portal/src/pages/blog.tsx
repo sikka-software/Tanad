@@ -19,9 +19,9 @@ export default function BlogPage() {
   );
 }
 
-BlogPage.messages = ["Pages", "General", "Blog"];
+BlogPage.messages = ["Metadata", "Pages", "General", "Blog"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, BlogPage.messages),

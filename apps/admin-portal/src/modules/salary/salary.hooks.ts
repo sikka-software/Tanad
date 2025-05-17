@@ -1,15 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
+
 import {
   createSalary,
-  deleteSalary,
   fetchSalaryById,
   fetchSalaries,
   updateSalary,
-  bulkDeleteSalaries,
   duplicateSalary,
 } from "@/salary/salary.service";
-import type { Salary, SalaryUpdateData } from "@/salary/salary.type";
+import type { SalaryUpdateData } from "@/salary/salary.type";
 
 export const salaryKeys = {
   all: ["salaries"] as const,
@@ -76,7 +76,7 @@ export function useDeleteSalary() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteSalary,
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/salaries/${id}`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: salaryKeys.lists() }),
     meta: { toast: { success: "Salaries.success.delete", error: "Salaries.error.delete" } },
   });
@@ -87,7 +87,7 @@ export function useBulkDeleteSalaries() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: bulkDeleteSalaries,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/salaries", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: salaryKeys.lists() }),
     meta: { toast: { success: "Salaries.success.delete", error: "Salaries.error.delete" } },
   });

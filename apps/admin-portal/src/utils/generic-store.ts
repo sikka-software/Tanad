@@ -13,12 +13,17 @@ export function createGenericStore<T extends { id: string }>(
 ) {
   // Read columnVisibility from localStorage if present
   let persistedColumnVisibility = {};
+  let persistedViewMode: "table" | "cards" = "cards";
   if (typeof window !== "undefined") {
     const stored = localStorage.getItem(`columnVisibility:${storeName}`);
     if (stored) {
       try {
         persistedColumnVisibility = JSON.parse(stored);
       } catch {}
+    }
+    const storedViewMode = localStorage.getItem(`viewMode:${storeName}`);
+    if (storedViewMode === "table" || storedViewMode === "cards") {
+      persistedViewMode = storedViewMode;
     }
   }
 
@@ -44,7 +49,7 @@ export function createGenericStore<T extends { id: string }>(
     filterConditions: [],
     filterCaseSensitive: false,
     searchQuery: "",
-    viewMode: "table",
+    viewMode: persistedViewMode,
     isDeleteDialogOpen: false,
     sortRules: [],
     sortCaseSensitive: false,
@@ -110,7 +115,16 @@ export function createGenericStore<T extends { id: string }>(
     setFilterConditions: (filterConditions) => set({ filterConditions }),
     setFilterCaseSensitive: (filterCaseSensitive) => set({ filterCaseSensitive }),
     setSearchQuery: (searchQuery) => set({ searchQuery }),
-    setViewMode: (viewMode) => set({ viewMode }),
+    setViewMode: (viewMode) => {
+      set(() => {
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem(`viewMode:${storeName}`, viewMode);
+          } catch {}
+        }
+        return { viewMode };
+      });
+    },
     setIsDeleteDialogOpen: (isDeleteDialogOpen) => set({ isDeleteDialogOpen }),
     setIsFormDialogOpen: (isFormDialogOpen) => set({ isFormDialogOpen }),
     setActionableItem: (actionableItem) => set({ actionableItem }),

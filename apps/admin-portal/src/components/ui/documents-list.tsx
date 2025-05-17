@@ -6,6 +6,8 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
+import { Button } from "@/ui/button";
+import { Card, CardContent } from "@/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,9 +17,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@root/src/components/ui/dialogs/alert-dialog";
-import { Button } from "@/ui/button";
-import { Card, CardContent } from "@/ui/card";
+} from "@/ui/dialogs/alert-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 
 import { deleteDocument, getDocumentsByEntity } from "@/services/documents";

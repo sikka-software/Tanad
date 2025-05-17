@@ -1,14 +1,14 @@
 import { DollarSign, Euro, PoundSterling, JapaneseYen } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 
-import { Input } from "@/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 
 import { currencyInputClassName, getCurrencySymbol } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { SARSymbol } from "./sar-symbol";
+import { SARSymbol } from "../sar-symbol";
 
 export const MoneyFormatter = (value: number, showDecimals = true) => {
   return new Intl.NumberFormat("en-US", {
@@ -47,7 +47,9 @@ export function CurrencyInput({
   showCommas = false,
   ...props
 }: CurrencyInputProps) {
-  const [inputText, setInputText] = useState(value?.toFixed(2) || "");
+  const [inputText, setInputText] = useState(
+    typeof value === "number" && !isNaN(value) ? value.toFixed(2) : "",
+  );
   const isUserInput = useRef(false);
   const profile = useUserStore((state) => state.profile);
   const currency = profile?.user_settings?.currency || "sar";
@@ -55,8 +57,12 @@ export function CurrencyInput({
 
   // Update input text when value prop changes, but only if it's not from user input
   useEffect(() => {
-    if (!isUserInput.current && value !== undefined) {
-      setInputText(value.toFixed(2));
+    if (!isUserInput.current) {
+      if (typeof value === "number" && !isNaN(value)) {
+        setInputText(value.toFixed(2));
+      } else {
+        setInputText("");
+      }
     }
     isUserInput.current = false;
   }, [value]);
@@ -102,11 +108,12 @@ export function CurrencyInput({
 
     setInputText(formattedValue);
 
-    // Update the numeric value
     const num = cleanWholePart
       ? Number(cleanWholePart + (decimalPart ? `.${decimalPart.slice(0, 2)}` : ""))
       : undefined;
-    if (!isNaN(num as number)) {
+    if (num === undefined || isNaN(num)) {
+      onChange?.(undefined);
+    } else {
       onChange?.(num);
     }
   };
@@ -114,7 +121,7 @@ export function CurrencyInput({
   const handleBlur = () => {
     // Format to always show 2 decimal places on blur if we have a value
     if (inputText) {
-      const num = Number(inputText);
+      const num = Number(inputText.replace(/,/g, ""));
       if (!isNaN(num)) {
         isUserInput.current = true;
         if (showCommas) {
@@ -139,10 +146,11 @@ export function CurrencyInput({
   return (
     <div className={cn("relative", props.containerClassName)}>
       <Input
+        dir="ltr"
         type="text"
         inputMode="decimal"
         placeholder="0.00"
-        className={cn("currency-input rtl:text-end", currencyInputClassName(currency))}
+        className={cn("currency-input placeholder:select-none", currencyInputClassName(currency))}
         value={inputText}
         onChange={handleChange}
         onBlur={handleBlur}

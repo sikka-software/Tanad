@@ -1,16 +1,19 @@
-import CodeCell from "@root/src/components/tables/code-cell";
-import SelectCell from "@root/src/components/tables/select-cell";
-import { MoneyFormatter } from "@root/src/components/ui/currency-input";
-import { getCurrencySymbol } from "@root/src/lib/currency-utils";
-import useUserStore from "@root/src/stores/use-user-store";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import { MoneyFormatter } from "@/ui/inputs/currency-input";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
+
+import CodeCell from "@/tables/code-cell";
+import SelectCell from "@/tables/select-cell";
+import TimestampCell from "@/tables/timestamp-cell";
+
+import { getCurrencySymbol } from "@/lib/currency-utils";
 
 import { Invoice } from "@/invoice/invoice.type";
+import { InvoiceStatus } from "@/invoice/invoice.type";
 
-import { InvoiceStatus } from "@/modules/invoice/invoice.type";
+import useUserStore from "@/stores/use-user-store";
 
 const useInvoiceColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
@@ -93,6 +96,26 @@ const useInvoiceColumns = (
           </span>
         );
       },
+    },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     //status
     {

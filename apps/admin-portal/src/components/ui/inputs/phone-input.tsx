@@ -14,17 +14,18 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import { countries } from "@/lib/constants/countries";
 import { cn } from "@/lib/utils";
 
+import { useFormField } from "../form";
+
 interface PhoneInputProps {
   value: string;
   defaultValue?: string;
   onChange: (value: string) => void;
-  ariaInvalid?: boolean;
   disabled?: boolean;
 }
 
@@ -39,6 +40,7 @@ export default function PhoneInput({
   const locale = useLocale();
   const [open, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = React.useState(countries[0]);
+  const { error } = useFormField();
 
   // Get the local value (without country code) from the full number
   const getLocalValue = (fullNumber: string, countryCode: string) => {
@@ -103,10 +105,9 @@ export default function PhoneInput({
             role="combobox"
             aria-expanded={open}
             className={cn(
-              "h-9 w-fit justify-between gap-0 rounded-e-none border-e-0",
-
-              props.ariaInvalid &&
-                "ring-destructive/20 dark:ring-destructive/40 border-destructive border-e-none",
+              "bg-input-background h-9 w-fit justify-between gap-0 rounded-e-none border-e-0",
+              error &&
+                "ring-destructive/20 dark:ring-destructive/40 border-destructive border-e-none rounded-bl-none",
             )}
             size="sm"
             disabled={disabled}
@@ -177,7 +178,7 @@ export default function PhoneInput({
         onChange={handleInputChange}
         placeholder={selectedCountry.placeholder}
         className="flex-1 rounded-s-none shadow-none"
-        aria-invalid={props.ariaInvalid}
+        aria-invalid={error !== undefined}
         disabled={disabled}
       />
     </div>

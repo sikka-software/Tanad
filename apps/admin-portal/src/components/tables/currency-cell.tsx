@@ -1,8 +1,9 @@
-import { getCurrencySymbol } from "@root/src/lib/currency-utils";
-import { currencies } from "@root/tanad.config";
+import { currencies } from "@tanad.config";
 import React from "react";
 
-import { MoneyFormatter } from "../ui/currency-input";
+import { getCurrencySymbol } from "@/lib/currency-utils";
+
+import { MoneyFormatter } from "../ui/inputs/currency-input";
 
 /**
  * Displays a formatted currency value with symbol.

@@ -9,7 +9,7 @@ export const SORTABLE_COLUMNS: SortableColumn[] = [
 
 export const FILTERABLE_FIELDS: FilterableField[] = [
   { id: "email", translationKey: "Users.form.email.label", type: "text" },
-//   { id: "role", translationKey: "Users.form.role.label", type: "select" },
+  //   { id: "role", translationKey: "Users.form.role.label", type: "select" },
   { id: "created_at", translationKey: "Users.form.created_at.label", type: "date" },
   { id: "updated_at", translationKey: "Users.form.updated_at.label", type: "date" },
 ];

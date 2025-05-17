@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { bulkDeleteResource, deleteResourceById } from "@/lib/api";
+
 import {
   fetchDepartments,
   createDepartment,
   updateDepartment,
-  deleteDepartment,
   duplicateDepartment,
-  bulkDeleteDepartments,
   fetchDepartmentById,
   fetchDepartmentsWithLocations,
   createDepartmentWithLocations,
@@ -22,23 +22,23 @@ export const departmentKeys = {
 };
 
 // List Query Hook
-export const useDepartments = () => {
+export function useDepartments() {
   return useQuery({
     queryKey: departmentKeys.lists(),
     queryFn: fetchDepartments,
   });
-};
+}
 
 // Hook to fetch a single department
-export const useDepartment = (id: string) => {
+export function useDepartment(id: string) {
   return useQuery({
     queryKey: departmentKeys.detail(id),
     queryFn: () => fetchDepartmentById(id),
     enabled: !!id,
   });
-};
+}
 // Create Mutation Hook
-export const useCreateDepartment = () => {
+export function useCreateDepartment() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -51,10 +51,10 @@ export const useCreateDepartment = () => {
       toast: { success: "Departments.success.create", error: "Departments.error.create" },
     },
   });
-};
+}
 
 // Update Mutation Hook
-export const useUpdateDepartment = () => {
+export function useUpdateDepartment() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -68,10 +68,10 @@ export const useUpdateDepartment = () => {
       toast: { success: "Departments.success.update", error: "Departments.error.update" },
     },
   });
-};
+}
 
 // Duplicate Mutation Hook
-export const useDuplicateDepartment = () => {
+export function useDuplicateDepartment() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -83,29 +83,31 @@ export const useDuplicateDepartment = () => {
       toast: { success: "Departments.success.duplicate", error: "Departments.error.duplicate" },
     },
   });
-};
+}
 
 // Delete Mutation Hook
-export const useDeleteDepartment = () => {
+export function useDeleteDepartment() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (id: string) => deleteDepartment(id),
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/departments/${id}`),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
       queryClient.removeQueries({ queryKey: departmentKeys.detail(variables) });
     },
     meta: { toast: { success: "Departments.success.delete", error: "Departments.error.delete" } },
   });
-};
+}
 
 // Hook to bulk delete departments
 export function useBulkDeleteDepartments() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: bulkDeleteDepartments,
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/departments", ids),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
+    },
+    meta: {
+      toast: { success: "Departments.success.delete", error: "Departments.error.delete" },
     },
   });
 }

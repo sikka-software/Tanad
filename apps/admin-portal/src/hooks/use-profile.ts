@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
-import useUserStore from "@/stores/use-user-store";
+import useUserStore, { Profile } from "@/stores/use-user-store";
 
 // Types for our profile data
 type ProfileData = {
@@ -38,17 +38,17 @@ const fetchProfile = async (profile_id: string): Promise<ProfileData> => {
 
 // Function to update profile data
 const updateProfile = async ({
-  profile_id,
+  id,
   data,
 }: {
-  profile_id: string;
+  id: string;
   data: ProfileUpdateData;
 }): Promise<ProfileData> => {
-  if (!profile_id) {
+  if (!id) {
     throw new Error("Profile ID is required");
   }
 
-  const response = await fetch(`/api/profile/update?profile_id=${profile_id}`, {
+  const response = await fetch(`/api/profile/update?profile_id=${id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -76,6 +76,7 @@ export function useProfile(profile_id: string) {
       return fetchProfile(profile_id);
     },
     enabled: !!profile_id,
+    refetchOnWindowFocus: false,
     staleTime: 60 * 1000, // Consider data fresh for 1 minute
     retry: (failureCount, error) => {
       // Don't retry if the error is due to missing profile_id
@@ -109,26 +110,13 @@ export function useUpdateProfile() {
           ...userStore.profile,
           full_name: data.full_name || userStore.profile.full_name,
           //      avatar_url: data.avatar_url || userStore.profile.avatar_url || "",
-          address: data.address || userStore.profile.address,
           email: data.email || userStore.profile.email,
           username: data.username || userStore.profile.username,
-          // Careful handling of user_settings to preserve the required fields
-          user_settings: {
-            currency: userStore.profile.user_settings?.currency,
-            calendar_type: userStore.profile.user_settings?.calendar_type,
-            timezone: data.user_settings?.timezone || userStore.profile.user_settings?.timezone,
-            notifications: userStore.profile.user_settings?.notifications,
-            // Preserve the navigation settings
-            navigation:
-              data.user_settings?.navigation || userStore.profile.user_settings?.navigation,
-            // Preserve hidden menu items
-            hidden_menu_items:
-              data.user_settings?.hidden_menu_items ||
-              userStore.profile.user_settings?.hidden_menu_items,
-          },
+          // Use the entire user_settings object from the server response
+          user_settings: data.user_settings,
         };
 
-        userStore.setProfile(updatedProfile);
+        userStore.setProfile(updatedProfile as Profile);
       }
 
       toast.success(t("Settings.saved_successfully"));
@@ -141,8 +129,8 @@ export function useUpdateProfile() {
 }
 
 // For integrating with the existing user store when needed
-export function useUserAndProfile(profile_id: string) {
-  const { data: profile, isLoading, error } = useProfile(profile_id);
+export function useUserAndProfile(id: string) {
+  const { data: profile, isLoading, error } = useProfile(id);
   const userStore = useUserStore();
 
   return {

@@ -26,13 +26,13 @@ const DataPageLayout = ({
       )}
     >
       <div>{children}</div>
-      {count && (
+      {count && count > 0 ? (
         <div className="w-full border-t">
           <p className="text-muted-foreground p-1 px-4 text-xs">
             {itemsText} {count}
           </p>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };

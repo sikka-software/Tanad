@@ -1,4 +1,4 @@
-import { currencies } from "@root/tanad.config";
+import { currencies } from "@tanad.config";
 import { DollarSign, Euro, PoundSterling, JapaneseYen } from "lucide-react";
 
 import { SARSymbol } from "@/components/ui/sar-symbol";
@@ -8,44 +8,61 @@ import { cn } from "./utils";
 export const getCurrencySymbol = (
   currency: (typeof currencies)[number],
   {
-    sarClassName,
-    usdClassName,
-    eurClassName,
-    gbpClassName,
-    jpyClassName,
+    sar,
+    usd,
+    eur,
+    gbp,
+    jpy,
   }: {
-    sarClassName?: string;
-    usdClassName?: string;
-    eurClassName?: string;
-    gbpClassName?: string;
-    jpyClassName?: string;
+    sar?: {
+      className?: string;
+      strokeWidth?: number;
+    };
+    usd?: {
+      className?: string;
+      strokeWidth?: number;
+    };
+    eur?: {
+      className?: string;
+      strokeWidth?: number;
+    };
+    gbp?: {
+      className?: string;
+      strokeWidth?: number;
+    };
+    jpy?: {
+      className?: string;
+      strokeWidth?: number;
+    };
   } = {},
 ): { is_icon: boolean; symbol: React.ReactNode } => {
   switch (currency) {
     case "sar":
       return {
         is_icon: true,
-        symbol: <SARSymbol className={cn("size-3", sarClassName)} />,
+        symbol: (
+          <SARSymbol className={cn("size-3", sar?.className)} strokeWidth={sar?.strokeWidth} />
+        ),
       };
     case "usd":
       return {
         is_icon: true,
-        symbol: <DollarSign className={cn("size-3", usdClassName)} />,
+        symbol: <DollarSign className={cn("size-3", usd?.className)} />,
       };
     case "eur":
       return {
         is_icon: true,
-        symbol: <Euro className={cn("size-3", eurClassName)} />,
+        symbol: <Euro className={cn("size-3", eur?.className)} />,
       };
     case "gbp":
       return {
         is_icon: true,
-        symbol: <PoundSterling className={cn("size-3", gbpClassName)} />,
+        symbol: <PoundSterling className={cn("size-3", gbp?.className)} />,
       };
     case "jpy":
       return {
         is_icon: true,
-        symbol: <JapaneseYen className={cn("size-3", jpyClassName)} />,
+        symbol: <JapaneseYen className={cn("size-3", jpy?.className)} />,
       };
     case "bhd":
       return {

@@ -1,0 +1,3 @@
+CREATE TYPE "public"."vehicle_ownership_status" AS ENUM('owned', 'financed', 'rented');--> statement-breakpoint
+ALTER TABLE "cars" ALTER COLUMN "ownership_status" SET DEFAULT 'owned'::"public"."vehicle_ownership_status";--> statement-breakpoint
+ALTER TABLE "cars" ALTER COLUMN "ownership_status" SET DATA TYPE "public"."vehicle_ownership_status" USING "ownership_status"::"public"."vehicle_ownership_status";

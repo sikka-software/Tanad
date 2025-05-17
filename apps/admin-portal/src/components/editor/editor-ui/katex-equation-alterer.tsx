@@ -6,7 +6,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import KatexRenderer from "@/components/editor/editor-ui/katex-renderer";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 

@@ -1,4 +1,3 @@
-import useTruckStore from "@root/src/modules/truck/truck.store";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -8,9 +7,10 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyTruck } from "@/lib/dummy-factory";
 
-import { TruckForm } from "@/modules/truck/truck.form";
+import { TruckForm } from "@/truck/truck.form";
+import useTruckStore from "@/truck/truck.store";
 
 export default function AddTruckPage() {
   const router = useRouter();
@@ -18,23 +18,6 @@ export default function AddTruckPage() {
 
   const setIsLoading = useTruckStore((state) => state.setIsLoading);
   const isLoading = useTruckStore((state) => state.isLoading);
-
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).truckForm;
-    if (form) {
-      form.setValue("name", dummyData.first_name);
-      form.setValue("make", dummyData.last_name);
-      form.setValue("model", dummyData.email);
-      form.setValue("year", dummyData.randomNumber(4));
-      form.setValue("color", dummyData.randomString);
-      form.setValue("vin", dummyData.randomString);
-      form.setValue("code", dummyData.randomString);
-      form.setValue("license_country", dummyData.randomString);
-      form.setValue("license_plate", dummyData.randomString);
-      form.setValue("notes", dummyData.state);
-    }
-  };
 
   return (
     <div>
@@ -49,23 +32,33 @@ export default function AddTruckPage() {
           submit_form: t("Pages.Trucks.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyTruck}
       />
 
       <TruckForm
         formHtmlId="truck-form"
         onSuccess={() => {
-          router.push("/trucks");
-          setIsLoading(false);
+          router.push("/trucks").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>
   );
 }
 
-AddTruckPage.messages = ["Pages", "Trucks", "Vehicles", "Notes", "Forms", "General"];
+AddTruckPage.messages = [
+  "Metadata",
+  "Pages",
+  "Trucks",
+  "Vehicles",
+  "Notes",
+  "Forms",
+  "General",
+  "PaymentCycles",
+];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

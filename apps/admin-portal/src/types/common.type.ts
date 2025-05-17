@@ -6,6 +6,9 @@ import { Constants } from "../lib/database.types";
 export const CommonStatus = Constants.public.Enums.common_status;
 export type CommonStatusProps = (typeof CommonStatus)[number];
 
+export const PaymentCycle = Constants.public.Enums.payment_cycle;
+export type PaymentCycleProps = (typeof PaymentCycle)[number];
+
 export const VehicleStatus = Constants.public.Enums.vehicle_status;
 export type VehicleStatusProps = (typeof VehicleStatus)[number];
 
@@ -16,6 +19,14 @@ export type ThemeProps = "light" | "dark";
 
 export type ViewMode = "table" | "cards";
 
+export type CardActionsProps = {
+  onEdit?: () => void;
+  onDuplicate?: () => void;
+  onView?: () => void;
+  onArchive?: () => void;
+  onDelete?: () => void;
+  onPreview?: () => void;
+};
 export type SortRule = {
   field: string;
   direction: "asc" | "desc";
@@ -57,6 +68,8 @@ export interface ModuleTableProps<T> {
   isLoading?: boolean;
   error?: Error | null;
   onActionClicked: (action: string, rowId: string) => void;
+  sorting?: any;
+  onSortingChange?: (updater: any) => void;
 }
 
 export interface ModuleFormProps<T> {

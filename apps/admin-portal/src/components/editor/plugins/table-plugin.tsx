@@ -16,7 +16,7 @@ import * as React from "react";
 import { invariant } from "@/components/editor/shared/invariant";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/components/ui/label";
 
 export type InsertTableCommandPayload = Readonly<{

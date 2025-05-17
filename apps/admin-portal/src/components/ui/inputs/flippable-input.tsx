@@ -5,7 +5,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-import IconButton from "./icon-button";
+import IconButton from "../icon-button";
 
 function FlippableInput({
   className,

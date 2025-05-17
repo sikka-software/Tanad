@@ -1,55 +1,59 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import FormSectionHeader from "@root/src/components/forms/form-section-header";
-import NotesSection from "@root/src/components/forms/notes-section";
-import BooleanTabs from "@root/src/components/ui/boolean-tabs";
-import { ComboboxAdd } from "@root/src/components/ui/comboboxes/combobox-add";
-import DigitsInput from "@root/src/components/ui/digits-input";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@root/src/components/ui/tooltip";
-import { employees } from "@root/src/db/schema";
-import { getNotesValue } from "@root/src/lib/utils";
-import { createSelectSchema } from "drizzle-zod";
-import { PlusCircle, Trash2Icon } from "lucide-react";
+import { parseDate } from "@internationalized/date";
+import { createInsertSchema } from "drizzle-zod";
+import { Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
+import { useDebounce } from "use-debounce";
 import * as z from "zod";
 
-import CountryInput from "@/ui/country-input";
-import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
-import { DatePicker } from "@/ui/date-picker";
+import { Button } from "@/ui/button";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { FormDialog } from "@/ui/form-dialog";
-import { Input } from "@/ui/input";
+import FormDialog from "@/ui/form-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 import { createClient } from "@/utils/supabase/component";
 
-import { Button } from "@/components/ui/button";
-import PhoneInput from "@/components/ui/phone-input";
+import FormSectionHeader from "@/components/forms/form-section-header";
+import NotesSection from "@/components/forms/notes-section";
+import CountryInput from "@/components/ui/inputs/country-input";
+import { CurrencyInput, MoneyFormatter } from "@/components/ui/inputs/currency-input";
+import { DateInput } from "@/components/ui/inputs/date-input";
+import DigitsInput from "@/components/ui/inputs/digits-input";
+import { Input } from "@/components/ui/inputs/input";
+import PhoneInput from "@/components/ui/inputs/phone-input";
+
+import { addressSchema } from "@/lib/schemas/address.schema";
+import { metadataSchema } from "@/lib/schemas/metadata.schema";
+import { getNotesValue } from "@/lib/utils";
+import { validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
+
+import JobForm from "@/job/job.form";
+import { useJobs } from "@/job/job.hooks";
+import useJobStore from "@/job/job.store";
 
 import DepartmentForm from "@/department/department.form";
 import { useDepartments } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";
 
+import { useCreateEmployee } from "@/employee/employee.hooks";
+import { useUpdateEmployee } from "@/employee/employee.hooks";
 import { SALARY_COMPONENT_TYPES } from "@/employee/employee.options";
 import useEmployeeStore from "@/employee/employee.store";
 import {
   EmployeeStatus,
-  EmployeeStatusProps,
   type EmployeeCreateData,
   type EmployeeUpdateData,
 } from "@/employee/employee.types";
 
+import { employees } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
-
-import { JobForm } from "../job/job.form";
-import { useJobs } from "../job/job.hooks";
-import useJobStore from "../job/job.store";
-import { useCreateEmployee } from "./employee.hooks";
-import { useUpdateEmployee } from "./employee.hooks";
 
 const salaryComponentSchema = z.object({
   type: z.string().min(1, "Type is required"),
@@ -61,6 +65,52 @@ const salaryComponentSchema = z.object({
     .default(0),
 });
 
+export const createEmployeeFormSchema = (t: (key: string) => string) => {
+  const EmployeeSelectSchema = createInsertSchema(employees, {
+    first_name: z.string().min(1, t("Employees.form.first_name.required")),
+    last_name: z.string().min(1, t("Employees.form.last_name.required")),
+    email: z.string().email(t("Employees.form.email.invalid")),
+    phone: z.string().optional(),
+    job_id: z.string().min(1, t("Employees.form.job.required")),
+
+    salary: z.array(salaryComponentSchema).optional(),
+    status: z.enum(EmployeeStatus),
+    nationality: z.string().optional(),
+    hire_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.hire_date.invalid")),
+    birth_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.birth_date.invalid")),
+    termination_date: z
+      .any()
+      .optional()
+      .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.termination_date.invalid")),
+    national_id: z.string().optional(),
+    eqama_id: z.string().optional(),
+    gender: z.string().optional(),
+    marital_status: z.string().optional(),
+    education_level: z.string().optional(),
+    employee_number: z.string().optional(),
+    onboarding_status: z.string().optional(),
+    offboarding_status: z.string().optional(),
+    emergency_contact: z
+      .object({
+        name: z.string().optional(),
+        phone: z.string().optional(),
+        relationship: z.string().optional(),
+      })
+      .optional(),
+    notes: z.any().optional().nullable(),
+    ...addressSchema,
+    ...metadataSchema,
+  });
+
+  return EmployeeSelectSchema;
+};
+
 export function EmployeeForm({
   formHtmlId,
   onSuccess,
@@ -71,157 +121,109 @@ export function EmployeeForm({
   const t = useTranslations();
   const locale = useLocale();
 
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
   const isDepartmentSaving = useDepartmentStore((state) => state.isLoading);
   const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
 
   const [isJobDialogOpen, setIsJobDialogOpen] = useState(false);
-  const { data: jobs, isLoading: jobsLoading } = useJobs();
+  const { data: jobs, isLoading: isFetchingJobs } = useJobs();
   const isJobSaving = useJobStore((state) => state.isLoading);
   const setIsJobSaving = useJobStore((state) => state.setIsLoading);
 
-  const { mutateAsync: updateEmployeeMutate, isPending: isUpdatingEmployee } = useUpdateEmployee();
-  const { mutateAsync: createEmployeeMutate, isPending: isCreatingEmployee } = useCreateEmployee();
+  const { mutateAsync: updateEmployeeMutate } = useUpdateEmployee();
+  const { mutateAsync: createEmployeeMutate } = useCreateEmployee();
 
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
 
-  const setIsFormDialogOpen = useEmployeeStore((state) => state.setIsFormDialogOpen);
-
+  const [email, setEmail] = useState(defaultValues?.email || "");
+  const [debouncedEmail] = useDebounce(email, 500);
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isEmailLoading, setIsEmailLoading] = useState(false);
   const actualEmployeeId = editMode ? defaultValues?.id : undefined;
   const initialEmail = editMode ? defaultValues?.email : undefined;
 
-  const createEmployeeFormSchema = () => {
+  useEffect(() => {
+    if (!debouncedEmail) {
+      setIsEmailValid(true);
+      setIsEmailLoading(false);
+      return;
+    }
+    if (actualEmployeeId && debouncedEmail === initialEmail) {
+      setIsEmailValid(true);
+      setIsEmailLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setIsEmailLoading(true);
     const supabase = createClient();
-    const EmployeeSelectSchema = createSelectSchema(employees, {
-      first_name: z.string().min(1, t("Employees.form.first_name.required")),
-      last_name: z.string().min(1, t("Employees.form.last_name.required")),
-      email: z
-        .string()
-        .email(t("Employees.form.email.invalid"))
-        .refine(async (email) => {
-          if (actualEmployeeId && email === initialEmail) {
-            return true;
-          }
-          setIsEmployeeSaving(true);
-
-          const { user } = useUserStore.getState();
-          if (!user?.id) return true;
-          const query = supabase
-            .from("employees")
-            .select("id", { count: "exact" })
-            .eq("email", email)
-            .eq("user_id", user.id);
-
-          if (actualEmployeeId) {
-            query.neq("id", actualEmployeeId);
-          }
-
-          const { error, count } = await query;
-
-          if (error) {
-            console.error("Email validation error:", error);
-            return false;
-          }
-
-          setIsEmployeeSaving(false);
-          return count === 0;
-        }, t("Employees.form.email.duplicate")),
-      phone: z.string().optional(),
-      job_id: z.string().min(1, t("Employees.form.job.required")),
-      hire_date: z.date({
-        required_error: t("Employees.form.hire_date.required"),
-      }),
-      salary: z.array(salaryComponentSchema).optional(),
-      status: z.enum(EmployeeStatus),
-      nationality: z.string().optional(),
-      birth_date: z.date().optional(),
-      national_id: z.string().optional(),
-      eqama_id: z.string().optional(),
-      gender: z.string().optional(),
-      marital_status: z.string().optional(),
-      education_level: z.string().optional(),
-      employee_number: z.string().optional(),
-      onboarding_status: z.string().optional(),
-      offboarding_status: z.string().optional(),
-      emergency_contact: z
-        .object({
-          name: z.string().optional(),
-          phone: z.string().optional(),
-          relationship: z.string().optional(),
-        })
-        .optional(),
-      notes: z.any().optional().nullable(),
-    });
-
-    return EmployeeSelectSchema;
-  };
+    supabase
+      .from("employees")
+      .select("id", { count: "exact" })
+      .eq("email", debouncedEmail)
+      .then(({ error, count }) => {
+        if (!cancelled) {
+          setIsEmailValid(!error && count === 0);
+          setIsEmailLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedEmail, actualEmployeeId, initialEmail, user?.id]);
 
   const form = useForm<z.input<ReturnType<typeof createEmployeeFormSchema>>>({
-    resolver: zodResolver(createEmployeeFormSchema()),
+    resolver: zodResolver(createEmployeeFormSchema(t)),
+    mode: "onChange",
     defaultValues: {
       first_name: defaultValues?.first_name || "",
       last_name: defaultValues?.last_name || "",
       email: defaultValues?.email || "",
-      phone: defaultValues?.phone ?? "",
+      created_at: defaultValues?.created_at || undefined,
+      updated_at: defaultValues?.updated_at || undefined,
+      user_id: defaultValues?.user_id || undefined,
+      enterprise_id: defaultValues?.enterprise_id || undefined,
+      id: defaultValues?.id || undefined,
+      status: defaultValues?.status || "active",
       job_id: defaultValues?.job_id || "",
-      hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
-      salary: defaultValues?.salary as { type: string; amount: number }[] | undefined,
-      status: (defaultValues?.status as EmployeeStatusProps) || "active",
+      phone: defaultValues?.phone || "",
+      salary:
+        (defaultValues?.salary as { type: string; amount: number }[] | undefined) || undefined,
       notes: getNotesValue(defaultValues) || "",
       nationality: defaultValues?.nationality || "",
+      hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
       birth_date: defaultValues?.birth_date ? new Date(defaultValues.birth_date) : undefined,
+      termination_date: defaultValues?.termination_date
+        ? new Date(defaultValues.termination_date)
+        : undefined,
       national_id: defaultValues?.national_id || "",
       eqama_id: defaultValues?.eqama_id || "",
       gender: defaultValues?.gender || "male",
+      short_address: defaultValues?.short_address || "",
+      additional_number: defaultValues?.additional_number || "",
+      street_name: defaultValues?.street_name || "",
+      building_number: defaultValues?.building_number || "",
+      city: defaultValues?.city || "",
+      region: defaultValues?.region || "",
+      country: defaultValues?.country || "",
+      zip_code: defaultValues?.zip_code || "",
       marital_status: defaultValues?.marital_status || "single",
       education_level: defaultValues?.education_level || "",
       employee_number: defaultValues?.employee_number || "",
       onboarding_status: defaultValues?.onboarding_status || "",
       offboarding_status: defaultValues?.offboarding_status || "",
+      emergency_contact:
+        typeof defaultValues?.emergency_contact === "object" &&
+        defaultValues?.emergency_contact !== null &&
+        !Array.isArray(defaultValues?.emergency_contact)
+          ? defaultValues.emergency_contact
+          : undefined,
     },
   });
-
-  useEffect(() => {
-    if (defaultValues) {
-      // Map status to allowed union type for reset
-      const mappedStatus = ["active", "inactive", "on_leave", "terminated"].includes(
-        (defaultValues.status || "") as string,
-      )
-        ? defaultValues.status
-        : "active";
-      form.reset({
-        ...defaultValues,
-        status: mappedStatus as EmployeeStatusProps,
-        hire_date: defaultValues.hire_date ? new Date(defaultValues.hire_date) : undefined,
-        job_id: defaultValues.job_id || "",
-        phone: defaultValues.phone || "",
-        salary:
-          (defaultValues.salary as { type: string; amount: number }[] | undefined) || undefined,
-        notes: getNotesValue(defaultValues) || "",
-        nationality: defaultValues.nationality || "",
-        birth_date: defaultValues.birth_date ? new Date(defaultValues.birth_date) : undefined,
-        national_id: defaultValues.national_id || "",
-        eqama_id: defaultValues.eqama_id || "",
-        gender: defaultValues.gender || "male",
-        marital_status: defaultValues.marital_status || "single",
-        education_level: defaultValues.education_level || "",
-        employee_number: defaultValues.employee_number || "",
-        onboarding_status: defaultValues.onboarding_status || "",
-        offboarding_status: defaultValues.offboarding_status || "",
-        emergency_contact:
-          typeof defaultValues.emergency_contact === "object" &&
-          defaultValues.emergency_contact !== null &&
-          !Array.isArray(defaultValues.emergency_contact)
-            ? defaultValues.emergency_contact
-            : undefined,
-      });
-    } else {
-      // Optionally reset to empty if defaultValues becomes null (e.g., switching modes)
-      // form.reset(mapDataToFormDefaults(null));
-    }
-  }, [defaultValues, form.reset]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -233,7 +235,9 @@ export function EmployeeForm({
     salaryComponents?.reduce((sum, comp) => sum + (Number(comp.amount) || 0), 0) || 0;
 
   const handleSubmit = async (data: z.input<ReturnType<typeof createEmployeeFormSchema>>) => {
+    console.log("data birth date", data.birth_date);
     setIsEmployeeSaving(true);
+
     // Log dirtyFields for debugging
     // console.log("Form dirtyFields:", form.formState.dirtyFields);
     // console.log("Form isDirty:", form.formState.isDirty);
@@ -259,8 +263,15 @@ export function EmployeeForm({
             last_name: data.last_name.trim(),
             email: data.email.trim(),
             phone: data.phone?.trim() || undefined,
-            hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
-            birth_date: data.birth_date ? data.birth_date.toISOString().split("T")[0] : undefined,
+            termination_date:
+              data.termination_date && typeof data.termination_date.toString === "function"
+                ? data.termination_date.toString()
+                : undefined,
+            hire_date: data.hire_date.toString(),
+            birth_date:
+              data.birth_date && typeof data.birth_date.toString === "function"
+                ? data.birth_date.toString()
+                : undefined,
             notes: data.notes,
             salary: (data.salary || []).map((comp) => ({
               ...comp,
@@ -273,19 +284,29 @@ export function EmployeeForm({
         const { membership, user } = useUserStore.getState();
         await createEmployeeMutate({
           ...data,
-          birth_date: data.birth_date ? data.birth_date.toISOString().split("T")[0] : undefined,
+          user_id: user?.id || "",
+          enterprise_id: membership?.enterprise_id || "",
+          termination_date:
+            data.termination_date && typeof data.termination_date.toString === "function"
+              ? data.termination_date.toString()
+              : undefined,
+          birth_date:
+            data.birth_date && typeof data.birth_date.toString === "function"
+              ? data.birth_date.toString()
+              : undefined,
+          hire_date:
+            data.hire_date && typeof data.hire_date.toString === "function"
+              ? data.hire_date.toString()
+              : undefined,
           first_name: data.first_name.trim(),
           last_name: data.last_name.trim(),
           email: data.email.trim(),
           phone: data.phone?.trim() || undefined,
-          hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
           notes: data.notes,
           salary: (data.salary || []).map((comp) => ({
             ...comp,
             amount: Number(comp.amount) || 0,
           })),
-          enterprise_id: membership?.enterprise_id || "",
-          user_id: user?.id || "",
         });
         onSuccess?.();
       }
@@ -320,7 +341,15 @@ export function EmployeeForm({
   return (
     <>
       <Form {...form}>
-        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <form
+          id={formHtmlId}
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit(handleSubmit)(e);
+          }}
+        >
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="form-fields-cols-2">
               <FormField
@@ -370,8 +399,19 @@ export function EmployeeForm({
                         type="email"
                         dir="ltr"
                         {...field}
+                        value={email}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          setEmail(e.target.value);
+                        }}
                       />
                     </FormControl>
+                    {!isEmailValid && (
+                      <FormMessage>{t("Employees.form.email.duplicate")}</FormMessage>
+                    )}
+                    {isEmailLoading && (
+                      <div className="text-xs text-gray-500">{t("General.loading")}</div>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -384,10 +424,9 @@ export function EmployeeForm({
                     <FormLabel>{t("Employees.form.phone.label")}</FormLabel>
                     <FormControl>
                       <PhoneInput
+                        value={field.value || ""}
+                        onChange={field.onChange}
                         disabled={isEmployeeSaving}
-                        {...field}
-                        value={field.value ?? ""}
-                        ariaInvalid={form.formState.errors.phone !== undefined}
                       />
                     </FormControl>
                     <FormMessage />
@@ -406,7 +445,7 @@ export function EmployeeForm({
                         data={jobOptions}
                         defaultValue={field.value ?? undefined}
                         onChange={field.onChange}
-                        isLoading={jobsLoading}
+                        isLoading={isFetchingJobs}
                         disabled={isEmployeeSaving}
                         texts={{
                           placeholder: t("Employees.form.job.placeholder"),
@@ -448,12 +487,16 @@ export function EmployeeForm({
                   <FormItem className="flex flex-col">
                     <FormLabel>{t("Employees.form.hire_date.label")} *</FormLabel>
                     <FormControl>
-                      <DatePicker
+                      <DateInput
                         placeholder={t("Employees.form.hire_date.placeholder")}
-                        date={field.value}
-                        onSelect={field.onChange}
+                        value={
+                          typeof field.value === "string"
+                            ? parseDate(field.value)
+                            : (field.value ?? null)
+                        }
+                        onChange={field.onChange}
+                        onSelect={(e) => field.onChange(e)}
                         disabled={isEmployeeSaving}
-                        ariaInvalid={form.formState.errors.hire_date !== undefined}
                       />
                     </FormControl>
                     <FormMessage />
@@ -465,7 +508,7 @@ export function EmployeeForm({
                 name="nationality"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Employees.form.nationality.label")} *</FormLabel>
+                    <FormLabel>{t("Employees.form.nationality.label")}</FormLabel>
                     <FormControl>
                       <CountryInput
                         value={field.value ?? ""}
@@ -489,14 +532,18 @@ export function EmployeeForm({
                 name="birth_date"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>{t("Employees.form.birth_date.label")} *</FormLabel>
+                    <FormLabel>{t("Employees.form.birth_date.label")}</FormLabel>
                     <FormControl>
-                      <DatePicker
+                      <DateInput
                         placeholder={t("Employees.form.birth_date.placeholder")}
-                        date={field.value}
-                        onSelect={field.onChange}
+                        value={
+                          typeof field.value === "string"
+                            ? parseDate(field.value)
+                            : (field.value ?? null)
+                        }
+                        onChange={field.onChange}
+                        onSelect={(e) => field.onChange(e)}
                         disabled={isEmployeeSaving}
-                        ariaInvalid={form.formState.errors.birth_date !== undefined}
                       />
                     </FormControl>
                     <FormMessage />
@@ -537,7 +584,7 @@ export function EmployeeForm({
                 name="gender"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Employees.form.gender.label")} *</FormLabel>
+                    <FormLabel>{t("Employees.form.gender.label")}</FormLabel>
                     <Select
                       defaultValue={field.value}
                       onValueChange={field.onChange}
@@ -570,13 +617,11 @@ export function EmployeeForm({
                     <Select
                       key={field.value}
                       value={field.value}
-                      onValueChange={(val) => {
-                        field.onChange(val);
-                      }}
+                      onValueChange={(val) => field.onChange(val)}
                       dir={locale === "ar" ? "rtl" : "ltr"}
                     >
                       <FormControl>
-                        <SelectTrigger onClear={() => field.onChange("")}>
+                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
                           <SelectValue
                             placeholder={t("Employees.form.onboarding_status.placeholder")}
                           />
@@ -613,7 +658,7 @@ export function EmployeeForm({
                       dir={locale === "ar" ? "rtl" : "ltr"}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
                           <SelectValue
                             placeholder={t("Employees.form.offboarding_status.placeholder")}
                           />
@@ -773,6 +818,7 @@ export function EmployeeForm({
         <JobForm
           formHtmlId="job-form"
           onSuccess={() => {
+            setIsJobSaving(false);
             setIsJobDialogOpen(false);
           }}
         />
@@ -790,6 +836,7 @@ export function EmployeeForm({
           formHtmlId="department-form"
           onSuccess={() => {
             setIsDepartmentDialogOpen(false);
+            setIsDepartmentSaving(false);
           }}
         />
       </FormDialog>

@@ -1,7 +1,6 @@
-import React, { useEffect } from "react";
-
 import Router from "next/router";
 import NProgress from "nprogress";
+import React, { useEffect } from "react";
 
 interface LoadingBarProps {
   color?: string;

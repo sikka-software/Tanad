@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import { Button } from "@/ui/button";
 
 type BottomCTAProps = {
@@ -16,9 +17,7 @@ const BottomCTA = (props: BottomCTAProps) => (
     <div className="text-center">{props.subtitle}</div>
     <div className="flex flex-row gap-6">
       <Link href={props.primaryActionSlug}>
-        <Button aria-label={props.primaryActionText}>
-          {props.primaryActionText}
-        </Button>
+        <Button aria-label={props.primaryActionText}>{props.primaryActionText}</Button>
       </Link>
       {props.secondaryActionText && (
         <Link href={props.secondaryActionSlug || ""}>

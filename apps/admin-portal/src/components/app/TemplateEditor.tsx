@@ -1,6 +1,5 @@
-import { useState } from "react";
-
 import { Printer, Save } from "lucide-react";
+import { useState } from "react";
 
 import { Button } from "@/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";

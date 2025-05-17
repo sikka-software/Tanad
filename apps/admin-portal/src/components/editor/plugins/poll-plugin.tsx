@@ -25,7 +25,7 @@ import * as React from "react";
 import { $createPollNode, PollNode, createPollOption } from "@/components/editor/nodes/poll-node";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/components/ui/label";
 
 export const INSERT_POLL_COMMAND: LexicalCommand<string> = createCommand("INSERT_POLL_COMMAND");

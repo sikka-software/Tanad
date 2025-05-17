@@ -14,39 +14,6 @@ export interface Profile {
   zip: string;
 }
 
-export interface UserSettings {
-  currency: string;
-  calendar_type: string;
-}
-
-export type TanadUser = User & {
-  id: string;
-  email: string;
-  phone: string;
-  address: string;
-  full_name: string;
-  profile: Profile;
-  subscribed_to: string;
-  stripe_customer_id: string;
-  user_settings: UserSettings;
-  username?: string;
-  price_id?: string;
-  avatar_url?: string;
-};
-
-export type Pukla = {
-  id: string;
-  title: string;
-  slug: string;
-  bio?: string;
-  avatar_url?: string;
-  created_at: string;
-  link_count?: number;
-  theme: PuklaThemeProps;
-  settings: PuklaSettings;
-  layout?: "1-col" | "2-col" | "3-col";
-};
-
 type ValidationTexts = {
   required?: string;
   invalid?: string;

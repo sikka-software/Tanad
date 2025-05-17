@@ -108,6 +108,12 @@ const EnterprisePage = () => {
                 industry: formData.industry ?? undefined,
                 email: formData.email ?? undefined,
                 logo: formData.logo ?? undefined,
+                website: undefined,
+                phone: undefined,
+                employees: undefined,
+                description: undefined,
+                address: undefined,
+                founded: undefined,
               }}
               formId="enterprise-form"
               readOnly={!isEditing}
@@ -150,9 +156,9 @@ const EnterprisePage = () => {
 
 export default EnterprisePage;
 
-EnterprisePage.messages = ["Pages", "General", "Enterprise"];
+EnterprisePage.messages = ["Metadata", "Pages", "General", "Enterprise"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

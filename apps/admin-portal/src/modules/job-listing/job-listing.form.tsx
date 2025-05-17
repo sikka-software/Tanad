@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import FormSectionHeader from "@root/src/components/forms/form-section-header";
-import { FormDialog } from "@root/src/components/ui/form-dialog";
+import { createInsertSchema } from "drizzle-zod";
 import { useTranslations } from "next-intl";
 import { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -8,42 +7,54 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
+import FormDialog from "@/ui/form-dialog";
 import { Textarea } from "@/ui/textarea";
 
 import JobListingJobsSelection from "@/components/forms/job-listing-jobs-selection";
 import JobListingOptionsSection from "@/components/forms/job-listing-options-section";
+import { Input } from "@/components/ui/inputs/input";
 
 import { ModuleFormProps } from "@/types/common.type";
 
+import JobForm from "@/job/job.form";
 import { useJobs } from "@/job/job.hooks";
+import useJobStore from "@/job/job.store";
 
 import { useCreateJobListing, useUpdateJobListing } from "@/job-listing/job-listing.hooks";
+import {
+  bulkAssociateJobsWithListing,
+  updateListingJobAssociations,
+  fetchJobListingById,
+} from "@/job-listing/job-listing.service";
 import useJobListingsStore from "@/job-listing/job-listing.store";
+import useJobListingStore from "@/job-listing/job-listing.store";
 import { JobListingUpdateData, JobListingCreateData } from "@/job-listing/job-listing.type";
 
+import { job_listings, offices } from "@/db/schema";
 import { useBranches } from "@/modules/branch/branch.hooks";
 import { useDepartments } from "@/modules/department/department.hooks";
 import { useOffices } from "@/modules/office/office.hooks";
 import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import useUserStore from "@/stores/use-user-store";
 
-import { JobForm } from "../job/job.form";
-import useJobStore from "../job/job.store";
-import { bulkAssociateJobsWithListing, updateListingJobAssociations } from "./job-listing.service";
-
-export const createJobListingFormSchema = (t: (key: string) => string) =>
-  z.object({
+const createJobListingSchema = (t: (key: string) => string) => {
+  const JobListingSelectSchema = createInsertSchema(job_listings, {
     title: z.string().min(1, t("JobListings.form.title.required")),
     description: z.string().optional(),
-    jobs: z.array(z.string()).min(1, t("JobListings.form.jobs.required")),
     currency: z.string().optional(),
-    enableSearchFiltering: z.boolean().optional(),
+    enable_search_filtering: z.boolean().optional(),
+
     locations: z.array(z.string()).optional(),
     departments: z.array(z.string()).optional(),
   });
+  const JobListingItemsSchema = z.array(z.string()).min(1, t("JobListings.form.jobs.required"));
 
-export type JobListingFormValues = z.infer<ReturnType<typeof createJobListingFormSchema>>;
+  return JobListingSelectSchema.extend({
+    jobs: JobListingItemsSchema,
+  });
+};
+
+export type JobListingFormValues = z.input<ReturnType<typeof createJobListingSchema>>;
 
 export function JobListingForm({
   formHtmlId,
@@ -52,6 +63,10 @@ export function JobListingForm({
   editMode,
 }: ModuleFormProps<JobListingUpdateData | JobListingCreateData>) {
   const t = useTranslations();
+
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+
   const { data: jobs, isLoading: isLoadingJobs } = useJobs();
 
   const { data: departments, isLoading: isLoadingDepartments } = useDepartments();
@@ -62,27 +77,36 @@ export function JobListingForm({
   const { mutateAsync: createJobListing, isPending: isCreating } = useCreateJobListing();
   const { mutateAsync: updateJobListing, isPending: isUpdating } = useUpdateJobListing();
 
-  const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
-  const { user, membership } = useUserStore();
+  const getJobIds = (jobs: any[] | undefined) => {
+    if (!Array.isArray(jobs)) return [];
+    if (jobs.length > 0 && typeof jobs[0] === "string") return jobs as string[];
+    return jobs.map((j: any) => j?.job_id || j?.id).filter(Boolean);
+  };
+
+  const [selectedJobs, setSelectedJobs] = useState<string[]>(() => getJobIds(defaultValues?.jobs));
 
   const [isJobDialogOpen, setIsJobDialogOpen] = useState(false);
   const isJobSaving = useJobStore((state) => state.isLoading);
   const setIsJobSaving = useJobStore((state) => state.setIsLoading);
   const isLoading = useJobListingsStore((state) => state.isLoading);
   const setIsLoading = useJobListingsStore((state) => state.setIsLoading);
+  const setData = useJobListingStore((state) => state.setData);
 
   const form = useForm<JobListingFormValues>({
-    resolver: zodResolver(createJobListingFormSchema(t)),
+    resolver: zodResolver(createJobListingSchema(t)),
     defaultValues: {
-      title: "",
-      description: "",
-      jobs: [],
-      currency: "sar",
-      enableSearchFiltering: true,
-      locations: [],
-      departments: [],
+      title: defaultValues?.title || "",
+      description: defaultValues?.description || "",
+      currency: defaultValues?.currency || "sar",
+      enable_search_filtering: defaultValues?.enable_search_filtering || true,
+      slug: defaultValues?.slug || "",
+      status: defaultValues?.status || "active",
+      is_public: defaultValues?.is_public || true,
+      jobs: getJobIds(defaultValues?.jobs),
     },
   });
+
+  console.log("default jobs ", defaultValues);
 
   const handleJobSelect = (job_id: string) => {
     setSelectedJobs((prev) => {
@@ -104,7 +128,7 @@ export function JobListingForm({
       return;
     }
 
-    if (!membership?.enterprise_id) {
+    if (!enterprise?.id) {
       toast.error(t("General.error_operation"), {
         description: t("JobListings.error.missing_enterprise"),
       });
@@ -115,12 +139,11 @@ export function JobListingForm({
     const {
       jobs: selectedJobIds,
       currency,
-      enableSearchFiltering,
+      enable_search_filtering,
       locations,
       departments,
       ...coreListingData
     } = data;
-    const enterpriseId = membership.enterprise_id;
 
     try {
       if (editMode && defaultValues) {
@@ -131,25 +154,36 @@ export function JobListingForm({
           return;
         }
 
-        const updatePayload: JobListingUpdateData = {
-          title: coreListingData.title.trim(),
-          description: coreListingData.description?.trim() || null,
-        };
-
         await updateJobListing(
-          { id: defaultValues.id, data: updatePayload },
+          {
+            id: defaultValues.id,
+            data: {
+              ...(() => {
+                const { jobs, ...rest } = data;
+                return rest;
+              })(),
+              title: data.title.trim(),
+              description: data.description?.trim() || null,
+            },
+          },
           {
             onSuccess: async (updatedListing) => {
               try {
                 await updateListingJobAssociations(defaultValues.id!, selectedJobIds);
-                // toast.info(t("JobListings.success.associations_updated"));
+                const latest = await fetchJobListingById(defaultValues.id!);
+                const prev = useJobListingStore.getState().data || [];
+                if (setData) {
+                  setData(prev.map((item: any) => (item.id === latest.id ? latest : item)));
+                }
+                if (onSuccess) {
+                  onSuccess();
+                }
               } catch (assocError) {
                 console.error("Failed to update job associations:", assocError);
                 toast.warning(t("JobListings.warning.associations_failed"));
-              }
-
-              if (onSuccess) {
-                onSuccess();
+                if (onSuccess) {
+                  onSuccess();
+                }
               }
             },
             onError: (error) => {
@@ -164,59 +198,50 @@ export function JobListingForm({
           },
         );
       } else {
-        const createPayload: JobListingCreateData = {
-          title: coreListingData.title.trim(),
-          description: coreListingData.description?.trim() || null,
-          user_id: user?.id || "",
-          enterprise_id: enterpriseId,
-          status: "active",
-          is_public: true,
-          slug: "",
-          updated_at: new Date().toISOString(),
-        };
-
-        // Generate a simple slug from the title + timestamp for uniqueness
         const generatedSlug = `${coreListingData.title
           .toLowerCase()
           .replace(/\s+/g, "-")
           .replace(/[^a-z0-9-]/g, "")}-${Date.now()}`;
 
-        const createPayloadWithSlug: JobListingCreateData = {
-          ...createPayload,
-          slug: generatedSlug,
-        };
-
-        await createJobListing(createPayloadWithSlug, {
-          onSuccess: async (createdListing) => {
-            toast.success(t("General.successful_operation"), {
-              description: t("JobListings.success.create"),
-            });
-
-            // Associate selected jobs
-            if (selectedJobIds.length > 0) {
-              try {
-                await bulkAssociateJobsWithListing(createdListing.id, selectedJobIds);
-              } catch (assocError) {
-                console.error("Failed to associate jobs:", assocError);
-                toast.warning(t("JobListings.warning.associations_failed_create"));
-                // The listing was created, but associating jobs failed.
+        await createJobListing(
+          {
+            user_id: user?.id || "",
+            enterprise_id: enterprise?.id || "",
+            updated_at: new Date().toISOString(),
+            title: coreListingData.title.trim(),
+            description: coreListingData.description?.trim() || null,
+            status: "active",
+            is_public: true,
+            slug: generatedSlug,
+            currency: currency,
+            enable_search_filtering: enable_search_filtering,
+            locations: locations,
+            departments: departments,
+          },
+          {
+            onSuccess: async (createdListing) => {
+              if (selectedJobIds.length > 0) {
+                try {
+                  await bulkAssociateJobsWithListing(createdListing.id, selectedJobIds);
+                } catch (assocError) {
+                  console.error("Failed to associate jobs:", assocError);
+                  toast.warning(t("JobListings.warning.associations_failed_create"));
+                }
               }
-            }
 
-            if (onSuccess) {
-              onSuccess();
-            }
+              if (onSuccess) onSuccess();
+            },
+            onError: (error) => {
+              console.error("Failed to create job listing:", error);
+              toast.error(t("General.error_operation"), {
+                description: t("JobListings.error.create"),
+              });
+            },
+            onSettled: () => {
+              setIsLoading(false);
+            },
           },
-          onError: (error) => {
-            console.error("Failed to create job listing:", error);
-            toast.error(t("General.error_operation"), {
-              description: t("JobListings.error.create"),
-            });
-          },
-          onSettled: () => {
-            setIsLoading(false);
-          },
-        });
+        );
       }
     } catch (error) {
       setIsLoading(false);
@@ -260,16 +285,24 @@ export function JobListingForm({
   // --- End Options Data ---
 
   useEffect(() => {
-    //  if there's at least one job selected, remove the form validation error state
-    if (form.getValues("jobs").length > 0) {
-      form.clearErrors("jobs");
+    const jobIds = getJobIds(defaultValues?.jobs);
+    setSelectedJobs(jobIds);
+    if (defaultValues?.id && setData) {
+      const prev = useJobListingStore.getState().data || [];
+      setData(
+        prev.map((item: any) => (item.id === defaultValues.id ? { ...item, jobs: jobIds } : item)),
+      );
     }
-  }, [form.getValues("jobs")]);
+    form.setValue("jobs", jobIds);
+  }, [defaultValues?.jobs]);
 
   return (
     <>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)} className="mb-40">
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
+
           <div className="form-container">
             <FormField
               control={form.control}

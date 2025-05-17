@@ -14,6 +14,7 @@ export const createMetadataSchema = (t: (key: string) => string) =>
   });
 
 export const metadataSchema = {
+  id: z.string().optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
   user_id: z.string().optional(),

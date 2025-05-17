@@ -64,7 +64,7 @@ const WarehouseTable = ({
   };
   if (isLoading) {
     return (
-      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
+      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={12} />
     );
   }
 

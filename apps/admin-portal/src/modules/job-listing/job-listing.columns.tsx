@@ -1,7 +1,8 @@
-import StatusCell from "@root/src/components/tables/status-cell";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
+import StatusCell from "@/components/tables/status-cell";
+import TimestampCell from "@/components/tables/timestamp-cell";
 import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { JobListingWithJobs } from "./job-listing.type";
@@ -34,10 +35,30 @@ const useCompanyColumns = (
       enableEditing: false,
       cell: ({ row }) => row.original.jobs_count,
     },
+
+    {
+      accessorKey: "created_at",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "updated_at",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
     {
       accessorKey: "status",
       maxSize: 80,
-      header: t("JobListings.form.status.label"),
+      header: t("CommonStatus.label"),
       validationSchema: z.enum(["active", "inactive"]),
       noPadding: true,
       enableEditing: false,
@@ -48,8 +69,8 @@ const useCompanyColumns = (
           <StatusCell
             status={status}
             statusOptions={[
-              { label: t("JobListings.form.status.active"), value: "active" },
-              { label: t("JobListings.form.status.inactive"), value: "inactive" },
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
             ]}
             onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
           />

@@ -18,8 +18,6 @@ export default function AddRolePage() {
   const setIsLoading = useEnterpriseUserStore((state) => state.setIsLoading);
   const isLoading = useEnterpriseUserStore((state) => state.isLoading);
 
-  const handleDummyData = () => {};
-
   return (
     <div>
       <CustomPageMeta title={t("Pages.Roles.add")} />
@@ -33,26 +31,25 @@ export default function AddRolePage() {
           submit_form: t("Pages.Roles.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
       />
 
       <div className="mx-auto max-w-2xl p-4">
         <RoleForm
           formHtmlId="role-form"
-          onSuccess={() =>
+          onSuccess={() => {
             router.push("/roles").then(() => {
               setIsLoading(false);
-            })
-          }
+            });
+          }}
         />
       </div>
     </div>
   );
 }
 
-AddRolePage.messages = ["Notes", "Pages", "Roles", "General"];
+AddRolePage.messages = ["Metadata", "Notes", "Pages", "Roles", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

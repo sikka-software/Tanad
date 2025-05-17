@@ -1,4 +1,3 @@
-import useDomainStore from "@root/src/modules/domain/domain.store";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -8,9 +7,10 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyDomain } from "@/lib/dummy-factory";
 
-import { DomainForm } from "@/modules/domain/domain.form";
+import { DomainForm } from "@/domain/domain.form";
+import useDomainStore from "@/domain/domain.store";
 
 export default function AddDomainPage() {
   const router = useRouter();
@@ -18,20 +18,6 @@ export default function AddDomainPage() {
 
   const setIsLoading = useDomainStore((state) => state.setIsLoading);
   const isLoading = useDomainStore((state) => state.isLoading);
-
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).domainForm;
-    if (form) {
-      form.setValue("domain_name", dummyData.first_name.toLowerCase() + ".com");
-      form.setValue("registrar", dummyData.email);
-      form.setValue("monthly_cost", dummyData.randomNumber(3));
-      form.setValue("annual_cost", dummyData.randomNumber(3));
-      form.setValue("payment_cycle", dummyData.randomPicker(["monthly", "annual"]));
-      form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
-      form.setValue("notes", dummyData.state);
-    }
-  };
 
   return (
     <div>
@@ -46,23 +32,24 @@ export default function AddDomainPage() {
           submit_form: t("Pages.Domains.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyDomain}
       />
 
       <DomainForm
         formHtmlId="domain-form"
         onSuccess={() => {
-          router.push("/domains");
-          setIsLoading(false);
+          router.push("/domains").then(() => {
+            setIsLoading(false);
+          });
         }}
       />
     </div>
   );
 }
 
-AddDomainPage.messages = ["Pages", "Domains", "Notes", "General"];
+AddDomainPage.messages = ["Metadata", "Pages", "Domains", "Notes", "General", "PaymentCycles"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

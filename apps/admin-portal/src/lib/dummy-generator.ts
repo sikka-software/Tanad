@@ -1,4 +1,5 @@
 // This will generate fake emails, fake names, fake numbers etc
+import { parseDate } from "@internationalized/date";
 
 export const generateDummyData = () => {
   const fakeFirstNames = [
@@ -248,7 +249,14 @@ export const generateDummyData = () => {
     );
   };
   const randomPicker = (array: any[]) => array[Math.floor(Math.random() * array.length)];
+  const randomParsedDate = () => {
+    const year = Math.floor(Math.random() * (2030 - 2000 + 1)) + 2000;
+    const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, "0");
+    const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, "0");
+    return parseDate(`${year}-${month}-${day}`);
+  };
   return {
+    randomParsedDate,
     randomPicker,
     random_ip_address:
       Math.floor(Math.random() * 255) +

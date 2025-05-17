@@ -2,13 +2,12 @@ import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { toast } from "sonner";
 
 import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { generateDummyData } from "@/lib/dummy-generator";
+import { generateDummyProduct } from "@/lib/dummy-factory";
 
 import { ProductForm } from "@/product/product.form";
 
@@ -20,26 +19,6 @@ export default function AddProductPage() {
 
   const isLoading = useProductStore((state) => state.isLoading);
   const setIsLoading = useProductStore((state) => state.setIsLoading);
-
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).productForm;
-    if (form) {
-      form.setValue("name", `Product ${dummyData.randomNumber(3)}`);
-      form.setValue("description", dummyData.randomString);
-      form.setValue("price", String(dummyData.randomNumber(4)));
-      form.setValue("sku", dummyData.randomString);
-      form.setValue("stock_quantity", String(dummyData.randomNumber(3)));
-    }
-  };
-
-  const onAddSuccess = () => {
-    toast.success(t("General.successful_operation"), {
-      description: t("Products.success.create"),
-    });
-    router.push("/products");
-    setIsLoading(false);
-  };
 
   return (
     <div>
@@ -54,17 +33,24 @@ export default function AddProductPage() {
           submit_form: t("Pages.Products.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
+        dummyButton={generateDummyProduct}
       />
 
-      <ProductForm formHtmlId="product-form" onSuccess={onAddSuccess} />
+      <ProductForm
+        formHtmlId="product-form"
+        onSuccess={() => {
+          router.push("/products").then(() => {
+            setIsLoading(false);
+          });
+        }}
+      />
     </div>
   );
 }
 
-AddProductPage.messages = ["Notes", "Pages", "Products", "Forms", "General"];
+AddProductPage.messages = ["Metadata", "Notes", "Pages", "Products", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

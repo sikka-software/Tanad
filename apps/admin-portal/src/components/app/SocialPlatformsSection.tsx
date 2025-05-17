@@ -1,9 +1,11 @@
-import { useTranslations } from "next-intl";
-import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Plus, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import * as z from "zod";
+
+import { Button } from "@/ui/button";
 // UI
 import {
   Form,
@@ -14,16 +16,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/ui/select";
-import { Input } from "@/ui/input";
-import { Button } from "@/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { socialLinkOptions } from "@/ui/social-platforms";
+
+import { Input } from "@/components/ui/inputs/input";
 
 // Define the form schema
 const socialLinkSchema = z.object({
@@ -41,7 +37,10 @@ type FormValues = z.infer<typeof formSchema>;
 interface SocialPlatformsSectionProps {
   initialLinks?: { platform: string; url: string }[];
   initialPosition?: "top" | "bottom";
-  onUpdate: (data: { socialLinks: { platform: string; url: string }[]; socials_position: "top" | "bottom" }) => void;
+  onUpdate: (data: {
+    socialLinks: { platform: string; url: string }[];
+    socials_position: "top" | "bottom";
+  }) => void;
   isPending?: boolean;
 }
 
@@ -89,7 +88,7 @@ const SocialPlatformsSection = React.forwardRef<
         })();
       },
     }),
-    [form, onUpdate]
+    [form, onUpdate],
   );
 
   return (
@@ -103,28 +102,18 @@ const SocialPlatformsSection = React.forwardRef<
             render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FormLabel className="text-base text-primary">
+                  <FormLabel className="text-primary text-base">
                     {t("Settings.socials_position_title")}
                   </FormLabel>
-                  <FormDescription>
-                    {t("Settings.socials_position_description")}
-                  </FormDescription>
+                  <FormDescription>{t("Settings.socials_position_description")}</FormDescription>
                 </div>
                 <FormControl>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={isPending}
-                  >
+                  <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
                     <SelectTrigger className="w-[180px] select-none">
-                      <SelectValue
-                        placeholder={t("Settings.socials_position_title")}
-                      />
+                      <SelectValue placeholder={t("Settings.socials_position_title")} />
                     </SelectTrigger>
                     <SelectContent className="select-none">
-                      <SelectItem value="top">
-                        {t("Settings.socials_position.top")}
-                      </SelectItem>
+                      <SelectItem value="top">{t("Settings.socials_position.top")}</SelectItem>
                       <SelectItem value="bottom">
                         {t("Settings.socials_position.bottom")}
                       </SelectItem>
@@ -137,7 +126,7 @@ const SocialPlatformsSection = React.forwardRef<
           {fields.map((field, index) => (
             <div
               key={field.id}
-              className="flex flex-col sm:flex-row gap-2 items-start sm:items-end"
+              className="flex flex-col items-start gap-2 sm:flex-row sm:items-end"
             >
               <FormField
                 control={form.control}
@@ -145,23 +134,15 @@ const SocialPlatformsSection = React.forwardRef<
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormLabel>{t("Theme.platform")}</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue
-                            placeholder={t("Theme.select_platform")}
-                          />
+                          <SelectValue placeholder={t("Theme.select_platform")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         {socialLinkOptions.map((option) => (
-                          <SelectItem
-                            key={option.platform}
-                            value={option.platform}
-                          >
+                          <SelectItem key={option.platform} value={option.platform}>
                             <div className="flex items-center gap-2 py-2">
                               {option.icon}
                               {option.label}
@@ -186,9 +167,7 @@ const SocialPlatformsSection = React.forwardRef<
                         dir="ltr"
                         placeholder={
                           socialLinkOptions.find(
-                            (opt) =>
-                              opt.platform ===
-                              form.watch(`socialLinks.${index}.platform`)
+                            (opt) => opt.platform === form.watch(`socialLinks.${index}.platform`),
                           )?.placeholder || "https://"
                         }
                         {...field}
@@ -199,12 +178,7 @@ const SocialPlatformsSection = React.forwardRef<
                 )}
               />
 
-              <Button
-                type="button"
-                variant="destructive"
-                size="icon"
-                onClick={() => remove(index)}
-              >
+              <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)}>
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>

@@ -20,11 +20,4 @@ export const INVOICE_RECURRENCE = [
   "yearly",
 ];
 
-export const INVOICE_CYCLES = [
-  "1_day",
-  "1_week",
-  "1_month",
-  "3_months",
-  "6_months",
-  "1_year",
-];
+export const INVOICE_CYCLES = ["1_day", "1_week", "1_month", "3_months", "6_months", "1_year"];

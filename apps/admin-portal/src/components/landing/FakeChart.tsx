@@ -1,6 +1,7 @@
 "use client";
 
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+
 import { ChartConfig, ChartContainer } from "@/ui/chart";
 
 const chartData = [

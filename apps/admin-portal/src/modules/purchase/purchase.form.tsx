@@ -1,30 +1,40 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useTranslations, useLocale } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import CodeInput from "@/ui/code-input";
 import { CommandSelect } from "@/ui/command-select";
-import { CurrencyInput } from "@/ui/currency-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
 import NotesSection from "@/components/forms/notes-section";
+import CodeInput from "@/components/ui/inputs/code-input";
+import { CurrencyInput } from "@/components/ui/inputs/currency-input";
+import { Input } from "@/components/ui/inputs/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
+import { purchases } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
+import { InvoiceStatus } from "../invoice/invoice.type";
 import { useCreatePurchase, usePurchases, useUpdatePurchase } from "./purchase.hooks";
 import usePurchaseStore from "./purchase.store";
 import { PurchaseUpdateData, PurchaseCreateData, PurchaseStatus } from "./purchase.type";
 
-export const createPurchaseSchema = (t: (key: string) => string) => {
-  return z.object({
+const createPurchaseSchema = (t: (key: string) => string) => {
+  const PurchaseSelectSchema = createInsertSchema(purchases, {
     purchase_number: z.string().min(1, t("Purchases.form.purchase_number.required")),
     description: z.string().optional().or(z.literal("")),
     amount: z.preprocess(
@@ -69,6 +79,7 @@ export const createPurchaseSchema = (t: (key: string) => string) => {
       .default(new Date().toISOString().split("T")[0]),
     notes: z.any().optional().nullable(),
   });
+  return PurchaseSelectSchema;
 };
 
 export type PurchaseFormValues = z.input<ReturnType<typeof createPurchaseSchema>>;
@@ -89,7 +100,9 @@ export function PurchaseForm({
   const t = useTranslations();
   const locale = useLocale();
 
-  const { user, enterprise } = useUserStore();
+  const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
+
   const { mutate: createPurchase } = useCreatePurchase();
   const { mutate: updatePurchase } = useUpdatePurchase();
   const { data: purchases } = usePurchases();
@@ -195,6 +208,8 @@ export function PurchaseForm({
     <div>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
@@ -220,14 +235,12 @@ export function PurchaseForm({
                           }
                           form.setValue("purchase_number", `PUR-${randomCode}`);
                         }}
-                      >
-                        <Input
-                          placeholder={t("Purchases.form.purchase_number.placeholder")}
-                          {...field}
-                          disabled={isLoading}
-                          aria-invalid={!!form.formState.errors.purchase_number}
-                        />
-                      </CodeInput>
+                        inputProps={{
+                          placeholder: t("Purchases.form.purchase_number.placeholder"),
+                          disabled: isLoading,
+                          ...field,
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -279,22 +292,25 @@ export function PurchaseForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("Purchases.form.status.label")} *</FormLabel>
-                    <FormControl>
-                      <CommandSelect
-                        disabled={isLoading}
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={[
-                          { label: t("Purchases.form.status.pending"), value: "pending" },
-                          { label: t("Purchases.form.status.paid"), value: "paid" },
-                          { label: t("Purchases.form.status.overdue"), value: "overdue" },
-                          { label: t("Purchases.form.status.cancelled"), value: "cancelled" },
-                        ]}
-                        defaultValue={field.value || "pending"}
-                        onChange={(value) => field.onChange(value || "pending")}
-                        texts={{ placeholder: t("Purchases.form.status.placeholder") }}
-                        ariaInvalid={!!form.formState.errors.status}
-                      />
-                    </FormControl>
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Purchases.form.status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+
+                      <SelectContent>
+                        {PurchaseStatus.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {t(`Purchases.form.status.${status}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

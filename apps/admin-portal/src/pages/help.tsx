@@ -1,4 +1,3 @@
-import settings from "@root/landing.config";
 import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -9,6 +8,8 @@ import { Card, CardContent, CardDescription, CardTitle } from "@/ui/card";
 import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import SocialIcons from "@/components/landing/SocialIcons";
+
+import settings from "../../landing.config";
 
 export default function HelpPage() {
   const t = useTranslations();
@@ -77,9 +78,9 @@ export default function HelpPage() {
   );
 }
 
-HelpPage.messages = ["Pages", "General", "Help"];
+HelpPage.messages = ["Metadata", "Pages", "General", "Help"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, HelpPage.messages),

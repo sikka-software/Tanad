@@ -1,4 +1,5 @@
 import { pick } from "lodash";
+import { Currency, FileMinus2, FilePlus2, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -6,10 +7,12 @@ import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
-import { FormDialog } from "@/ui/form-dialog";
+import FormDialog from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
+
+import { createModuleStoreHooks } from "@/utils/module-hooks";
 
 import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
@@ -30,43 +33,47 @@ import usePurchaseStore from "@/purchase/purchase.store";
 import PurchasesTable from "@/purchase/purchase.table";
 import { PurchaseUpdateData } from "@/purchase/purchase.type";
 
-import useUserStore from "@/stores/use-user-store";
-
 export default function PurchasesPage() {
   const t = useTranslations();
   const router = useRouter();
 
   const columns = usePurchaseColumns();
 
-  const canReadPurchases = useUserStore((state) => state.hasPermission("purchases.read"));
-  const canCreatePurchases = useUserStore((state) => state.hasPermission("purchases.create"));
+  const moduleHooks = createModuleStoreHooks(usePurchaseStore, "purchases");
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionablePurchase, setActionablePurchase] = useState<PurchaseUpdateData | null>(null);
   const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
-  const loadingSavePurchase = usePurchaseStore((state) => state.isLoading);
-  const setLoadingSavePurchase = usePurchaseStore((state) => state.setIsLoading);
-
-  const isDeleteDialogOpen = usePurchaseStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = usePurchaseStore((state) => state.setIsDeleteDialogOpen);
-
-  const selectedRows = usePurchaseStore((state) => state.selectedRows);
-  const setSelectedRows = usePurchaseStore((state) => state.setSelectedRows);
-
-  const columnVisibility = usePurchaseStore((state) => state.columnVisibility);
-  const setColumnVisibility = usePurchaseStore((state) => state.setColumnVisibility);
-
-  const viewMode = usePurchaseStore((state) => state.viewMode);
-  const clearSelection = usePurchaseStore((state) => state.clearSelection);
-  const sortRules = usePurchaseStore((state) => state.sortRules);
-  const sortCaseSensitive = usePurchaseStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = usePurchaseStore((state) => state.sortNullsFirst);
-  const searchQuery = usePurchaseStore((state) => state.searchQuery);
-  const filterConditions = usePurchaseStore((state) => state.filterConditions);
-  const filterCaseSensitive = usePurchaseStore((state) => state.filterCaseSensitive);
-  const getFilteredPurchases = usePurchaseStore((state) => state.getFilteredData);
-  const getSortedPurchases = usePurchaseStore((state) => state.getSortedData);
+  // Permissions
+  const canRead = moduleHooks.useCanRead();
+  const canCreate = moduleHooks.useCanCreate();
+  // Loading
+  const loadingSave = moduleHooks.useIsLoading();
+  const setLoadingSave = moduleHooks.useSetIsLoading();
+  // Delete Dialog
+  const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
+  const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+  // Selected Rows
+  const selectedRows = moduleHooks.useSelectedRows();
+  const setSelectedRows = moduleHooks.useSetSelectedRows();
+  const clearSelection = moduleHooks.useClearSelection();
+  // Column Visibility
+  const columnVisibility = moduleHooks.useColumnVisibility();
+  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+  // Sorting
+  const sortRules = moduleHooks.useSortRules();
+  const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
+  const sortNullsFirst = moduleHooks.useSortNullsFirst();
+  const setSortRules = moduleHooks.useSetSortRules();
+  // Filtering
+  const filterConditions = moduleHooks.useFilterConditions();
+  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
+  const getFilteredData = moduleHooks.useGetFilteredData();
+  const getSortedData = moduleHooks.useGetSortedData();
+  // Misc
+  const searchQuery = moduleHooks.useSearchQuery();
+  const viewMode = moduleHooks.useViewMode();
 
   const { data: purchases, isLoading: loadingFetchPurchases, error } = usePurchases();
   const { mutate: duplicatePurchase } = useDuplicatePurchase();
@@ -105,16 +112,34 @@ export default function PurchasesPage() {
   }, [purchases, setData]);
 
   const filteredPurchases = useMemo(() => {
-    return getFilteredPurchases(storeData);
-  }, [storeData, getFilteredPurchases, searchQuery, filterConditions, filterCaseSensitive]);
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedPurchases = useMemo(() => {
-    return getSortedPurchases(filteredPurchases);
+    return getSortedData(filteredPurchases);
   }, [filteredPurchases, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  if (!canReadPurchases) {
+  const tanstackSorting = useMemo(
+    () => sortRules.map((rule) => ({ id: rule.field, desc: rule.direction === "desc" })),
+    [sortRules],
+  );
+  const handleTanstackSortingChange = (
+    updater:
+      | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
+      | { id: string; desc: boolean }[],
+  ) => {
+    let nextSorting = typeof updater === "function" ? updater(tanstackSorting) : updater;
+    const newSortRules = nextSorting.map((s: { id: string; desc: boolean }) => ({
+      field: s.id,
+      direction: (s.desc ? "desc" : "asc") as "asc" | "desc",
+    }));
+    setSortRules(newSortRules);
+  };
+
+  if (!canRead) {
     return <NoPermission />;
   }
+
   return (
     <div>
       <CustomPageMeta
@@ -139,9 +164,7 @@ export default function PurchasesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Purchases.title")}
-            onAddClick={
-              canCreatePurchases ? () => router.push(router.pathname + "/add") : undefined
-            }
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Purchases.add")}
             searchPlaceholder={t("Pages.Purchases.search")}
             hideOptions={purchases?.length === 0}
@@ -161,6 +184,8 @@ export default function PurchasesPage() {
               isLoading={loadingFetchPurchases}
               error={error}
               onActionClicked={onActionClicked}
+              sorting={tanstackSorting}
+              onSortingChange={handleTanstackSortingChange}
             />
           ) : viewMode === "cards" ? (
             <div className="p-4">
@@ -168,8 +193,16 @@ export default function PurchasesPage() {
                 data={sortedPurchases}
                 isLoading={loadingFetchPurchases}
                 error={error}
-                emptyMessage={t("Purchases.no_purchases_found")}
-                renderItem={(purchase) => <PurchaseCard key={purchase.id} purchase={purchase} />}
+                empty={{
+                  title: t("Purchases.create_first.title"),
+                  description: t("Purchases.create_first.description"),
+                  add: t("Pages.Purchases.add"),
+                  icons: [FileMinus2, Plus, FilePlus2],
+                  onClick: () => router.push(router.pathname + "/add"),
+                }}
+                renderItem={(purchase) => (
+                  <PurchaseCard purchase={purchase} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>
@@ -181,14 +214,14 @@ export default function PurchasesPage() {
           onOpenChange={setIsFormDialogOpen}
           title={actionablePurchase ? t("Pages.Purchases.edit") : t("Pages.Purchases.add")}
           formId="purchase-form"
-          loadingSave={loadingSavePurchase}
+          loadingSave={loadingSave}
         >
           <PurchaseForm
             formHtmlId={"purchase-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionablePurchase(null);
-              setLoadingSavePurchase(false);
+              setLoadingSave(false);
             }}
             defaultValues={actionablePurchase}
             editMode={true}
@@ -203,15 +236,16 @@ export default function PurchasesPage() {
           title={t("Purchases.confirm_delete", { count: selectedRows.length })}
           description={t("Purchases.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}
+          onCancel={() => selectedRows.length === 1 && viewMode === "cards" && setSelectedRows([])}
         />
       </DataPageLayout>
     </div>
   );
 }
 
-PurchasesPage.messages = ["Notes", "Pages", "Purchases", "Forms", "General"];
+PurchasesPage.messages = ["Metadata", "Notes", "Pages", "Purchases", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps  = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

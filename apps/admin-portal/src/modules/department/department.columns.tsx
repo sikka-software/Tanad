@@ -1,4 +1,3 @@
-import useUserStore from "@root/src/stores/use-user-store";
 import { Row } from "@tanstack/react-table";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -11,14 +10,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/ui/dropdown-menu";
+import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import TimestampCell from "@/tables/timestamp-cell";
 
-import { useBranches } from "../branch/branch.hooks";
-import { useOffices } from "../office/office.hooks";
-import { useWarehouses } from "../warehouse/warehouse.hooks";
-import { useUpdateDepartment } from "./department.hooks";
-import { Department } from "./department.type";
+import { useOffices } from "@/office/office.hooks";
+
+import { useBranches } from "@/branch/branch.hooks";
+
+import { useUpdateDepartment } from "@/department/department.hooks";
+import { Department } from "@/department/department.type";
+
+import { useWarehouses } from "@/warehouse/warehouse.hooks";
 
 const useDepartmentColumns = () => {
   const t = useTranslations();
@@ -60,6 +63,7 @@ const useDepartmentColumns = () => {
       className: "min-w-[250px]",
     },
     {
+      enableEditing: false,
       accessorKey: "locations",
       header: t("Departments.form.locations.label"),
       validationSchema: z.array(z.string()).min(1, t("Departments.form.locations.required")),
@@ -102,17 +106,25 @@ const useDepartmentColumns = () => {
         }
       },
     },
+
     {
       accessorKey: "created_at",
-      header: t("Departments.form.created_at.label"),
-      validationSchema: z.string().min(1, t("Departments.form.created_at.required")),
-      className: "min-w-[180px]",
+      maxSize: 95,
+      enableEditing: false,
+      header: t("Metadata.created_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "updated_at",
-      header: t("Departments.form.updated_at.label"),
-      validationSchema: z.string().min(1, t("Departments.form.updated_at.required")),
-      className: "min-w-[180px]",
+      maxSize: 95,
+      enableEditing: false,
+
+      header: t("Metadata.updated_at.label"),
+      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
+      noPadding: true,
+      cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
   ];
 

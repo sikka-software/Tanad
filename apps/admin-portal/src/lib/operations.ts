@@ -2,7 +2,7 @@ import { toast } from "sonner";
 
 import { createClient } from "@/utils/supabase/component";
 
-import { LinkItemProps, Pukla } from "./types";
+import { LinkItemProps } from "./types";
 
 type OperationOptions = {
   toasts: {
@@ -195,21 +195,6 @@ export const fetchAllPuklas = async (options: OperationOptions) => {
   const { data, error } = await supabase.from("puklas").select("slug, updated_at");
   if (error) throw error;
   return data;
-};
-
-export const createPukla = async (data: Partial<Pukla>, user_id: string) => {
-  const supabase = createClient();
-  const { data: pukla, error } = await supabase
-    .from("puklas")
-    .insert([{ ...data, user_id: user_id }])
-    .select()
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  return pukla;
 };
 
 export const addLinkToPukla = async (puklaId: string, data: Partial<LinkItemProps>) => {

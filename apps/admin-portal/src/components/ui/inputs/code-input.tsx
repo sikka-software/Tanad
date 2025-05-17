@@ -1,29 +1,34 @@
-import { cn } from "@root/src/lib/utils";
 import { DiamondPlus, Hash, Shuffle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/ui/dropdown-menu";
+
+import { cn } from "@/lib/utils";
+
+import { useFormField } from "../form";
+import { Input } from "./input";
 
 type CodeInputProps = {
-  children: React.ReactNode;
   onSerial: () => void;
   onRandom: () => void;
   inCell?: boolean;
+  inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 };
 
-const CodeInput = ({ children, onSerial, onRandom, inCell }: CodeInputProps) => {
+const CodeInput = ({ onSerial, onRandom, inCell, inputProps }: CodeInputProps) => {
   const t = useTranslations();
   const locale = useLocale();
+  const { error } = useFormField();
 
   return (
     <div className="relative">
-      {children}
+      <Input aria-invalid={error !== undefined} inCell={inCell} {...inputProps} />
       <DropdownMenu dir={locale === "ar" ? "rtl" : "ltr"}>
         <DropdownMenuTrigger asChild>
           <Button
