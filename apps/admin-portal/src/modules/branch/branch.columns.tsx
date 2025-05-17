@@ -81,6 +81,7 @@ const useBranchColumns = (
         const branch = row.original;
         return (
           <ComboboxAdd
+            isolated
             dir={locale === "ar" ? "rtl" : "ltr"}
             inCell
             data={employeeOptions}

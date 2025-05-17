@@ -7,6 +7,7 @@ import * as React from "react";
 import { I18nProvider, useDateFormatter } from "react-aria";
 import { Group } from "react-aria-components";
 import { DateRange } from "react-day-picker";
+import { FieldError } from "react-hook-form";
 
 import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
@@ -40,7 +41,12 @@ export function DateInputField({
   const [open, setOpen] = React.useState(false);
   const locale = useLocale();
   const dateFormatter = useDateFormatter({ dateStyle: "medium" });
-  const { error } = useFormField();
+
+  let error: FieldError | undefined;
+  if (!isolated) {
+    const { error: formError } = useFormField();
+    error = formError;
+  }
 
   // Handler for calendar selection
   const handleCalendarSelect = (selected: Date | undefined) => {
@@ -80,6 +86,7 @@ export function DateInputField({
         <DateField value={value} isDisabled={disabled} className="w-full" onChange={onChange}>
           <Group className="w-full">
             <DateInput
+              isolated={isolated}
               className={cn("rounded-e-none", error && "rounded-bl-none rtl:rounded-br-none")}
             />
           </Group>

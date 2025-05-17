@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 
 import { Button } from "../button";
 import { useFormField } from "../form";
+import { FieldError } from "react-hook-form";
 
 type ComboboxAddTypes<T> = {
   labelKey?: keyof T | any;
@@ -54,6 +55,7 @@ type ComboboxAddTypes<T> = {
   containerClassName?: string;
   inCell?: boolean;
   buttonClassName?: string;
+  isolated?: boolean;
 };
 export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<any>>(
   (
@@ -72,6 +74,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
       addText = "Add New",
       inCell = false,
       buttonClassName,
+      isolated = false,
       ...props
     },
     ref,
@@ -79,7 +82,12 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
     const [open, setOpen] = React.useState(false);
     const [selectedValue, setSelectedValue] = React.useState(defaultValue);
     const inputRef = React.useRef<HTMLInputElement>(null);
-    const { error } = useFormField();
+
+    let error: FieldError | undefined;
+    if (!isolated) {
+      const { error: formError } = useFormField();
+      error = formError;
+    }
 
     React.useEffect(() => {
       setSelectedValue(defaultValue);

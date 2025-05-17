@@ -1,5 +1,6 @@
 "use client";
 
+import { parseDate, getLocalTimeZone, CalendarDate } from "@internationalized/date";
 import { Filter, Plus, Trash2, Save, Clock, Check } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -13,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/ui/dropdown-menu";
 import IconButton from "@/ui/icon-button";
+import { DateInput } from "@/ui/inputs/date-input";
 import { Input } from "@/ui/inputs/input";
 import { Label } from "@/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
@@ -215,13 +217,28 @@ export default function FilterPopover({
     }
 
     if (type === "date") {
+      let calendarDateValue: CalendarDate | null = null;
+      if (value) {
+        try {
+          calendarDateValue = parseDate(value.split("T")[0]);
+        } catch (e) {
+          // Handle cases where value might not be a valid ISO string for parseDate
+          console.error("Error parsing date:", e);
+        }
+      }
       return (
         <div className="mt-2">
-          <Calendar
-            mode="single"
-            selected={value ? new Date(value) : undefined}
-            onSelect={(date) => updateFilterCondition(id, "value", date ? date.toISOString() : "")}
-            className="rounded-md border"
+          <DateInput
+            isolated
+            value={calendarDateValue}
+            onChange={(date) => {
+              console.log("date is ", date);
+              updateFilterCondition(
+                id,
+                "value",
+                date ? date.toDate(getLocalTimeZone()).toISOString().split("T")[0] : "",
+              );
+            }}
           />
         </div>
       );
@@ -282,12 +299,16 @@ export default function FilterPopover({
         </PopoverTrigger>
         <PopoverContent className="w-96" align="end" dir={locale === "ar" ? "rtl" : "ltr"}>
           <Tabs defaultValue="filters" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-4 grid grid-cols-2 w-full">
+            <TabsList className="mb-4 grid w-full grid-cols-2">
               <TabsTrigger value="filters">{t("General.filter_options")}</TabsTrigger>
               <TabsTrigger value="saved">{t("General.saved_filters")}</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="filters" className="space-y-4" dir={locale === "ar" ? "rtl" : "ltr"}>
+            <TabsContent
+              value="filters"
+              className="space-y-4"
+              dir={locale === "ar" ? "rtl" : "ltr"}
+            >
               <div className="flex items-center justify-between">
                 <h4 className="leading-none font-medium">{t("General.filter_options")}</h4>
                 <div className="flex gap-2">
