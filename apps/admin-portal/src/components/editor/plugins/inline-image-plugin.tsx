@@ -125,7 +125,7 @@ export function InsertInlineImageDialog({
       <div className="grid gap-2">
         <Label htmlFor="position">Position</Label>
         <Select defaultValue="left" onValueChange={(value) => setPosition(value as Position)}>
-          <SelectTrigger id="position">
+          <SelectTrigger isolated id="position">
             <SelectValue placeholder="Select position" />
           </SelectTrigger>
           <SelectContent>

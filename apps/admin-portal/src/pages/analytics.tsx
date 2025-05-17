@@ -283,7 +283,7 @@ export default function Analytics() {
                 }
               }}
             >
-              <SelectTrigger className="w-full md:w-[180px]">
+              <SelectTrigger isolated className="w-full md:w-[180px]">
                 <SelectValue placeholder={t("Analytics.select_module")} />
               </SelectTrigger>
               <SelectContent>

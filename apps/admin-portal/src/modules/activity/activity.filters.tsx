@@ -191,7 +191,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                     onValueChange={(value) => setFilters({ eventType: value })}
                     dir={locale === "ar" ? "rtl" : "ltr"}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger isolated>
                       <SelectValue placeholder={t("ActivityLogs.filters.select_event_type")} />
                     </SelectTrigger>
                     <SelectContent>

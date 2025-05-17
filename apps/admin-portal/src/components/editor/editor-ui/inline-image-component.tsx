@@ -136,7 +136,7 @@ export function UpdateInlineImageDialog({
       <div className="space-y-2">
         <Label htmlFor="position-select">Position</Label>
         <Select value={position} onValueChange={(value) => setPosition(value as Position)}>
-          <SelectTrigger id="position-select">
+          <SelectTrigger isolated id="position-select">
             <SelectValue placeholder="Select position" />
           </SelectTrigger>
           <SelectContent>

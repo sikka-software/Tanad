@@ -138,7 +138,7 @@ export const QrCodeDialog: React.FC<QrCodeDialogProps> = ({ slug, openDialog, se
               value={downloadType}
               onValueChange={(value: "svg" | "png") => setDownloadType(value)}
             >
-              <SelectTrigger className="w-full min-w-[80px]">
+              <SelectTrigger isolated className="w-full min-w-[80px]">
                 <SelectValue placeholder="Format" />
               </SelectTrigger>
               <SelectContent>

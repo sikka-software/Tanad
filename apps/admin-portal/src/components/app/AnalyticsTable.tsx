@@ -187,7 +187,7 @@ export default function AnalyticsTable<TData>({
                 table.setPageSize(Number(value));
               }}
             >
-              <SelectTrigger id={id} className="w-fit whitespace-nowrap">
+              <SelectTrigger id={id} className="w-fit whitespace-nowrap" isolated>
                 <SelectValue placeholder={t("General.select_number_of_results")} />
               </SelectTrigger>
               <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">

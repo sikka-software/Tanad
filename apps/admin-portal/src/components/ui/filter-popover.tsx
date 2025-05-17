@@ -282,12 +282,12 @@ export default function FilterPopover({
         </PopoverTrigger>
         <PopoverContent className="w-96" align="end" dir={locale === "ar" ? "rtl" : "ltr"}>
           <Tabs defaultValue="filters" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-4 grid grid-cols-2">
+            <TabsList className="mb-4 grid grid-cols-2 w-full">
               <TabsTrigger value="filters">{t("General.filter_options")}</TabsTrigger>
               <TabsTrigger value="saved">{t("General.saved_filters")}</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="filters" className="space-y-4">
+            <TabsContent value="filters" className="space-y-4" dir={locale === "ar" ? "rtl" : "ltr"}>
               <div className="flex items-center justify-between">
                 <h4 className="leading-none font-medium">{t("General.filter_options")}</h4>
                 <div className="flex gap-2">
@@ -313,7 +313,7 @@ export default function FilterPopover({
                             updateFilterCondition(condition.id, "conjunction", value)
                           }
                         >
-                          <SelectTrigger className="w-24">
+                          <SelectTrigger isolated className="w-24">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -334,7 +334,7 @@ export default function FilterPopover({
                     )}
 
                     <div className="grid grid-cols-2 gap-2">
-                      <div>
+                      <div className="flex flex-col gap-2">
                         <Label>{t("General.field")}</Label>
                         <Select
                           value={condition.field}
@@ -342,7 +342,7 @@ export default function FilterPopover({
                             updateFilterCondition(condition.id, "field", value)
                           }
                         >
-                          <SelectTrigger>
+                          <SelectTrigger isolated>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -355,7 +355,7 @@ export default function FilterPopover({
                         </Select>
                       </div>
 
-                      <div>
+                      <div className="flex flex-col gap-2">
                         <Label>{t("General.operator")}</Label>
                         <Select
                           value={condition.operator}
@@ -363,7 +363,7 @@ export default function FilterPopover({
                             updateFilterCondition(condition.id, "operator", value)
                           }
                         >
-                          <SelectTrigger>
+                          <SelectTrigger isolated>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>

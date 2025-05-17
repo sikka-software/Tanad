@@ -81,7 +81,7 @@ export function CodeLanguageToolbarPlugin() {
 
   return (
     <Select>
-      <SelectTrigger className="h-8 w-min gap-1">
+      <SelectTrigger isolated className="h-8 w-min gap-1">
         <span>{getLanguageFriendlyName(codeLanguage)}</span>
       </SelectTrigger>
       <SelectContent>

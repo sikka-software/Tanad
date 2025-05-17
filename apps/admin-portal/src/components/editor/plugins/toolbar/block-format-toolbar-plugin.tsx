@@ -55,7 +55,7 @@ export function BlockFormatDropDown({ children }: { children: React.ReactNode })
         setBlockType(value as keyof typeof blockTypeToBlockName);
       }}
     >
-      <SelectTrigger className="h-8 w-min gap-1">
+      <SelectTrigger isolated className="h-8 w-min gap-1">
         {blockTypeToBlockName[blockType].icon}
         <span>{blockTypeToBlockName[blockType].label}</span>
       </SelectTrigger>

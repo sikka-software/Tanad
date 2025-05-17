@@ -58,7 +58,7 @@ export function InsertLayoutDialog({
   return (
     <>
       <Select onValueChange={setLayout} defaultValue={layout}>
-        <SelectTrigger className="w-full">
+        <SelectTrigger isolated className="w-full">
           <SelectValue placeholder={buttonLabel} />
         </SelectTrigger>
         <SelectContent className="w-full">
