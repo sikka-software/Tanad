@@ -46,8 +46,16 @@ export function DateInputField({
   const handleCalendarSelect = (selected: Date | undefined) => {
     if (selected) {
       // Convert JS Date to CalendarDate using parseDate
-      const iso = selected.toISOString().split("T")[0];
-      const calendarDate = parseDate(iso);
+      // const iso = selected.toISOString().split("T")[0];
+      // const calendarDate = parseDate(iso);
+
+      // Format the date as YYYY-MM-DD in local time
+      const year = selected.getFullYear();
+      const month = (selected.getMonth() + 1).toString().padStart(2, "0"); // Month is 0-indexed
+      const day = selected.getDate().toString().padStart(2, "0");
+      const localDateString = `${year}-${month}-${day}`;
+
+      const calendarDate = parseDate(localDateString);
       if (onChange) onChange(calendarDate);
       setOpen(false);
     }
