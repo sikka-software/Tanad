@@ -5,7 +5,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { Building2, ShoppingCart, Store, Warehouse } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -143,10 +143,14 @@ function JobForm({
     },
   });
 
-  const departmentOptions = departments.map((dept) => ({
-    label: dept.name,
-    value: dept.name,
-  }));
+  const departmentOptions = useMemo(
+    () =>
+      departments.map((dept) => ({
+        label: dept.name,
+        value: dept.name,
+      })),
+    [departments],
+  );
 
   const handleSubmit = async (data: JobFormValues) => {
     setIsSavingJob(true);
