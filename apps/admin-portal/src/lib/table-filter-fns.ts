@@ -74,4 +74,4 @@ export const dateTableFilterFn: FilterFn<any> = <TData extends RowData>(
     default:
       return false;
   }
-}; 
+};

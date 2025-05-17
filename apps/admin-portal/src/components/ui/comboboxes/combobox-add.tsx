@@ -2,6 +2,7 @@ import { LabelProps } from "@radix-ui/react-label";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Plus } from "lucide-react";
 import * as React from "react";
+import { FieldError } from "react-hook-form";
 
 import {
   Command,
@@ -19,7 +20,6 @@ import { cn } from "@/lib/utils";
 
 import { Button } from "../button";
 import { useFormField } from "../form";
-import { FieldError } from "react-hook-form";
 
 type ComboboxAddTypes<T> = {
   labelKey?: keyof T | any;

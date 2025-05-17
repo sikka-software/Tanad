@@ -218,10 +218,12 @@ export interface SheetTableProps<T extends object> extends FooterProps {
   onColumnVisibilityChange?: (updater: any) => void;
   sorting?: any;
   onSortingChange?: (updater: any) => void;
-  // --- Filtering --- 
+  // --- Filtering ---
   columnFilters?: ColumnFiltersState;
   globalFilter?: string;
-  onColumnFiltersChange?: (updater: ColumnFiltersState | ((old: ColumnFiltersState) => ColumnFiltersState)) => void;
+  onColumnFiltersChange?: (
+    updater: ColumnFiltersState | ((old: ColumnFiltersState) => ColumnFiltersState),
+  ) => void;
   onGlobalFilterChange?: (updater: string | ((old: string) => string)) => void;
 }
 
@@ -803,7 +805,7 @@ function SheetTable<
       texts,
       onActionClicked,
       columns,
-      cellOriginalContent
+      cellOriginalContent,
     ],
   );
 
@@ -910,7 +912,7 @@ function SheetTable<
             // The groupKey and level might need more robust derivation if deep nesting + grouping is complex.
             // For now, assuming headerKey is on original items and depth from TanStack row is sufficient.
             const groupKey = row.original.headerKey || "ungrouped";
-            const level = row.depth; 
+            const level = row.depth;
             return React.cloneElement(
               memoizedRenderRow(row, groupKey, level) as React.ReactElement,
               { key: row.id + virtualItem.index },

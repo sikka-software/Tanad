@@ -289,27 +289,23 @@ export function useModulePageLogic<
 
   // Delete handler setup
   const { createDeleteHandler } = useDeleteHandler();
-  const handleConfirmDelete = createDeleteHandler(
-    bulkDeleteMutation,
-    {
-      loading: pageTexts.loadingDelete,
-      success: pageTexts.successDelete,
-      error: pageTexts.errorDelete,
-      onSuccess: () => {
-        clearSelection();
-        setPendingDeleteIds([]);
-        setStoreIsDeleteDialogOpen(false);
-        mutateDataHook?.();
-        toast.success(`${t(pageTexts.itemUnit, { count: pendingDeleteIds.length })} deleted.`);
-      },
-      onError: (error) => {
-        toast.error(
-          `Error deleting ${t(pageTexts.itemUnit, { count: pendingDeleteIds.length })}: ${error.message}`,
-        );
-      },
+  const handleConfirmDelete = createDeleteHandler(bulkDeleteMutation, {
+    loading: pageTexts.loadingDelete,
+    success: pageTexts.successDelete,
+    error: pageTexts.errorDelete,
+    onSuccess: () => {
+      clearSelection();
+      setPendingDeleteIds([]);
+      setStoreIsDeleteDialogOpen(false);
+      mutateDataHook?.();
+      toast.success(`${t(pageTexts.itemUnit, { count: pendingDeleteIds.length })} deleted.`);
     },
-    t, // Pass the t function from useModulePageLogic
-  );
+    onError: (error) => {
+      toast.error(
+        `Error deleting ${t(pageTexts.itemUnit, { count: pendingDeleteIds.length })}: ${error.message}`,
+      );
+    },
+  });
 
   // DEBUGGING: Check if setColumnVisibility is defined
   // console.log('[useModulePageLogic] storeAccess:', storeAccess); // Kept for reference, but store instance is more direct now
