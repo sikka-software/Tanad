@@ -48,6 +48,7 @@ export default function EmployeesPage() {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<EmployeeUpdateData | null>(null);
   const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
+  const [isApplyingClientFilter, setIsApplyingClientFilter] = useState(false);
 
   // Permissions
   const canRead = moduleHooks.useCanRead();
@@ -83,6 +84,10 @@ export default function EmployeesPage() {
   const zustandFilterConditions = useEmployeesStore((state) => state.filterConditions);
   const zustandSetFilterConditions = useEmployeesStore((state) => state.setFilterConditions);
   const zustandFilterCaseSensitive = useEmployeesStore((state) => state.filterCaseSensitive);
+  const zustandCaseSensitive = useEmployeesStore((state) => state.sortCaseSensitive);
+  const zustandSortRules = useEmployeesStore((state) => state.sortRules);
+  const zustandSortCaseSensitive = useEmployeesStore((state) => state.sortCaseSensitive);
+  const zustandSortNullsFirst = useEmployeesStore((state) => state.sortNullsFirst);
 
   // Re-introduce client-side filtering/sorting for non-TanStack views (e.g., Card view)
   const getFilteredDataClient = useEmployeesStore((state) => state.getFilteredData);
@@ -126,7 +131,7 @@ export default function EmployeesPage() {
 
   // Transform filterConditions from store to TanStack Table's ColumnFiltersState
   const columnFiltersTanStack = useMemo(() => {
-    return zustandFilterConditions.map(condition => ({
+    return zustandFilterConditions.map((condition) => ({
       id: condition.field,
       value: {
         filterValue: condition.value,
@@ -138,10 +143,11 @@ export default function EmployeesPage() {
 
   // Handler for TanStack Table's onColumnFiltersChange
   const handleColumnFiltersChange = (updaterOrValue: any) => {
-    const newFilters = typeof updaterOrValue === 'function' ? updaterOrValue(columnFiltersTanStack) : updaterOrValue;
+    const newFilters =
+      typeof updaterOrValue === "function" ? updaterOrValue(columnFiltersTanStack) : updaterOrValue;
     // This is still a simplification. Converting newFilters (ColumnFilter[]) back to FilterCondition[]
     // is non-trivial as TanStack's state doesn't hold operator, type, conjunction.
-    // For a robust solution, FilterPopover should perhaps emit TanStack-ready filters, 
+    // For a robust solution, FilterPopover should perhaps emit TanStack-ready filters,
     // or this function becomes much more complex, or columns get individual filter controls.
     // As a TEMPORARY step, if PageSearchAndFilter updates zustandFilterConditions directly,
     // this handler might not need to do much other than log or be a pass-through if TanStack manages it internally.
@@ -149,11 +155,23 @@ export default function EmployeesPage() {
     // We'd need to map `newFilters` back or adjust how `PageSearchAndFilter` updates.
     // console.log("New TanStack Column Filters:", newFilters);
 
-    // Simplistic: If `PageSearchAndFilter` is the sole source of truth for `filterConditions` 
+    // Simplistic: If `PageSearchAndFilter` is the sole source of truth for `filterConditions`
     // in the store, this function might not need to call `zustandSetFilterConditions`
     // unless TanStack Table needs to be the one driving that state update.
     // Let's assume PageSearchAndFilter updates zustandFilterConditions, and this is for TanStack to read.
   };
+
+  // Effect to manage the isApplyingClientFilter state for visual feedback
+  useEffect(() => {
+    // This effect triggers when the actual filters in the store change.
+    // We want to show loading briefly.
+    setIsApplyingClientFilter(true);
+    const timer = setTimeout(() => {
+      setIsApplyingClientFilter(false);
+    }, 50); // Brief delay to ensure UI can show loading
+
+    return () => clearTimeout(timer);
+  }, [zustandFilterConditions, zustandSearchQuery]); // Dependencies that trigger table re-filter
 
   // Data for Card View (uses client-side filtering/sorting from the store)
   const filteredDataForCards = useMemo(() => {
@@ -170,8 +188,14 @@ export default function EmployeesPage() {
   );
 
   console.log("[EmployeesPage] storeData to be passed to table:", storeData);
-  console.log("[EmployeesPage] columnFiltersTanStack to be passed to table:", columnFiltersTanStack);
-  console.log("[EmployeesPage] globalFilter (zustandSearchQuery) to be passed to table:", zustandSearchQuery);
+  console.log(
+    "[EmployeesPage] columnFiltersTanStack to be passed to table:",
+    columnFiltersTanStack,
+  );
+  console.log(
+    "[EmployeesPage] globalFilter (zustandSearchQuery) to be passed to table:",
+    zustandSearchQuery,
+  );
 
   const handleTanstackSortingChange = (
     updater:
@@ -187,7 +211,7 @@ export default function EmployeesPage() {
   };
 
   const handleTanstackGlobalFilterChange = (updater: string | ((old: string) => string)) => {
-    if (typeof updater === 'function') {
+    if (typeof updater === "function") {
       zustandSetSearchQuery(updater(zustandSearchQuery));
     } else {
       zustandSetSearchQuery(updater);
@@ -232,6 +256,7 @@ export default function EmployeesPage() {
                 typeof updater === "function" ? updater(prev) : updater,
               );
             }}
+            isApplyingFilter={isApplyingClientFilter}
           />
         )}
         <div>

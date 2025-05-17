@@ -47,6 +47,7 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
   columns?: ExtendedColumnDef<any>[];
   columnVisibility?: VisibilityState;
   onColumnVisibilityChange?: (updater: any) => void;
+  isApplyingFilter?: boolean;
 }
 
 const PageSearchAndFilter = ({
@@ -62,6 +63,7 @@ const PageSearchAndFilter = ({
   columns,
   columnVisibility,
   onColumnVisibilityChange,
+  isApplyingFilter,
   ...props
 }: PageSearchAndFilterProps) => {
   const viewMode = useStore(store, (state) => state.viewMode);
@@ -133,6 +135,7 @@ const PageSearchAndFilter = ({
               onConditionsChange={onFilterConditionsChange}
               caseSensitive={filterCaseSensitive}
               onCaseSensitiveChange={onFilterCaseSensitiveChange}
+              isApplying={isApplyingFilter}
             />
             <SortPopover
               columns={sortableColumns}

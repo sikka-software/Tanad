@@ -1,7 +1,7 @@
 "use client";
 
 import { parseDate, getLocalTimeZone, CalendarDate } from "@internationalized/date";
-import { Filter, Plus, Trash2, Save, Clock, Check } from "lucide-react";
+import { Filter, Plus, Trash2, Save, Clock, Check, Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 
@@ -80,6 +80,7 @@ interface FilterPopoverProps {
   onConditionsChange?: (conditions: FilterCondition[]) => void;
   caseSensitive?: boolean;
   onCaseSensitiveChange?: (value: boolean) => void;
+  isApplying?: boolean;
 }
 
 export default function FilterPopover({
@@ -88,6 +89,7 @@ export default function FilterPopover({
   onConditionsChange,
   caseSensitive = false,
   onCaseSensitiveChange,
+  isApplying = false,
 }: FilterPopoverProps) {
   const t = useTranslations();
   const locale = useLocale();
@@ -222,7 +224,7 @@ export default function FilterPopover({
   };
 
   const resetFilters = () => {
-    const defaultConditions: FilterCondition[] = [
+    const defaultStagedConditions: FilterCondition[] = [
       {
         id: 1,
         field: fields[0]?.id || "name",
@@ -232,10 +234,10 @@ export default function FilterPopover({
         conjunction: "and",
       },
     ];
-    setStagedFilterConditions(defaultConditions);
+    setStagedFilterConditions(defaultStagedConditions);
     setStagedCaseSensitive(false);
     
-    onConditionsChange?.(defaultConditions);
+    onConditionsChange?.([]);
     if (onCaseSensitiveChange) {
       onCaseSensitiveChange(false);
     }
@@ -478,7 +480,10 @@ export default function FilterPopover({
                   </svg>
                   {t("General.reset_all")}
                 </Button>
-                <Button onClick={applyFilters} className="flex-1">
+                <Button onClick={applyFilters} className="flex-1" disabled={isApplying}>
+                  {isApplying ? (
+                    <Loader2 className="me-2 h-4 w-4 animate-spin" />
+                  ) : null}
                   {t("General.apply_filters")}
                 </Button>
               </div>
