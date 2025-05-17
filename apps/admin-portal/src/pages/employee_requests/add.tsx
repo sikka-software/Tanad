@@ -44,7 +44,14 @@ export default function AddEmployeeRequestPage() {
   );
 }
 
-AddEmployeeRequestPage.messages = ["Metadata", "Notes", "Pages", "EmployeeRequests", "General"];
+AddEmployeeRequestPage.messages = [
+  "Metadata",
+  "Notes",
+  "Pages",
+  "Employees",
+  "EmployeeRequests",
+  "General",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

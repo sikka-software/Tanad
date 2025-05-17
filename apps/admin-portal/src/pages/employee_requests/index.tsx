@@ -255,6 +255,7 @@ EmployeeRequestsPage.messages = [
   "Metadata",
   "Notes",
   "Pages",
+  "Employees",
   "EmployeeRequests",
   "General",
   "CommonStatus",

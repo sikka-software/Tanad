@@ -1,4 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
+import { useMemo } from "react";
 import { z } from "zod";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
@@ -28,10 +29,15 @@ const useSalaryColumns = (
 
   const { mutate: updateSalary } = useUpdateSalary();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
-  const employeeOptions = employees.map((employee) => ({
-    label: `${employee.first_name} ${employee.last_name}`,
-    value: employee.id,
-  }));
+
+  const employeeOptions = useMemo(
+    () =>
+      employees.map((employee) => ({
+        label: `${employee.first_name} ${employee.last_name}`,
+        value: employee.id,
+      })),
+    [employees],
+  );
 
   const columns: ExtendedColumnDef<Salary>[] = [
     {

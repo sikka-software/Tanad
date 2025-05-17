@@ -3,7 +3,7 @@ import { parseDate } from "@internationalized/date";
 import { createInsertSchema } from "drizzle-zod";
 import { Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -159,12 +159,6 @@ export function SalaryForm({
     name: "deductions",
   });
 
-  // Format employees for ComboboxAdd
-  const employeeOptions = employees.map((emp) => ({
-    label: `${emp.first_name} ${emp.last_name}`,
-    value: emp.id,
-  }));
-
   const handleSubmit: (data: SalaryFormValues) => Promise<void> = async (data) => {
     setLoadingSave(true);
     try {
@@ -232,6 +226,15 @@ export function SalaryForm({
       });
     }
   };
+
+  const employeeOptions = useMemo(
+    () =>
+      employees.map((emp) => ({
+        label: `${emp.first_name} ${emp.last_name}`,
+        value: emp.id,
+      })),
+    [employees],
+  );
 
   if (typeof window !== "undefined") {
     (window as any).salaryForm = form;

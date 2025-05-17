@@ -8,67 +8,68 @@ import { FormItem, FormLabel } from "@/ui/form";
 import { FormField } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
 
-import ClientForm from "@/client/client.form";
-import useClientStore from "@/client/client.store";
-import { Client } from "@/client/client.type";
+import { EmployeeForm } from "@/employee/employee.form";
+import useEmployeeStore from "@/employee/employee.store";
+import { Employee } from "@/employee/employee.types";
 
-interface ClientComboboxProps {
+interface EmployeeComboboxProps {
   label: string;
   control: Control<any>;
-  clients: Client[];
+  employees: Employee[];
   loadingCombobox: boolean;
   isSaving: boolean;
   disabled?: boolean;
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;
+  formName: string;
 }
 
-const ClientCombobox = ({
+const EmployeeCombobox = ({
   label,
   control,
-  clients,
+  employees,
   loadingCombobox,
   isSaving,
   isDialogOpen,
   setIsDialogOpen,
   disabled,
-}: ClientComboboxProps) => {
+  formName,
+}: EmployeeComboboxProps) => {
   const t = useTranslations();
   const locale = useLocale();
 
-  const setIsSaving = useClientStore((state) => state.setIsLoading);
+  const setIsSaving = useEmployeeStore((state) => state.setIsLoading);
 
-  const clientOptions = useMemo(
+  const employeeOptions = useMemo(
     () =>
-      clients.map((client) => ({
-        value: client.id,
-        label: client.name,
-        email: client.email,
+      employees.map((employee) => ({
+        value: employee.id,
+        label: `${employee.first_name} ${employee.last_name}`,
       })),
-    [clients],
+    [employees],
   );
 
   return (
     <div>
       <FormField
         control={control}
-        name="client_id"
+        name={formName}
         render={({ field, fieldState }) => (
           <FormItem>
             <FormLabel>{label} *</FormLabel>
             <FormControl>
               <ComboboxAdd
                 dir={locale === "ar" ? "rtl" : "ltr"}
-                data={clientOptions}
+                data={employeeOptions}
                 isLoading={loadingCombobox}
                 defaultValue={field.value}
                 onChange={(value) => field.onChange(value || null)}
                 texts={{
-                  placeholder: t("Pages.Clients.select"),
-                  searchPlaceholder: t("Pages.Clients.search"),
-                  noItems: t("Pages.Clients.no_clients_found"),
+                  placeholder: t("Pages.Employees.select"),
+                  searchPlaceholder: t("Pages.Employees.search"),
+                  noItems: t("Pages.Employees.no_employees_found"),
                 }}
-                addText={t("Pages.Clients.add")}
+                addText={t("Pages.Employees.add")}
                 onAddClick={() => setIsDialogOpen(true)}
                 disabled={disabled}
                 renderOption={(option) => (
@@ -87,23 +88,24 @@ const ClientCombobox = ({
       <FormDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        title={t("Pages.Clients.add")}
-        formId="client-form"
+        title={t("Pages.Employees.add")}
+        formId="employee-form"
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
         loadingSave={isSaving}
       >
-        <ClientForm
-          formHtmlId="client-form"
+        <EmployeeForm
+          formHtmlId="employee-form"
           nestedForm
           onSuccess={() => {
             setIsDialogOpen(false);
             setIsSaving(false);
           }}
+          //   editMode={false}
         />
       </FormDialog>
     </div>
   );
 };
 
-export default ClientCombobox;
+export default EmployeeCombobox;

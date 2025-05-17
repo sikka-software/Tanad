@@ -1,4 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
+import { useMemo } from "react";
 import { z } from "zod";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
@@ -19,10 +20,15 @@ const useWarehouseColumns = (
   const locale = useLocale();
 
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
-  const employeeOptions = employees.map((emp) => ({
-    label: `${emp.first_name} ${emp.last_name}`,
-    value: emp.id,
-  }));
+
+  const employeeOptions = useMemo(
+    () =>
+      employees.map((emp) => ({
+        label: `${emp.first_name} ${emp.last_name}`,
+        value: emp.id,
+      })),
+    [employees],
+  );
 
   const columns: ExtendedColumnDef<Warehouse>[] = [
     {

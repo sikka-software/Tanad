@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -180,13 +180,16 @@ export default function ClientForm({
     }
   };
 
-  const companyOptions =
-    companies?.map((company) => ({
-      label: company.name,
-      value: company.id,
-      email: company.email,
-      website: company.website,
-    })) || [];
+  const companyOptions = useMemo(
+    () =>
+      companies?.map((company) => ({
+        label: company.name,
+        value: company.id,
+        email: company.email,
+        website: company.website,
+      })) || [],
+    [companies],
+  );
 
   if (typeof window !== "undefined") {
     (window as any).clientForm = form;

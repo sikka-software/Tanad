@@ -7,9 +7,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import BooleanTabs from "@/ui/boolean-tabs";
-import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import FormDialog from "@/ui/form-dialog";
 import CodeInput from "@/ui/inputs/code-input";
 import { Input } from "@/ui/inputs/input";
 import PhoneInput from "@/ui/inputs/phone-input";
@@ -27,7 +25,7 @@ import { useCreateOffice, useOffices, useUpdateOffice } from "@/office/office.ho
 import useOfficeStore from "@/office/office.store";
 import { OfficeCreateData, OfficeUpdateData } from "@/office/office.type";
 
-import { EmployeeForm } from "@/employee/employee.form";
+import EmployeeCombobox from "@/employee/employee.combobox";
 import { useEmployees } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
 
@@ -298,34 +296,17 @@ export function OfficeForm({
                 )}
               />
 
-              <FormField
+              <EmployeeCombobox
+                formName="manager"
+                label={t("Offices.form.manager.label")}
                 control={form.control}
-                name="manager"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Offices.form.manager.label")}</FormLabel>
-                    <FormControl>
-                      <ComboboxAdd
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={employeeOptions}
-                        isLoading={isFetchingEmployees}
-                        defaultValue={field.value || ""}
-                        onChange={(value) => {
-                          field.onChange(value || null);
-                        }}
-                        texts={{
-                          placeholder: t("Offices.form.manager.placeholder"),
-                          searchPlaceholder: t("Pages.Employees.search"),
-                          noItems: t("Pages.Employees.no_employees_found"),
-                        }}
-                        addText={t("Pages.Employees.add")}
-                        onAddClick={() => setIsEmployeeFormDialogOpen(true)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                employees={employees || []}
+                loadingCombobox={isFetchingEmployees}
+                isSaving={isEmployeeSaving}
+                isDialogOpen={isEmployeeFormDialogOpen}
+                setIsDialogOpen={setIsEmployeeFormDialogOpen}
               />
+
               <FormField
                 control={form.control}
                 name="status"
@@ -419,22 +400,6 @@ export function OfficeForm({
           />
         </form>
       </Form>
-      <FormDialog
-        open={isEmployeeFormDialogOpen}
-        onOpenChange={setIsEmployeeFormDialogOpen}
-        title={t("Pages.Employees.add")}
-        formId="employee-form"
-        loadingSave={isEmployeeSaving}
-      >
-        <EmployeeForm
-          nestedForm
-          formHtmlId="employee-form"
-          onSuccess={() => {
-            setIsEmployeeSaving(false);
-            setIsEmployeeFormDialogOpen(false);
-          }}
-        />
-      </FormDialog>
     </div>
   );
 }

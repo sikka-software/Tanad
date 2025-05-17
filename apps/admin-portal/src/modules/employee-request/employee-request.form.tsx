@@ -35,6 +35,7 @@ import useEmployeeRequestsStore from "@/employee-request/employee-request.store"
 import { employee_requests } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
+import EmployeeCombobox from "../employee/employee.combobox";
 import { InvoiceStatus } from "../invoice/invoice.type";
 import { useCreateEmployeeRequest, useUpdateEmployeeRequest } from "./employee-request.hooks";
 import {
@@ -263,43 +264,15 @@ export function EmployeeRequestForm({
             />
 
             <div className="form-fields-cols-2">
-              <FormField
+              <EmployeeCombobox
+                formName="employee_id"
+                label={t("EmployeeRequests.form.employee.label")}
                 control={form.control}
-                name="employee_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("EmployeeRequests.form.employee.label")} *</FormLabel>
-                    <FormControl>
-                      <ComboboxAdd
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={employeeOptions}
-                        disabled={isLoadingSave}
-                        isLoading={isFetchingEmployees}
-                        defaultValue={field.value}
-                        valueKey={"id"}
-                        onChange={(value) => {
-                          field.onChange(value || null);
-                        }}
-                        renderOption={(item) => {
-                          return (
-                            <div className="flex flex-col">
-                              <span>{item.label}</span>
-                              <span className="text-muted-foreground text-sm">{item.value}</span>
-                            </div>
-                          );
-                        }}
-                        texts={{
-                          placeholder: t("EmployeeRequests.form.employee.placeholder"),
-                          searchPlaceholder: t("Pages.Employees.search"),
-                          noItems: t("Pages.Employees.no_employees_found"),
-                        }}
-                        addText={t("Pages.Employees.add")}
-                        onAddClick={() => setIsEmployeeDialogOpen(true)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                employees={employees || []}
+                loadingCombobox={isFetchingEmployees}
+                isSaving={isLoadingCreateEmployee}
+                isDialogOpen={isEmployeeDialogOpen}
+                setIsDialogOpen={setIsEmployeeDialogOpen}
               />
 
               <FormField
@@ -410,23 +383,6 @@ export function EmployeeRequestForm({
           />
         </form>
       </Form>
-
-      <FormDialog
-        open={isEmployeeDialogOpen}
-        onOpenChange={setIsEmployeeDialogOpen}
-        title={t("Pages.Employees.add")}
-        formId="employee-form"
-        loadingSave={isLoadingCreateEmployee}
-      >
-        <EmployeeForm
-          nestedForm
-          formHtmlId="employee-form"
-          onSuccess={() => {
-            setIsEmployeeDialogOpen(false);
-            setIsLoadingCreateEmployee(false);
-          }}
-        />
-      </FormDialog>
     </>
   );
 }

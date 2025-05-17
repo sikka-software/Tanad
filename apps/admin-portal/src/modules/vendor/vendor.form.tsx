@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createInsertSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -86,13 +86,6 @@ export function VendorForm({
     (window as any).vendorForm = form;
   }
 
-  // Format companies for ComboboxAdd
-  const companyOptions =
-    companies?.map((company: Company) => ({
-      label: company.name,
-      value: company.id,
-    })) || [];
-
   const handleSubmit = async (data: VendorFormValues) => {
     setIsLoading(true);
     try {
@@ -168,6 +161,15 @@ export function VendorForm({
     }
   };
 
+  const companyOptions = useMemo(
+    () =>
+      companies?.map((company: Company) => ({
+        label: company.name,
+        value: company.id,
+      })) || [],
+    [companies],
+  );
+
   return (
     <>
       <Form {...form}>
@@ -203,7 +205,7 @@ export function VendorForm({
                     <FormControl>
                       <ComboboxAdd
                         dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={companyOptions.map((opt) => ({ ...opt, value: opt.label }))}
+                        data={companyOptions}
                         isLoading={companiesLoading}
                         defaultValue={field.value}
                         onChange={(value) => field.onChange(value || null)}

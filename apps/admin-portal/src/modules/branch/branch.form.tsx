@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createInsertSchema } from "drizzle-zod";
 import { useTranslations, useLocale } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -192,11 +192,14 @@ export function BranchForm({
     }
   };
 
-  const employeeOptions =
-    employees?.map((emp) => ({
-      label: `${emp.first_name} ${emp.last_name}`,
-      value: emp.id,
-    })) || [];
+  const employeeOptions = useMemo(
+    () =>
+      employees?.map((emp) => ({
+        label: `${emp.first_name} ${emp.last_name}`,
+        value: emp.id,
+      })) || [],
+    [employees],
+  );
 
   if (typeof window !== "undefined") {
     (window as any).branchForm = form;

@@ -241,6 +241,15 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
   // Use internal loading state
   const isFormSubmitting = isCreating || isUpdating;
 
+  const roleOptions = useMemo(
+    () =>
+      allRoles.roles.map((role) => ({
+        label: predefinedRoles(t, role.name)?.name || role.name, // Pass role.name to predefinedRoles
+        value: role.name, // Form value
+      })),
+    [allRoles.roles],
+  );
+
   return (
     <Form {...form}>
       {/* Use the correct form ID */}
@@ -337,10 +346,7 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
                   <ComboboxAdd
                     dir={locale === "ar" ? "rtl" : "ltr"}
                     // Use role name as value, consistent with previous Select
-                    data={allRoles.roles.map((role) => ({
-                      label: predefinedRoles(t, role.name)?.name || role.name, // Pass role.name to predefinedRoles
-                      value: role.name, // Form value
-                    }))}
+                    data={roleOptions}
                     isLoading={rolesLoading}
                     defaultValue={field.value} // Current form value (role name)
                     onChange={(value) => field.onChange(value || null)} // Update form value
