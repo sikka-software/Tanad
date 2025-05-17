@@ -328,7 +328,7 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
       props: {
         jobListing: jobListingData as JobListingWithJobs,
         enterprise,
-        messages: (await import(`../../../../locales/${context.locale}.json`)).default,
+        messages: (await import(`../../../locales/${context.locale}.json`)).default,
       },
     };
   } catch (error: any) {
@@ -338,7 +338,7 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
         jobListing: null,
         enterprise: null,
         error: error.message || "Failed to load job listing.",
-        messages: (await import(`../../../../locales/${context.locale}.json`)).default,
+        messages: (await import(`../../../locales/${context.locale}.json`)).default,
       },
     };
   }
