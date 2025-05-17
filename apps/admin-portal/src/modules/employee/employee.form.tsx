@@ -65,8 +65,19 @@ export const createEmployeeFormSchema = (t: (key: string) => string) => {
 
     salary: z.array(
       z.object({
-        type: z.string().min(1, "Type is required"),
-        amount: z.coerce.number().min(0, t("Expenses.form.amount.required")),
+        type: z.string().min(1, t("Employees.form.salary.type_required")),
+        amount: z
+          .string({ required_error: t("Employees.form.salary.amount_required") })
+          .refine((value) => value.trim() !== "", {
+            message: t("Employees.form.salary.amount_required"),
+          })
+          .transform((value) => parseFloat(value))
+          .refine((value) => !isNaN(value), {
+            message: t("Employees.form.salary.amount_invalid_type"),
+          })
+          .refine((value) => value >= 0, {
+            message: t("Employees.form.salary.amount_min_value"),
+          }),
       }),
     ),
     status: z.enum(EmployeeStatus),
@@ -139,8 +150,12 @@ export function EmployeeForm({
 
   const creatingNewStandalone = !editMode && !nestedForm;
 
-  const form = useForm<z.input<ReturnType<typeof createEmployeeFormSchema>>>({
-    resolver: zodResolver(createEmployeeFormSchema(t)),
+  const formSchema = createEmployeeFormSchema(t);
+  type EmployeeFormInput = z.input<typeof formSchema>;
+  type EmployeeFormOutput = z.output<typeof formSchema>;
+
+  const form = useForm<EmployeeFormInput>({
+    resolver: zodResolver(formSchema, undefined, { raw: true }),
     mode: "onChange",
     defaultValues: {
       ...defaultValues,
@@ -149,9 +164,14 @@ export function EmployeeForm({
       phone: defaultValues?.phone || "",
       salary: creatingNewStandalone
         ? defaultValues?.salary && (defaultValues.salary as any[]).length > 0
-          ? (defaultValues.salary as { type: string; amount: number }[])
-          : [{ type: "base", amount: 0 }]
-        : (defaultValues?.salary as { type: string; amount: number }[] | undefined) || undefined,
+          ? (defaultValues.salary as { type: string; amount: number | string }[]).map((s) => ({
+              ...s,
+              amount: String(s.amount),
+            }))
+          : [{ type: "base", amount: "0" }]
+        : (defaultValues?.salary as { type: string; amount: number | string }[] | undefined)?.map(
+            (s) => ({ ...s, amount: String(s.amount) }),
+          ) || undefined,
       notes: getNotesValue(defaultValues) || "",
       nationality: defaultValues?.nationality || "",
       hire_date: defaultValues?.hire_date ? parseDate(defaultValues.hire_date) : undefined,
@@ -224,22 +244,20 @@ export function EmployeeForm({
     };
   }, [debouncedEmail, actualEmployeeId, initialEmail, user?.id]);
 
-  const handleSubmit = async (data: z.input<ReturnType<typeof createEmployeeFormSchema>>) => {
-    console.log("data birth date", data.birth_date);
+  const handleSubmit = async (data: EmployeeFormInput) => {
     setIsEmployeeSaving(true);
+    let submissionData: EmployeeFormOutput;
+    try {
+      submissionData = formSchema.parse(data);
+    } catch (validationError) {
+      console.error("Zod parsing error after RHF validation:", validationError);
+      toast.error(t("General.error_invalid_data"));
+      setIsEmployeeSaving(false);
+      return;
+    }
 
-    // Log dirtyFields for debugging
-    // console.log("Form dirtyFields:", form.formState.dirtyFields);
-    // console.log("Form isDirty:", form.formState.isDirty);
-
-    // Explicitly check if any field has been marked as dirty
     const isActuallyDirty = Object.keys(form.formState.dirtyFields).length > 0;
-    // console.log("Is Actually Dirty (based on dirtyFields object):", isActuallyDirty);
-
-    // Check if editing and if the form is actually dirty based on the dirtyFields object
     if (editMode && !isActuallyDirty) {
-      // console.log("Form not dirty (based on dirtyFields), closing without saving.");
-      // If nothing changed, just close the form without an API call or toast
       onSuccess?.();
       return;
     }
@@ -248,24 +266,25 @@ export function EmployeeForm({
         await updateEmployeeMutate({
           id: actualEmployeeId!,
           data: {
-            ...data,
-            first_name: data.first_name.trim(),
-            last_name: data.last_name.trim(),
-            email: data.email.trim(),
-            phone: data.phone?.trim() || undefined,
+            ...submissionData,
+            first_name: submissionData.first_name.trim(),
+            last_name: submissionData.last_name.trim(),
+            email: submissionData.email.trim(),
+            phone: submissionData.phone?.trim() || undefined,
             termination_date:
-              data.termination_date && typeof data.termination_date.toString === "function"
-                ? data.termination_date.toString()
+              submissionData.termination_date &&
+              typeof submissionData.termination_date.toString === "function"
+                ? submissionData.termination_date.toString()
                 : undefined,
-            hire_date: data.hire_date.toString(),
+            hire_date: submissionData.hire_date.toString(),
             birth_date:
-              data.birth_date && typeof data.birth_date.toString === "function"
-                ? data.birth_date.toString()
+              submissionData.birth_date && typeof submissionData.birth_date.toString === "function"
+                ? submissionData.birth_date.toString()
                 : undefined,
-            notes: data.notes,
-            salary: (data.salary || []).map((comp) => ({
+            notes: submissionData.notes,
+            salary: (submissionData.salary || []).map((comp) => ({
               ...comp,
-              amount: Number(comp.amount) || 0,
+              amount: comp.amount,
             })),
           },
         });
@@ -273,29 +292,30 @@ export function EmployeeForm({
       } else {
         const { membership, user } = useUserStore.getState();
         await createEmployeeMutate({
-          ...data,
+          ...submissionData,
           user_id: user?.id || "",
           enterprise_id: membership?.enterprise_id || "",
           termination_date:
-            data.termination_date && typeof data.termination_date.toString === "function"
-              ? data.termination_date.toString()
+            submissionData.termination_date &&
+            typeof submissionData.termination_date.toString === "function"
+              ? submissionData.termination_date.toString()
               : undefined,
           birth_date:
-            data.birth_date && typeof data.birth_date.toString === "function"
-              ? data.birth_date.toString()
+            submissionData.birth_date && typeof submissionData.birth_date.toString === "function"
+              ? submissionData.birth_date.toString()
               : undefined,
           hire_date:
-            data.hire_date && typeof data.hire_date.toString === "function"
-              ? data.hire_date.toString()
+            submissionData.hire_date && typeof submissionData.hire_date.toString === "function"
+              ? submissionData.hire_date.toString()
               : undefined,
-          first_name: data.first_name.trim(),
-          last_name: data.last_name.trim(),
-          email: data.email.trim(),
-          phone: data.phone?.trim() || undefined,
-          notes: data.notes,
-          salary: (data.salary || []).map((comp) => ({
+          first_name: submissionData.first_name.trim(),
+          last_name: submissionData.last_name.trim(),
+          email: submissionData.email.trim(),
+          phone: submissionData.phone?.trim() || undefined,
+          notes: submissionData.notes,
+          salary: (submissionData.salary || []).map((comp) => ({
             ...comp,
-            amount: Number(comp.amount) || 0,
+            amount: comp.amount,
           })),
         });
         onSuccess?.();

@@ -3790,8 +3790,12 @@
         "required": "الراتب مطلوب",
         "amount_label": "المبلغ",
         "amount_placeholder": "أدخل المبلغ",
+        "amount_required": "المبلغ مطلوب",
+        "amount_invalid_type": "المبلغ غير صالح",
+        "amount_min_value": "المبلغ يجب أن يكون أكبر من 0",
         "type_label": "نوع الراتب",
         "type_placeholder": "أدخل نوع الراتب",
+        "type_required": "نوع الراتب مطلوب",
         "add_component": "إضافة مكون",
         "total": "المجموع",
         "total_label": "المجموع",
@@ -3936,10 +3940,10 @@
       "required": "الرمز البريدي مطلوب"
     },
     "industry": {
-      "label": "المجال" ,
+      "label": "المجال",
       "placeholder": "أدخل المجال"
     },
-    "size": { 
+    "size": {
       "label": "الحجم",
       "placeholder": "أدخل الحجم"
     },
