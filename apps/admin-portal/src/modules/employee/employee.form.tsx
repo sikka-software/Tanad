@@ -3,7 +3,7 @@ import { parseDate } from "@internationalized/date";
 import { createInsertSchema } from "drizzle-zod";
 import { Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
@@ -158,14 +158,12 @@ export function EmployeeForm({
 
   const creatingNewStandalone = !editMode && !nestedForm;
 
-  const formSchema = createEmployeeFormSchema(t);
+  const formSchema = useMemo(() => createEmployeeFormSchema(t), [t]);
   type EmployeeFormInput = z.input<typeof formSchema>;
   type EmployeeFormOutput = z.output<typeof formSchema>;
 
-  const form = useForm<EmployeeFormInput>({
-    resolver: zodResolver(formSchema, undefined, { raw: true }),
-    mode: "onChange",
-    defaultValues: {
+  const processedDefaultValues = useMemo(() => {
+    return {
       ...defaultValues,
       status: defaultValues?.status || "active",
       job_id: defaultValues?.job_id || "",
@@ -209,7 +207,13 @@ export function EmployeeForm({
         !Array.isArray(defaultValues?.emergency_contact)
           ? defaultValues.emergency_contact
           : undefined,
-    },
+    };
+  }, [defaultValues, creatingNewStandalone]);
+
+  const form = useForm<EmployeeFormInput>({
+    resolver: zodResolver(formSchema, undefined, { raw: true }),
+    mode: "onChange",
+    defaultValues: processedDefaultValues,
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -217,40 +221,7 @@ export function EmployeeForm({
     name: "salary",
   });
 
-  const [email, setEmail] = useState(defaultValues?.email || "");
-  const [debouncedEmail] = useDebounce(email, 500);
-
-  useEffect(() => {
-    if (!debouncedEmail) {
-      setIsEmailLoading(false);
-      return;
-    }
-    if (actualEmployeeId && debouncedEmail === initialEmail) {
-      setIsEmailLoading(false);
-      return;
-    }
-    let cancelled = false;
-    setIsEmailLoading(true);
-    const supabase = createClient();
-    supabase
-      .from("employees")
-      .select("id", { count: "exact" })
-      .eq("email", debouncedEmail)
-      .then(({ error, count }) => {
-        console.log("count", count);
-        if (!cancelled) {
-          if (count && count > 0) {
-            form.setError("email", {
-              message: t("Employees.form.email.duplicate"),
-            });
-          }
-          setIsEmailLoading(false);
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [debouncedEmail, actualEmployeeId, initialEmail, user?.id]);
+  const supabase = useMemo(() => createClient(), []);
 
   const handleSubmit = async (data: EmployeeFormInput) => {
     setIsEmployeeSaving(true);
@@ -394,34 +365,70 @@ export function EmployeeForm({
               <FormField
                 control={form.control}
                 name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Employees.form.email.label")} *</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          placeholder={t("Employees.form.email.placeholder")}
-                          disabled={isEmployeeSaving}
-                          type="email"
-                          dir="ltr"
-                          {...field}
-                          value={email}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            setEmail(e.target.value);
-                          }}
-                          aria-invalid={!!form.formState.errors.email}
-                        />
-                        {isEmailLoading && (
-                          <div className="absolute top-0 right-3 bottom-0 flex items-center justify-center">
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          </div>
-                        )}
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const handleEmailBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+                    field.onBlur();
+                    const currentEmail = e.target.value;
+
+                    if (!currentEmail) {
+                      setIsEmailLoading(false);
+                      return;
+                    }
+
+                    if (actualEmployeeId && currentEmail === initialEmail) {
+                      setIsEmailLoading(false);
+                      return;
+                    }
+
+                    setIsEmailLoading(true);
+                    try {
+                      const { error, count } = await supabase
+                        .from("employees")
+                        .select("id", { count: "exact" })
+                        .eq("email", currentEmail)
+                        .eq("enterprise_id", enterprise?.id);
+
+                      if (error) {
+                        console.error("Error checking email uniqueness:", error);
+                      }
+
+                      if (count && count > 0) {
+                        form.setError("email", {
+                          message: t("Employees.form.email.duplicate"),
+                        });
+                      }
+                    } catch (err) {
+                      console.error("Exception during email uniqueness check:", err);
+                    } finally {
+                      setIsEmailLoading(false);
+                    }
+                  };
+
+                  return (
+                    <FormItem>
+                      <FormLabel>{t("Employees.form.email.label")} *</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            placeholder={t("Employees.form.email.placeholder")}
+                            disabled={isEmployeeSaving}
+                            type="email"
+                            dir="ltr"
+                            {...field}
+                            onBlur={handleEmailBlur}
+                            aria-invalid={!!form.formState.errors.email}
+                          />
+                          {isEmailLoading && (
+                            <div className="absolute top-0 right-3 bottom-0 flex items-center justify-center">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            </div>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
               <FormField
                 control={form.control}

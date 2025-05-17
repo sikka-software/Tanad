@@ -22,7 +22,7 @@ interface SalaryFormSectionProps {
   inDialog?: boolean;
 }
 
-const SalaryFormSection: React.FC<SalaryFormSectionProps> = ({
+const SalaryFormSection: React.FC<SalaryFormSectionProps> = React.memo(({
   control,
   fields,
   append,
@@ -73,6 +73,8 @@ const SalaryFormSection: React.FC<SalaryFormSectionProps> = ({
       </div>
     </div>
   );
-};
+});
+
+SalaryFormSection.displayName = "SalaryFormSection";
 
 export default SalaryFormSection;
