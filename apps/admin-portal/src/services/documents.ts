@@ -43,6 +43,7 @@ export async function uploadDocument(document: DocumentFile) {
       entity_type: document.entity_type,
       file_path: fileName,
       user_id: user_id,
+      enterprise_id: enterprise_id,
     })
     .select()
     .single();

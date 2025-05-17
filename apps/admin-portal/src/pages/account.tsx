@@ -58,7 +58,7 @@ export default function Account() {
         const { data: userData } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", user?.id)
+          .eq("id", user?.id || "")
           .single();
 
         if (userData) {
@@ -93,7 +93,7 @@ export default function Account() {
       const { error: updateProfileError } = await supabase
         .from("profiles")
         .update({ full_name: data.name })
-        .eq("id", user?.id);
+        .eq("id", user?.id || "");
 
       if (updateError) throw updateError;
       if (updateProfileError) throw updateProfileError;

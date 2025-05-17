@@ -7,7 +7,6 @@ import { createClient } from "@/utils/supabase/component";
 import { Constants, Database } from "@/lib/database.types";
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
-  avatar_url: string;
   user_settings: {
     currency: (typeof currencies)[number];
     calendar: "gregorian" | "hijri";

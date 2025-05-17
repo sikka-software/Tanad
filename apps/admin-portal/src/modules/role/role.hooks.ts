@@ -72,7 +72,7 @@ export function useRoles() {
       const { data: rolesData, error: rolesError } = await supabase
         .from("roles")
         .select("*") // Select all columns: id, name, description, is_system
-        .in("id", roleIds); // Filter by the unique IDs found
+        .in("id", roleIds as string[]); // Filter by the unique IDs found
 
       if (rolesError) throw rolesError;
       const roles = (rolesData || []) as Role[];
@@ -88,8 +88,8 @@ export function useRoles() {
       // 4. Group permissions by role_id
       const rolePermissionsMap = (permissionsData || []).reduce(
         (acc, { role_id, permission }) => {
-          if (!acc[role_id]) acc[role_id] = [];
-          acc[role_id].push(permission);
+          if (!acc[role_id as string]) acc[role_id as string] = [];
+          acc[role_id as string].push(permission);
           return acc;
         },
         {} as Record<string, string[]>,
@@ -141,7 +141,7 @@ export function useCreateRole() {
         }));
         const { error: permissionsError } = await supabase
           .from("permissions") // Insert into the actual permissions table
-          .insert(permissionsToInsert);
+          .insert(permissionsToInsert as any);
 
         if (permissionsError) {
           // Attempt to clean up the created role if permissions fail?
@@ -202,7 +202,7 @@ export function useUpdateRole() {
           }));
           const { error: permissionsError } = await supabase
             .from("permissions") // Insert into the actual permissions table
-            .insert(permissionsToInsert);
+            .insert(permissionsToInsert as any);
 
           if (permissionsError) throw permissionsError;
         }
@@ -393,8 +393,8 @@ export function useSystemRoles() {
       // 3. Group permissions by role_id
       const rolePermissionsMap = (permissionsData || []).reduce(
         (acc, { role_id, permission }) => {
-          if (!acc[role_id]) acc[role_id] = [];
-          acc[role_id].push(permission);
+          if (!acc[role_id as string]) acc[role_id as string] = [];
+          acc[role_id as string].push(permission);
           return acc;
         },
         {} as Record<string, string[]>,
@@ -447,8 +447,8 @@ export function useCustomRoles() {
 
       const rolePermissionsMap = (permissionsData || []).reduce(
         (acc, { role_id, permission }) => {
-          if (!acc[role_id]) acc[role_id] = [];
-          acc[role_id].push(permission);
+          if (!acc[role_id as string]) acc[role_id as string] = [];
+          acc[role_id as string].push(permission);
           return acc;
         },
         {} as Record<string, string[]>,

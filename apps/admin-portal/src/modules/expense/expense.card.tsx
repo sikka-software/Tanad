@@ -28,7 +28,9 @@ const ExpenseCard = ({
   const { mutate: updateExpense } = useUpdateExpense();
   const data = useExpenseStore((state) => state.data);
   const setData = useExpenseStore((state) => state.setData);
-  const currency = useAppCurrencySymbol({ sar: { className: "size-4" } }).symbol;
+  const currency = useAppCurrencySymbol({
+    all: { className: "size-4" },
+  }).symbol;
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;

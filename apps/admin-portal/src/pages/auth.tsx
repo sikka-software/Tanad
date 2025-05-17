@@ -130,9 +130,16 @@ export default function Auth() {
           email: data.user.email,
           full_name: email.split("@")[0], // Placeholder name
           stripe_customer_id: customerId,
+
           user_settings: {
             currency: "sar",
             calendar: "gregorian",
+            language: "ar",
+            timezone: "UTC",
+            date_format: "dmy",
+            time_format: "12h",
+
+            hidden_menu_items: {},
           },
         });
 

@@ -290,7 +290,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     amount: price?.unit_amount ? (price.unit_amount / 100).toString() : "0",
                     currency: price?.currency?.toUpperCase() || "SAR",
                     billingInterval: `per ${price?.recurring?.interval || "month"}`,
-                    language: subscription.metadata?.language || profile.language || "ar",
+                    language:
+                      subscription.metadata?.language || profile.user_settings?.language || "ar",
                     status: "canceling", // Custom status to indicate being canceled
                     cancelAt: subscription.cancel_at
                       ? new Date(subscription.cancel_at * 1000).toISOString()
@@ -347,7 +348,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                   amount: price?.unit_amount ? (price.unit_amount / 100).toString() : "0",
                   currency: price?.currency?.toUpperCase() || "SAR",
                   billingInterval: `per ${price?.recurring?.interval || "month"}`,
-                  language: subscription.metadata?.language || profile.language || "ar",
+                  language:
+                    subscription.metadata?.language || profile.user_settings?.language || "ar",
                   status: subscription.status,
                 });
                 console.log("✓ Updated subscription email sent successfully");
@@ -420,7 +422,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 amount: price?.unit_amount ? (price.unit_amount / 100).toString() : "0",
                 currency: price?.currency?.toUpperCase() || "SAR",
                 billingInterval: `per ${price?.recurring?.interval || "month"}`,
-                language: subscription.metadata?.language || profile.language || "ar",
+                language:
+                  subscription.metadata?.language || profile.user_settings?.language || "ar",
               });
               console.log("✓ Expiration email sent successfully");
             } catch (error) {

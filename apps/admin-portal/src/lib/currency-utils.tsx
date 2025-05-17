@@ -142,6 +142,7 @@ export const currencyInputClassName = (currency: (typeof currencies)[number]) =>
 
 // Define the options type for the new hook
 type CurrencySymbolOptions = {
+  all?: { className?: string; strokeWidth?: number };
   sar?: { className?: string; strokeWidth?: number };
   usd?: { className?: string; strokeWidth?: number };
   eur?: { className?: string; strokeWidth?: number };
@@ -170,7 +171,7 @@ export const useAppCurrencySymbol = (
         is_icon: true,
         symbol: (
           <SARSymbol
-            className={cn("size-3", options.sar?.className)}
+            className={cn("size-3", options.all?.className, options.sar?.className)}
             strokeWidth={options.sar?.strokeWidth}
           />
         ),
@@ -179,67 +180,73 @@ export const useAppCurrencySymbol = (
       return {
         currency: "usd",
         is_icon: true,
-        symbol: <DollarSign className={cn("size-3", options.usd?.className)} />,
+        symbol: (
+          <DollarSign className={cn("size-3", options.all?.className, options.usd?.className)} />
+        ),
       };
     case "eur":
       return {
         currency: "eur",
         is_icon: true,
-        symbol: <Euro className={cn("size-3", options.eur?.className)} />,
+        symbol: <Euro className={cn("size-3", options.all?.className, options.eur?.className)} />,
       };
     case "gbp":
       return {
         currency: "gbp",
         is_icon: true,
-        symbol: <PoundSterling className={cn("size-3", options.gbp?.className)} />,
+        symbol: (
+          <PoundSterling className={cn("size-3", options.all?.className, options.gbp?.className)} />
+        ),
       };
     case "jpy":
       return {
         currency: "jpy",
         is_icon: true,
-        symbol: <JapaneseYen className={cn("size-3", options.jpy?.className)} />,
+        symbol: (
+          <JapaneseYen className={cn("size-3", options.all?.className, options.jpy?.className)} />
+        ),
       };
     case "bhd":
       return {
         currency: "bhd",
         is_icon: false,
-        symbol: <span className="h-full text-xs">BHD</span>,
+        symbol: <span className={cn("h-full text-xs", options.all?.className)}>BHD</span>,
       };
     case "aed":
       return {
         currency: "aed",
         is_icon: false,
-        symbol: <span className="h-full text-xs">AED</span>,
+        symbol: <span className={cn("h-full text-xs", options.all?.className)}>AED</span>,
       };
     case "omr":
       return {
         currency: "omr",
         is_icon: false,
-        symbol: <span className="h-full text-xs">OMR</span>,
+        symbol: <span className={cn("h-full text-xs", options.all?.className)}>OMR</span>,
       };
     case "try":
       return {
         currency: "try",
         is_icon: false,
-        symbol: <span className="h-full text-xs">TRY</span>,
+        symbol: <span className={cn("h-full text-xs", options.all?.className)}>TRY</span>,
       };
     case "iqd":
       return {
         currency: "iqd",
         is_icon: false,
-        symbol: <span className="h-full text-xs">IQD</span>,
+        symbol: <span className={cn("h-full text-xs", options.all?.className)}>IQD</span>,
       };
     case "kwd":
       return {
         currency: "kwd",
         is_icon: false,
-        symbol: <span className="h-full text-xs">KWD</span>,
+        symbol: <span className={cn("h-full text-xs", options.all?.className)}>KWD</span>,
       };
     case "qar":
       return {
         currency: "qar",
         is_icon: false,
-        symbol: <span className="h-full text-xs">QAR</span>,
+        symbol: <span className={cn("h-full text-xs", options.all?.className)}>QAR</span>,
       };
     default:
       // It's good practice to handle the default case,

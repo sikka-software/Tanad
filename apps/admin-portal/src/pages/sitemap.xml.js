@@ -1,5 +1,4 @@
 // pages/sitemap.xml.js
-import { fetchAllPuklas } from "../lib/operations";
 
 const URL = "https://tanad.app";
 
@@ -43,10 +42,8 @@ function generateSiteMap(posts) {
 }
 
 export async function getServerSideProps({ res }) {
-  const puklas = await fetchAllPuklas();
-
   // Generate the XML sitemap with the blog data
-  const sitemap = generateSiteMap(puklas);
+  const sitemap = generateSiteMap([]);
 
   res.setHeader("Content-Type", "text/xml");
   // Send the XML to the browser

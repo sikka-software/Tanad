@@ -8,6 +8,8 @@ import { createClient } from "@/utils/supabase/component";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { Database } from "@/lib/database.types";
+
 import useDashboardStore from "@/stores/dashboard.store";
 import useUserStore from "@/stores/use-user-store";
 
@@ -78,7 +80,7 @@ export default function Dashboard() {
       // --- Fetch Stats --- (extracted logic)
       const fetchStats = async () => {
         const fetchCount = async (
-          tableName: string,
+          tableName: keyof Database["public"]["Tables"],
           additionalFilter?: object,
         ): Promise<number> => {
           const query = supabase
@@ -97,7 +99,10 @@ export default function Dashboard() {
           return count ?? 0;
         };
 
-        const fetchSum = async (tableName: string, columnName: string): Promise<number> => {
+        const fetchSum = async (
+          tableName: keyof Database["public"]["Tables"],
+          columnName: string,
+        ): Promise<number> => {
           const { data, error } = await supabase
             .from(tableName)
             .select(columnName)

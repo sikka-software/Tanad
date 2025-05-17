@@ -1343,6 +1343,7 @@ export const profiles = pgTable(
     subscribed_to: text(),
     price_id: text(),
     cancel_at_period_end: boolean().default(false),
+    avatar_url: text(),
     // You can use { mode: "bigint" } if numbers are exceeding js number limitations
     cancel_at: bigint({ mode: "number" }),
   },

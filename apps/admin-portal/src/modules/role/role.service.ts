@@ -54,7 +54,7 @@ export class RoleService {
 
     const { data, error } = await query;
     if (error) throw error;
-    return data;
+    return data as Role[];
   }
 
   // Get single role
@@ -63,7 +63,7 @@ export class RoleService {
     const { data, error } = await supabase.from(this.TABLE_NAME).select("*").eq("id", id).single();
 
     if (error) throw error;
-    return data;
+    return data as Role;
   }
 
   // Create role
@@ -78,7 +78,7 @@ export class RoleService {
     console.log("created", created);
 
     if (error) throw error;
-    return created;
+    return created as Role;
   }
 
   // Update role
@@ -92,7 +92,7 @@ export class RoleService {
       .single();
 
     if (error) throw error;
-    return updated;
+    return updated as Role;
   }
 
   // Delete role

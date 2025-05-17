@@ -386,7 +386,7 @@ export function EmployeeForm({
                         .from("employees")
                         .select("id", { count: "exact" })
                         .eq("email", currentEmail)
-                        .eq("enterprise_id", enterprise?.id);
+                        .eq("enterprise_id", enterprise?.id || "");
 
                       if (error) {
                         console.error("Error checking email uniqueness:", error);

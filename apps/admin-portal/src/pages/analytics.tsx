@@ -21,6 +21,7 @@ import { CrudChart } from "@/components/analytics/crud-chart";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { MODULE_ANALYTICS } from "@/lib/constants";
+import { Database } from "@/lib/database.types";
 
 import useUserStore from "../stores/use-user-store";
 
@@ -33,7 +34,7 @@ export default function Analytics() {
 
   const [selectedModule, setSelectedModule] = useState<{
     key: string;
-    rpc: string;
+    rpc: keyof Database["public"]["Functions"];
     add: string;
     update: string;
     delete: string;
@@ -132,7 +133,7 @@ export default function Analytics() {
 
     let calType = profile?.user_settings.calendar;
     if (dataRpc) {
-      const formattedChartData = dataRpc.map((item: any) => ({
+      const formattedChartData = (dataRpc as any[]).map((item: any) => ({
         label: new Date(item.period_start).toLocaleString(calType === "hijri" ? "ar-SA" : "en-US", {
           day: "2-digit",
           month: "2-digit",
@@ -150,7 +151,7 @@ export default function Analytics() {
         updated: item[selectedModule.update],
         removed: item[selectedModule.delete],
       }));
-      setAnalyticsData({ chartData: formattedChartData, tableData: dataRpc });
+      setAnalyticsData({ chartData: formattedChartData, tableData: dataRpc as any[] });
     }
 
     // Add else if for other modules like 'jobs' here
@@ -272,7 +273,9 @@ export default function Analytics() {
                 if (value) {
                   setSelectedModule({
                     key: value,
-                    rpc: MODULE_ANALYTICS.find((m) => m.key === value)?.rpc || "",
+                    rpc:
+                      (MODULE_ANALYTICS.find((m) => m.key === value)
+                        ?.rpc as keyof Database["public"]["Functions"]) || "",
                     add: MODULE_ANALYTICS.find((m) => m.key === value)?.add || "",
                     update: MODULE_ANALYTICS.find((m) => m.key === value)?.update || "",
                     delete: MODULE_ANALYTICS.find((m) => m.key === value)?.delete || "",
