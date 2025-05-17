@@ -33,6 +33,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "vcbrjspzfsvzgtjndjat.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "chart.googleapis.com",
+      },
     ],
   },
 };
