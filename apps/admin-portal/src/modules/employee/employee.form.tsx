@@ -189,10 +189,6 @@ export function EmployeeForm({
     name: "salary",
   });
 
-  const salaryComponents = form.watch("salary");
-  const totalSalary =
-    salaryComponents?.reduce((sum, comp) => sum + (Number(comp.amount) || 0), 0) || 0;
-
   const [email, setEmail] = useState(defaultValues?.email || "");
   const [debouncedEmail] = useDebounce(email, 500);
 
@@ -654,7 +650,6 @@ export function EmployeeForm({
             append={append}
             remove={remove}
             isSaving={isEmployeeSaving}
-            totalSalary={totalSalary}
             inDialog={editMode || nestedForm}
           />
 
