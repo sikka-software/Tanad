@@ -1,24 +1,28 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
 import { createInsertSchema } from "drizzle-zod";
-import { useTranslations, useLocale } from "next-intl";
-import { useState, useEffect, useCallback } from "react";
-import React from "react";
-import { useForm, useFieldArray, FieldError, useWatch } from "react-hook-form";
+import { useLocale, useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
+import { FieldError, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
 import CodeInput from "@/ui/inputs/code-input";
 import { DateInput } from "@/ui/inputs/date-input";
 import NumberInput from "@/ui/inputs/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Switch } from "@/ui/switch";
 
 import NotesSection from "@/components/forms/notes-section";
 import ProductsFormSection from "@/components/forms/products-form-section";
+import { Input } from "@/components/ui/inputs/input";
+import { ZatcaQRCode } from "@/components/zatca/ZatcaQRCode";
 
 import { getNotesValue, validateYearRange } from "@/lib/utils";
+import { calculateVAT } from "@/lib/zatca/zatca-utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -26,14 +30,13 @@ import ClientCombobox from "@/client/client.combobox";
 import { useClients } from "@/client/client.hooks";
 import useClientStore from "@/client/client.store";
 
-import { useInvoices } from "@/invoice/invoice.hooks";
-import { useCreateInvoice, useUpdateInvoice } from "@/invoice/invoice.hooks";
+import { useCreateInvoice, useInvoices, useUpdateInvoice } from "@/invoice/invoice.hooks";
 import useInvoiceStore from "@/invoice/invoice.store";
 import {
-  InvoiceUpdateData,
   InvoiceCreateData,
   InvoiceItem,
   InvoiceStatus,
+  InvoiceUpdateData,
 } from "@/invoice/invoice.type";
 
 import { ProductForm } from "@/product/product.form";
@@ -152,6 +155,17 @@ export function InvoiceForm({
     defaultValues: formDefaultValues,
   });
 
+  const taxAmount = calculateVAT(form.watch("subtotal") || 0, form.watch("tax_rate") || 0);
+
+  const [zatcaEnabled, setZatcaEnabled] = useState<boolean>(defaultValues?.zatca_enabled || false);
+  const [sellerName, setSellerName] = useState<string>(
+    defaultValues?.seller_name || "Mansour Company",
+  );
+  const [vatNumber, setVatNumber] = useState<string>(
+    defaultValues?.vat_number || "310122393500003",
+  );
+  const [showZatcaPreview, setShowZatcaPreview] = useState<boolean>(false);
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "items",
@@ -220,6 +234,10 @@ export function InvoiceForm({
           tax_rate: data.tax_rate,
           notes: data.notes || null,
           items: itemsPayload,
+          zatca_enabled: zatcaEnabled,
+          seller_name: zatcaEnabled ? sellerName : undefined,
+          vat_number: zatcaEnabled ? vatNumber : undefined,
+          tax_amount: taxAmount,
         };
 
         await updateInvoice(
@@ -247,6 +265,10 @@ export function InvoiceForm({
             tax_rate: data.tax_rate,
             notes: data.notes || null,
             items: itemsPayload,
+            zatca_enabled: zatcaEnabled,
+            seller_name: zatcaEnabled ? sellerName : undefined,
+            vat_number: zatcaEnabled ? vatNumber : undefined,
+            tax_amount: taxAmount,
           },
           {
             onSuccess: async (response) => {
@@ -427,6 +449,86 @@ export function InvoiceForm({
               />
             </div>
           </div>
+
+          {/* ZATCA Testing Section */}
+          <Card className="mt-6 mb-6 border-blue-200 bg-blue-50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-blue-800">ZATCA Testing Configuration</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between space-x-2">
+                  <FormLabel htmlFor="zatca-enabled" className="flex flex-col space-y-1">
+                    <span>Enable ZATCA Compliance</span>
+                    <span className="text-muted-foreground text-sm font-normal">
+                      Enable ZATCA Phase 1 compliance for this invoice
+                    </span>
+                  </FormLabel>
+                  <Switch
+                    id="zatca-enabled"
+                    checked={zatcaEnabled}
+                    onCheckedChange={setZatcaEnabled}
+                  />
+                </div>
+
+                {zatcaEnabled && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <FormLabel htmlFor="seller-name">Seller Name</FormLabel>
+                        <Input
+                          id="seller-name"
+                          value={sellerName}
+                          onChange={(e: any) => setSellerName(e.target.value)}
+                          placeholder="Enter seller name as registered with ZATCA"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <FormLabel htmlFor="vat-number">VAT Registration Number</FormLabel>
+                        <Input
+                          id="vat-number"
+                          value={vatNumber}
+                          onChange={(e: any) => setVatNumber(e.target.value)}
+                          placeholder="15-digit VAT number"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <div>
+                        <FormLabel className="mb-1 block">ZATCA QR Code Preview</FormLabel>
+                        <div className="flex flex-col items-start gap-2">
+                          <Switch
+                            id="show-preview"
+                            checked={showZatcaPreview}
+                            onCheckedChange={setShowZatcaPreview}
+                          />
+                          <span className="text-xs text-gray-500">Show/hide QR code preview</span>
+                        </div>
+                      </div>
+
+                      {showZatcaPreview && form.watch("issue_date") && (
+                        <div className="flex flex-col items-center gap-2">
+                          <ZatcaQRCode
+                            sellerName={sellerName}
+                            vatNumber={vatNumber}
+                            invoiceTimestamp={form.watch("issue_date").toISOString()}
+                            invoiceTotal={form.watch("subtotal") + taxAmount}
+                            vatAmount={taxAmount}
+                            size={140}
+                          />
+                          <span className="text-xs text-gray-500">
+                            Preview updates as you edit values
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
           <ProductsFormSection
             control={form.control as any}
