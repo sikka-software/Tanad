@@ -20,6 +20,8 @@ import { createClient } from "@/utils/supabase/component";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
+import { convertToTranslationKey } from "@/lib/text-utils";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function Auth() {
@@ -66,14 +68,14 @@ export default function Auth() {
 
       if (error) throw error;
       toast.success(t("Auth.logged_in_successfully"));
-    } catch (error: any) {
-      // Attempt to translate Supabase auth error codes
-      const errorCode = error.code || error.message;
-      const translatedError = t(`Auth.${errorCode}`, undefined, errorCode);
-      toast.error(translatedError);
-    } finally {
       setLoading(false);
       window.location.href = "/dashboard";
+    } catch (error: any) {
+      const errorCode = error.code || error.message;
+      toast.error(t("Auth.error_occured"), {
+        description: t(`Auth.${convertToTranslationKey(errorCode)}`),
+      });
+      setLoading(false);
     }
   };
 
@@ -130,7 +132,6 @@ export default function Auth() {
           email: data.user.email,
           full_name: email.split("@")[0], // Placeholder name
           stripe_customer_id: customerId,
-
           user_settings: {
             currency: "sar",
             calendar: "gregorian",
@@ -138,7 +139,6 @@ export default function Auth() {
             timezone: "UTC",
             date_format: "dmy",
             time_format: "12h",
-
             hidden_menu_items: {},
           },
         });

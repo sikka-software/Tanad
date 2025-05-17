@@ -1362,7 +1362,9 @@
     "sign_in_to_your_account": "تسجيل الدخول إلى حسابك",
     "welcome_back": "مرحبا بك مرة أخرى",
     "over_email_send_rate_limit": "لقد قمت بإرسال طلب إعادة تعيين كلمة المرور بشكل متكرر. يرجى المحاولة لاحقاً.",
-    "invalid_credentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+    "invalid_credentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+    "error_occured": "حدث خطأ",
+    "failed_to_fetch": "فشل في جلب البيانات"
   },
   "Editor": {
     "change_thumbnail": "تعديل إيقونة الرابط",

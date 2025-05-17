@@ -34,9 +34,7 @@ const SalaryRowComponent: React.FC<SalaryRowProps> = ({
           name={`salary.${index}.type`}
           render={({ field: typeField }) => (
             <FormItem className="flex-1">
-              <FormLabel className="text-xs">
-                {t("Employees.form.salary.type_label")}
-              </FormLabel>
+              <FormLabel className="text-xs">{t("Employees.form.salary.type_label")}</FormLabel>
               <Select
                 dir={locale === "ar" ? "rtl" : "ltr"}
                 onValueChange={typeField.onChange}
@@ -67,9 +65,7 @@ const SalaryRowComponent: React.FC<SalaryRowProps> = ({
           name={`salary.${index}.amount`}
           render={({ field: amountField }) => (
             <FormItem className="flex-1">
-              <FormLabel className="text-xs">
-                {t("Employees.form.salary.amount_label")}
-              </FormLabel>
+              <FormLabel className="text-xs">{t("Employees.form.salary.amount_label")}</FormLabel>
               <FormControl>
                 <CurrencyInput
                   placeholder={t("Employees.form.salary.amount_placeholder")}
@@ -77,7 +73,9 @@ const SalaryRowComponent: React.FC<SalaryRowProps> = ({
                   {...amountField}
                   showCommas={true}
                   value={
-                    amountField.value !== undefined && amountField.value !== null && amountField.value !== ""
+                    amountField.value !== undefined &&
+                    amountField.value !== null &&
+                    amountField.value !== ""
                       ? parseFloat(String(amountField.value))
                       : undefined
                   }
@@ -105,4 +103,4 @@ const SalaryRowComponent: React.FC<SalaryRowProps> = ({
   );
 };
 
-export const SalaryRow = React.memo(SalaryRowComponent); 
+export const SalaryRow = React.memo(SalaryRowComponent);

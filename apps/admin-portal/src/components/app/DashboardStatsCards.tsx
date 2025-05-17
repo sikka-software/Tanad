@@ -63,7 +63,7 @@ const DashboardCards = ({
                 {/* You might want to translate category names too if they are dynamic */}
                 {t(`Pages.${categoryName.replace(/\s+/g, "_")}.title`) || categoryName}
               </h2>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4">
                 {visibleModules.map((module) => {
                   const pascalKey = convertToPascalCase(module.key);
                   return (

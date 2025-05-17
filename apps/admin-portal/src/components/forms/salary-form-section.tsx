@@ -24,61 +24,55 @@ interface SalaryFormSectionProps {
   salaryErrorText?: string;
 }
 
-const SalaryFormSection: React.FC<SalaryFormSectionProps> = React.memo(({
-  control,
-  fields,
-  append,
-  remove,
-  isSaving,
-  inDialog,
-  isSalaryError,
-  salaryErrorText,
-}) => {
-  const t = useTranslations();
+const SalaryFormSection: React.FC<SalaryFormSectionProps> = React.memo(
+  ({ control, fields, append, remove, isSaving, inDialog, isSalaryError, salaryErrorText }) => {
+    const t = useTranslations();
 
-  const salaryComponents = useWatch({
-    control,
-    name: "salary",
-  });
-  const totalSalary =
-    salaryComponents?.reduce((sum: number, comp: any) => sum + (Number(comp.amount) || 0), 0) || 0;
+    const salaryComponents = useWatch({
+      control,
+      name: "salary",
+    });
+    const totalSalary =
+      salaryComponents?.reduce((sum: number, comp: any) => sum + (Number(comp.amount) || 0), 0) ||
+      0;
 
-  useEffect(() => {
-    if (fields.length === 0 && !inDialog) {
-      append({ type: "base", amount: 0 });
-    }
-  }, [fields, append, inDialog]);
+    useEffect(() => {
+      if (fields.length === 0 && !inDialog) {
+        append({ type: "base", amount: 0 });
+      }
+    }, [fields, append, inDialog]);
 
-  return (
-    <div>
-      <FormSectionHeader
-        title={t("Employees.salary_section_title")}
-        onCreate={() => append({ type: "", amount: 0 })}
-        onCreateText={t("Employees.form.salary.add_component")}
-        onCreateDisabled={isSaving}
-        isError={isSalaryError}
-        onErrorText={salaryErrorText}
-        inDialog={inDialog}
-      />
+    return (
+      <div>
+        <FormSectionHeader
+          title={t("Employees.salary_section_title")}
+          onCreate={() => append({ type: "", amount: 0 })}
+          onCreateText={t("Employees.form.salary.add_component")}
+          onCreateDisabled={isSaving}
+          isError={isSalaryError}
+          onErrorText={salaryErrorText}
+          inDialog={inDialog}
+        />
 
-      <div className="form-container p-4">
-        {fields.map((field, index) => (
-          <SalaryRow
-            key={field.id}
-            control={control}
-            index={index}
-            isSaving={isSaving}
-            onRemoveItem={() => remove(index)}
-          />
-        ))}
+        <div className="form-container p-4">
+          {fields.map((field, index) => (
+            <SalaryRow
+              key={field.id}
+              control={control}
+              index={index}
+              isSaving={isSaving}
+              onRemoveItem={() => remove(index)}
+            />
+          ))}
 
-        <div className="mt-4 text-end font-medium">
-          {t("Employees.form.salary.total")}: {MoneyFormatter(totalSalary)}
+          <div className="mt-4 text-end font-medium">
+            {t("Employees.form.salary.total")}: {MoneyFormatter(totalSalary)}
+          </div>
         </div>
       </div>
-    </div>
-  );
-});
+    );
+  },
+);
 
 SalaryFormSection.displayName = "SalaryFormSection";
 

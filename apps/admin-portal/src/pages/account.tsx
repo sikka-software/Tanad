@@ -14,6 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 
 import { createClient } from "@/utils/supabase/component";
 
+import useUserStore, { Profile } from "@/stores/use-user-store";
+
 interface ProfileFormValues {
   name: string;
   email: string;
@@ -30,9 +32,10 @@ export default function Account() {
   const supabase = createClient();
   const t = useTranslations();
   const lang = useLocale();
-
+  const user = useUserStore((state) => state.user);
+  const profile = useUserStore((state) => state.profile);
+  const setProfile = useUserStore((state) => state.setProfile);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const {
     register: registerProfile,
@@ -62,10 +65,11 @@ export default function Account() {
           .single();
 
         if (userData) {
-          setUser({
-            ...userData,
-            email: user?.email,
-          });
+          // setProfile({
+          //   ...(profile as Profile),
+          //   email: user?.email || "",
+          //   full_name: userData.full_name || "",
+          // });
           setValue("email", user?.email || "");
           setValue("name", userData.full_name || "");
         }
