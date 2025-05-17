@@ -1,5 +1,4 @@
 import { useTranslations } from "next-intl";
-import { z } from "zod";
 
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
@@ -17,18 +16,15 @@ const useCompanyColumns = (
     {
       accessorKey: "name",
       header: t("Clients.form.name.label"),
-      validationSchema: z.string().min(1, t("Clients.form.name.required")),
     },
     {
       accessorKey: "email",
       header: t("Clients.form.email.label"),
-      validationSchema: z.string().email(t("Clients.form.email.invalid")),
       cell: ({ row }) => <span dir="ltr">{row.original.email}</span>,
     },
     {
       accessorKey: "phone",
       header: t("Clients.form.phone.label"),
-      validationSchema: z.string().min(1, t("Clients.form.phone.required")),
       cell: ({ row }) => <span dir="ltr">{row.original.phone}</span>,
     },
     {
@@ -47,12 +43,10 @@ const useCompanyColumns = (
     {
       accessorKey: "city",
       header: t("Forms.city.label"),
-      validationSchema: z.string().min(1, t("Forms.city.required")),
     },
     {
       accessorKey: "region",
       header: t("Forms.region.label"),
-      validationSchema: z.string().min(1, t("Forms.region.required")),
     },
 
     {
@@ -60,7 +54,6 @@ const useCompanyColumns = (
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -68,9 +61,7 @@ const useCompanyColumns = (
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },

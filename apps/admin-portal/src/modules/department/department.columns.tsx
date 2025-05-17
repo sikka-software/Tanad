@@ -1,7 +1,6 @@
 import { Row } from "@tanstack/react-table";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { z } from "zod";
 
 import { Button } from "@/ui/button";
 import {
@@ -53,20 +52,17 @@ const useDepartmentColumns = () => {
     {
       accessorKey: "name",
       header: t("Departments.form.name.label"),
-      validationSchema: z.string().min(1, t("Departments.form.name.required")),
       className: "min-w-[200px]",
     },
     {
       accessorKey: "description",
       header: t("Departments.form.description.label"),
-      validationSchema: z.string().min(1, t("Departments.form.description.required")),
       className: "min-w-[250px]",
     },
     {
       enableEditing: false,
       accessorKey: "locations",
       header: t("Departments.form.locations.label"),
-      validationSchema: z.array(z.string()).min(1, t("Departments.form.locations.required")),
       className: "min-w-[200px]",
       cell: ({ row }) => {
         const locations = row.original.locations || [];
@@ -112,7 +108,6 @@ const useDepartmentColumns = () => {
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -120,9 +115,7 @@ const useDepartmentColumns = () => {
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },

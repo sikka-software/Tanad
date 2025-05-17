@@ -1,6 +1,4 @@
-import { format } from "date-fns";
 import { useTranslations } from "next-intl";
-import { z } from "zod";
 
 import { Badge } from "@/ui/badge";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
@@ -35,7 +33,6 @@ const useEmployeeRequestColumns = (
     {
       accessorKey: "title",
       header: t("EmployeeRequests.form.title.label"),
-      validationSchema: z.string().min(1, t("EmployeeRequests.form.title.required")),
     },
 
     {
@@ -56,7 +53,6 @@ const useEmployeeRequestColumns = (
     {
       accessorKey: "description",
       header: t("EmployeeRequests.form.description.label"),
-      validationSchema: z.string().nullable(),
     },
 
     {
@@ -64,7 +60,6 @@ const useEmployeeRequestColumns = (
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -72,9 +67,7 @@ const useEmployeeRequestColumns = (
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },

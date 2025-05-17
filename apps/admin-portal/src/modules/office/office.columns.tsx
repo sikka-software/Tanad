@@ -1,7 +1,6 @@
 import { format } from "date-fns";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { z } from "zod";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
@@ -35,13 +34,11 @@ const useOfficeColumns = (
     {
       accessorKey: "name",
       header: t("Offices.form.name.label"),
-      validationSchema: z.string().min(1, t("Offices.form.name.required")),
     },
     {
       noPadding: true,
       accessorKey: "code",
       header: t("Offices.form.code.label"),
-      validationSchema: z.string().min(1, t("Offices.form.code.required")),
       cell: ({ getValue, row }) => (
         <CodeCell
           onChange={(e) => handleEdit?.(row.id, "code", e.target.value)}
@@ -66,17 +63,14 @@ const useOfficeColumns = (
     {
       accessorKey: "email",
       header: t("Offices.form.email.label"),
-      validationSchema: z.string().email(t("Offices.form.email.invalid")),
     },
     {
       accessorKey: "phone",
       header: t("Offices.form.phone.label"),
-      validationSchema: z.string().min(1, t("Offices.form.phone.required")),
     },
     {
       accessorKey: "manager",
       header: t("Offices.form.manager.label"),
-      validationSchema: z.string().nullable(),
       noPadding: true,
 
       cell: ({ row }) => {
@@ -107,22 +101,18 @@ const useOfficeColumns = (
     // {
     //   accessorKey: "city",
     //   header: t("Forms.city.label"),
-    //   validationSchema: z.string().min(1, t("Forms.city.required")),
     // },
     // {
     //   accessorKey: "region",
     //   header: t("Forms.region.label"),
-    //   validationSchema: z.string().min(1, t("Forms.region.required")),
     // },
     // {
     //   accessorKey: "zip_code",
     //   header: t("Forms.zip_code.label"),
-    //   validationSchema: z.string().min(1, t("Forms.zip_code.required")),
     // },
     {
       accessorKey: "area",
       header: t("Offices.form.area.label"),
-      validationSchema: z.string().min(1, t("Offices.form.area.required")),
     },
 
     {
@@ -130,7 +120,6 @@ const useOfficeColumns = (
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -138,9 +127,7 @@ const useOfficeColumns = (
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -149,7 +136,6 @@ const useOfficeColumns = (
       accessorKey: "status",
       maxSize: 80,
       header: t("CommonStatus.label"),
-      validationSchema: z.enum(["active", "inactive"]),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {

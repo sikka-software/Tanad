@@ -1,5 +1,4 @@
 import { useTranslations } from "next-intl";
-import { z } from "zod";
 
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
@@ -25,7 +24,6 @@ const useInvoiceColumns = (
       noPadding: true,
       accessorKey: "invoice_number",
       header: t("Invoices.form.invoice_number.label"),
-      validationSchema: z.string().min(1, t("Invoices.form.invoice_number.required")),
       cell: ({ getValue, row }) => (
         <CodeCell
           onChange={(e) => handleEdit?.(row.id, "invoice_number", e.target.value)}
@@ -69,7 +67,6 @@ const useInvoiceColumns = (
       enableEditing: false,
       accessorKey: "issue_date",
       header: t("Invoices.form.issue_date.label"),
-      validationSchema: z.string().min(1, t("Invoices.form.issue_date.required")),
       cell: ({ row }) => useFormatDate(row.original.issue_date),
     },
     //due_date
@@ -77,7 +74,6 @@ const useInvoiceColumns = (
       enableEditing: false,
       accessorKey: "due_date",
       header: t("Invoices.form.due_date.label"),
-      validationSchema: z.string().min(1, t("Invoices.form.due_date.required")),
       cell: ({ row }) => useFormatDate(row.original.due_date),
     },
     //total
@@ -85,7 +81,6 @@ const useInvoiceColumns = (
       enableEditing: false,
       accessorKey: "total",
       header: t("Invoices.form.total.label"),
-      validationSchema: z.number().min(0, t("Invoices.form.total.required")),
       cell: ({ row }) => {
         return (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
@@ -101,7 +96,6 @@ const useInvoiceColumns = (
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -109,9 +103,7 @@ const useInvoiceColumns = (
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -119,7 +111,6 @@ const useInvoiceColumns = (
     {
       accessorKey: "status",
       header: t("Invoices.form.status.label"),
-      validationSchema: z.string().min(1, t("Invoices.form.status.required")),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => (

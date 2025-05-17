@@ -1,6 +1,5 @@
 import { CellContext } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
-import { z } from "zod";
 
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
@@ -20,7 +19,6 @@ const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string)
     {
       accessorKey: "quote_number",
       header: t("Quotes.form.quote_number.label"),
-      validationSchema: z.string().min(1, t("Quotes.form.quote_number.required")),
     },
     //client.name
     {
@@ -53,7 +51,6 @@ const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string)
     {
       accessorKey: "subtotal",
       header: t("Quotes.form.subtotal.label"),
-      validationSchema: z.number().min(0, t("Quotes.form.subtotal.required")),
       cell: ({ row }) => {
         return (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
@@ -66,16 +63,13 @@ const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string)
     {
       accessorKey: "tax_rate",
       header: t("Quotes.form.tax_rate.label"),
-      validationSchema: z.number().min(0, t("Quotes.form.tax_rate.required")),
       cell: (props: CellContext<Quote, unknown>) => `${props.row.original.tax_rate || 0}%`,
     },
-
     {
       accessorKey: "created_at",
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -83,16 +77,13 @@ const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string)
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "status",
       header: t("Quotes.form.status.label"),
-      validationSchema: z.enum(QuoteStatus),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => (

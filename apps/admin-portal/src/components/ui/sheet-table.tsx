@@ -281,7 +281,6 @@ export function handleKeyDown<T extends object>(
   colDef: ExtendedColumnDef<T>,
 ) {
   if (!colDef.validationSchema) return;
-
   const schemaType = (colDef.validationSchema as any)?._def?.typeName;
   if (schemaType === "ZodNumber") {
     // Allowed keys for numeric input:

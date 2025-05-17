@@ -1,6 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { z } from "zod";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
@@ -34,13 +33,11 @@ const useWarehouseColumns = (
     {
       accessorKey: "name",
       header: t("Warehouses.form.name.label"),
-      validationSchema: z.string().min(1, t("Warehouses.form.name.required")),
     },
     {
       noPadding: true,
       accessorKey: "code",
       header: t("Warehouses.form.code.label"),
-      validationSchema: z.string().min(1, t("Warehouses.form.code.required")),
       cell: ({ getValue, row }) => (
         <CodeCell
           onChange={(e) => handleEdit?.(row.id, "code", e.target.value)}
@@ -65,12 +62,10 @@ const useWarehouseColumns = (
     {
       accessorKey: "email",
       header: t("Warehouses.form.email.label"),
-      validationSchema: z.string().email(t("Warehouses.form.email.invalid")),
     },
     {
       accessorKey: "phone",
       header: t("Warehouses.form.phone.label"),
-      validationSchema: z.string().nullable(),
     },
     {
       accessorKey: "area",
@@ -79,14 +74,12 @@ const useWarehouseColumns = (
     {
       accessorKey: "capacity",
       header: t("Warehouses.form.capacity.label"),
-      validationSchema: z.number().min(0, t("Warehouses.form.capacity.invalid")),
     },
 
     {
       accessorKey: "manager",
       header: t("Warehouses.form.manager.label"),
       noPadding: true,
-      validationSchema: z.string().nullable(),
       cell: ({ row }) => {
         const warehouse = row.original;
         return (
@@ -116,17 +109,14 @@ const useWarehouseColumns = (
     {
       accessorKey: "city",
       header: t("Forms.city.label"),
-      validationSchema: z.string().min(1, t("Forms.city.required")),
     },
     {
       accessorKey: "region",
       header: t("Forms.region.label"),
-      validationSchema: z.string().min(1, t("Forms.region.required")),
     },
     {
       accessorKey: "zip_code",
       header: t("Forms.zip_code.label"),
-      validationSchema: z.string().min(1, t("Forms.zip_code.required")),
     },
 
     {
@@ -134,7 +124,6 @@ const useWarehouseColumns = (
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -142,9 +131,7 @@ const useWarehouseColumns = (
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },

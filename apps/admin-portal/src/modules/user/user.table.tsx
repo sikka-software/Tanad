@@ -3,7 +3,6 @@
 import { useTranslations } from "next-intl";
 import { useCallback } from "react";
 import React from "react";
-import { z } from "zod";
 
 import { Badge } from "@/ui/badge";
 import ErrorComponent from "@/ui/error-component";
@@ -43,10 +42,6 @@ export default function UsersTable({
     {
       accessorKey: "email",
       header: t("Users.form.email.label"),
-      validationSchema: z
-        .string()
-        .email(t("Users.form.email.invalid"))
-        .min(1, t("Users.form.email.required")),
     },
     {
       accessorKey: "role",
@@ -55,7 +50,6 @@ export default function UsersTable({
         const role = row.original.role;
         return <Badge variant="outline">{predefinedRoles(t, role)?.name || role}</Badge>;
       },
-      validationSchema: z.string().min(1, t("Users.form.role.required")),
     },
     {
       accessorKey: "created_at",

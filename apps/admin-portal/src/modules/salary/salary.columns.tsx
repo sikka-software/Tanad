@@ -1,6 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { z } from "zod";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
@@ -44,7 +43,6 @@ const useSalaryColumns = (
       accessorKey: "employee_name",
       header: t("Salaries.form.employee_name.label"),
       noPadding: true,
-      validationSchema: z.string().nullable(),
       cell: ({ row }) => {
         const salary = row.original;
         return (
@@ -91,7 +89,6 @@ const useSalaryColumns = (
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -99,9 +96,7 @@ const useSalaryColumns = (
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },

@@ -1,5 +1,4 @@
 import { useTranslations } from "next-intl";
-import { z } from "zod";
 
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
@@ -60,13 +59,11 @@ const useServerColumns = (
     {
       accessorKey: "monthly_payment",
       header: t("PaymentCycles.monthly_payment.label"),
-      validationSchema: z.number().min(0, "Required"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
     {
       accessorKey: "annual_payment",
       header: t("PaymentCycles.annual_payment.label"),
-      validationSchema: z.number().min(0, "Required"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
     {
@@ -74,7 +71,6 @@ const useServerColumns = (
       noPadding: true,
       enableEditing: false,
       header: t("PaymentCycles.label"),
-      validationSchema: z.string().min(1, "Required"),
       cell: ({ getValue, row }) => (
         <SelectCell
           onChange={(value) => handleEdit?.(row.id, "payment_cycle", value)}
@@ -93,7 +89,6 @@ const useServerColumns = (
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -101,9 +96,7 @@ const useServerColumns = (
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },

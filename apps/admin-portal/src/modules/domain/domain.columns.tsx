@@ -1,6 +1,5 @@
 import { SquareArrowOutUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { z } from "zod";
 
 import IconButton from "@/ui/icon-button";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
@@ -35,18 +34,15 @@ const useDomainColumns = (
     {
       accessorKey: "registrar",
       header: t("Domains.form.registrar.label"),
-      validationSchema: z.string().min(1, "Required"),
     },
     {
       accessorKey: "monthly_payment",
       header: t("PaymentCycles.monthly_payment.label"),
-      validationSchema: z.number().min(0, "Required"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
     {
       accessorKey: "annual_payment",
       header: t("PaymentCycles.annual_payment.label"),
-      validationSchema: z.number().min(0, "Required"),
       cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
     {
@@ -64,7 +60,6 @@ const useDomainColumns = (
         />
       ),
       header: t("PaymentCycles.label"),
-      validationSchema: z.string().min(1, "Required"),
     },
 
     {
@@ -72,7 +67,6 @@ const useDomainColumns = (
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -80,9 +74,7 @@ const useDomainColumns = (
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },

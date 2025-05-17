@@ -1,7 +1,6 @@
-import { useLocale, useTranslations } from "next-intl";
-import { z } from "zod";
-import { Row, FilterFn } from "@tanstack/react-table";
 import { parseDate, CalendarDate } from "@internationalized/date";
+import { Row, FilterFn } from "@tanstack/react-table";
+import { useLocale, useTranslations } from "next-intl";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
@@ -29,7 +28,7 @@ const dateTableFilterFn: FilterFn<Employee> = (
   if (operator === "is_not_empty") return !!rowValue;
 
   if (type !== "date" || !filterValue) {
-    return false; 
+    return false;
   }
 
   if (!rowValue) {
@@ -40,16 +39,18 @@ const dateTableFilterFn: FilterFn<Employee> = (
   try {
     const jsDate = new Date(rowValue);
     if (isNaN(jsDate.getTime())) {
-      return false; 
+      return false;
     }
-    rowDate = parseDate(`${jsDate.getFullYear()}-${String(jsDate.getMonth() + 1).padStart(2, '0')}-${String(jsDate.getDate()).padStart(2, '0')}`);
+    rowDate = parseDate(
+      `${jsDate.getFullYear()}-${String(jsDate.getMonth() + 1).padStart(2, "0")}-${String(jsDate.getDate()).padStart(2, "0")}`,
+    );
   } catch (e) {
     return false;
   }
 
   let filterCalendarDate: CalendarDate;
   try {
-    filterCalendarDate = parseDate(filterValue); 
+    filterCalendarDate = parseDate(filterValue);
   } catch (e) {
     return false;
   }
@@ -64,12 +65,12 @@ const dateTableFilterFn: FilterFn<Employee> = (
     case "after":
       const isAfter = rowDate.compare(filterCalendarDate) > 0;
       return isAfter;
-    case "is_empty": 
+    case "is_empty":
       return !rowValue;
-    case "is_not_empty": 
+    case "is_not_empty":
       return !!rowValue;
     default:
-      return false; 
+      return false;
   }
 };
 
@@ -84,23 +85,19 @@ const useCompanyColumns = (
     {
       accessorKey: "first_name",
       header: t("Employees.form.first_name.label"),
-      validationSchema: z.string().min(1, t("Employees.form.first_name.required")),
     },
     {
       accessorKey: "last_name",
       header: t("Employees.form.last_name.label"),
-      validationSchema: z.string().min(1, t("Employees.form.last_name.required")),
     },
     {
       accessorKey: "email",
       dir: "ltr",
       header: t("Employees.form.email.label"),
-      validationSchema: z.string().email(t("Employees.form.email.invalid")),
     },
     {
       accessorKey: "phone",
       header: t("Employees.form.phone.label"),
-      validationSchema: z.string().optional(),
     },
     {
       accessorKey: "birth_date",
@@ -117,15 +114,7 @@ const useCompanyColumns = (
     {
       accessorKey: "job_id",
       header: t("Employees.form.job.label"),
-      validationSchema: z.string().min(1, t("Employees.form.job.required")),
-      // cell: ({ row }) => {
-      //   const jobId = row.original.job_id;
-      //   const job = jobs?.find((j) => j.id === jobId);
-      //   return job ? job.title : jobId || "-";
-      // },
-
       noPadding: true,
-
       cell: ({ row }) => {
         const employee = row.original;
         return (
@@ -145,7 +134,7 @@ const useCompanyColumns = (
             texts={{
               placeholder: ". . .",
               searchPlaceholder: t("Pages.Employees.search"),
-              noItems: t("Offices.form.manager.no_employees"),
+              noItems: t("Pages.Jobs.no_jobs_found"),
             }}
             addText={t("Pages.Employees.add")}
             renderOption={(option) => {
@@ -178,15 +167,12 @@ const useCompanyColumns = (
       accessorKey: "nationality",
       header: t("Employees.form.nationality.label"),
       maxSize: 100,
-      validationSchema: z.string().min(1, t("Employees.form.nationality.required")),
     },
-
     {
       accessorKey: "created_at",
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
       filterFn: dateTableFilterFn,
@@ -196,16 +182,13 @@ const useCompanyColumns = (
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
       filterFn: dateTableFilterFn,
     },
-
     {
       accessorKey: "status",
       header: t("Employees.form.status.label"),
-      validationSchema: z.string().min(1, t("Employees.form.status.required")),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => (

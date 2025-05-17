@@ -1,6 +1,5 @@
 import { SquareArrowOutUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { z } from "zod";
 
 import IconButton from "@/ui/icon-button";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
@@ -35,7 +34,6 @@ const useOnlineStoreColumns = (
     {
       accessorKey: "platform",
       header: t("OnlineStores.form.platform.label"),
-      validationSchema: z.string().min(1, "Required"),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => (
@@ -54,7 +52,6 @@ const useOnlineStoreColumns = (
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -62,9 +59,7 @@ const useOnlineStoreColumns = (
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },

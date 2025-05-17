@@ -1,9 +1,16 @@
+import {
+  VisibilityState,
+  Updater as TableUpdater,
+  ColumnFilter,
+  ColumnFiltersState,
+  OnChangeFn,
+} from "@tanstack/react-table";
 import { pick } from "lodash";
 import { FileUser, Plus, User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -116,10 +123,12 @@ export default function EmployeesPage() {
     }
   }, [employeesFromHook, setData]);
 
-  const columnFiltersTanStack = useMemo(() => {
+  // This structure is passed to TanStack Table.
+  // Its `value` is a complex object. Column filterFns must handle this.
+  const columnFiltersConfigForTable = useMemo((): ColumnFilter[] => {
     return filterConditions.map((condition) => ({
       id: condition.field,
-      value: {
+      value: { // Pass the complex object as the filter value
         filterValue: condition.value,
         operator: condition.operator,
         type: condition.type,
@@ -127,26 +136,33 @@ export default function EmployeesPage() {
     }));
   }, [filterConditions]);
 
-  const handleColumnFiltersChange = (updaterOrValue: any) => {
-    const newTanStackFilters =
-      typeof updaterOrValue === "function" ? updaterOrValue(columnFiltersTanStack) : updaterOrValue;
+  const handleColumnFiltersChange: OnChangeFn<ColumnFiltersState> = useCallback(
+    (updaterOrValue) => {
+      let newTanStackFilters: ColumnFiltersState;
+      if (typeof updaterOrValue === "function") {
+        newTanStackFilters = updaterOrValue(columnFiltersConfigForTable);
+      } else {
+        newTanStackFilters = updaterOrValue;
+      }
 
-    const newStoreFilters: FilterCondition[] = newTanStackFilters.map((tf: any) => ({
-      field: tf.id,
-      value: tf.value.filterValue,
-      operator: tf.value.operator,
-      type: tf.value.type,
-      conjunction: "and",
-    }));
-    setFilterConditions(newStoreFilters);
-  };
+      const newStoreFilters: FilterCondition[] = newTanStackFilters.map((tf: ColumnFilter) => ({
+        id: Date.now() + Math.random(),
+        field: tf.id,
+        value: String(tf.value ?? ""), 
+        operator: "contains",
+        type: "text",
+        conjunction: "and",
+      }));
+      setFilterConditions(newStoreFilters);
+    },
+    [columnFiltersConfigForTable, setFilterConditions],
+  );
 
   useEffect(() => {
     setIsApplyingClientFilter(true);
     const timer = setTimeout(() => {
       setIsApplyingClientFilter(false);
     }, 50);
-
     return () => clearTimeout(timer);
   }, [filterConditions, searchQuery]);
 
@@ -163,26 +179,57 @@ export default function EmployeesPage() {
     [sortRules],
   );
 
-  const handleTanstackSortingChange = (
-    updater:
-      | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
-      | { id: string; desc: boolean }[],
-  ) => {
-    let nextSorting = typeof updater === "function" ? updater(tanstackSorting) : updater;
-    const newSortRules = nextSorting.map((s: { id: string; desc: boolean }) => ({
-      field: s.id,
-      direction: (s.desc ? "desc" : "asc") as "asc" | "desc",
-    }));
-    setSortRules(newSortRules);
-  };
+  const handleTanstackSortingChange = useCallback(
+    (
+      updater:
+        | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
+        | { id: string; desc: boolean }[],
+    ) => {
+      let nextSorting = typeof updater === "function" ? updater(tanstackSorting) : updater;
+      const newSortRules = nextSorting.map((s: { id: string; desc: boolean }) => ({
+        field: s.id,
+        direction: (s.desc ? "desc" : "asc") as "asc" | "desc",
+      }));
+      setSortRules(newSortRules);
+    },
+    [tanstackSorting, setSortRules],
+  );
 
-  const handleTanstackGlobalFilterChange = (updater: string | ((old: string) => string)) => {
-    if (typeof updater === "function") {
-      setSearchQuery(updater(searchQuery));
-    } else {
-      setSearchQuery(updater);
-    }
-  };
+  const handleTanstackGlobalFilterChange = useCallback(
+    (updater: string | ((old: string) => string)) => {
+      if (typeof updater === "function") {
+        setSearchQuery(updater(searchQuery));
+      } else {
+        setSearchQuery(updater);
+      }
+    },
+    [searchQuery, setSearchQuery],
+  );
+
+  const handleColumnVisibilityChange = useCallback(
+    (updater: VisibilityState | TableUpdater<VisibilityState>) => {
+      setColumnVisibility((prev) => (typeof updater === "function" ? updater(prev) : updater));
+    },
+    [setColumnVisibility],
+  );
+
+  const handleSetIsDeleteDialogOpenForSelection = useCallback(
+    (open: boolean) => {
+      if (open) setPendingDeleteIds(selectedRows);
+      setIsDeleteDialogOpen(open);
+    },
+    [selectedRows, setIsDeleteDialogOpen, setPendingDeleteIds],
+  );
+
+  const handleAddClickForEmptyList = useCallback(() => {
+    router.push(router.pathname + "/add");
+  }, [router]);
+
+  const handleFormSuccess = useCallback(() => {
+    setIsFormDialogOpen(false);
+    setLoadingSave(false);
+    setActionableItem(null);
+  }, [setIsFormDialogOpen, setLoadingSave, setActionableItem]);
 
   if (!canRead) {
     return <NoPermission />;
@@ -192,7 +239,7 @@ export default function EmployeesPage() {
     <div>
       <CustomPageMeta
         title={t("Pages.Employees.title")}
-        description={t("Pages.Employees.description")}
+        // description={t("Pages.Employees.description")}
       />
       <DataPageLayout count={employeesFromHook?.length} itemsText={t("Pages.Employees.title")}>
         {selectedRows.length > 0 ? (
@@ -200,10 +247,7 @@ export default function EmployeesPage() {
             selectedRows={selectedRows}
             clearSelection={clearSelection}
             isDeleting={isDeleting}
-            setIsDeleteDialogOpen={(open) => {
-              if (open) setPendingDeleteIds(selectedRows);
-              setIsDeleteDialogOpen(open);
-            }}
+            setIsDeleteDialogOpen={handleSetIsDeleteDialogOpenForSelection}
           />
         ) : (
           <PageSearchAndFilter
@@ -212,16 +256,12 @@ export default function EmployeesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Employees.title")}
-            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
+            onAddClick={canCreate ? handleAddClickForEmptyList : undefined}
             createLabel={t("Pages.Employees.add")}
             searchPlaceholder={t("Pages.Employees.search")}
             hideOptions={employeesFromHook?.length === 0}
             columnVisibility={columnVisibility}
-            onColumnVisibilityChange={(updater) => {
-              setColumnVisibility((prev) =>
-                typeof updater === "function" ? updater(prev) : updater,
-              );
-            }}
+            onColumnVisibilityChange={handleColumnVisibilityChange}
             isApplyingFilter={isApplyingClientFilter}
           />
         )}
@@ -236,7 +276,7 @@ export default function EmployeesPage() {
               onSortingChange={handleTanstackSortingChange}
               globalFilter={searchQuery}
               onGlobalFilterChange={handleTanstackGlobalFilterChange}
-              columnFilters={columnFiltersTanStack}
+              columnFilters={columnFiltersConfigForTable}
               onColumnFiltersChange={handleColumnFiltersChange}
             />
           ) : (
@@ -250,7 +290,7 @@ export default function EmployeesPage() {
                   description: t("Employees.create_first.description"),
                   add: t("Pages.Employees.add"),
                   icons: [FileUser, Plus, FileUser],
-                  onClick: () => router.push(router.pathname + "/add"),
+                  onClick: handleAddClickForEmptyList,
                 }}
                 renderItem={(employee) => (
                   <EmployeeCard
@@ -274,11 +314,7 @@ export default function EmployeesPage() {
         >
           <EmployeeForm
             formHtmlId={"employee-form"}
-            onSuccess={() => {
-              setIsFormDialogOpen(false);
-              setLoadingSave(false);
-              setActionableItem(null);
-            }}
+            onSuccess={handleFormSuccess}
             defaultValues={actionableItem}
             editMode={true}
           />

@@ -34,13 +34,11 @@ const useBranchColumns = (
     {
       accessorKey: "name",
       header: t("Branches.form.name.label"),
-      validationSchema: z.string().min(1, t("Branches.form.name.required")),
     },
     {
       noPadding: true,
       accessorKey: "code",
       header: t("Branches.form.code.label"),
-      validationSchema: z.string().min(1, t("Branches.form.code.required")),
       cell: ({ getValue, row }) => (
         <CodeCell
           onChange={(e) => handleEdit?.(row.id, "code", e.target.value)}
@@ -65,18 +63,15 @@ const useBranchColumns = (
     {
       accessorKey: "email",
       header: t("Branches.form.email.label"),
-      validationSchema: z.string().email(t("Branches.form.email.invalid")),
     },
     {
       accessorKey: "phone",
       header: t("Branches.form.phone.label"),
-      validationSchema: z.string().nullable(),
     },
     {
       accessorKey: "manager",
       header: t("Branches.form.manager.label"),
       noPadding: true,
-      validationSchema: z.string().nullable(),
       cell: ({ row }) => {
         const branch = row.original;
         return (
@@ -103,31 +98,25 @@ const useBranchColumns = (
     {
       accessorKey: "address",
       header: t("Forms.address.label"),
-      validationSchema: z.string().min(1, t("Forms.address.required")),
     },
     {
       accessorKey: "city",
       header: t("Forms.city.label"),
-      validationSchema: z.string().min(1, t("Forms.city.required")),
     },
     {
       accessorKey: "region",
       header: t("Forms.region.label"),
-      validationSchema: z.string().min(1, t("Forms.region.required")),
     },
     {
       accessorKey: "zip_code",
       header: t("Forms.zip_code.label"),
-      validationSchema: z.string().min(1, t("Forms.zip_code.required")),
     },
 
     {
       accessorKey: "created_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -135,9 +124,7 @@ const useBranchColumns = (
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },

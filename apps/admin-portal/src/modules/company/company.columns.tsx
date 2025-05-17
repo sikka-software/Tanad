@@ -1,6 +1,5 @@
 import { SquareArrowOutUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { z } from "zod";
 
 import IconButton from "@/ui/icon-button";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
@@ -19,17 +18,14 @@ const useCompanyColumns = (
     {
       accessorKey: "name",
       header: t("Companies.form.name.label"),
-      validationSchema: z.string().min(1, t("Companies.form.name.required")),
     },
     {
       accessorKey: "industry",
       header: t("Companies.form.industry.label"),
-      validationSchema: z.string().optional(),
     },
     {
       accessorKey: "email",
       header: t("Companies.form.email.label"),
-      validationSchema: z.string().email(t("Companies.form.email.invalid")),
     },
     {
       accessorKey: "phone",
@@ -37,7 +33,6 @@ const useCompanyColumns = (
       cell: ({ row }) => {
         return <span dir="ltr"> {row.original.phone}</span>;
       },
-      validationSchema: z.string().optional(),
     },
     {
       accessorKey: "website",
@@ -55,36 +50,28 @@ const useCompanyColumns = (
     {
       accessorKey: "address",
       header: t("Forms.address.label"),
-      validationSchema: z.string().optional(),
     },
     {
       accessorKey: "city",
       header: t("Forms.city.label"),
-      validationSchema: z.string().optional(),
     },
-
     {
       accessorKey: "region",
       header: t("Forms.region.label"),
-      validationSchema: z.string().optional(),
     },
     {
       accessorKey: "zip_code",
       header: t("Forms.zip_code.label"),
-      validationSchema: z.string().optional(),
     },
     {
       accessorKey: "size",
       header: t("Companies.form.size.label"),
-      validationSchema: z.number().min(0, t("Companies.form.size.invalid")),
     },
-
     {
       accessorKey: "created_at",
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -92,9 +79,7 @@ const useCompanyColumns = (
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },

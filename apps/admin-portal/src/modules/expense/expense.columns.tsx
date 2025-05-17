@@ -1,5 +1,4 @@
 import { useTranslations } from "next-intl";
-import { z } from "zod";
 
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
@@ -21,7 +20,6 @@ const useExpenseColumns = (
     {
       accessorKey: "expense_number",
       header: t("Expenses.form.expense_number.label"),
-      validationSchema: z.string().min(1, t("Expenses.form.expense_number.required")),
     },
     {
       accessorKey: "issue_date",
@@ -33,11 +31,9 @@ const useExpenseColumns = (
       header: t("Expenses.form.due_date.label"),
       cell: ({ row }) => useFormatDate(row.original.due_date),
     },
-
     {
       accessorKey: "amount",
       header: t("Expenses.form.amount.label"),
-      validationSchema: z.number().min(0, t("Expenses.form.amount.required")),
       cell: ({ row }) => {
         return (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
@@ -50,15 +46,12 @@ const useExpenseColumns = (
     {
       accessorKey: "category",
       header: t("Expenses.form.category.label"),
-      validationSchema: z.string().min(1, t("Expenses.form.category.required")),
     },
-
     {
       accessorKey: "created_at",
       maxSize: 95,
       enableEditing: false,
       header: t("Metadata.created_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.created_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
@@ -66,16 +59,13 @@ const useExpenseColumns = (
       accessorKey: "updated_at",
       maxSize: 95,
       enableEditing: false,
-
       header: t("Metadata.updated_at.label"),
-      validationSchema: z.string().min(1, t("Metadata.updated_at.required")),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
     },
     {
       accessorKey: "status",
       header: t("Expenses.form.status.label"),
-      validationSchema: z.enum(["paid", "pending", "rejected", "overdue"]),
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => (
