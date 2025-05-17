@@ -40,7 +40,6 @@ import {
 } from "@/employee/employee.types";
 
 import DepartmentForm from "@/department/department.form";
-import { useDepartments } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";
 
 import JobCombobox from "@/job/job.combobox";
@@ -51,15 +50,6 @@ import { employees } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
 export const createEmployeeFormSchema = (t: (key: string) => string) => {
-  const salaryComponentSchema = z.object({
-    type: z.string().min(1, "Type is required"),
-    amount: z.coerce
-      .number({
-        invalid_type_error: "Amount must be a number",
-      })
-      .min(0, "Amount must be non-negative")
-      .default(0),
-  });
   const EmployeeSelectSchema = createInsertSchema(employees, {
     first_name: z
       .string({ required_error: t("Employees.form.first_name.required") })
@@ -73,7 +63,12 @@ export const createEmployeeFormSchema = (t: (key: string) => string) => {
     phone: z.string().optional(),
     job_id: z.string().min(1, t("Employees.form.job.required")),
 
-    salary: z.array(salaryComponentSchema).optional(),
+    salary: z.array(
+      z.object({
+        type: z.string().min(1, "Type is required"),
+        amount: z.coerce.number().min(0, t("Expenses.form.amount.required")),
+      }),
+    ),
     status: z.enum(EmployeeStatus),
     nationality: z.string().optional(),
     hire_date: z
@@ -330,6 +325,7 @@ export function EmployeeForm({
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
+            console.log("form data is ", form.getValues());
             form.handleSubmit(handleSubmit)(e);
           }}
         >
