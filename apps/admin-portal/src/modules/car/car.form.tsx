@@ -187,7 +187,14 @@ export function CarForm({
 
   return (
     <Form {...form}>
-      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+      <form
+        id={formHtmlId || "car-form"}
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit(handleSubmit)(e);
+        }}
+      >
         <div className="form-container">
           <input hidden type="text" value={user?.id} {...form.register("user_id")} />
           <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />

@@ -1,6 +1,6 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { Control } from "react-hook-form";
+import { Control, ControllerRenderProps } from "react-hook-form";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { FormControl, FormMessage } from "@/ui/form";
@@ -21,6 +21,8 @@ interface ClientComboboxProps {
   disabled?: boolean;
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;
+  onClientSelected?: (field: ControllerRenderProps<any, string>, value: any) => void;
+  formName: string;
 }
 
 const ClientCombobox = ({
@@ -32,6 +34,8 @@ const ClientCombobox = ({
   isDialogOpen,
   setIsDialogOpen,
   disabled,
+  formName,
+  onClientSelected,
 }: ClientComboboxProps) => {
   const t = useTranslations();
   const locale = useLocale();
@@ -52,7 +56,7 @@ const ClientCombobox = ({
     <div>
       <FormField
         control={control}
-        name="client_id"
+        name={formName}
         render={({ field, fieldState }) => (
           <FormItem>
             <FormLabel>{label} *</FormLabel>
@@ -62,7 +66,9 @@ const ClientCombobox = ({
                 data={clientOptions}
                 isLoading={loadingCombobox}
                 defaultValue={field.value}
-                onChange={(value) => field.onChange(value || null)}
+                onChange={(value) =>
+                  onClientSelected ? onClientSelected(field, value) : field.onChange(value || null)
+                }
                 texts={{
                   placeholder: t("Pages.Clients.select"),
                   searchPlaceholder: t("Pages.Clients.search"),

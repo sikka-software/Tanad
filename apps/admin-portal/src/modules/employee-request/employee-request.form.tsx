@@ -193,7 +193,14 @@ export function EmployeeRequestForm({
   return (
     <>
       <Form {...form}>
-        <form id={formHtmlId || "employee-request-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+        <form
+          id={formHtmlId || "employee-request-form"}
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit(handleSubmit)(e);
+          }}
+        >
           <input hidden type="text" value={user?.id} {...form.register("user_id")} />
           <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">

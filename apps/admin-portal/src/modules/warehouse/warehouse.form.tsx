@@ -189,10 +189,10 @@ export function WarehouseForm({
   return (
     <Form {...form}>
       <form
-        id={formHtmlId}
+        id={formHtmlId || "warehouse-form"}
         onSubmit={(e) => {
           e.preventDefault();
-          console.log("form errors ", form.formState.errors);
+          e.stopPropagation();
           form.handleSubmit(handleSubmit)(e);
         }}
       >

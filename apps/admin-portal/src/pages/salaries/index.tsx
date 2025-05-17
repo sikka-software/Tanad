@@ -249,7 +249,18 @@ export default function SalariesPage() {
   );
 }
 
-SalariesPage.messages = ["Metadata", "Notes", "Pages", "Salaries", "General", "CommonStatus"];
+SalariesPage.messages = [
+  "Metadata",
+  "Notes",
+  "Pages",
+  "Salaries",
+  "Employees",
+  "Jobs",
+  "Forms",
+  "Departments",
+  "General",
+  "CommonStatus",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

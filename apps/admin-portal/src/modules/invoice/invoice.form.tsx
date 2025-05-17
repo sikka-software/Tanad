@@ -278,6 +278,7 @@ export function InvoiceForm({
           id={formHtmlId || "invoice-form"}
           onSubmit={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             form.handleSubmit(handleSubmit)(e);
           }}
         >
@@ -350,6 +351,7 @@ export function InvoiceForm({
                 )}
               />
               <ClientCombobox
+                formName="client_id"
                 label={t("Invoices.form.client.label")}
                 control={form.control}
                 clients={clients || []}

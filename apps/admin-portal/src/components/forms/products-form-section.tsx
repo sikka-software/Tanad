@@ -82,6 +82,10 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
   }) => {
     const quantity = useWatch({ control, name: `items.${index}.quantity` });
     const unitPrice = useWatch({ control, name: `items.${index}.unit_price` });
+    const currency = useAppCurrencySymbol().symbol;
+    const smallerCurrency = useAppCurrencySymbol({
+      sar: { className: "!size-2.5 text-black", strokeWidth: 28 },
+    }).symbol;
 
     // Memoize the mapped products data for the combobox
     const comboboxProductsData = useMemo(() => {
@@ -135,11 +139,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                         <span>{option.label}</span>
                         <div className="flex flex-row items-center gap-1 text-sm font-medium !text-black">
                           <span>{MoneyFormatter(option.price)}</span>
-                          {
-                            useAppCurrencySymbol({
-                              sar: { className: "!size-2.5 text-black", strokeWidth: 28 },
-                            }).symbol
-                          }
+                          {smallerCurrency}
                         </div>
                       </div>
                     )}
@@ -246,7 +246,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
         <TableCell className="w-[150px] max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap">
           <div className="flex flex-row items-center gap-1 text-right">
             {MoneyFormatter(subtotalNumber)}
-            {useAppCurrencySymbol().symbol}
+            {currency}
           </div>
         </TableCell>
 

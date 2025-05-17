@@ -66,6 +66,7 @@ export default function Component({
           className="space-y-5"
           onSubmit={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             onConfirm();
           }}
         >

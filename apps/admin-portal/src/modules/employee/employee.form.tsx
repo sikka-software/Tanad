@@ -342,9 +342,10 @@ export function EmployeeForm({
     <>
       <Form {...form}>
         <form
-          id={formHtmlId}
+          id={formHtmlId || "employee-form"}
           onSubmit={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             form.handleSubmit(handleSubmit)(e);
           }}
         >

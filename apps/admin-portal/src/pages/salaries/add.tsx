@@ -44,7 +44,17 @@ export default function AddSalaryPage() {
   );
 }
 
-AddSalaryPage.messages = ["Metadata", "Notes", "Pages", "Salaries", "General"];
+AddSalaryPage.messages = [
+  "Metadata",
+  "Notes",
+  "Pages",
+  "Salaries",
+  "Employees",
+  "Jobs",
+  "Forms",
+  "Departments",
+  "General",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

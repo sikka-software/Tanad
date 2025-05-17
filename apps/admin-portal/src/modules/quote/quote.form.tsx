@@ -235,7 +235,6 @@ export function QuoteForm({
       toast.error(t("Quotes.error.save"));
       setIsLoading(false);
     }
-    // console.log("Form Data:", formData);
   };
 
   if (typeof window !== "undefined") {
@@ -245,13 +244,21 @@ export function QuoteForm({
   return (
     <>
       <Form {...form}>
-        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <form
+          id={formHtmlId || "quote-form"}
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit(handleSubmit)(e);
+          }}
+        >
           <input hidden type="text" value={user?.id} {...form.register("user_id")} />
           <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
 
           <div className="form-container">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <ClientCombobox
+                formName="client_id"
                 label={t("Quotes.form.client.label")}
                 control={form.control}
                 clients={clients || []}

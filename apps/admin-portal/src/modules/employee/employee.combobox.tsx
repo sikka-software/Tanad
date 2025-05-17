@@ -1,6 +1,6 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { Control } from "react-hook-form";
+import { Control, ControllerRenderProps } from "react-hook-form";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { FormControl, FormMessage } from "@/ui/form";
@@ -21,6 +21,7 @@ interface EmployeeComboboxProps {
   disabled?: boolean;
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;
+  onEmployeeSelected?: (field: ControllerRenderProps<any, string>, value: any) => void;
   formName: string;
 }
 
@@ -28,6 +29,7 @@ const EmployeeCombobox = ({
   label,
   control,
   employees,
+  onEmployeeSelected,
   loadingCombobox,
   isSaving,
   isDialogOpen,
@@ -63,7 +65,11 @@ const EmployeeCombobox = ({
                 data={employeeOptions}
                 isLoading={loadingCombobox}
                 defaultValue={field.value}
-                onChange={(value) => field.onChange(value || null)}
+                onChange={(value) =>
+                  onEmployeeSelected
+                    ? onEmployeeSelected(field, value)
+                    : field.onChange(value || null)
+                }
                 texts={{
                   placeholder: t("Pages.Employees.select"),
                   searchPlaceholder: t("Pages.Employees.search"),
@@ -101,7 +107,7 @@ const EmployeeCombobox = ({
             setIsDialogOpen(false);
             setIsSaving(false);
           }}
-          //   editMode={false}
+          editMode={false}
         />
       </FormDialog>
     </div>

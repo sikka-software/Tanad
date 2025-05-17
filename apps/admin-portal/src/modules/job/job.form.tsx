@@ -237,13 +237,12 @@ function JobForm({
   return (
     <Form {...form}>
       <form
-        id={formHtmlId}
+        id={formHtmlId || "job-form"}
         onSubmit={(e) => {
           e.preventDefault();
-          console.log("form errors are", form.formState.errors);
+          e.stopPropagation();
           form.handleSubmit(handleSubmit)(e);
         }}
-        className="space-y-4"
       >
         <input hidden type="text" value={user?.id} {...form.register("user_id")} />
         <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
