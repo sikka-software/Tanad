@@ -3801,7 +3801,8 @@
         "add_component": "إضافة مكون",
         "total": "المجموع",
         "total_label": "المجموع",
-        "total_placeholder": "أدخل المجموع"
+        "total_placeholder": "أدخل المجموع",
+        "general_error": "يجب إدخال الراتب"
       },
       "status": {
         "label": "الحالة",

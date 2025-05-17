@@ -686,6 +686,10 @@ export function EmployeeForm({
             remove={remove}
             isSaving={isEmployeeSaving}
             inDialog={editMode || nestedForm}
+            isSalaryError={!!form.formState.errors.salary}
+            salaryErrorText={
+              form.formState.errors.salary ? t("Employees.form.salary.general_error") : undefined
+            }
           />
 
           <NotesSection

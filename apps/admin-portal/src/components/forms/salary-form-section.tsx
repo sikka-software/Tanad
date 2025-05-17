@@ -20,6 +20,8 @@ interface SalaryFormSectionProps {
   remove: UseFieldArrayRemove;
   isSaving: boolean;
   inDialog?: boolean;
+  isSalaryError?: boolean;
+  salaryErrorText?: string;
 }
 
 const SalaryFormSection: React.FC<SalaryFormSectionProps> = React.memo(({
@@ -29,6 +31,8 @@ const SalaryFormSection: React.FC<SalaryFormSectionProps> = React.memo(({
   remove,
   isSaving,
   inDialog,
+  isSalaryError,
+  salaryErrorText,
 }) => {
   const t = useTranslations();
 
@@ -52,7 +56,8 @@ const SalaryFormSection: React.FC<SalaryFormSectionProps> = React.memo(({
         onCreate={() => append({ type: "", amount: 0 })}
         onCreateText={t("Employees.form.salary.add_component")}
         onCreateDisabled={isSaving}
-        isError={false}
+        isError={isSalaryError}
+        onErrorText={salaryErrorText}
         inDialog={inDialog}
       />
 
