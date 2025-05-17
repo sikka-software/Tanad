@@ -7,6 +7,10 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
+import { Button } from "@/ui/button";
+import { Skeleton } from "@/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
+
 import { useSubscription } from "@/hooks/use-subscription";
 import { useUsage } from "@/hooks/use-usage";
 
@@ -14,9 +18,6 @@ import CurrentPlan from "@/components/billing/CurrentPlan";
 import SubscriptionSelection from "@/components/billing/SubscriptionSelection";
 import UsageStats from "@/components/billing/UsageStats";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import useUserStore from "@/stores/use-user-store";
 

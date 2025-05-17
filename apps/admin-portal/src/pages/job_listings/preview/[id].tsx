@@ -16,10 +16,10 @@ import JobCard from "@/components/jobs/job-card";
 import JobDetailsModal from "@/components/jobs/job-details-dialog";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
+import { JobListing } from "@/job-listing/job-listing.type";
+
 // Assuming server client path
 import { Job } from "@/job/job.type";
-
-import { JobListing } from "@/job-listing/job-listing.type";
 
 // Extend JobListing type locally if needed to clarify nested structure from query
 type JobListingWithJobs = Omit<JobListing, "jobs"> & {

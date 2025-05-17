@@ -2,9 +2,10 @@
 
 import { ImageIcon } from "lucide-react";
 
+import { SelectItem } from "@/ui/select";
+
 import { useToolbarContext } from "@/components/editor/context/toolbar-context";
 import { InsertImageDialog } from "@/components/editor/plugins/images-plugin";
-import { SelectItem } from "@/components/ui/select";
 
 export function InsertImage() {
   const { activeEditor, showModal } = useToolbarContext();

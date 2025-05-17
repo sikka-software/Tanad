@@ -7,11 +7,11 @@ import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus, CommonStatusProps } from "@/types/common.type";
 
+import { Product } from "@/product/product.type";
+
 import { useUpdateOffice } from "@/office/office.hooks";
 import useOfficeStore from "@/office/office.store";
 import { Office } from "@/office/office.type";
-
-import { Product } from "@/product/product.type";
 
 import { useUpdateProduct } from "./product.hooks";
 import useProductStore from "./product.store";

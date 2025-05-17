@@ -1,9 +1,10 @@
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 
+import { ExtendedColumnDef } from "@/ui/sheet-table";
+
 import StatusCell from "@/components/tables/status-cell";
 import TimestampCell from "@/components/tables/timestamp-cell";
-import { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { JobListingWithJobs } from "./job-listing.type";
 

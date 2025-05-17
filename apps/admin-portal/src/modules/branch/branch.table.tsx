@@ -2,9 +2,8 @@ import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 
 import ErrorComponent from "@/ui/error-component";
+import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
-
-import SheetTable from "@/components/ui/sheet-table";
 
 import { ModuleTableProps } from "@/types/common.type";
 

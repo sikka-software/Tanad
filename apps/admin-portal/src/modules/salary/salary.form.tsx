@@ -12,10 +12,9 @@ import { Button } from "@/ui/button";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
+import { CurrencyInput } from "@/ui/inputs/currency-input";
+import { DateInput } from "@/ui/inputs/date-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-
-import { CurrencyInput } from "@/components/ui/inputs/currency-input";
-import { DateInput } from "@/components/ui/inputs/date-input";
 
 import NotesSection from "@/forms/notes-section";
 

@@ -3,8 +3,6 @@
 import Link from "next/link";
 import * as React from "react";
 
-import { useMediaQuery } from "@/hooks/use-media-query";
-
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -13,8 +11,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
+} from "@/ui/breadcrumb";
+import { Button } from "@/ui/button";
 import {
   Drawer,
   DrawerClose,
@@ -24,13 +22,15 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer";
+} from "@/ui/drawer";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/ui/dropdown-menu";
+
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 const items = [
   { href: "#", label: "Home" },

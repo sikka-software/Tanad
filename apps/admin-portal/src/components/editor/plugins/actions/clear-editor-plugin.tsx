@@ -3,7 +3,7 @@ import { CLEAR_EDITOR_COMMAND } from "lexical";
 import { Trash2Icon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -13,8 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+} from "@/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 export function ClearEditorActionPlugin() {
   const t = useTranslations();

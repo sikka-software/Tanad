@@ -2,8 +2,7 @@ import { ExternalLink, SquareArrowOutUpRight } from "lucide-react";
 import { ChangeEvent } from "react";
 
 import IconButton from "@/ui/icon-button";
-
-import { Input } from "@/components/ui/inputs/input";
+import { Input } from "@/ui/inputs/input";
 
 import { cn } from "@/lib/utils";
 

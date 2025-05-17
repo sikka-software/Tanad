@@ -5,12 +5,11 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import BooleanTabs from "@/ui/boolean-tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { CurrencyInput } from "@/ui/inputs/currency-input";
+import { Input } from "@/ui/inputs/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-
-import BooleanTabs from "@/components/ui/boolean-tabs";
-import { CurrencyInput } from "@/components/ui/inputs/currency-input";
-import { Input } from "@/components/ui/inputs/input";
 
 import NotesSection from "@/forms/notes-section";
 

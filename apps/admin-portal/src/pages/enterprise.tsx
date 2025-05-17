@@ -8,10 +8,11 @@ import React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card";
 
-import { EnterpriseForm, EnterpriseFormValues } from "@/modules/enterprise/enterprise.form";
+import { EnterpriseForm, EnterpriseFormValues } from "@/enterprise/enterprise.form";
+
 import useUserStore from "@/stores/use-user-store";
 
 const EnterprisePage = () => {

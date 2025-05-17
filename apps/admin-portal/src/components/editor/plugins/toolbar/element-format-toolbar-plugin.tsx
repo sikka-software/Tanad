@@ -16,11 +16,12 @@ import { AlignJustifyIcon } from "lucide-react";
 import { AlignCenterIcon, AlignRightIcon } from "lucide-react";
 import { useState } from "react";
 
+import { Separator } from "@/ui/separator";
+import { ToggleGroup, ToggleGroupItem } from "@/ui/toggle-group";
+
 import { useToolbarContext } from "@/components/editor/context/toolbar-context";
 import { useUpdateToolbarHandler } from "@/components/editor/editor-hooks/use-update-toolbar";
 import { getSelectedNode } from "@/components/editor/utils/get-selected-node";
-import { Separator } from "@/components/ui/separator";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const ELEMENT_FORMAT_OPTIONS: {
   [key in Exclude<ElementFormatType, "start" | "end" | "">]: {

@@ -4,18 +4,11 @@ import { PencilIcon } from "lucide-react";
 import { TrashIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import IconButton from "@/components/ui/icon-button";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Badge } from "@/ui/badge";
+import { Button } from "@/ui/button";
+import IconButton from "@/ui/icon-button";
+import { Skeleton } from "@/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 
 import { BankAccount } from "./bank_account.type";
 

@@ -7,10 +7,9 @@ import * as z from "zod";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/ui/accordion";
 import { Checkbox } from "@/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { Input } from "@/ui/inputs/input";
 import { ScrollArea } from "@/ui/scroll-area";
 import { Textarea } from "@/ui/textarea";
-
-import { Input } from "@/components/ui/inputs/input";
 
 import { convertToPascalCase } from "@/lib/utils";
 

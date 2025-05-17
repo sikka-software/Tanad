@@ -1,9 +1,9 @@
 import * as React from "react";
 import { HexColorPicker } from "react-colorful";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/inputs/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/ui/button";
+import { Input } from "@/ui/inputs/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 
 type Props = {
   disabled?: boolean;

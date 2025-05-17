@@ -2,13 +2,12 @@ import { MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { Control } from "react-hook-form";
 
+import { Badge } from "@/ui/badge";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/ui/form";
-
-import { Badge } from "@/components/ui/badge";
-import IconButton from "@/components/ui/icon-button";
-import CountryInput from "@/components/ui/inputs/country-input";
-import { Input } from "@/components/ui/inputs/input";
-import NumberInput from "@/components/ui/inputs/number-input";
+import IconButton from "@/ui/icon-button";
+import CountryInput from "@/ui/inputs/country-input";
+import { Input } from "@/ui/inputs/input";
+import NumberInput from "@/ui/inputs/number-input";
 
 import FormSectionHeader from "./form-section-header";
 

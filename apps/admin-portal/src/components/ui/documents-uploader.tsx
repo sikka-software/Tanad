@@ -7,10 +7,9 @@ import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
 import { Card, CardContent } from "@/ui/card";
+import { Input } from "@/ui/inputs/input";
 import { Label } from "@/ui/label";
 import { ScrollArea } from "@/ui/scroll-area";
-
-import { Input } from "@/components/ui/inputs/input";
 
 import { uploadDocument } from "@/services/documents";
 

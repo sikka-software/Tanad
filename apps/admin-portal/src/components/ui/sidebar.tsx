@@ -12,9 +12,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/ui/t
 
 import { useIsMobile } from "@/hooks/use-mobile";
 
-import { Input } from "@/components/ui/inputs/input";
-
 import { cn } from "@/lib/utils";
+
+import { Input } from "@/uiut";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;

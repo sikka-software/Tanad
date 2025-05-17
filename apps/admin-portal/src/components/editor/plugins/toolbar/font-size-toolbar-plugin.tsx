@@ -5,10 +5,11 @@ import { $getSelection, $isRangeSelection, BaseSelection } from "lexical";
 import { Minus, Plus } from "lucide-react";
 import { useCallback, useState } from "react";
 
+import { Button } from "@/ui/button";
+import { Input } from "@/ui/inputs/input";
+
 import { useToolbarContext } from "@/components/editor/context/toolbar-context";
 import { useUpdateToolbarHandler } from "@/components/editor/editor-hooks/use-update-toolbar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/inputs/input";
 
 const DEFAULT_FONT_SIZE = 16;
 const MIN_FONT_SIZE = 1;

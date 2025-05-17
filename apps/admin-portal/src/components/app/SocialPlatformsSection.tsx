@@ -16,10 +16,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/ui/form";
+import { Input } from "@/ui/inputs/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { socialLinkOptions } from "@/ui/social-platforms";
-
-import { Input } from "@/components/ui/inputs/input";
 
 // Define the form schema
 const socialLinkSchema = z.object({

@@ -5,7 +5,7 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import * as React from "react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -13,9 +13,9 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-import { Input } from "@/components/ui/inputs/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+} from "@/ui/command";
+import { Input } from "@/ui/inputs/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 
 import { countries } from "@/lib/constants/countries";
 import { cn } from "@/lib/utils";

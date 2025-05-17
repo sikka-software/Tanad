@@ -7,11 +7,11 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import { useDepartments } from "@/department/department.hooks";
-
 import { useUpdateEmployee } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
 import { Employee, EmployeeUpdateData } from "@/employee/employee.types";
+
+import { useDepartments } from "@/department/department.hooks";
 
 import useUserStore from "@/stores/use-user-store";
 

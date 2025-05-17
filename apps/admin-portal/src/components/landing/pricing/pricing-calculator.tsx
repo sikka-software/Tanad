@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import React from "react";
 
 // Import allModules
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 
 import { useLandingPricingStore } from "@/stores/landing-pricing-store";
 import { allModules } from "@/stores/landing-pricing-store";

@@ -22,11 +22,12 @@ import { useLocale } from "next-intl";
 import { useEffect, useState, JSX } from "react";
 import * as React from "react";
 
+import { Button } from "@/ui/button";
+import { DialogFooter } from "@/ui/dialog";
+import { Input } from "@/ui/inputs/input";
+import { Label } from "@/ui/label";
+
 import { $createPollNode, PollNode, createPollOption } from "@/components/editor/nodes/poll-node";
-import { Button } from "@/components/ui/button";
-import { DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/inputs/input";
-import { Label } from "@/components/ui/label";
 
 export const INSERT_POLL_COMMAND: LexicalCommand<string> = createCommand("INSERT_POLL_COMMAND");
 

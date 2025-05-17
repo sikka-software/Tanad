@@ -18,7 +18,7 @@ import * as React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { Command, CommandList, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Command, CommandList, CommandGroup, CommandItem } from "@/ui/command";
 
 const LexicalTypeaheadMenuPlugin = dynamic(
   () => import("./default/lexical-typeahead-menu-plugin"),

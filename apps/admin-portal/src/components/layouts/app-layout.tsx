@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { Toaster } from "sonner";
 
+import { AppBreadcrumb } from "@/ui/app-breadcrumb";
 import { AppSidebar } from "@/ui/app-sidebar";
 import { Button } from "@/ui/button";
 import { CommandMenu } from "@/ui/command-menu";
@@ -19,7 +20,6 @@ import { UserDropdown } from "@/ui/user-dropdown";
 import { useMainStore } from "@/hooks/main.store";
 
 import ProtectedRoute from "@/components/app/ProtectedRoute";
-import { AppBreadcrumb } from "@/components/ui/app-breadcrumb";
 
 import useDashboardStore from "@/stores/dashboard.store";
 import useUserStore from "@/stores/use-user-store";

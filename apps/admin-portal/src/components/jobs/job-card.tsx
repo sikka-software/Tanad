@@ -3,9 +3,9 @@
 import { Calendar, MapPin, Briefcase } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/ui/badge";
+import { Button } from "@/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@/ui/card";
 
 import { Job } from "@/job/job.type";
 

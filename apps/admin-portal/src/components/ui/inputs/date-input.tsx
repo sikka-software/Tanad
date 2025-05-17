@@ -10,9 +10,8 @@ import { DateRange } from "react-day-picker";
 
 import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
+import { DateField, DateInput } from "@/ui/datefield-rac";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
-
-import { DateField, DateInput } from "@/components/ui/datefield-rac";
 
 import { cn } from "@/lib/utils";
 

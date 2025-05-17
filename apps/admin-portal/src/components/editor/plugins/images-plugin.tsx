@@ -30,6 +30,12 @@ import {
 import { useEffect, useRef, useState, JSX } from "react";
 import * as React from "react";
 
+import { Button } from "@/ui/button";
+import { DialogFooter } from "@/ui/dialog";
+import { Input } from "@/ui/inputs/input";
+import { Label } from "@/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
+
 import {
   $createImageNode,
   $isImageNode,
@@ -37,11 +43,6 @@ import {
   ImagePayload,
 } from "@/components/editor/nodes/image-node";
 import { CAN_USE_DOM } from "@/components/editor/shared/can-use-dom";
-import { Button } from "@/components/ui/button";
-import { DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/inputs/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export type InsertImagePayload = Readonly<ImagePayload>;
 

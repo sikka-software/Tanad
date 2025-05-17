@@ -13,14 +13,13 @@ import { useFormContext, useWatch } from "react-hook-form";
 import { Button } from "@/ui/button";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { FormField, FormItem, FormControl, FormMessage } from "@/ui/form";
+import { CurrencyInput, MoneyFormatter } from "@/ui/inputs/currency-input";
+import { Input } from "@/ui/inputs/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
-
-import { CurrencyInput, MoneyFormatter } from "@/components/ui/inputs/currency-input";
-import { Input } from "@/components/ui/inputs/input";
 
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
 
-import { useProducts } from "@/modules/product/product.hooks";
+import { useProducts } from "@/product/product.hooks";
 
 import FormSectionHeader from "./form-section-header";
 

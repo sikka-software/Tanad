@@ -30,9 +30,7 @@ import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
 import { OfficeForm } from "@/office/office.form";
 
-import { useCreateJob, useUpdateJob } from "@/job/job.hooks";
-import useJobStore from "@/job/job.store";
-import { JobUpdateData, JobCreateData } from "@/job/job.type";
+import { WarehouseForm } from "@/warehouse/warehouse.form";
 
 import { BranchForm } from "@/branch/branch.form";
 import useBranchStore from "@/branch/branch.store";
@@ -41,11 +39,14 @@ import DepartmentForm from "@/department/department.form";
 import { useDepartments } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";
 
-import { WarehouseForm } from "@/warehouse/warehouse.form";
+import { useCreateJob, useUpdateJob } from "@/job/job.hooks";
+import useJobStore from "@/job/job.store";
+import { JobUpdateData, JobCreateData } from "@/job/job.type";
+
+import { OnlineStoreForm } from "@/online-store/online-store.form";
+import useOnlineStoreStore from "@/online-store/online-store.store";
 
 import { jobs } from "@/db/schema";
-import { OnlineStoreForm } from "@/modules/online-store/online-store.form";
-import useOnlineStoreStore from "@/modules/online-store/online-store.store";
 import useUserStore from "@/stores/use-user-store";
 
 const createJobFormSchema = (t: (key: string) => string) => {

@@ -6,21 +6,14 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { Badge } from "@/ui/badge";
+import { Button } from "@/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
+import { Skeleton } from "@/ui/skeleton";
+
 import { usePricing } from "@/hooks/use-pricing";
 import { useSubscription } from "@/hooks/use-subscription";
-
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Skeleton } from "@/components/ui/skeleton";
 
 import { TANAD_PRODUCT_ID } from "@/lib/constants";
 import { cn } from "@/lib/utils";

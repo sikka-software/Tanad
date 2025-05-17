@@ -7,11 +7,10 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-
-import CodeInput from "@/components/ui/inputs/code-input";
-import { Input } from "@/components/ui/inputs/input";
-import PhoneInput from "@/components/ui/inputs/phone-input";
-import UnitsInput from "@/components/ui/inputs/units-input";
+import CodeInput from "@/ui/inputs/code-input";
+import { Input } from "@/ui/inputs/input";
+import PhoneInput from "@/ui/inputs/phone-input";
+import UnitsInput from "@/ui/inputs/units-input";
 
 import { AddressFormSection } from "@/forms/address-form-section";
 import NotesSection from "@/forms/notes-section";

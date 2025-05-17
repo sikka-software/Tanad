@@ -1,8 +1,9 @@
 import React from "react";
 
+import RowActionsPopover from "@/ui/popovers/row-actions-popover";
+import { TableRow, TableCell } from "@/ui/table";
+
 import SheetTableCell from "@/components/tables/sheet-table-cell";
-import RowActionsPopover from "@/components/ui/popovers/row-actions-popover";
-import { TableRow, TableCell } from "@/components/ui/table";
 
 import { cn } from "@/lib/utils";
 

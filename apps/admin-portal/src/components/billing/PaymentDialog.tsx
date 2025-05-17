@@ -7,16 +7,16 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+// Import the subscription event constant to make sure it's available
+import { Button } from "@/ui/button";
+import { Checkbox } from "@/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
+
 import { createClient } from "@/utils/supabase/component";
 
 import { useSubscription } from "@/hooks/use-subscription";
-
-// Import the subscription event constant to make sure it's available
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import useUserStore from "@/stores/use-user-store";
 

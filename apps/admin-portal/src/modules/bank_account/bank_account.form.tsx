@@ -5,16 +5,9 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-
-import DigitsInput from "@/components/ui/inputs/digits-input";
-import { Input } from "@/components/ui/inputs/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import DigitsInput from "@/ui/inputs/digits-input";
+import { Input } from "@/ui/inputs/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import { getNotesValue } from "@/lib/utils";
 

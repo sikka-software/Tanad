@@ -14,13 +14,12 @@ import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/ui/card";
+import { Input } from "@/ui/inputs/input";
 import { Label } from "@/ui/label";
 import LanguageSwitcher from "@/ui/language-switcher";
 import ThemeSwitcher from "@/ui/theme-switcher";
 
 import { createClient } from "@/utils/supabase/component";
-
-import { Input } from "@/components/ui/inputs/input";
 
 const ResetPassword = () => {
   const supabase = createClient();

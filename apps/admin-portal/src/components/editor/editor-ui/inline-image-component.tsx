@@ -24,23 +24,18 @@ import {
 import * as React from "react";
 import { Suspense, useCallback, useEffect, useRef, useState, JSX } from "react";
 
+import { Button } from "@/ui/button";
+import { Checkbox } from "@/ui/checkbox";
+import { DialogFooter } from "@/ui/dialog";
+import { Input } from "@/ui/inputs/input";
+import { Label } from "@/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+
 import { useEditorModal } from "@/components/editor/editor-hooks/use-modal";
 import { ContentEditable } from "@/components/editor/editor-ui/content-editable";
 import type { Position } from "@/components/editor/nodes/inline-image-node";
 import { $isInlineImageNode, InlineImageNode } from "@/components/editor/nodes/inline-image-node";
 import { LinkPlugin } from "@/components/editor/plugins/link-plugin";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/inputs/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const imageCache = new Set();
 

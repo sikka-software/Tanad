@@ -12,6 +12,7 @@ import TimestampCell from "@/tables/timestamp-cell";
 import { VehicleStatus } from "@/types/common.type";
 
 import { Car } from "@/car/car.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 const useCarColumns = (handleEdit?: (rowId: string, columnId: string, value: unknown) => void) => {

@@ -52,13 +52,20 @@
       "@/website/*": ["./src/modules/website/*"],
       "@/server/*": ["./src/modules/server/*"],
       "@/truck/*": ["./src/modules/truck/*"],
-      "@/car/*": ["./src/modules/car/*"]
+      "@/car/*": ["./src/modules/car/*"],
+      "@/activity/*": ["./src/modules/activity/*"],
+      "@/bank_account/*": ["./src/modules/bank_account/*"],
+      "@/enterprise/*": ["./src/modules/enterprise/*"],
+      "@/onboarding/*": ["./src/modules/onboarding/*"],
+      "@/online-store/*": ["./src/modules/online-store/*"],
+      "@/permission/*": ["./src/modules/permission/*"]
     },
     "plugins": [
       {
         "name": "next"
       }
-    ]
+    ],
+    "baseUrl": "."
   },
   "include": ["**/*.ts", "**/*.tsx", "next-env.d.ts", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

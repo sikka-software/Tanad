@@ -20,6 +20,9 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { useCompanies } from "@/company/company.hooks";
+import { Company } from "@/company/company.type";
+
 import ClientCard from "@/client/client.card";
 import useClientColumns from "@/client/client.columns";
 import { ClientForm } from "@/client/client.form";
@@ -28,9 +31,6 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/client/client.options";
 import useClientStore from "@/client/client.store";
 import ClientsTable from "@/client/client.table";
 import { ClientUpdateData, Client } from "@/client/client.type";
-
-import { useCompanies } from "@/company/company.hooks";
-import { Company } from "@/company/company.type";
 
 export default function ClientsPage() {
   const t = useTranslations();

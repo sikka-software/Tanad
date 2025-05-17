@@ -1,6 +1,7 @@
 import { ChevronDown, MoreHorizontal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/ui/accordion";
 import { Badge } from "@/ui/badge";
 import { Button } from "@/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card";
@@ -12,13 +13,6 @@ import {
 } from "@/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { ScrollArea } from "@/ui/scroll-area";
-
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@/components/ui/accordion";
 
 import { convertToPascalCase } from "@/lib/utils";
 

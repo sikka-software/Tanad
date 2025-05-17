@@ -13,6 +13,12 @@ import { Button } from "@/ui/button";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
+import CountryInput from "@/ui/inputs/country-input";
+import { CurrencyInput, MoneyFormatter } from "@/ui/inputs/currency-input";
+import { DateInput } from "@/ui/inputs/date-input";
+import DigitsInput from "@/ui/inputs/digits-input";
+import { Input } from "@/ui/inputs/input";
+import PhoneInput from "@/ui/inputs/phone-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
@@ -20,12 +26,6 @@ import { createClient } from "@/utils/supabase/component";
 
 import FormSectionHeader from "@/components/forms/form-section-header";
 import NotesSection from "@/components/forms/notes-section";
-import CountryInput from "@/components/ui/inputs/country-input";
-import { CurrencyInput, MoneyFormatter } from "@/components/ui/inputs/currency-input";
-import { DateInput } from "@/components/ui/inputs/date-input";
-import DigitsInput from "@/components/ui/inputs/digits-input";
-import { Input } from "@/components/ui/inputs/input";
-import PhoneInput from "@/components/ui/inputs/phone-input";
 
 import { addressSchema } from "@/lib/schemas/address.schema";
 import { metadataSchema } from "@/lib/schemas/metadata.schema";
@@ -33,14 +33,6 @@ import { getNotesValue } from "@/lib/utils";
 import { validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
-
-import JobForm from "@/job/job.form";
-import { useJobs } from "@/job/job.hooks";
-import useJobStore from "@/job/job.store";
-
-import DepartmentForm from "@/department/department.form";
-import { useDepartments } from "@/department/department.hooks";
-import useDepartmentStore from "@/department/department.store";
 
 import { useCreateEmployee } from "@/employee/employee.hooks";
 import { useUpdateEmployee } from "@/employee/employee.hooks";
@@ -51,6 +43,14 @@ import {
   type EmployeeCreateData,
   type EmployeeUpdateData,
 } from "@/employee/employee.types";
+
+import DepartmentForm from "@/department/department.form";
+import { useDepartments } from "@/department/department.hooks";
+import useDepartmentStore from "@/department/department.store";
+
+import JobForm from "@/job/job.form";
+import { useJobs } from "@/job/job.hooks";
+import useJobStore from "@/job/job.store";
 
 import { employees } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";

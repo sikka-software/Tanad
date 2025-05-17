@@ -3,12 +3,12 @@ import React from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { createClient } from "@/utils/supabase/component";
+import { Button } from "@/ui/button";
+import { Input } from "@/ui/inputs/input";
+import { Label } from "@/ui/label";
+import { Textarea } from "@/ui/textarea";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/inputs/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { createClient } from "@/utils/supabase/component";
 
 export type EnterpriseFormValues = {
   id?: string;

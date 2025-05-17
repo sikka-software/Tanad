@@ -11,9 +11,10 @@ import { $findMatchingParent } from "@lexical/utils";
 import { $getNodeByKey, $isRangeSelection, $isRootOrShadowRoot, BaseSelection } from "lexical";
 import { useCallback, useState } from "react";
 
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/ui/select";
+
 import { useToolbarContext } from "@/components/editor/context/toolbar-context";
 import { useUpdateToolbarHandler } from "@/components/editor/editor-hooks/use-update-toolbar";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 
 function getCodeLanguageOptions(): [string, string][] {
   const options: [string, string][] = [];

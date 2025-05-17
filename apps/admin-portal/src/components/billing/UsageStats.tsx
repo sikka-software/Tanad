@@ -1,12 +1,12 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect } from "react";
 
-import { useUsage } from "@/hooks/use-usage";
+import { Card } from "@/ui/card";
+import { Progress } from "@/ui/progress";
+import { Skeleton } from "@/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 
-import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useUsage } from "@/hooks/use-usage";
 
 interface UsageItemProps {
   title: string;

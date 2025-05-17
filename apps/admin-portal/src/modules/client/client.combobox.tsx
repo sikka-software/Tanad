@@ -1,11 +1,11 @@
 import { useLocale, useTranslations } from "next-intl";
 import { Control } from "react-hook-form";
 
-import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
-import { FormControl, FormMessage } from "@/components/ui/form";
-import { FormItem, FormLabel } from "@/components/ui/form";
-import { FormField } from "@/components/ui/form";
-import FormDialog from "@/components/ui/form-dialog";
+import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
+import { FormControl, FormMessage } from "@/ui/form";
+import { FormItem, FormLabel } from "@/ui/form";
+import { FormField } from "@/ui/form";
+import FormDialog from "@/ui/form-dialog";
 
 import { ClientForm } from "./client.form";
 import useClientStore from "./client.store";

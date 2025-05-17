@@ -2,9 +2,10 @@
 
 import { TableIcon } from "lucide-react";
 
+import { SelectItem } from "@/ui/select";
+
 import { useToolbarContext } from "@/components/editor/context/toolbar-context";
 import { InsertTableDialog } from "@/components/editor/plugins/table-plugin";
-import { SelectItem } from "@/components/ui/select";
 
 export function InsertTable() {
   const { activeEditor, showModal } = useToolbarContext();

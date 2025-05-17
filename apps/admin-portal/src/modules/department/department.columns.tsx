@@ -16,12 +16,12 @@ import TimestampCell from "@/tables/timestamp-cell";
 
 import { useOffices } from "@/office/office.hooks";
 
+import { useWarehouses } from "@/warehouse/warehouse.hooks";
+
 import { useBranches } from "@/branch/branch.hooks";
 
 import { useUpdateDepartment } from "@/department/department.hooks";
 import { Department } from "@/department/department.type";
-
-import { useWarehouses } from "@/warehouse/warehouse.hooks";
 
 const useDepartmentColumns = () => {
   const t = useTranslations();

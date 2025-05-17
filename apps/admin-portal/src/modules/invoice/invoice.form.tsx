@@ -10,13 +10,13 @@ import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
+import CodeInput from "@/ui/inputs/code-input";
+import { DateInput } from "@/ui/inputs/date-input";
+import NumberInput from "@/ui/inputs/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import NotesSection from "@/components/forms/notes-section";
 import ProductsFormSection from "@/components/forms/products-form-section";
-import CodeInput from "@/components/ui/inputs/code-input";
-import { DateInput } from "@/components/ui/inputs/date-input";
-import NumberInput from "@/components/ui/inputs/number-input";
 
 import { getNotesValue, validateYearRange } from "@/lib/utils";
 

@@ -14,9 +14,10 @@ import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState, JSX, RefObject } from "react";
 import * as React from "react";
 
+import { Command, CommandGroup, CommandItem, CommandList } from "@/ui/command";
+
 import { useEditorModal } from "@/components/editor/editor-hooks/use-modal";
 import { ComponentPickerOption } from "@/components/editor/plugins/picker/component-picker-option";
-import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from "../../ui/popover";
 

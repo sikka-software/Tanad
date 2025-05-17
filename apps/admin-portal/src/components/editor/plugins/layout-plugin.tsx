@@ -18,6 +18,9 @@ import {
 import * as React from "react";
 import { useState, useEffect, JSX } from "react";
 
+import { Button } from "@/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+
 import {
   $createLayoutContainerNode,
   $isLayoutContainerNode,
@@ -28,14 +31,6 @@ import {
   $isLayoutItemNode,
   LayoutItemNode,
 } from "@/components/editor/nodes/layout-item-node";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const LAYOUTS = [
   { label: "2 columns (equal width)", value: "1fr 1fr" },

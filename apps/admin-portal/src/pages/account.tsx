@@ -1,7 +1,5 @@
 import { User } from "@supabase/supabase-js";
 import { pick } from "lodash";
-import { EyeOff } from "lucide-react";
-import { Eye } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
@@ -9,13 +7,12 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
+import { Input } from "@/ui/inputs/input";
 import { Label } from "@/ui/label";
+import PasswordInput from "@/ui/password-input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 
 import { createClient } from "@/utils/supabase/component";
-
-import { Input } from "@/components/ui/inputs/input";
-import PasswordInput from "@/components/ui/password-input";
 
 interface ProfileFormValues {
   name: string;

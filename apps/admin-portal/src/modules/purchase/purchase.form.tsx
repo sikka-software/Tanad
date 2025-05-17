@@ -7,19 +7,13 @@ import * as z from "zod";
 
 import { CommandSelect } from "@/ui/command-select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import CodeInput from "@/ui/inputs/code-input";
+import { CurrencyInput } from "@/ui/inputs/currency-input";
+import { Input } from "@/ui/inputs/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
 import NotesSection from "@/components/forms/notes-section";
-import CodeInput from "@/components/ui/inputs/code-input";
-import { CurrencyInput } from "@/components/ui/inputs/currency-input";
-import { Input } from "@/components/ui/inputs/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 import { getNotesValue } from "@/lib/utils";
 

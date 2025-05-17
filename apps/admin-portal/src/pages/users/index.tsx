@@ -18,6 +18,7 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import useUserStore from "@/stores/use-user-store";
 import UserCard from "@/user/user.card";
 import { UserForm } from "@/user/user.form";
 import { useUsers, useBulkDeleteUsers, useDuplicateUser } from "@/user/user.hooks";
@@ -25,8 +26,6 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/user/user.options";
 import useEnterpriseUsersStore from "@/user/user.store";
 import UsersTable from "@/user/user.table";
 import { UserType } from "@/user/user.type";
-
-import useUserStore from "@/stores/use-user-store";
 
 export default function UsersPage() {
   const t = useTranslations();

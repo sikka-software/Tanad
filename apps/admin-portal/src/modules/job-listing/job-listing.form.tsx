@@ -8,17 +8,13 @@ import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
+import { Input } from "@/ui/inputs/input";
 import { Textarea } from "@/ui/textarea";
 
-import JobListingJobsSelection from "@/components/forms/job-listing-jobs-selection";
-import JobListingOptionsSection from "@/components/forms/job-listing-options-section";
-import { Input } from "@/components/ui/inputs/input";
+import JobListingJobsSelection from "@/forms/job-listing-jobs-selection";
+import JobListingOptionsSection from "@/forms/job-listing-options-section";
 
 import { ModuleFormProps } from "@/types/common.type";
-
-import JobForm from "@/job/job.form";
-import { useJobs } from "@/job/job.hooks";
-import useJobStore from "@/job/job.store";
 
 import { useCreateJobListing, useUpdateJobListing } from "@/job-listing/job-listing.hooks";
 import {
@@ -29,6 +25,10 @@ import {
 import useJobListingsStore from "@/job-listing/job-listing.store";
 import useJobListingStore from "@/job-listing/job-listing.store";
 import { JobListingUpdateData, JobListingCreateData } from "@/job-listing/job-listing.type";
+
+import JobForm from "@/job/job.form";
+import { useJobs } from "@/job/job.hooks";
+import useJobStore from "@/job/job.store";
 
 import { job_listings, offices } from "@/db/schema";
 import { useBranches } from "@/modules/branch/branch.hooks";

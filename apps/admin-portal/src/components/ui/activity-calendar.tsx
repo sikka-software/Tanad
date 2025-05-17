@@ -2,7 +2,7 @@
 
 // Remove useState import if no longer needed internally
 // import { useState } from "react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/ui/tooltip";
 
 // Define the expected data structure for the prop
 interface ActivityCalendarProps {

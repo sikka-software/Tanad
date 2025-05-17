@@ -8,12 +8,12 @@ import * as z from "zod";
 
 import { DocumentFile } from "@/ui/documents-uploader";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import DigitsInput from "@/ui/inputs/digits-input";
+import { Input } from "@/ui/inputs/input";
+import PhoneInput from "@/ui/inputs/phone-input";
 import PrefixedInput from "@/ui/prefixed-input";
 
 import NotesSection from "@/components/forms/notes-section";
-import DigitsInput from "@/components/ui/inputs/digits-input";
-import { Input } from "@/components/ui/inputs/input";
-import PhoneInput from "@/components/ui/inputs/phone-input";
 
 import { AddressFormSection } from "@/forms/address-form-section";
 

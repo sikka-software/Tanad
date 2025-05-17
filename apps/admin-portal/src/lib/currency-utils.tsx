@@ -1,7 +1,7 @@
 import { currencies } from "@tanad.config";
 import { DollarSign, Euro, PoundSterling, JapaneseYen } from "lucide-react";
 
-import { SARSymbol } from "@/components/ui/sar-symbol";
+import { SARSymbol } from "@/ui/sar-symbol";
 
 import useUserStore from "@/stores/use-user-store";
 

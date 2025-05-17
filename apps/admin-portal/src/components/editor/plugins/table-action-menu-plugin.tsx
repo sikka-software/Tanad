@@ -45,16 +45,11 @@ import * as React from "react";
 import { ReactPortal, useCallback, useEffect, useRef, useState, JSX } from "react";
 import { createPortal } from "react-dom";
 
+import { Command, CommandGroup, CommandItem, CommandList, CommandSeparator } from "@/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
+
 import { useEditorModal } from "@/components/editor/editor-hooks/use-modal";
 import ColorPicker from "@/components/editor/editor-ui/colorpicker";
-import {
-  Command,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 function computeSelectionCount(selection: TableSelection): {
   columns: number;

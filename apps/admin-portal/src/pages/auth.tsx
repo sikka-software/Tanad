@@ -11,6 +11,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import { Input } from "@/ui/inputs/input";
 import { Label } from "@/ui/label";
 import LanguageSwitcher from "@/ui/language-switcher";
 import ThemeSwitcher from "@/ui/theme-switcher";
@@ -18,7 +19,6 @@ import ThemeSwitcher from "@/ui/theme-switcher";
 import { createClient } from "@/utils/supabase/component";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import { Input } from "@/components/ui/inputs/input";
 
 import useUserStore from "@/stores/use-user-store";
 

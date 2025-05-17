@@ -1,8 +1,7 @@
 import { Eye } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
-import { CodeTabs } from "@/components/animate-ui/components/code-tabs";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -11,8 +10,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from "@/ui/dialog";
+import { ScrollArea } from "@/ui/scroll-area";
+
+import { CodeTabs } from "@/components/animate-ui/components/code-tabs";
 
 import { useActivityLogStore } from "./activity.store";
 

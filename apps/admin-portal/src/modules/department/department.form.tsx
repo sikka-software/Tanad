@@ -8,28 +8,32 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { Input } from "@/ui/inputs/input";
 import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
 
-import NotesSection from "@/components/forms/notes-section";
-import { Input } from "@/components/ui/inputs/input";
+import NotesSection from "@/forms/notes-section";
 
 import { convertToPascalCase } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
-import { departments } from "@/db/schema";
-import { useBranches } from "@/modules/branch/branch.hooks";
-import { useCreateDepartment, useUpdateDepartment } from "@/modules/department/department.hooks";
-import useDepartmentStore from "@/modules/department/department.store";
+import { useOffices } from "@/office/office.hooks";
+
+import { useWarehouses } from "@/warehouse/warehouse.hooks";
+
+import { useBranches } from "@/branch/branch.hooks";
+
+import { useCreateDepartment, useUpdateDepartment } from "@/department/department.hooks";
+import useDepartmentStore from "@/department/department.store";
 import {
   Department,
   DepartmentCreateData,
   DepartmentUpdateData,
   DepartmentLocation,
-} from "@/modules/department/department.type";
-import { useOffices } from "@/modules/office/office.hooks";
-import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
+} from "@/department/department.type";
+
+import { departments } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
 type LocationValue = {

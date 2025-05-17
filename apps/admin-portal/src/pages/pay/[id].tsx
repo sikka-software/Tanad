@@ -4,9 +4,9 @@ import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 
-import { createClient } from "@/utils/supabase/server-props";
+import { MoneyFormatter } from "@/ui/inputs/currency-input";
 
-import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
+import { createClient } from "@/utils/supabase/server-props";
 
 import { Invoice, InvoiceItem } from "@/invoice/invoice.type";
 

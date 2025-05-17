@@ -5,11 +5,11 @@ import ModuleCard from "@/components/cards/module-card";
 import { CommonStatus } from "@/types/common.type";
 import { CommonStatusProps } from "@/types/common.type";
 
+import { Company } from "@/company/company.type";
+
 import { useUpdateClient } from "@/client/client.hooks";
 import useClientStore from "@/client/client.store";
 import { Client } from "@/client/client.type";
-
-import { Company } from "@/company/company.type";
 
 const ClientCard = ({
   client,

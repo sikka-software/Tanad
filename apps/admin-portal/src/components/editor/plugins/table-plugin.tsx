@@ -13,11 +13,12 @@ import {
 import { createContext, useContext, useEffect, useMemo, useState, JSX } from "react";
 import * as React from "react";
 
+import { Button } from "@/ui/button";
+import { DialogFooter } from "@/ui/dialog";
+import { Input } from "@/ui/inputs/input";
+import { Label } from "@/ui/label";
+
 import { invariant } from "@/components/editor/shared/invariant";
-import { Button } from "@/components/ui/button";
-import { DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/inputs/input";
-import { Label } from "@/components/ui/label";
 
 export type InsertTableCommandPayload = Readonly<{
   columns: string;

@@ -4,18 +4,17 @@ import { useState, useMemo } from "react";
 import { FieldError, UseFormReturn } from "react-hook-form";
 
 import { FormField, FormItem } from "@/ui/form";
-
-import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
-import { Input } from "@/components/ui/inputs/input";
+import { MoneyFormatter } from "@/ui/inputs/currency-input";
+import { Input } from "@/ui/inputs/input";
 
 import FormSectionHeader from "@/forms/form-section-header";
 
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 
-import { Job } from "@/job/job.type";
-
 import { JobListingFormValues } from "@/job-listing/job-listing.form";
+
+import { Job } from "@/job/job.type";
 
 import { EmptyState } from "../ui/empty-state";
 

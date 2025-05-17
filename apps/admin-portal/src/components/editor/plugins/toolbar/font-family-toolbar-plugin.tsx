@@ -5,9 +5,10 @@ import { $getSelection, $isRangeSelection, BaseSelection } from "lexical";
 import { TypeIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/ui/select";
+
 import { useToolbarContext } from "@/components/editor/context/toolbar-context";
 import { useUpdateToolbarHandler } from "@/components/editor/editor-hooks/use-update-toolbar";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 
 const FONT_FAMILY_OPTIONS = [
   "Arial",

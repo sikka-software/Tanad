@@ -22,6 +22,12 @@ import {
 import * as React from "react";
 import { useEffect, useRef, useState, JSX } from "react";
 
+import { Button } from "@/ui/button";
+import { Checkbox } from "@/ui/checkbox";
+import { Input } from "@/ui/inputs/input";
+import { Label } from "@/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+
 import type { Position } from "@/components/editor/nodes/inline-image-node";
 import {
   $createInlineImageNode,
@@ -30,17 +36,6 @@ import {
   InlineImagePayload,
 } from "@/components/editor/nodes/inline-image-node";
 import { CAN_USE_DOM } from "@/components/editor/shared/can-use-dom";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/inputs/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export type InsertInlineImagePayload = Readonly<InlineImagePayload>;
 

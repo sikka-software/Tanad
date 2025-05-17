@@ -1,4 +1,5 @@
 import { Button } from "@/ui/button";
+import { Input } from "@/ui/inputs/input";
 import { Label } from "@/ui/label";
 
 import {
@@ -8,7 +9,6 @@ import {
   TabsContents,
   TabsContent,
 } from "@/components/animate-ui/components/tabs";
-import { Input } from "@/components/ui/inputs/input";
 
 export const DepartmentsFeatures = () => {
   return (

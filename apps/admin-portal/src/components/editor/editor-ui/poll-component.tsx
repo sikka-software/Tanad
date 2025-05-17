@@ -16,10 +16,11 @@ import {
 import * as React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, JSX } from "react";
 
+import { Button } from "@/ui/button";
+import { Input } from "@/ui/inputs/input";
+
 import type { Option, Options, PollNode } from "@/components/editor/nodes/poll-node";
 import { $isPollNode, createPollOption } from "@/components/editor/nodes/poll-node";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/inputs/input";
 
 function getTotalVotes(options: Options): number {
   return options.reduce((totalVotes, next) => {

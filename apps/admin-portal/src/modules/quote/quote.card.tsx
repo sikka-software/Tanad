@@ -1,8 +1,9 @@
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 
+import { MoneyFormatter } from "@/ui/inputs/currency-input";
+
 import ModuleCard from "@/components/cards/module-card";
-import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
 

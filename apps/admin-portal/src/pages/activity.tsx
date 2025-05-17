@@ -4,15 +4,16 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 
+import { CardDescription, CardHeader, CardTitle } from "@/ui/card";
+
 import { createClient } from "@/utils/supabase/component";
 
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { ActivityLogDialog } from "@/modules/activity/activity.dialog";
-import { ActivityLogFilters } from "@/modules/activity/activity.filters";
-import { useActivityLogs, activityLogKeys } from "@/modules/activity/activity.hook";
-import { ActivityLogTable } from "@/modules/activity/activity.table";
+import { ActivityLogDialog } from "@/activity/activity.dialog";
+import { ActivityLogFilters } from "@/activity/activity.filters";
+import { useActivityLogs, activityLogKeys } from "@/activity/activity.hook";
+import { ActivityLogTable } from "@/activity/activity.table";
 
 import CustomPageMeta from "../components/landing/CustomPageMeta";
 

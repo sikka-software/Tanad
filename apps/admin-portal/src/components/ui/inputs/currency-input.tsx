@@ -1,14 +1,9 @@
-import { DollarSign, Euro, PoundSterling, JapaneseYen } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 
-import { Input } from "@/components/ui/inputs/input";
+import { Input } from "@/ui/inputs/input";
 
 import { currencyInputClassName, useAppCurrencySymbol } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
-
-import useUserStore from "@/stores/use-user-store";
-
-import { SARSymbol } from "../sar-symbol";
 
 export const MoneyFormatter = (value: number, showDecimals = true) => {
   return new Intl.NumberFormat("en-US", {

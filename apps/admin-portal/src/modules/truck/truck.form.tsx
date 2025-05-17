@@ -6,24 +6,24 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import CountryInput from "@/ui/inputs/country-input";
+import { CurrencyInput } from "@/ui/inputs/currency-input";
+import DigitsInput from "@/ui/inputs/digits-input";
+import { Input } from "@/ui/inputs/input";
+import NumberInput from "@/ui/inputs/number-input";
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/ui/select";
-
-import CountryInput from "@/components/ui/inputs/country-input";
-import { CurrencyInput } from "@/components/ui/inputs/currency-input";
-import DigitsInput from "@/components/ui/inputs/digits-input";
-import { Input } from "@/components/ui/inputs/input";
-import NumberInput from "@/components/ui/inputs/number-input";
 
 import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps, PaymentCycle, VehicleStatus } from "@/types/common.type";
 import { VehicleOwnershipStatus } from "@/types/vehicle.types";
 
-import { trucks } from "@/db/schema";
-import useUserStore from "@/stores/use-user-store";
 import { useCreateTruck, useUpdateTruck } from "@/truck/truck.hooks";
 import useTruckStore from "@/truck/truck.store";
 import { TruckUpdateData, TruckCreateData } from "@/truck/truck.type";
+
+import { trucks } from "@/db/schema";
+import useUserStore from "@/stores/use-user-store";
 
 export const createTruckSchema = (t: (key: string) => string) => {
   const TruckSelectSchema = createInsertSchema(trucks, {

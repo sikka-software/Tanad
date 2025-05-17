@@ -8,9 +8,8 @@ import { z } from "zod";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
+import { Input } from "@/ui/inputs/input";
 import PasswordInput from "@/ui/password-input";
-
-import { Input } from "@/components/ui/inputs/input";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -19,12 +18,10 @@ import { useCustomRoles, useSystemRoles } from "@/role/role.hooks";
 import { predefinedRoles } from "@/role/role.options";
 import useRoleStore from "@/role/role.store";
 import type { Role } from "@/role/role.type";
-
+import useUserStore from "@/stores/use-user-store";
 import { useCreateUser, useUpdateUser } from "@/user/user.hooks";
 import useEnterpriseUsersStore from "@/user/user.store";
 import type { UserCreateData, UserUpdateData, UserType } from "@/user/user.type";
-
-import useUserStore from "@/stores/use-user-store";
 
 const createUserFormSchema = (t: (key: string) => string) => {
   const UserFormSchema = z.object({

@@ -1,11 +1,11 @@
 import { useLocale } from "next-intl";
 import React from "react";
 
-import { CommandSelect } from "@/components/ui/command-select";
-import CodeInput from "@/components/ui/inputs/code-input";
-import { Input } from "@/components/ui/inputs/input";
-import type { ExtendedColumnDef } from "@/components/ui/sheet-table";
-import { TableCell } from "@/components/ui/table";
+import { CommandSelect } from "@/ui/command-select";
+import CodeInput from "@/ui/inputs/code-input";
+import { Input } from "@/ui/inputs/input";
+import type { ExtendedColumnDef } from "@/ui/sheet-table";
+import { TableCell } from "@/ui/table";
 
 import { cn } from "@/lib/utils";
 

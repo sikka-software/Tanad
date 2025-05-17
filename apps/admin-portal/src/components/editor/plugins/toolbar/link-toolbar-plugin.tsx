@@ -6,12 +6,13 @@ import { KEY_MODIFIER_COMMAND } from "lexical";
 import { LinkIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
+import { Toggle } from "@/ui/toggle";
+
 import { useFloatingLinkContext } from "@/components/editor/context/floating-link-context";
 import { useToolbarContext } from "@/components/editor/context/toolbar-context";
 import { useUpdateToolbarHandler } from "@/components/editor/editor-hooks/use-update-toolbar";
 import { getSelectedNode } from "@/components/editor/utils/get-selected-node";
 import { sanitizeUrl } from "@/components/editor/utils/url";
-import { Toggle } from "@/components/ui/toggle";
 
 export function LinkToolbarPlugin() {
   const { activeEditor } = useToolbarContext();

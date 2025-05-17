@@ -4,15 +4,8 @@ import { TrendingUp } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Line, LineChart, CartesianGrid, XAxis, Tooltip } from "recharts";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { ChartConfig, ChartContainer } from "@/components/ui/chart";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/ui/card";
+import { ChartConfig, ChartContainer } from "@/ui/chart";
 
 interface LineProps {
   dataKey: string;

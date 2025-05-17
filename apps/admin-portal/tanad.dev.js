@@ -1,0 +1,38 @@
+const TanadModulesDirectories = [
+  "enterprise",
+
+  "users",
+  "roles",
+  "activity",
+  "sales",
+  "job-listing",
+  "company",
+  "applicant",
+  "purchase",
+  "client",
+  "vendor",
+  "invoice",
+  "quote",
+  "product",
+  "office",
+  "warehouse",
+  "branch",
+  "employee",
+  "department",
+  "employee-request",
+  "job",
+  "expense",
+
+  "salary",
+  "settings",
+  "websites",
+  "servers",
+  "domains",
+  "online-store",
+  "car",
+  "truck",
+  "recruitment",
+  "bank-account",
+];
+
+module.exports = TanadModulesDirectories;

@@ -9,8 +9,8 @@ import dynamic from "next/dynamic";
 import * as React from "react";
 import { ReactElement, useEffect, useLayoutEffect, useRef, useState, JSX } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogFooter } from "@/ui/dialog";
 
 const Excalidraw = dynamic(() => import("./excalidraw"), { ssr: false });
 

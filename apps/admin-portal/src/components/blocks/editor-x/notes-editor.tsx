@@ -4,10 +4,11 @@ import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalCompos
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { EditorState, SerializedEditorState } from "lexical";
 
+import { TooltipProvider } from "@/ui/tooltip";
+
 import { FloatingLinkContext } from "@/components/editor/context/floating-link-context";
 import { SharedAutocompleteContext } from "@/components/editor/context/shared-autocomplete-context";
 import { editorTheme } from "@/components/editor/themes/editor-theme";
-import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { nodes } from "./nodes";
 import { Plugins } from "./plugins";

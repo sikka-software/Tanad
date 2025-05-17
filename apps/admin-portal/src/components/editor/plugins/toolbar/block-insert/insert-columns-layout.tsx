@@ -1,8 +1,9 @@
 import { Columns3Icon } from "lucide-react";
 
+import { SelectItem } from "@/ui/select";
+
 import { useToolbarContext } from "@/components/editor/context/toolbar-context";
 import { InsertLayoutDialog } from "@/components/editor/plugins/layout-plugin";
-import { SelectItem } from "@/components/ui/select";
 
 export function InsertColumnsLayout() {
   const { activeEditor, showModal } = useToolbarContext();

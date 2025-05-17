@@ -11,10 +11,9 @@ import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import FormDialog from "@/ui/form-dialog";
+import CodeInput from "@/ui/inputs/code-input";
+import { Input } from "@/ui/inputs/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-
-import CodeInput from "@/components/ui/inputs/code-input";
-import { Input } from "@/components/ui/inputs/input";
 
 import NotesSection from "@/forms/notes-section";
 import ProductsFormSection from "@/forms/products-form-section";
@@ -27,8 +26,6 @@ import { ClientForm } from "@/client/client.form";
 import { useClients } from "@/client/client.hooks";
 import useClientStore from "@/client/client.store";
 
-import { Product } from "@/product/product.type";
-
 import { useCreateQuote, useUpdateQuote } from "@/quote/quote.hooks";
 import { useQuotes } from "@/quote/quote.hooks";
 import useQuoteStore from "@/quote/quote.store";
@@ -39,6 +36,8 @@ import {
   QuoteItemClientData,
   QuoteStatus,
 } from "@/quote/quote.type";
+
+import { Product } from "@/product/product.type";
 
 import { quotes } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";

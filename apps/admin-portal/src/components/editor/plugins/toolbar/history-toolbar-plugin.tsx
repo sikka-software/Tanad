@@ -11,8 +11,9 @@ import {
 import { RedoIcon, UndoIcon } from "lucide-react";
 import { useEffect, useImperativeHandle, useState } from "react";
 
+import { Button } from "@/ui/button";
+
 import { useToolbarContext } from "@/components/editor/context/toolbar-context";
-import { Button } from "@/components/ui/button";
 
 const IS_APPLE = true;
 

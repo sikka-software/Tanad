@@ -4,12 +4,12 @@ import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { Badge } from "@/ui/badge";
+import { Button } from "@/ui/button";
+import { Skeleton } from "@/ui/skeleton";
+
 import { usePricing } from "@/hooks/use-pricing";
 import { useSubscription } from "@/hooks/use-subscription";
-
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 
 import { TANAD_PRODUCT_ID } from "@/lib/constants";
 

@@ -5,12 +5,13 @@ import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
+import { Badge } from "@/ui/badge";
+import IconButton from "@/ui/icon-button";
+import { Skeleton } from "@/ui/skeleton";
+import { Table, TableBody, TableCell, TableRow } from "@/ui/table";
+
 import TablePagination from "@/components/table-pagination";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import IconButton from "@/components/ui/icon-button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 import { useActivityLogs } from "./activity.hook";
 import { useActivityLogStore } from "./activity.store";

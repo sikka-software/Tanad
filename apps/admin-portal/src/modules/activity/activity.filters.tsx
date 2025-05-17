@@ -17,28 +17,22 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect, Fragment, useMemo } from "react";
 import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { DatePicker } from "@/components/ui/date-picker";
+import { Badge } from "@/ui/badge";
+import { Button } from "@/ui/button";
+import { Calendar } from "@/ui/calendar";
+import { DatePicker } from "@/ui/date-picker";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import IconButton from "@/components/ui/icon-button";
-import { Input } from "@/components/ui/inputs/input";
-import { Label } from "@/components/ui/label";
-import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+} from "@/ui/dropdown-menu";
+import IconButton from "@/ui/icon-button";
+import { Input } from "@/ui/inputs/input";
+import { Label } from "@/ui/label";
+import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import { downloadCSV } from "@/lib/csv-utils";
 import { cn } from "@/lib/utils";

@@ -3,12 +3,13 @@ import * as React from "react";
 import { useCallback, useState, JSX } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
+import { Button } from "@/ui/button";
+import { Checkbox } from "@/ui/checkbox";
+import { Input } from "@/ui/inputs/input";
+import { Label } from "@/ui/label";
+import { Textarea } from "@/ui/textarea";
+
 import KatexRenderer from "@/components/editor/editor-ui/katex-renderer";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/inputs/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 
 type Props = {
   initialEquation?: string;

@@ -4,8 +4,9 @@ import { Calendar, CalendarClock, CalendarPlus, Tag } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useDateFormatter } from "react-aria";
 
+import { MoneyFormatter } from "@/ui/inputs/currency-input";
+
 import ModuleCard from "@/components/cards/module-card";
-import { MoneyFormatter } from "@/components/ui/inputs/currency-input";
 
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
 

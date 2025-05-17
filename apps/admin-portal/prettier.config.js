@@ -1,4 +1,5 @@
 /** @type {import("prettier").Config} */
+const TanadModulesDirectories = require("./tanad.dev.js");
 
 module.exports = {
   trailingComma: "all",
@@ -22,30 +23,7 @@ module.exports = {
     "^@/data/(.*)$",
     "^@/api/(.*)$",
     "^@/tags/(.*)$",
-    "^@/office/(.*)$",
-    "^@/job/(.*)$",
-    "^@/applicant/(.*)$",
-    "^@/branch/(.*)$",
-    "^@/client/(.*)$",
-    "^@/company/(.*)$",
-    "^@/dashboard/(.*)$",
-    "^@/department/(.*)$",
-    "^@/employee/(.*)$",
-    "^@/employee-request/(.*)$",
-    "^@/expense/(.*)$",
-    "^@/invoice/(.*)$",
-    "^@/job-listing/(.*)$",
-    "^@/product/(.*)$",
-    "^@/purchase/(.*)$",
-    "^@/quote/(.*)$",
-    "^@/role/(.*)$",
-    "^@/salary/(.*)$",
-    "^@/sale/(.*)$",
-    "^@/setting/(.*)$",
-    "^@/user/(.*)$",
-    "^@/vendor/(.*)$",
-    "^@/warehouse/(.*)$",
-
+    ...TanadModulesDirectories.map((module) => `^@/${module}/(.*)$`),
     "^@/(.*)$",
     "^[./]",
   ],

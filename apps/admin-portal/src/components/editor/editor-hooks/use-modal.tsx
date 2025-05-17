@@ -2,7 +2,7 @@ import { useLocale } from "next-intl";
 import { useCallback, useMemo, useState, JSX } from "react";
 import * as React from "react";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/ui/dialog";
 
 export function useEditorModal(): [
   JSX.Element | null,

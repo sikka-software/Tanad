@@ -10,9 +10,9 @@ import TimestampCell from "@/tables/timestamp-cell";
 
 import { useFormatDate } from "@/lib/date-utils";
 
-import { useJobs } from "@/job/job.hooks";
-
 import { Employee, EmployeeStatus } from "@/employee/employee.types";
+
+import { useJobs } from "@/job/job.hooks";
 
 const useCompanyColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,

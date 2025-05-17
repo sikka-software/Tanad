@@ -3,9 +3,10 @@ import { $isRangeSelection, BaseSelection, FORMAT_TEXT_COMMAND, TextFormatType }
 import { BoldIcon, CodeIcon, ItalicIcon, StrikethroughIcon, UnderlineIcon } from "lucide-react";
 import { useState } from "react";
 
+import { Toggle } from "@/ui/toggle";
+
 import { useToolbarContext } from "@/components/editor/context/toolbar-context";
 import { useUpdateToolbarHandler } from "@/components/editor/editor-hooks/use-update-toolbar";
-import { Toggle } from "@/components/ui/toggle";
 
 const Icons: Partial<Record<TextFormatType, React.ElementType>> = {
   bold: BoldIcon,

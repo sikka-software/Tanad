@@ -20,15 +20,16 @@ import type { LexicalEditor } from "lexical";
 import { FigmaIcon, TwitterIcon, YoutubeIcon } from "lucide-react";
 import { useMemo, useState, JSX } from "react";
 
+import { Button } from "@/ui/button";
+import { Command, CommandGroup, CommandItem, CommandList } from "@/ui/command";
+import { DialogFooter } from "@/ui/dialog";
+import { Input } from "@/ui/inputs/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
+
 import { useEditorModal } from "@/components/editor/editor-hooks/use-modal";
 import { INSERT_FIGMA_COMMAND } from "@/components/editor/plugins/embeds/figma-plugin";
 import { INSERT_TWEET_COMMAND } from "@/components/editor/plugins/embeds/twitter-plugin";
 import { INSERT_YOUTUBE_COMMAND } from "@/components/editor/plugins/embeds/youtube-plugin";
-import { Button } from "@/components/ui/button";
-import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
-import { DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/inputs/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export interface CustomEmbedConfig extends EmbedConfig {
   // Human readable name of the embeded content e.g. Tweet or Google Map.

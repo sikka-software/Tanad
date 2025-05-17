@@ -8,9 +8,9 @@ import CodeCell from "@/tables/code-cell";
 import StatusCell from "@/tables/status-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
-import { useEmployees } from "@/employee/employee.hooks";
-
 import { Warehouse } from "@/warehouse/warehouse.type";
+
+import { useEmployees } from "@/employee/employee.hooks";
 
 const useWarehouseColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
