@@ -6,7 +6,7 @@ import {
   OnChangeFn,
 } from "@tanstack/react-table";
 import { pick } from "lodash";
-import { FileUser, Plus, User } from "lucide-react";
+import { FileUser, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -123,12 +123,11 @@ export default function EmployeesPage() {
     }
   }, [employeesFromHook, setData]);
 
-  // This structure is passed to TanStack Table.
-  // Its `value` is a complex object. Column filterFns must handle this.
   const columnFiltersConfigForTable = useMemo((): ColumnFilter[] => {
     return filterConditions.map((condition) => ({
       id: condition.field,
-      value: { // Pass the complex object as the filter value
+      value: {
+        // Pass the complex object as the filter value
         filterValue: condition.value,
         operator: condition.operator,
         type: condition.type,
@@ -148,7 +147,7 @@ export default function EmployeesPage() {
       const newStoreFilters: FilterCondition[] = newTanStackFilters.map((tf: ColumnFilter) => ({
         id: Date.now() + Math.random(),
         field: tf.id,
-        value: String(tf.value ?? ""), 
+        value: String(tf.value ?? ""),
         operator: "contains",
         type: "text",
         conjunction: "and",
@@ -237,10 +236,7 @@ export default function EmployeesPage() {
 
   return (
     <div>
-      <CustomPageMeta
-        title={t("Pages.Employees.title")}
-        // description={t("Pages.Employees.description")}
-      />
+      <CustomPageMeta title={t("Pages.Employees.title")} />
       <DataPageLayout count={employeesFromHook?.length} itemsText={t("Pages.Employees.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -262,7 +258,6 @@ export default function EmployeesPage() {
             hideOptions={employeesFromHook?.length === 0}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={handleColumnVisibilityChange}
-            isApplyingFilter={isApplyingClientFilter}
           />
         )}
         <div>

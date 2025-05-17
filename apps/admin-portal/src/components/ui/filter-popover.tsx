@@ -69,7 +69,6 @@ interface FilterPopoverProps {
   onConditionsChange?: (conditions: FilterCondition[]) => void;
   caseSensitive?: boolean;
   onCaseSensitiveChange?: (value: boolean) => void;
-  isApplying?: boolean;
 }
 
 export default function FilterPopover({
@@ -78,7 +77,6 @@ export default function FilterPopover({
   onConditionsChange,
   caseSensitive = false,
   onCaseSensitiveChange,
-  isApplying = false,
 }: FilterPopoverProps) {
   const t = useTranslations();
   const locale = useLocale();
@@ -496,8 +494,7 @@ export default function FilterPopover({
                   </svg>
                   {t("General.reset_all")}
                 </Button>
-                <Button onClick={applyFilters} className="flex-1" disabled={isApplying}>
-                  {isApplying ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : null}
+                <Button onClick={applyFilters} className="flex-1">
                   {t("General.apply_filters")}
                 </Button>
               </div>

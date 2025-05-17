@@ -1,5 +1,3 @@
-import { parseDate, CalendarDate } from "@internationalized/date";
-import { Row, FilterFn } from "@tanstack/react-table";
 import { useLocale, useTranslations } from "next-intl";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
@@ -10,69 +8,11 @@ import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
 import { useFormatDate } from "@/lib/date-utils";
+import { dateTableFilterFn } from "@/lib/table-filter-fns";
 
 import { Employee, EmployeeStatus } from "@/employee/employee.types";
 
 import { useJobs } from "@/job/job.hooks";
-
-// Custom filter function for date columns
-const dateTableFilterFn: FilterFn<Employee> = (
-  row: Row<Employee>,
-  columnId: string,
-  filterValueWithOperator: { filterValue: string; operator: string; type: string },
-) => {
-  const { filterValue, operator, type } = filterValueWithOperator;
-  const rowValue = row.getValue(columnId) as string | Date | null;
-
-  if (operator === "is_empty") return !rowValue;
-  if (operator === "is_not_empty") return !!rowValue;
-
-  if (type !== "date" || !filterValue) {
-    return false;
-  }
-
-  if (!rowValue) {
-    return false;
-  }
-
-  let rowDate: CalendarDate;
-  try {
-    const jsDate = new Date(rowValue);
-    if (isNaN(jsDate.getTime())) {
-      return false;
-    }
-    rowDate = parseDate(
-      `${jsDate.getFullYear()}-${String(jsDate.getMonth() + 1).padStart(2, "0")}-${String(jsDate.getDate()).padStart(2, "0")}`,
-    );
-  } catch (e) {
-    return false;
-  }
-
-  let filterCalendarDate: CalendarDate;
-  try {
-    filterCalendarDate = parseDate(filterValue);
-  } catch (e) {
-    return false;
-  }
-
-  switch (operator) {
-    case "equals":
-      const isEqual = rowDate.compare(filterCalendarDate) === 0;
-      return isEqual;
-    case "before":
-      const isBefore = rowDate.compare(filterCalendarDate) < 0;
-      return isBefore;
-    case "after":
-      const isAfter = rowDate.compare(filterCalendarDate) > 0;
-      return isAfter;
-    case "is_empty":
-      return !rowValue;
-    case "is_not_empty":
-      return !!rowValue;
-    default:
-      return false;
-  }
-};
 
 const useEmployeeColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,

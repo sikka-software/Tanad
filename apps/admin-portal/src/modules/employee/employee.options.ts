@@ -2,6 +2,7 @@ import { FilterableField, SortableColumn } from "@/types/common.type";
 
 export const FILTERABLE_FIELDS: FilterableField[] = [
   { id: "created_at", translationKey: "Metadata.created_at.label", type: "date" },
+  { id: "updated_at", translationKey: "Metadata.updated_at.label", type: "date" },
 ];
 
 export const SORTABLE_COLUMNS: SortableColumn[] = [
