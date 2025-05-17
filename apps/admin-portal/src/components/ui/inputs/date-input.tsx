@@ -1,6 +1,6 @@
 "use client";
 
-import { parseDate, getLocalTimeZone, CalendarDate } from "@internationalized/date";
+import { CalendarDate, getLocalTimeZone, parseDate } from "@internationalized/date";
 import { CalendarIcon } from "lucide-react";
 import { useLocale } from "next-intl";
 import * as React from "react";
@@ -23,8 +23,8 @@ interface DatePickerProps {
   disabled?: boolean;
   isolated?: boolean;
   mode?: "default" | "multiple" | "range" | "single";
-  onChange?: (date: CalendarDate | null) => void;
-  value?: CalendarDate | null;
+  onChange?: (date: any) => void;
+  value?: any | null;
 }
 
 export function DateInputField({
