@@ -176,7 +176,7 @@ export function EmployeeForm({
               ...s,
               amount: String(s.amount),
             }))
-          : [{ type: "base", amount: "0" }]
+          : [{ type: "base", amount: "" }]
         : (defaultValues?.salary as { type: string; amount: number | string }[] | undefined)?.map(
             (s) => ({ ...s, amount: String(s.amount) }),
           ) || undefined,

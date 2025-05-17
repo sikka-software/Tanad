@@ -19,6 +19,7 @@ import { useFormField } from "./form";
 function DateField<T extends DateValueRac>({ className, children, ...props }: DateFieldProps<T>) {
   return (
     <DateFieldRac
+      aria-label="date field"
       className={composeRenderProps(className, (className) => cn(className))}
       {...props}
     >

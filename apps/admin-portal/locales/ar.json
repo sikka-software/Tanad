@@ -3805,6 +3805,7 @@
       },
       "status": {
         "label": "الحالة",
+        "placeholder": "اختر الحالة",
         "active": "نشط",
         "onboarding": "قيد التوظيف",
         "probation": "قيد التجربة",
@@ -3815,6 +3816,7 @@
       },
       "gender": {
         "label": "الجنس",
+        "placeholder": "اختر الجنس",
         "male": "ذكر",
         "female": "أنثى"
       },
