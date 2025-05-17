@@ -1,6 +1,6 @@
 import { Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import React from "react";
+import React, { useEffect } from "react";
 import type {
   Control,
   UseFieldArrayAppend,
@@ -39,6 +39,12 @@ const SalaryFormSection: React.FC<SalaryFormSectionProps> = ({
   const t = useTranslations();
   const locale = useLocale();
 
+  useEffect(() => {
+    if (fields.length === 0 && !inDialog) {
+      append({ type: "", amount: 0 });
+    }
+  }, [fields, append, inDialog]);
+
   return (
     <div>
       <FormSectionHeader
@@ -51,66 +57,72 @@ const SalaryFormSection: React.FC<SalaryFormSectionProps> = ({
       />
 
       <div className="form-container p-4">
-        <FormLabel>{t("Employees.form.salary.label")}</FormLabel>
+        {/* <FormLabel>{t("Employees.form.salary.label")}</FormLabel> */}
         {fields.map((field, index) => (
-          <div key={field.id} className="mt-2 flex items-end gap-2">
-            <FormField
-              control={control}
-              name={`salary.${index}.type`}
-              render={({ field: typeField }) => (
-                <FormItem className="flex-1">
-                  <FormLabel className="text-xs">{t("Employees.form.salary.type_label")}</FormLabel>
-                  <Select
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                    onValueChange={typeField.onChange}
-                    defaultValue={typeField.value}
-                    disabled={isSaving}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("Employees.form.salary.type_placeholder")} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {SALARY_COMPONENT_TYPES.map((typeOpt) => (
-                        <SelectItem key={typeOpt.value} value={typeOpt.value}>
-                          {t(`Employees.salary_types.${typeOpt.value}`, {
-                            defaultValue: typeOpt.label,
-                          })}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
-              name={`salary.${index}.amount`}
-              render={({ field: amountField }) => (
-                <FormItem className="flex-1">
-                  <FormLabel className="text-xs">
-                    {t("Employees.form.salary.amount_label")}
-                  </FormLabel>
-                  <FormControl>
-                    <CurrencyInput
-                      placeholder={t("Employees.form.salary.amount_placeholder")}
+          <div key={field.id} className="relative mt-2 flex items-start gap-2">
+            <div className="flex w-[calc(100%-3rem)]  flex-row items-start gap-2">
+              <FormField
+                control={control}
+                name={`salary.${index}.type`}
+                render={({ field: typeField }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel className="text-xs">
+                      {t("Employees.form.salary.type_label")}
+                    </FormLabel>
+                    <Select
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                      onValueChange={typeField.onChange}
+                      defaultValue={typeField.value}
                       disabled={isSaving}
-                      {...amountField}
-                      showCommas={true}
-                      value={amountField.value ? parseFloat(String(amountField.value)) : undefined}
-                      onChange={(value) => amountField.onChange(value?.toString() || "")}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Employees.form.salary.type_placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {SALARY_COMPONENT_TYPES.map((typeOpt) => (
+                          <SelectItem key={typeOpt.value} value={typeOpt.value}>
+                            {t(`Employees.salary_types.${typeOpt.value}`, {
+                              defaultValue: typeOpt.label,
+                            })}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name={`salary.${index}.amount`}
+                render={({ field: amountField }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel className="text-xs">
+                      {t("Employees.form.salary.amount_label")}
+                    </FormLabel>
+                    <FormControl>
+                      <CurrencyInput
+                        placeholder={t("Employees.form.salary.amount_placeholder")}
+                        disabled={isSaving}
+                        {...amountField}
+                        showCommas={true}
+                        value={
+                          amountField.value ? parseFloat(String(amountField.value)) : undefined
+                        }
+                        onChange={(value) => amountField.onChange(value?.toString() || "")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <Button
               type="button"
               variant="outline"
-              className="w-9"
+              className="absolute end-0 top-6 w-9"
               onClick={() => remove(index)}
               disabled={isSaving}
               aria-label={t("General.remove")}
