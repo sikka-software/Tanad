@@ -1,10 +1,13 @@
-import { Session, User } from "@supabase/supabase-js";
+import { User } from "@supabase/supabase-js";
 import { currencies } from "@tanad.config";
 import { create } from "zustand";
 
 import { createClient } from "@/utils/supabase/component";
 
-import { Constants, Database } from "@/lib/database.types";
+import { Database } from "@/lib/database.types";
+
+export type Enterprise = Database["public"]["Tables"]["enterprises"]["Row"];
+export type Membership = Database["public"]["Tables"]["memberships"]["Row"];
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
   user_settings: {
@@ -35,27 +38,6 @@ export type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
     hidden_menu_items?: Record<string, string[]>;
   };
 };
-
-export type Enterprise = Database["public"]["Tables"]["enterprises"]["Row"];
-export type Membership = Database["public"]["Tables"]["memberships"]["Row"];
-
-// interface EnterpriseType {
-//   id: string;
-//   name: string;
-//   created_at: string;
-//   email: string | null;
-//   industry: string | null;
-//   size: string | null;
-//   logo: string | null;
-// }
-
-// interface MembershipType {
-//   id: string;
-//   profile_id: string;
-//   enterprise_id: string;
-//   role_id: string;
-//   created_at: string;
-// }
 
 interface UserState {
   user: User | null;

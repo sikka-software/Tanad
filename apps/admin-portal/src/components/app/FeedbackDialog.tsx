@@ -29,15 +29,16 @@ export function FeedbackDialog({ onOpenChange }: FeedbackDialogProps) {
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from("feedback").insert([
-        {
-          user_id: user?.id,
-          email: user?.email,
-          message: feedback.trim(),
-        },
-      ]);
+      // TODO: call an api to send the feedback via email via n8n
+      // const { error } = await supabase.from("feedback").insert([
+      //   {
+      //     user_id: user?.id,
+      //     email: user?.email,
+      //     message: feedback.trim(),
+      //   },
+      // ]);
 
-      if (error) throw error;
+      // if (error) throw error;
 
       toast.success(t("Feedback.feedback_submitted"), {
         description: t("Feedback.thank_you_feedback"),
