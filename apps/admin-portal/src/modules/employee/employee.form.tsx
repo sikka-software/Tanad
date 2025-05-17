@@ -94,7 +94,15 @@ export const createEmployeeFormSchema = (t: (key: string) => string) => {
       .any()
       .optional()
       .superRefine(validateYearRange(t, 1800, 2200, "Employees.form.termination_date.invalid")),
-    national_id: z.string().optional(),
+    national_id: z
+      .string()
+      .optional()
+      .refine((val) => !val || /^[0-9]+$/.test(val), {
+        message: t("Employees.form.national_id.invalid"),
+      })
+      .refine((val) => !val || val.length === 10, {
+        message: t("Employees.form.national_id.exact_length"),
+      }),
     eqama_id: z.string().optional(),
     gender: z.string().optional(),
     marital_status: z.string().optional(),
