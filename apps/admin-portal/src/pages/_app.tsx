@@ -122,7 +122,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   }
 
   // job listing page
-  if (router.pathname === "/job_listings/preview/[id]") {
+  if (router.pathname === "/careers/[id]") {
     return (
       <div>
         <NextIntlClientProvider

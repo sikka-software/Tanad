@@ -87,7 +87,7 @@ export default function JobListingsPage() {
     setActionableItem,
     duplicateMutation: duplicateJobListing,
     previewAction: (id: string) => {
-      window.open(`/job_listings/preview/${id}`, "_blank");
+      window.open(`/careers/${id}`, "_blank");
     },
     moduleName: "JobListings",
   });
