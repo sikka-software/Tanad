@@ -124,7 +124,7 @@
     "react-day-picker": "8.10.1",
     "react-dom": "^19.1.0",
     "react-error-boundary": "^6.0.0",
-    "react-hook-form": "^7.56.3",
+    "react-hook-form": "^7.56.4",
     "react-resize-detector": "^12.0.2",
     "react-use-measure": "^2.1.7",
     "recharts": "^2.15.3",
@@ -161,7 +161,7 @@
     "prettier-plugin-tailwindcss": "^0.6.11",
     "tailwindcss": "^4.1.7",
     "tsx": "^4.19.4",
-    "tw-animate-css": "^1.2.9",
+    "tw-animate-css": "^1.3.0",
     "typescript": "^5"
   },
   "$schema": "https://json.schemastore.org/package.json"
