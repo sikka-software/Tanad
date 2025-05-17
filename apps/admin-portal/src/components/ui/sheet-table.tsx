@@ -218,6 +218,11 @@ export interface SheetTableProps<T extends object> extends FooterProps {
   onColumnVisibilityChange?: (updater: any) => void;
   sorting?: any;
   onSortingChange?: (updater: any) => void;
+  // --- Filtering --- 
+  columnFilters?: ColumnFiltersState;
+  globalFilter?: string;
+  onColumnFiltersChange?: (updater: ColumnFiltersState | ((old: ColumnFiltersState) => ColumnFiltersState)) => void;
+  onGlobalFilterChange?: (updater: string | ((old: string) => string)) => void;
 }
 
 /**
@@ -362,6 +367,10 @@ function SheetTable<
     tableOptions,
     sorting,
     onSortingChange,
+    columnFilters: propColumnFilters,
+    globalFilter: propGlobalFilter,
+    onColumnFiltersChange: propOnColumnFiltersChange,
+    onGlobalFilterChange: propOnGlobalFilterChange,
   } = props;
 
   const t = useTranslations();
@@ -404,8 +413,6 @@ function SheetTable<
    */
   const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
 
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [globalFilter, setGlobalFilter] = React.useState("");
   const [expanded, setExpanded] = React.useState<ExpandedState>({});
 
   /**
@@ -414,25 +421,23 @@ function SheetTable<
   const table = useReactTable({
     data,
     columns: columns as ColumnDef<T>[],
-    // Provide subRows if you have them:
     getSubRows: (row) => row.subRows ?? undefined,
-    // enableExpanding: true,
     onExpandedChange: setExpanded,
     getExpandedRowModel: getExpandedRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
-    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: onColumnVisibilityChange,
     onSortingChange,
+    onColumnFiltersChange: propOnColumnFiltersChange,
+    onGlobalFilterChange: propOnGlobalFilterChange,
     ...(tableOptions || {}),
     state: {
       ...tableOptions?.state,
-      columnFilters,
+      columnFilters: propColumnFilters,
+      globalFilter: propGlobalFilter,
       columnVisibility,
-      globalFilter,
       expanded,
       sorting,
       pagination: {
@@ -593,24 +598,12 @@ function SheetTable<
     return out;
   }, [data]);
 
-  // Flatten all rows for virtualization (no sub-rows)
-  const flatRows = React.useMemo(() => {
-    const result: { row: TanStackRow<T>; groupKey: string; level: number }[] = [];
-    Object.entries(groupedData).forEach(([groupKey, topRows]) => {
-      topRows.forEach((rowData) => {
-        const row = table.getRowModel().flatRows.find((r) => r.original === rowData);
-        if (row) {
-          result.push({ row, groupKey, level: 0 });
-        }
-      });
-    });
-    return result;
-  }, [groupedData, table]);
-
-  // Virtualizer setup
   const parentRef = React.useRef<HTMLDivElement>(null);
+
+  const tableRows = table.getRowModel().rows;
+
   const rowVirtualizer = useVirtualizer({
-    count: flatRows.length,
+    count: tableRows.length, // Use the length of rows from TanStack Table model
     getScrollElement: () => parentRef.current,
     estimateSize: () => 48, // Adjust to your row height
     overscan: 10,
@@ -789,7 +782,30 @@ function SheetTable<
 
   const memoizedRenderRow = React.useCallback(
     (row: TanStackRow<T>, groupKey: string, level = 0) => renderRow(row, groupKey, level),
-    [renderRow],
+    [
+      findTableRow,
+      disabledRows,
+      disabledColumns,
+      enableRowSelection,
+      enableRowActions,
+      enableColumnSizing,
+      cellErrors,
+      handleCellFocus,
+      handlePaste,
+      handleCellInput,
+      handleCellBlur,
+      setHoveredRowId,
+      props.canEditAction,
+      props.canDeleteAction,
+      props.canDuplicateAction,
+      props.canViewAction,
+      props.canArchiveAction,
+      props.canPreviewAction,
+      texts,
+      onActionClicked,
+      columns,
+      cellOriginalContent
+    ],
   );
 
   // Calculate total min width for the table
@@ -890,11 +906,15 @@ function SheetTable<
             <tr style={{ height: `${rowVirtualizer.getVirtualItems()[0].start}px` }} />
           )}
           {/* Virtualized rows */}
-          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-            const { row, groupKey, level } = flatRows[virtualRow.index];
+          {rowVirtualizer.getVirtualItems().map((virtualItem) => {
+            const row = tableRows[virtualItem.index] as TanStackRow<T>;
+            // The groupKey and level might need more robust derivation if deep nesting + grouping is complex.
+            // For now, assuming headerKey is on original items and depth from TanStack row is sufficient.
+            const groupKey = row.original.headerKey || "ungrouped";
+            const level = row.depth; 
             return React.cloneElement(
               memoizedRenderRow(row, groupKey, level) as React.ReactElement,
-              { key: row.id },
+              { key: row.id + virtualItem.index },
             );
           })}
           {rowVirtualizer.getVirtualItems().length > 0 && (

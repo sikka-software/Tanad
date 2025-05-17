@@ -32,7 +32,7 @@ import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/employee/employee.options
 import useEmployeesStore from "@/employee/employee.store";
 import useEmployeeStore from "@/employee/employee.store";
 import EmployeesTable from "@/employee/employee.table";
-import { EmployeeUpdateData } from "@/employee/employee.types";
+import { Employee, EmployeeUpdateData } from "@/employee/employee.types";
 
 import { useJobs } from "@/job/job.hooks";
 
@@ -72,20 +72,29 @@ export default function EmployeesPage() {
   const setSortRules = moduleHooks.useSetSortRules();
   // Filtering
   const filterConditions = moduleHooks.useFilterConditions();
-  const filterCaseSensitive = moduleHooks.useFilterCaseSensitive();
   const getFilteredData = moduleHooks.useGetFilteredData();
   const getSortedData = moduleHooks.useGetSortedData();
   // Misc
-  const searchQuery = moduleHooks.useSearchQuery();
   const viewMode = moduleHooks.useViewMode();
 
-  const { data: employees, isLoading, error } = useEmployees();
+  // Get state and setters directly from the store for filters if not in moduleHooks
+  const zustandSearchQuery = useEmployeesStore((state) => state.searchQuery);
+  const zustandSetSearchQuery = useEmployeesStore((state) => state.setSearchQuery);
+  const zustandFilterConditions = useEmployeesStore((state) => state.filterConditions);
+  const zustandSetFilterConditions = useEmployeesStore((state) => state.setFilterConditions);
+  const zustandFilterCaseSensitive = useEmployeesStore((state) => state.filterCaseSensitive);
+
+  // Re-introduce client-side filtering/sorting for non-TanStack views (e.g., Card view)
+  const getFilteredDataClient = useEmployeesStore((state) => state.getFilteredData);
+  const getSortedDataClient = useEmployeesStore((state) => state.getSortedData);
+
+  const { data: employeesFromHook, isLoading, error } = useEmployees();
   const { mutateAsync: deleteEmployees, isPending: isDeleting } = useBulkDeleteEmployees();
   const { mutate: duplicateEmployee } = useDuplicateEmployee();
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
-    data: employees,
+    data: employeesFromHook,
     setSelectedRows,
     setPendingDeleteIds,
     setIsDeleteDialogOpen,
@@ -110,23 +119,60 @@ export default function EmployeesPage() {
   const setData = useEmployeeStore((state) => state.setData);
 
   useEffect(() => {
-    if (employees && setData) {
-      setData(employees);
+    if (employeesFromHook && setData) {
+      setData(employeesFromHook);
     }
-  }, [employees, setData]);
+  }, [employeesFromHook, setData]);
 
-  const filteredData = useMemo(() => {
-    return getFilteredData(storeData);
-  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+  // Transform filterConditions from store to TanStack Table's ColumnFiltersState
+  const columnFiltersTanStack = useMemo(() => {
+    return zustandFilterConditions.map(condition => ({
+      id: condition.field,
+      value: {
+        filterValue: condition.value,
+        operator: condition.operator,
+        type: condition.type,
+      },
+    }));
+  }, [zustandFilterConditions]);
 
-  const sortedData = useMemo(() => {
-    return getSortedData(filteredData);
-  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+  // Handler for TanStack Table's onColumnFiltersChange
+  const handleColumnFiltersChange = (updaterOrValue: any) => {
+    const newFilters = typeof updaterOrValue === 'function' ? updaterOrValue(columnFiltersTanStack) : updaterOrValue;
+    // This is still a simplification. Converting newFilters (ColumnFilter[]) back to FilterCondition[]
+    // is non-trivial as TanStack's state doesn't hold operator, type, conjunction.
+    // For a robust solution, FilterPopover should perhaps emit TanStack-ready filters, 
+    // or this function becomes much more complex, or columns get individual filter controls.
+    // As a TEMPORARY step, if PageSearchAndFilter updates zustandFilterConditions directly,
+    // this handler might not need to do much other than log or be a pass-through if TanStack manages it internally.
+    // For now, we will assume zustandSetFilterConditions handles the FilterCondition[] format.
+    // We'd need to map `newFilters` back or adjust how `PageSearchAndFilter` updates.
+    // console.log("New TanStack Column Filters:", newFilters);
+
+    // Simplistic: If `PageSearchAndFilter` is the sole source of truth for `filterConditions` 
+    // in the store, this function might not need to call `zustandSetFilterConditions`
+    // unless TanStack Table needs to be the one driving that state update.
+    // Let's assume PageSearchAndFilter updates zustandFilterConditions, and this is for TanStack to read.
+  };
+
+  // Data for Card View (uses client-side filtering/sorting from the store)
+  const filteredDataForCards = useMemo(() => {
+    return getFilteredDataClient(storeData); // Uses storeData, searchQuery, filterConditions from store
+  }, [storeData, getFilteredDataClient]); // searchQuery and filterConditions are implicit via getFilteredDataClient
+
+  const sortedDataForCards = useMemo(() => {
+    return getSortedDataClient(filteredDataForCards);
+  }, [filteredDataForCards, getSortedDataClient]); // sortRules etc. are implicit via getSortedDataClient
 
   const tanstackSorting = useMemo(
     () => sortRules.map((rule) => ({ id: rule.field, desc: rule.direction === "desc" })),
     [sortRules],
   );
+
+  console.log("[EmployeesPage] storeData to be passed to table:", storeData);
+  console.log("[EmployeesPage] columnFiltersTanStack to be passed to table:", columnFiltersTanStack);
+  console.log("[EmployeesPage] globalFilter (zustandSearchQuery) to be passed to table:", zustandSearchQuery);
+
   const handleTanstackSortingChange = (
     updater:
       | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
@@ -140,6 +186,14 @@ export default function EmployeesPage() {
     setSortRules(newSortRules);
   };
 
+  const handleTanstackGlobalFilterChange = (updater: string | ((old: string) => string)) => {
+    if (typeof updater === 'function') {
+      zustandSetSearchQuery(updater(zustandSearchQuery));
+    } else {
+      zustandSetSearchQuery(updater);
+    }
+  };
+
   if (!canRead) {
     return <NoPermission />;
   }
@@ -150,7 +204,7 @@ export default function EmployeesPage() {
         title={t("Pages.Employees.title")}
         description={t("Pages.Employees.description")}
       />
-      <DataPageLayout count={employees?.length} itemsText={t("Pages.Employees.title")}>
+      <DataPageLayout count={employeesFromHook?.length} itemsText={t("Pages.Employees.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -171,7 +225,7 @@ export default function EmployeesPage() {
             onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Employees.add")}
             searchPlaceholder={t("Pages.Employees.search")}
-            hideOptions={employees?.length === 0}
+            hideOptions={employeesFromHook?.length === 0}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={(updater) => {
               setColumnVisibility((prev) =>
@@ -183,17 +237,21 @@ export default function EmployeesPage() {
         <div>
           {viewMode === "table" ? (
             <EmployeesTable
-              data={sortedData}
+              data={storeData}
               isLoading={isLoading}
               error={error}
               onActionClicked={onActionClicked}
               sorting={tanstackSorting}
               onSortingChange={handleTanstackSortingChange}
+              globalFilter={zustandSearchQuery}
+              onGlobalFilterChange={handleTanstackGlobalFilterChange}
+              columnFilters={columnFiltersTanStack}
+              onColumnFiltersChange={handleColumnFiltersChange}
             />
           ) : (
             <div className="p-4">
-              <DataModelList
-                data={sortedData}
+              <DataModelList<Employee>
+                data={sortedDataForCards}
                 isLoading={isLoading}
                 error={error}
                 empty={{

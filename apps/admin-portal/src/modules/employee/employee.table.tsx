@@ -5,7 +5,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { ModuleTableProps } from "@/types/common.type";
+import { ModuleTableProps, FilterCondition } from "@/types/common.type";
+import { ColumnFiltersState } from "@tanstack/react-table";
 
 import { useUpdateEmployee } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
@@ -22,7 +23,20 @@ const EmployeesTable = ({
   isLoading,
   error,
   onActionClicked,
-}: ModuleTableProps<Employee>) => {
+  columnFilters,
+  globalFilter,
+  onColumnFiltersChange,
+  onGlobalFilterChange,
+  sorting,
+  onSortingChange,
+}: ModuleTableProps<Employee> & {
+  columnFilters?: ColumnFiltersState;
+  globalFilter?: string;
+  onColumnFiltersChange?: (updater: ColumnFiltersState | ((old: ColumnFiltersState) => ColumnFiltersState)) => void;
+  onGlobalFilterChange?: (updater: string | ((old: string) => string)) => void;
+  sorting?: any;
+  onSortingChange?: (updater: any) => void;
+}) => {
   const t = useTranslations();
   const { mutateAsync: updateEmployee } = useUpdateEmployee();
 
@@ -110,6 +124,12 @@ const EmployeesTable = ({
       onActionClicked={onActionClicked}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={setColumnVisibility}
+      columnFilters={columnFilters}
+      globalFilter={globalFilter}
+      onColumnFiltersChange={onColumnFiltersChange}
+      onGlobalFilterChange={onGlobalFilterChange}
+      sorting={sorting}
+      onSortingChange={onSortingChange}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

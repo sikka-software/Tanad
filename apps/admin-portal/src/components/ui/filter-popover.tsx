@@ -3,7 +3,7 @@
 import { parseDate, getLocalTimeZone, CalendarDate } from "@internationalized/date";
 import { Filter, Plus, Trash2, Save, Clock, Check } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
@@ -92,9 +92,11 @@ export default function FilterPopover({
   const t = useTranslations();
   const locale = useLocale();
   const [open, setOpen] = useState(false);
-  const [activeFilters, setActiveFilters] = useState(0);
-  const [filterConditions, setFilterConditions] = useState<FilterCondition[]>(
-    externalConditions || [
+  const [activeFilters, setActiveFilters] = useState(
+    (externalConditions || []).filter(c => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty").length
+  );
+  const [stagedFilterConditions, setStagedFilterConditions] = useState<FilterCondition[]>(
+    externalConditions ? JSON.parse(JSON.stringify(externalConditions)) : [
       {
         id: 1,
         field: fields[0]?.id || "name",
@@ -105,7 +107,26 @@ export default function FilterPopover({
       },
     ],
   );
+  const [stagedCaseSensitive, setStagedCaseSensitive] = useState(caseSensitive);
+
   const [activeTab, setActiveTab] = useState("filters");
+
+  useEffect(() => {
+    if (!open) {
+      setStagedFilterConditions(externalConditions ? JSON.parse(JSON.stringify(externalConditions)) : [
+        {
+          id: 1,
+          field: fields[0]?.id || "name",
+          operator: "contains",
+          value: "",
+          type: fields[0]?.type || "text",
+          conjunction: "and",
+        },
+      ]);
+      setStagedCaseSensitive(caseSensitive);
+      setActiveFilters((externalConditions || []).filter(c => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty").length);
+    }
+  }, [externalConditions, caseSensitive, open, fields]);
 
   const getOperatorsForField = (fieldId: string) => {
     const field = fields.find((f) => f.id === fieldId);
@@ -127,7 +148,7 @@ export default function FilterPopover({
   };
 
   const addFilterCondition = () => {
-    const newId = Math.max(0, ...filterConditions.map((c) => c.id)) + 1;
+    const newId = Math.max(0, ...stagedFilterConditions.map((c) => c.id)) + 1;
     const newCondition: FilterCondition = {
       id: newId,
       field: fields[0]?.id || "name",
@@ -136,28 +157,30 @@ export default function FilterPopover({
       type: fields[0]?.type || "text",
       conjunction: "and",
     };
-    const newConditions = [...filterConditions, newCondition];
-    setFilterConditions(newConditions);
-    onConditionsChange?.(newConditions);
+    const newConditions = [...stagedFilterConditions, newCondition];
+    setStagedFilterConditions(newConditions);
+    setActiveFilters(newConditions.filter(c => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty").length);
   };
 
   const removeFilterCondition = (id: number) => {
-    const newConditions = filterConditions.filter((condition) => condition.id !== id);
-    setFilterConditions(newConditions);
-    onConditionsChange?.(newConditions);
+    const newConditions = stagedFilterConditions.filter((condition) => condition.id !== id);
+    setStagedFilterConditions(newConditions);
+    setActiveFilters(newConditions.filter(c => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty").length);
   };
 
   const updateFilterCondition = (id: number, field: string, value: string) => {
-    const newConditions = filterConditions.map((condition) => {
+    const newConditions = stagedFilterConditions.map((condition) => {
       if (condition.id === id) {
         const updatedCondition = { ...condition, [field]: value };
 
-        // If field changed, update the operator and type
+        if (field === "value" && condition.type === "date") {
+          console.log("[FilterPopover] updateFilterCondition (date value) - ID:", id, "New Value:", value);
+        }
+
         if (field === "field") {
           const fieldType = getFieldType(value);
           updatedCondition.type = fieldType;
 
-          // Set default operator based on field type
           switch (fieldType) {
             case "number":
               updatedCondition.operator = "equals";
@@ -169,11 +192,9 @@ export default function FilterPopover({
               updatedCondition.operator = "contains";
           }
 
-          // Reset value when changing field type
           updatedCondition.value = "";
         }
 
-        // Ensure conjunction is always "and" or "or"
         if (field === "conjunction" && value !== "and" && value !== "or") {
           updatedCondition.conjunction = "and";
         }
@@ -183,18 +204,20 @@ export default function FilterPopover({
       return condition;
     });
 
-    setFilterConditions(newConditions);
-    onConditionsChange?.(newConditions);
+    setStagedFilterConditions(newConditions);
+    setActiveFilters(newConditions.filter(c => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty").length);
   };
 
   const applyFilters = () => {
-    // Filter out conditions with empty values unless operator is isEmpty/isNotEmpty
-    const validConditions = filterConditions.filter(
+    const validConditions = stagedFilterConditions.filter(
       (c) => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty",
     );
-
-    setActiveFilters(validConditions.length);
+    console.log("[FilterPopover] applyFilters - Staged Conditions:", stagedFilterConditions, "Valid Conditions to apply:", validConditions);
     onConditionsChange?.(validConditions);
+    if (onCaseSensitiveChange) {
+      onCaseSensitiveChange(stagedCaseSensitive);
+    }
+    setActiveFilters(validConditions.length);
     setOpen(false);
   };
 
@@ -209,19 +232,20 @@ export default function FilterPopover({
         conjunction: "and",
       },
     ];
-    setFilterConditions(defaultConditions);
+    setStagedFilterConditions(defaultConditions);
+    setStagedCaseSensitive(false);
+    
     onConditionsChange?.(defaultConditions);
-    setActiveFilters(0);
-    setOpen(false);
     if (onCaseSensitiveChange) {
       onCaseSensitiveChange(false);
     }
+    setActiveFilters(0);
+    setOpen(false);
   };
 
   const renderValueInput = (condition: any) => {
     const { type, operator, value, id } = condition;
 
-    // No input needed for isEmpty/isNotEmpty operators
     if (operator === "isEmpty" || operator === "isNotEmpty") {
       return null;
     }
@@ -230,25 +254,24 @@ export default function FilterPopover({
       let calendarDateValue: CalendarDate | null = null;
       if (value) {
         try {
-          calendarDateValue = parseDate(value.split("T")[0]);
+          calendarDateValue = parseDate(value.split("T")[0]); 
         } catch (e) {
-          // Handle cases where value might not be a valid ISO string for parseDate
-          console.error("Error parsing date:", e);
+          console.error("[FilterPopover] Error parsing date for DateInput:", value, e);
         }
       }
+      console.log("[FilterPopover] renderValueInput (date) - Input Value:", value, "Parsed CalendarDate:", calendarDateValue);
       return (
         <div className="mt-2">
           <DateInput
             isolated
             value={calendarDateValue}
             onChange={(date) => {
-              console.log("date is ", date);
+              const formattedDate = date ? `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}` : "";
+              console.log("[FilterPopover] DateInput onChange - Selected CalendarDate:", date, "Formatted YYYY-MM-DD:", formattedDate);
               updateFilterCondition(
                 id,
                 "value",
-                date
-                  ? `${date.year}-${String(date.month).padStart(2, "0")}-${String(date.day).padStart(2, "0")}`
-                  : "",
+                formattedDate,
               );
             }}
           />
@@ -336,7 +359,7 @@ export default function FilterPopover({
               </div>
 
               <div className="space-y-4">
-                {filterConditions.map((condition, index) => (
+                {stagedFilterConditions.map((condition, index) => (
                   <div key={condition.id} className="space-y-2 border-b border-dashed pb-4">
                     {index > 0 && (
                       <div className="mb-2 flex items-center">
@@ -428,8 +451,8 @@ export default function FilterPopover({
               <div className="flex items-center space-x-2">
                 <Switch
                   id="case-sensitive"
-                  checked={caseSensitive}
-                  onCheckedChange={onCaseSensitiveChange}
+                  checked={stagedCaseSensitive}
+                  onCheckedChange={setStagedCaseSensitive}
                 />
                 <Label htmlFor="case-sensitive">{t("General.case_sensitive")}</Label>
               </div>
@@ -481,7 +504,6 @@ export default function FilterPopover({
                     key={filter.id}
                     className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-md p-2"
                     onClick={() => {
-                      // In a real app, we would load the filter conditions here
                       setActiveTab("filters");
                     }}
                   >
