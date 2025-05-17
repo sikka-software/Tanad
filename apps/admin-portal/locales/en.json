@@ -1322,7 +1322,8 @@
       "data_management": "Data Management",
       "custom_automation": "Custom Automation",
       "biomitric_auth": "Biometric Authentication",
-      "complete_white_label": "Complete White Label"
+      "complete_white_label": "Complete White Label",
+      "multiple_payment_gateways": "Multiple Payment Gateways"
     },
     "selected_plan_button": "Select Plan",
     "tanad_pro_description": "Pro plan for small businesses",
