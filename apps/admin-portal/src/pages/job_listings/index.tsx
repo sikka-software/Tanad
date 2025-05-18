@@ -190,7 +190,11 @@ export default function JobListingsPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(listing: JobListingWithJobs) => (
-                  <JobListingCard jobListing={listing} onActionClicked={onActionClicked} />
+                  <JobListingCard
+                    key={listing.id}
+                    jobListing={listing}
+                    onActionClicked={onActionClicked}
+                  />
                 )}
                 gridCols="3"
               />

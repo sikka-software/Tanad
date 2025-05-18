@@ -182,7 +182,7 @@ export default function TrucksPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(truck) => (
-                  <TruckCard truck={truck} onActionClicked={onActionClicked} />
+                  <TruckCard key={truck.id} truck={truck} onActionClicked={onActionClicked} />
                 )}
                 gridCols="3"
               />

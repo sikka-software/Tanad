@@ -185,7 +185,7 @@ export default function VendorsPage() {
                 onClick: () => router.push(router.pathname + "/add"),
               }}
               renderItem={(vendor) => (
-                <VendorCard vendor={vendor} onActionClicked={onActionClicked} />
+                <VendorCard key={vendor.id} vendor={vendor} onActionClicked={onActionClicked} />
               )}
               gridCols="3"
             />

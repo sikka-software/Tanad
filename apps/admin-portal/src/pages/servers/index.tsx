@@ -185,7 +185,7 @@ export default function ServersPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(server) => (
-                  <ServerCard server={server} onActionClicked={onActionClicked} />
+                  <ServerCard key={server.id} server={server} onActionClicked={onActionClicked} />
                 )}
                 gridCols="3"
               />

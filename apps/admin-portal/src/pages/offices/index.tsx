@@ -185,7 +185,7 @@ export default function OfficesPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(office) => (
-                  <OfficeCard office={office} onActionClicked={onActionClicked} />
+                  <OfficeCard key={office.id} office={office} onActionClicked={onActionClicked} />
                 )}
                 gridCols="3"
               />

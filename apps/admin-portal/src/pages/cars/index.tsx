@@ -181,7 +181,9 @@ export default function CarsPage() {
                   icons: [Car, Plus, Car],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(car) => <CarCard car={car} onActionClicked={onActionClicked} />}
+                renderItem={(car) => (
+                  <CarCard key={car.id} car={car} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>

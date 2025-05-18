@@ -189,7 +189,11 @@ export default function InvoicesPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(invoice) => (
-                  <InvoiceCard invoice={invoice} onActionClicked={onActionClicked} />
+                  <InvoiceCard
+                    key={invoice.id}
+                    invoice={invoice}
+                    onActionClicked={onActionClicked}
+                  />
                 )}
                 gridCols="2"
               />

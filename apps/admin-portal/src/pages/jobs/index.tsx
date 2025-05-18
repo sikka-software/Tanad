@@ -170,7 +170,9 @@ export default function JobsPage() {
                   icons: [Briefcase, Plus, Briefcase],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
-                renderItem={(job) => <JobCard job={job} onActionClicked={onActionClicked} />}
+                renderItem={(job) => (
+                  <JobCard key={job.id} job={job} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>

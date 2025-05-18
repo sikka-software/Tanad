@@ -187,7 +187,11 @@ export default function DepartmentsPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(department) => (
-                  <DepartmentCard department={department} onActionClicked={onActionClicked} />
+                  <DepartmentCard
+                    key={department.id}
+                    department={department}
+                    onActionClicked={onActionClicked}
+                  />
                 )}
                 gridCols="3"
               />

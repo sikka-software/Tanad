@@ -79,8 +79,8 @@ const createJobFormSchema = (t: (key: string) => string) => {
     status: z.enum(CommonStatus, {
       invalid_type_error: t("Jobs.form.status.required"),
     }),
-    total_positions: z.string().optional(),
-    occupied_positions: z.string().optional(),
+    total_positions: z.coerce.number().optional(),
+    occupied_positions: z.coerce.number().optional(),
   });
 
   return JobSelectSchema;
@@ -136,10 +136,8 @@ function JobForm({
       start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
       end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
       status: defaultValues?.status || "active",
-      total_positions:
-        defaultValues && typeof (defaultValues as any).total_positions !== "undefined"
-          ? String((defaultValues as any).total_positions)
-          : "1",
+      total_positions: defaultValues?.total_positions || 1,
+      occupied_positions: defaultValues?.occupied_positions || 0,
     },
   });
 
@@ -167,6 +165,7 @@ function JobForm({
           {
             id: defaultValues?.id || "",
             data: {
+              ...data,
               title: data.title.trim(),
               description: data.description?.trim() || null,
               requirements: data.requirements?.trim() || null,
@@ -179,10 +178,7 @@ function JobForm({
               status: data.status,
               start_date: data.start_date?.toString() || null,
               end_date: data.end_date?.toString() || null,
-              total_positions:
-                data.total_positions && data.total_positions.trim() !== ""
-                  ? Number(data.total_positions)
-                  : undefined,
+              total_positions: data.total_positions || 1,
             },
           },
           {
@@ -196,6 +192,7 @@ function JobForm({
       } else {
         await createJob(
           {
+            ...data,
             user_id: user?.id,
             enterprise_id: enterprise?.id || "",
             title: data.title.trim(),
@@ -210,10 +207,7 @@ function JobForm({
             status: data.status,
             start_date: data.start_date?.toString() || null,
             end_date: data.end_date?.toString() || null,
-            total_positions:
-              data.total_positions && data.total_positions.trim() !== ""
-                ? Number(data.total_positions)
-                : undefined,
+            total_positions: data.total_positions || 1,
           },
           {
             onSuccess: async (response) => {
@@ -416,15 +410,15 @@ function JobForm({
                 <FormControl>
                   <NumberInputWithButtons
                     value={(() => {
-                      const stringToParse: string = field.value || "";
-                      return parseInt(stringToParse, 10);
+                      const numberToParse: number = field.value || 1;
+                      return numberToParse;
                     })()}
                     minValue={0}
                     onChange={(numericValue) => {
                       if (isNaN(numericValue)) {
                         field.onChange("");
                       } else {
-                        field.onChange(numericValue.toString());
+                        field.onChange(numericValue);
                       }
                     }}
                   />

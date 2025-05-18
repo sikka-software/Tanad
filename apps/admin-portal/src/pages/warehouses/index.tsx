@@ -190,7 +190,11 @@ export default function WarehousesPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(warehouse) => (
-                  <WarehouseCard warehouse={warehouse} onActionClicked={onActionClicked} />
+                  <WarehouseCard
+                    key={warehouse.id}
+                    warehouse={warehouse}
+                    onActionClicked={onActionClicked}
+                  />
                 )}
                 gridCols="3"
               />

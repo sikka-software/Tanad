@@ -7,6 +7,8 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
+import { generateDummyInvoice } from "@/lib/dummy-factory";
+
 import { InvoiceForm } from "@/invoice/invoice.form";
 import useInvoiceStore from "@/invoice/invoice.store";
 
@@ -30,6 +32,7 @@ export default function AddInvoicePage() {
           submit_form: t("Pages.Invoices.add"),
           cancel: t("General.cancel"),
         }}
+        dummyButton={generateDummyInvoice}
       />
 
       <InvoiceForm

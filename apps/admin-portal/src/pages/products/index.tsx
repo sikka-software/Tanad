@@ -199,7 +199,11 @@ export default function ProductsPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(product) => (
-                  <ProductCard product={product} onActionClicked={onActionClicked} />
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onActionClicked={onActionClicked}
+                  />
                 )}
                 gridCols="3"
               />

@@ -184,7 +184,7 @@ export default function QuotesPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(quote) => (
-                  <QuoteCard quote={quote} onActionClicked={onActionClicked} />
+                  <QuoteCard key={quote.id} quote={quote} onActionClicked={onActionClicked} />
                 )}
                 gridCols="2"
               />

@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 import NotesSection from "@/components/forms/notes-section";
 
+import { formatToYYYYMMDD } from "@/lib/date-utils";
 import { getNotesValue } from "@/lib/utils";
 import { validateYearRange } from "@/lib/utils";
 
@@ -29,11 +30,18 @@ import useUserStore from "@/stores/use-user-store";
 
 export const createExpenseSchema = (t: (key: string) => string) => {
   const ExpenseSelectSchema = createInsertSchema(expenses, {
+    expense_number: z
+      .string({ message: t("Expenses.form.expense_number.required") })
+      .min(1, t("Expenses.form.expense_number.required")),
     description: z.string().optional(),
-    amount: z.coerce.number().min(0, t("Expenses.form.amount.required")),
+    amount: z.coerce
+      .number({ message: t("Expenses.form.amount.required") })
+      .min(0, t("Expenses.form.amount.required")),
     incurred_at: z.any().optional(),
     created_by: z.string().optional(),
-    category: z.string().min(1, t("Expenses.form.category.required")),
+    category: z
+      .string({ message: t("Expenses.form.category.required") })
+      .min(1, t("Expenses.form.category.required")),
     due_date: z
       .any()
       .optional()
@@ -43,7 +51,6 @@ export const createExpenseSchema = (t: (key: string) => string) => {
       .optional()
       .superRefine(validateYearRange(t, 1800, 2200, "Expenses.form.issue_date.invalid")),
     notes: z.any().optional().nullable(),
-    expense_number: z.string().min(1, t("Expenses.form.expense_number.required")),
     status: z.enum(ExpenseStatus).default("draft"),
   });
 
@@ -72,7 +79,9 @@ export function ExpenseForm({
   const form = useForm<ExpenseFormValues>({
     resolver: zodResolver(createExpenseSchema(t)),
     defaultValues: {
-      expense_number: defaultValues?.expense_number || "",
+      ...defaultValues,
+      description: defaultValues?.description || "",
+      created_by: defaultValues?.created_by || "",
       issue_date: defaultValues?.issue_date
         ? typeof defaultValues.issue_date === "string"
           ? parseDate(defaultValues.issue_date.split("T")[0])
@@ -83,11 +92,7 @@ export function ExpenseForm({
           ? parseDate(defaultValues.due_date.split("T")[0])
           : parseDate(new Date(defaultValues.due_date).toISOString().split("T")[0])
         : undefined,
-      status: defaultValues?.status || "draft",
-      amount: defaultValues?.amount || 0,
-      category: defaultValues?.category || "",
       notes: getNotesValue(defaultValues),
-      // client_id: defaultValues?.client_id || "",
     },
   });
 
@@ -99,51 +104,20 @@ export function ExpenseForm({
       });
       return;
     }
+    const payload = {
+      ...data,
+      due_date: formatToYYYYMMDD(data.due_date),
+      issue_date: formatToYYYYMMDD(data.issue_date),
+    };
 
     try {
       if (editMode) {
-        await updateExpense({
-          id: defaultValues?.id || "",
-          data: {
-            ...data,
-            due_date:
-              data.due_date && typeof data.due_date.toString === "function"
-                ? data.due_date.toString()
-                : undefined,
-            issue_date:
-              data.issue_date && typeof data.issue_date.toString === "function"
-                ? data.issue_date.toString()
-                : undefined,
-          },
-        });
+        await updateExpense({ id: defaultValues?.id || "", data: payload });
       } else {
-        await createExpense(
-          {
-            user_id: user?.id,
-            enterprise_id: enterprise?.id || "",
-            expense_number: data.expense_number.trim(),
-            issue_date:
-              data.issue_date && typeof data.issue_date.toString === "function"
-                ? data.issue_date.toString()
-                : undefined,
-            due_date:
-              data.due_date && typeof data.due_date.toString === "function"
-                ? data.due_date.toString()
-                : undefined,
-            amount: data.amount,
-            category: data.category.trim(),
-            // ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
-            status: data.status || "draft",
-            notes: data.notes,
-          },
-          {
-            onSuccess: () => {
-              if (onSuccess) {
-                onSuccess();
-              }
-            },
-          },
-        );
+        await createExpense(payload, {
+          onSuccess: () => onSuccess?.(),
+          onError: () => setIsLoading(false),
+        });
       }
     } catch (error) {
       setIsLoading(false);
@@ -179,7 +153,7 @@ export function ExpenseForm({
                       onSerial={() => {
                         const nextNumber = (expenses?.length || 0) + 1;
                         const paddedNumber = String(nextNumber).padStart(4, "0");
-                        form.setValue("expense_number", `EX-${paddedNumber}`);
+                        field.onChange(`EX-${paddedNumber}`);
                       }}
                       onRandom={() => {
                         const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -189,7 +163,7 @@ export function ExpenseForm({
                             Math.floor(Math.random() * randomChars.length),
                           );
                         }
-                        form.setValue("expense_number", `EX-${randomCode}`);
+                        field.onChange(`EX-${randomCode}`);
                       }}
                       inputProps={{
                         placeholder: t("Expenses.form.expense_number.placeholder"),
@@ -303,6 +277,7 @@ export function ExpenseForm({
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                     disabled={isLoading}
+                    {...field}
                   >
                     <FormControl>
                       <SelectTrigger>

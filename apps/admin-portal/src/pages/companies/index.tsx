@@ -187,7 +187,11 @@ export default function CompaniesPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(company) => (
-                  <CompanyCard company={company} onActionClicked={onActionClicked} />
+                  <CompanyCard
+                    key={company.id}
+                    company={company}
+                    onActionClicked={onActionClicked}
+                  />
                 )}
                 gridCols="3"
               />

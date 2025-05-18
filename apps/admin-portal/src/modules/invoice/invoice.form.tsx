@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import NotesSection from "@/components/forms/notes-section";
 import ProductsFormSection from "@/components/forms/products-form-section";
 
+import { formatToYYYYMMDD } from "@/lib/date-utils";
 import { getNotesValue, validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
@@ -209,23 +210,16 @@ export function InvoiceForm({
 
     try {
       if (editMode && defaultValues?.id) {
-        const invoiceDataForUpdate = {
-          id: defaultValues.id as string,
-          client_id: data.client_id,
-          invoice_number: data.invoice_number,
-          issue_date: data.issue_date.toISOString(),
-          due_date: data.due_date?.toISOString() || null,
-          status: data.status,
-          subtotal: data.subtotal,
-          tax_rate: data.tax_rate,
-          notes: data.notes || null,
-          items: itemsPayload,
-        };
-
         await updateInvoice(
           {
             id: defaultValues.id as string,
-            data: invoiceDataForUpdate,
+            data: {
+              ...data,
+              id: defaultValues.id as string,
+              issue_date: formatToYYYYMMDD(data.issue_date),
+              due_date: formatToYYYYMMDD(data.due_date),
+              items: itemsPayload,
+            },
           },
           {
             onSuccess: async () => {
@@ -238,14 +232,9 @@ export function InvoiceForm({
       } else {
         await createInvoice(
           {
-            client_id: data.client_id,
-            invoice_number: data.invoice_number,
-            issue_date: data.issue_date.toISOString(),
-            due_date: data.due_date?.toISOString() || null,
-            status: data.status,
-            subtotal: data.subtotal,
-            tax_rate: data.tax_rate,
-            notes: data.notes || null,
+            ...data,
+            issue_date: formatToYYYYMMDD(data.issue_date),
+            due_date: formatToYYYYMMDD(data.due_date),
             items: itemsPayload,
           },
           {

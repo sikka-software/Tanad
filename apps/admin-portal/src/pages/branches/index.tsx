@@ -185,7 +185,7 @@ export default function BranchesPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(branch) => (
-                  <BranchCard branch={branch} onActionClicked={onActionClicked} />
+                  <BranchCard key={branch.id} branch={branch} onActionClicked={onActionClicked} />
                 )}
                 gridCols="3"
               />

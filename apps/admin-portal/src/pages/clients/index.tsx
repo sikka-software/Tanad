@@ -190,6 +190,7 @@ export default function ClientsPage() {
                 }}
                 renderItem={(client) => (
                   <ClientCard
+                    key={client.id}
                     client={client}
                     company={companies?.find((company) => company.id === client.company) as Company}
                     onActionClicked={onActionClicked}

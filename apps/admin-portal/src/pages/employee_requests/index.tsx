@@ -198,6 +198,7 @@ export default function EmployeeRequestsPage() {
                 }}
                 renderItem={(request) => (
                   <EmployeeRequestCard
+                    key={request.id}
                     employeeRequest={request}
                     employee={employees?.find((e) => e.id === request.employee_id) || null}
                     onActionClicked={onActionClicked}

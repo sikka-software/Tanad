@@ -189,7 +189,11 @@ export default function OnlineStoresPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(onlineStore) => (
-                  <OnlineStoreCard onlineStore={onlineStore} onActionClicked={onActionClicked} />
+                  <OnlineStoreCard
+                    key={onlineStore.id}
+                    onlineStore={onlineStore}
+                    onActionClicked={onActionClicked}
+                  />
                 )}
                 gridCols="3"
               />

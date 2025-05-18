@@ -136,7 +136,9 @@ export default function UsersPage() {
                 data={sortedUsers}
                 isLoading={isLoading}
                 error={error as Error | null}
-                renderItem={(user) => <UserCard user={user} onActionClicked={onActionClicked} />}
+                renderItem={(user) => (
+                  <UserCard key={user.id} user={user} onActionClicked={onActionClicked} />
+                )}
                 gridCols="3"
               />
             </div>

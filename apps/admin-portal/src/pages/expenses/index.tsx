@@ -189,7 +189,11 @@ export default function ExpensesPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(expense) => (
-                  <ExpenseCard expense={expense} onActionClicked={onActionClicked} />
+                  <ExpenseCard
+                    key={expense.id}
+                    expense={expense}
+                    onActionClicked={onActionClicked}
+                  />
                 )}
                 gridCols="3"
               />

@@ -185,7 +185,11 @@ export default function WebsitesPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(website) => (
-                  <WebsiteCard website={website} onActionClicked={onActionClicked} />
+                  <WebsiteCard
+                    key={website.id}
+                    website={website}
+                    onActionClicked={onActionClicked}
+                  />
                 )}
                 gridCols="3"
               />

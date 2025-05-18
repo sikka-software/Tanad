@@ -190,7 +190,11 @@ export default function PurchasesPage() {
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(purchase) => (
-                  <PurchaseCard purchase={purchase} onActionClicked={onActionClicked} />
+                  <PurchaseCard
+                    key={purchase.id}
+                    purchase={purchase}
+                    onActionClicked={onActionClicked}
+                  />
                 )}
                 gridCols="3"
               />

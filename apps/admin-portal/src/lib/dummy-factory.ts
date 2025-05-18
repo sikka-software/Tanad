@@ -1,5 +1,7 @@
 import { parseDate } from "@internationalized/date";
 
+import { ExpenseStatus } from "@/modules/expense/expense.type";
+
 import { E_COMMERCE_PLATFORMS, SERVER_OS, SERVER_PROVIDERS } from "./constants";
 import { generateDummyData } from "./dummy-generator";
 
@@ -30,6 +32,23 @@ export const generateDummyWarehouse = () => {
     form.setValue("phone", "123-456-7890");
     form.setValue("email", "warehouse@example.com");
     form.setValue("notes", "This is a dummy warehouse");
+  }
+};
+
+export const generateDummyInvoice = () => {
+  const dummyData = generateDummyData();
+
+  const form = (window as any).invoiceForm;
+  if (form) {
+    // code randomly
+    form.setValue(
+      "invoice_number",
+      "INV-" + Math.random().toString(36).substring(2, 5).toUpperCase(),
+    );
+    form.setValue("issue_date", dummyData.randomParsedDate());
+    form.setValue("due_date", dummyData.randomParsedDate());
+    form.setValue("status", "draft");
+    form.setValue("tax_rate", 0.1);
   }
 };
 
@@ -223,13 +242,16 @@ export const generateDummyExpense = () => {
   const dummyData = generateDummyData();
   const form = (window as any).expenseForm;
   if (form) {
-    form.setValue("expense_number", dummyData.stringNumber);
-    // form.setValue("issue_date", dummyData.randomDate);
-    // form.setValue("due_date", dummyData.randomDate);
+    form.setValue(
+      "expense_number",
+      "EXP-" + Math.random().toString(36).substring(2, 5).toUpperCase(),
+    );
+    form.setValue("issue_date", dummyData.randomParsedDate());
+    form.setValue("due_date", dummyData.randomParsedDate());
     form.setValue("amount", dummyData.randomNumber(4));
     form.setValue("category", dummyData.expense_category);
     form.setValue("notes", dummyData.randomString);
-    form.setValue("status", dummyData.pick(["pending", "paid", "overdue"]));
+    form.setValue("status", dummyData.randomPicker(ExpenseStatus as any));
   }
 };
 

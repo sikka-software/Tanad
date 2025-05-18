@@ -80,6 +80,7 @@ export default function ContactsPage() {
               }}
               renderItem={(client) => (
                 <ClientCard
+                  key={client.id}
                   client={client}
                   company={companies?.find((company) => company.id === client.company) as Company}
                   onActionClicked={() => console.log("TODO")}
@@ -102,7 +103,11 @@ export default function ContactsPage() {
                 onClick: () => router.push(router.pathname + "/add"),
               }}
               renderItem={(vendor) => (
-                <VendorCard vendor={vendor} onActionClicked={() => console.log("TODO")} />
+                <VendorCard
+                  key={vendor.id}
+                  vendor={vendor}
+                  onActionClicked={() => console.log("TODO")}
+                />
               )}
               gridCols="3"
             />

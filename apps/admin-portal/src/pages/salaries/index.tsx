@@ -188,6 +188,7 @@ export default function SalariesPage() {
                 }}
                 renderItem={(salary) => (
                   <SalaryCard
+                    key={salary.id}
                     salary={salary}
                     employee={
                       employees?.find((e) => e.id === salary.employee_id)?.first_name +
