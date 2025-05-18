@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
 
 import ModuleCard from "@/components/cards/module-card";
@@ -15,6 +17,7 @@ const PurchaseCard = ({
   purchase: Purchase;
   onActionClicked: (action: string, rowId: string) => void;
 }) => {
+  const t = useTranslations();
   const currency = useAppCurrencySymbol().symbol;
   const { mutate: updatePurchase } = useUpdatePurchase();
   const data = usePurchaseStore((state) => state.data);
@@ -40,10 +43,15 @@ const PurchaseCard = ({
       onDuplicate={() => onActionClicked("duplicate", purchase.id)}
     >
       <div className="space-y-3">
-        <p className="money text-sm text-gray-500">
-          {MoneyFormatter(purchase.amount || 0)} {currency}
+        <p className="text-sm text-gray-500">
+          {t("Purchases.form.due_date.label")} {purchase.due_date}
         </p>
-        <p className="text-sm text-gray-500">Due Date: {purchase.due_date}</p>
+        <div className="flex items-center justify-end gap-2 text-sm">
+          <span className="money text-xl font-bold">
+            {MoneyFormatter(purchase.amount || 0)}
+            {currency}
+          </span>
+        </div>
       </div>
     </ModuleCard>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { parsePhoneNumber } from "libphonenumber-js/min";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import * as React from "react";
 
@@ -14,13 +14,12 @@ import {
   CommandItem,
   CommandList,
 } from "@/ui/command";
+import { useFormField } from "@/ui/form";
 import { Input } from "@/ui/inputs/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 
 import { countries } from "@/lib/constants/countries";
 import { cn } from "@/lib/utils";
-
-import { useFormField } from "../form";
 
 interface PhoneInputProps {
   value: string;
@@ -29,26 +28,18 @@ interface PhoneInputProps {
   disabled?: boolean;
 }
 
-export default function PhoneInput({
-  value,
-  defaultValue,
-  onChange,
-  disabled,
-  ...props
-}: PhoneInputProps) {
+export default function PhoneInput({ value, defaultValue, onChange, disabled }: PhoneInputProps) {
   const t = useTranslations();
   const locale = useLocale();
   const [open, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = React.useState(countries[0]);
   const { error } = useFormField();
 
-  // Get the local value (without country code) from the full number
   const getLocalValue = (fullNumber: string, countryCode: string) => {
     if (!fullNumber) return "";
     return fullNumber.startsWith(countryCode) ? fullNumber.slice(countryCode.length) : fullNumber;
   };
 
-  // Get the initial local value
   const initialLocalValue = React.useMemo(() => {
     try {
       if (value) {
@@ -117,7 +108,7 @@ export default function PhoneInput({
             </div>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[240px] p-0" align="start">
+        <PopoverContent className="w-[280px] p-0" align="start">
           <Command>
             <CommandInput placeholder={t("General.search_country")} />
             <CommandList>
