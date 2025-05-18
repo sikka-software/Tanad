@@ -1,12 +1,6 @@
-import {
-  VisibilityState,
-  Updater as TableUpdater,
-  ColumnFilter,
-  ColumnFiltersState,
-  OnChangeFn,
-} from "@tanstack/react-table";
+import { ColumnFilter, ColumnFiltersState, OnChangeFn } from "@tanstack/react-table";
 import { pick } from "lodash";
-import { FileUser, Plus } from "lucide-react";
+import { FileUser, Plus, UsersRound } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -57,6 +51,7 @@ export default function EmployeesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<EmployeeUpdateData | null>(null);
+  const [hasRequests, setHasRequests] = useState(false);
 
   // Permissions
   const canRead = moduleHooks.useCanRead();
@@ -105,7 +100,8 @@ export default function EmployeesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(
-    (options?: { cascade?: boolean }) => deleteEmployees({ ids: pendingDeleteIds, cascade: options?.cascade }),
+    (options?: { cascade?: boolean }) =>
+      deleteEmployees({ ids: pendingDeleteIds, cascade: options?.cascade }),
     {
       loading: "Employees.loading.delete",
       success: "Employees.success.delete",
@@ -115,7 +111,7 @@ export default function EmployeesPage() {
         setPendingDeleteIds([]);
         setIsDeleteDialogOpen(false);
       },
-    }
+    },
   );
 
   const storeData = useEmployeeStore((state) => state.data) || [];
@@ -219,6 +215,26 @@ export default function EmployeesPage() {
     setActionableItem(null);
   }, [setIsFormDialogOpen, setLoadingSave, setActionableItem]);
 
+  useEffect(() => {
+    if (pendingDeleteIds.length > 0) {
+      // Check if any of the selected employees have requests
+      fetch("/api/resource/employees/check_requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: pendingDeleteIds }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setHasRequests(data.has_requests);
+        })
+        .catch((error) => {
+          console.error("Error checking employee requests:", error);
+        });
+    } else {
+      setHasRequests(false);
+    }
+  }, [pendingDeleteIds]);
+
   if (!canRead) {
     return <NoPermission />;
   }
@@ -236,33 +252,28 @@ export default function EmployeesPage() {
         ) : (
           <PageSearchAndFilter
             store={useEmployeeStore}
-            title={t("Pages.Employees.title")}
-            createLabel={t("Pages.Employees.add")}
-            searchPlaceholder={t("Pages.Employees.search")}
             columns={viewMode === "table" ? columns : []}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            onAddClick={canCreate ? handleAddClickForEmptyList : undefined}
+            title={t("Pages.Employees.title")}
+            onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
+            createLabel={t("Pages.Employees.add")}
+            searchPlaceholder={t("Pages.Employees.search")}
             hideOptions={employeesFromHook?.length === 0}
           />
         )}
+
         <div>
           {viewMode === "table" ? (
             <EmployeesTable
-              data={storeData}
+              data={sortedDataForCards}
               isLoading={isLoading}
               error={error}
               onActionClicked={onActionClicked}
-              sorting={tanstackSorting}
-              onSortingChange={handleTanstackSortingChange}
-              globalFilter={searchQuery}
-              onGlobalFilterChange={handleTanstackGlobalFilterChange}
-              columnFilters={columnFiltersConfigForTable}
-              onColumnFiltersChange={handleColumnFiltersChange}
             />
           ) : (
             <div className="p-4">
-              <DataModelList<Employee>
+              <DataModelList
                 data={sortedDataForCards}
                 isLoading={isLoading}
                 error={error}
@@ -270,14 +281,15 @@ export default function EmployeesPage() {
                   title: t("Employees.create_first.title"),
                   description: t("Employees.create_first.description"),
                   add: t("Pages.Employees.add"),
-                  icons: [FileUser, Plus, FileUser],
-                  onClick: handleAddClickForEmptyList,
+                  icons: [UsersRound, Plus, UsersRound],
+                  onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(employee) => (
                   <EmployeeCard
+                    key={employee.id}
+                    employee={employee}
                     position={jobs?.find((j) => j.id === employee.job_id)?.title || ""}
                     onActionClicked={onActionClicked}
-                    employee={employee}
                   />
                 )}
                 gridCols="3"
@@ -310,7 +322,7 @@ export default function EmployeesPage() {
           description={t("Employees.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}
           onCancel={() => selectedRows.length === 1 && viewMode === "cards" && setSelectedRows([])}
-          showCascadeOption={true}
+          showCascadeOption={hasRequests}
           cascadeDescription={t("Employees.cascade_delete_description")}
         />
       </DataPageLayout>

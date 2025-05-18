@@ -161,15 +161,32 @@ export function useBulkDeleteEmployees() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (params: { ids: string[]; cascade?: boolean }) => {
-      const response = await bulkDeleteResource("/api/resource/employees", params.ids, { cascade: params.cascade });
-      if (!response.ok) {
-        throw new Error("Failed to delete employees");
+      // First check if any of the employees have requests
+      const checkResponse = await fetch("/api/resource/employees/check_requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: params.ids }),
+      });
+
+      if (!checkResponse.ok) {
+        throw new Error("Failed to check employee requests");
       }
-      const data = await response.json();
-      return data;
+
+      const checkData = await checkResponse.json();
+      
+      // If there are requests but cascade is not enabled, throw an error
+      if (checkData.has_requests && !params.cascade) {
+        throw new Error(`Cannot delete employees with ${checkData.request_count} associated requests. Please use cascade delete.`);
+      }
+
+      // Proceed with deletion
+      return await bulkDeleteResource("/api/resource/employees", params.ids, { cascade: params.cascade });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
+    },
+    meta: {
+      toast: { success: "Employees.success.delete", error: "Employees.error.delete" },
     },
   });
 }

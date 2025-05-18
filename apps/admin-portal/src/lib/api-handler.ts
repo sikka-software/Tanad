@@ -102,8 +102,8 @@ export function createApiHandler({ tableName, customHandlers = {} }: Options) {
 
         case "DELETE":
           if (customHandlers.DELETE) {
-            await customHandlers.DELETE(supabase, user_id, req);
-            return res.status(204).end();
+            const data = await customHandlers.DELETE(supabase, user_id, req);
+            return res.status(200).json(data);
           }
 
           const { ids } = req.body;

@@ -128,17 +128,20 @@ export default function DepartmentForm({
 
   const renderLocationOption = (option: MultiSelectOption<LocationValue>) => {
     const type = (option as LocationOption).metadata?.type;
-    const typeLabel = type ? t(`Pages.${convertToPascalCase(type)}s.title`) : "";
+    let typeLabel;
     let typeIcon;
     switch (type) {
       case "office":
         typeIcon = <BuildingIcon className="!text-muted-foreground !size-3" />;
+        typeLabel = type ? t(`Pages.Offices.title`) : "";
         break;
       case "branch":
         typeIcon = <StoreIcon className="!text-muted-foreground !size-3" />;
+        typeLabel = type ? t(`Pages.Branches.title`) : "";
         break;
       case "warehouse":
         typeIcon = <WarehouseIcon className="!text-muted-foreground !size-3" />;
+        typeLabel = type ? t(`Pages.Warehouses.title`) : "";
         break;
     }
     return (
