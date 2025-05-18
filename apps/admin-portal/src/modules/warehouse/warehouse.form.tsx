@@ -120,6 +120,7 @@ export function WarehouseForm({
           {
             id: defaultValues.id,
             data: {
+              ...data,
               name: data.name.trim(),
               code: data.code.trim(),
               capacity: data.capacity,
@@ -147,6 +148,7 @@ export function WarehouseForm({
       } else {
         await createWarehouse(
           {
+            ...data,
             user_id: user?.id || "",
             enterprise_id: enterprise?.id || "",
             name: data.name.trim(),
