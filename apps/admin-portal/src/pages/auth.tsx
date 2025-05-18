@@ -68,8 +68,9 @@ export default function Auth() {
 
       if (error) throw error;
       toast.success(t("Auth.logged_in_successfully"));
-      setLoading(false);
-      window.location.href = "/dashboard";
+      router.push("/dashboard").then(() => {
+        setLoading(false);
+      });
     } catch (error: any) {
       const errorCode = error.code || error.message;
       toast.error(t("Auth.error_occured"), {

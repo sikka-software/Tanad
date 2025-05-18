@@ -97,25 +97,9 @@ const useBranchColumns = (
         );
       },
     },
-
-    {
-      accessorKey: "address",
-      header: t("Forms.address.label"),
-    },
-    {
-      accessorKey: "city",
-      header: t("Forms.city.label"),
-      enableHiding: true,
-    },
-    {
-      accessorKey: "region",
-      header: t("Forms.region.label"),
-    },
-    {
-      accessorKey: "zip_code",
-      header: t("Forms.zip_code.label"),
-    },
-
+    { accessorKey: "city", header: t("Forms.city.label") },
+    { accessorKey: "region", header: t("Forms.region.label") },
+    { accessorKey: "zip_code", header: t("Forms.zip_code.label") },
     {
       accessorKey: "created_at",
       maxSize: 95,

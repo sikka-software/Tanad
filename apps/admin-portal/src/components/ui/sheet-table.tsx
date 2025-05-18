@@ -29,6 +29,8 @@ import {
   ColumnFiltersState,
   getSortedRowModel,
   getFilteredRowModel,
+  Updater,
+  VisibilityState,
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useLocale, useTranslations } from "next-intl";
@@ -215,7 +217,7 @@ export interface SheetTableProps<T extends object> extends FooterProps {
   canPreviewAction?: boolean;
   // --- Column visibility ---
   columnVisibility?: Record<string, boolean>;
-  onColumnVisibilityChange?: (updater: any) => void;
+  onColumnVisibilityChange?: (updater: Updater<VisibilityState>) => void;
   sorting?: any;
   onSortingChange?: (updater: any) => void;
   // --- Filtering ---
