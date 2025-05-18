@@ -136,7 +136,7 @@ export default function UsersPage() {
                 data={sortedUsers}
                 isLoading={isLoading}
                 error={error as Error | null}
-                renderItem={(user) => <UserCard key={user.id} user={user} />}
+                renderItem={(user) => <UserCard user={user} onActionClicked={onActionClicked} />}
                 gridCols="3"
               />
             </div>
@@ -177,7 +177,16 @@ export default function UsersPage() {
   );
 }
 
-UsersPage.messages = ["Metadata", "Notes", "Pages", "Users", "Roles", "General"];
+UsersPage.messages = [
+  "Metadata",
+  "Notes",
+  "Pages",
+  "Users",
+  "Roles",
+  "General",
+  "CommonStatus",
+  "Metadata",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
