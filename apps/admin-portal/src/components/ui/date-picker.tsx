@@ -38,7 +38,7 @@ export function DatePicker({
           <Button
             variant={"outline"}
             className={cn(
-              "w-full justify-start text-left font-normal shadow-xs",
+              "w-full !bg-input-background justify-start text-left font-normal shadow-xs",
               !date && "text-muted-foreground",
               ariaInvalid &&
                 "ring-destructive/20 dark:ring-destructive/40 border-destructive border-e-none",
@@ -61,7 +61,7 @@ export function DatePicker({
             <Button
               variant={"outline"}
               className={cn(
-                "w-full justify-start text-left font-normal shadow-xs",
+                "w-full !bg-input-background justify-start text-left font-normal shadow-xs",
                 !date && "text-muted-foreground",
                 ariaInvalid &&
                   "ring-destructive/20 dark:ring-destructive/40 border-destructive border-e-none",

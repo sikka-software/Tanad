@@ -29,9 +29,9 @@ const createDomainSchema = (t: (key: string) => string) => {
     registrar: z.string().optional().or(z.literal("")),
     monthly_payment: z.number().optional().or(z.literal("")),
     annual_payment: z.number().optional().or(z.literal("")),
-    payment_cycle: z.string().min(1, t("Domains.form.payment_cycle.required")),
+    payment_cycle: z.string().min(1, t("PaymentCycles.required")),
     status: z.enum(CommonStatus, {
-      invalid_type_error: t("Domains.form.status.required"),
+      invalid_type_error: t("CommonStatus.required"),
     }),
     notes: z.any().optional().nullable(),
   });
@@ -276,11 +276,11 @@ export function DomainForm({
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Domains.form.status.label")}</FormLabel>
+                  <FormLabel>{t("CommonStatus.label")}</FormLabel>
                   <FormControl>
                     <BooleanTabs
-                      trueText={t("Domains.form.status.active")}
-                      falseText={t("Domains.form.status.inactive")}
+                      trueText={t("CommonStatus.active")}
+                      falseText={t("CommonStatus.inactive")}
                       value={field.value === "active"}
                       onValueChange={(newValue) => {
                         field.onChange(newValue ? "active" : "inactive");

@@ -82,7 +82,10 @@ export function DateInputField({
           <Group className="w-full">
             <DateInput
               isolated={isolated}
-              className={cn("rounded-e-none", error && "rounded-bl-none rtl:rounded-br-none")}
+              className={cn(
+                "bg-input-background rounded-e-none",
+                error && "rounded-bl-none rtl:rounded-br-none",
+              )}
             />
           </Group>
         </DateField>
@@ -93,7 +96,7 @@ export function DateInputField({
             type="button"
             variant="outline"
             className={cn(
-              "ms- flex !size-9 min-w-9 items-center justify-center rounded-s-none border-s-0 p-0 shadow-xs",
+              "bg-input-background flex !size-9 min-w-9 items-center justify-center rounded-s-none border-s-0 p-0 shadow-xs",
               error &&
                 "ring-destructive/20 dark:ring-destructive/40 border-destructive rounded-br-none rtl:rounded-bl-none",
             )}

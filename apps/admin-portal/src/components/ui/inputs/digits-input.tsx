@@ -39,7 +39,7 @@ export default function DigitsInput({ className, ...props }: React.ComponentProp
         id={id}
         maxLength={maxLength}
         dir="ltr"
-        containerClassName="flex items-center gap-3 has-disabled:opacity-50 w-full"
+        containerClassName="flex items-center gap-3 has-disabled:opacity-50 w-full "
         render={({ slots }) => (
           <>
             <div className="flex w-full rounded-md">
@@ -48,6 +48,7 @@ export default function DigitsInput({ className, ...props }: React.ComponentProp
                   key={idx}
                   {...slot}
                   className={cn(
+                    "bg-input-background",
                     {
                       "!rounded-bl-none": idx === 0 && error,
                       "!rounded-br-none": idx === slots.length - 1 && error,

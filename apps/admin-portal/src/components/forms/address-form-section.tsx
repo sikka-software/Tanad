@@ -44,18 +44,19 @@ export function AddressFormSection({
                     disabled={disabled}
                     placeholder={t("Forms.short_address.placeholder")}
                     {...field}
-                    value={field.value || ""} // Ensure controlled component
+                    value={field.value || ""}
                   />
                   <IconButton
+                    className="!bg-input-background rounded-inner-05 absolute end-0.5 top-0.5"
                     size="icon_sm"
                     buttonType="button"
                     disabled={disabled}
                     contentClassName="flex flex-col gap-1 max-w-40"
                     onClick={(e) => e.preventDefault()}
-                    icon={<MapPin className="size-6" />}
+                    icon={<MapPin className="!size-4" />}
                     label={
                       <div className="relative">
-                        <Badge className="absolute -end-4 -top-2 rounded-sm rounded-e-none !rounded-t-none bg-blue-200 p-1 px-2 text-[10px] text-black dark:bg-blue-800 dark:text-white">
+                        <Badge className="absolute -end-4 -top-2 rounded-md rounded-e-none !rounded-t-none bg-blue-200 p-1 px-2 text-[10px] text-black dark:bg-blue-800 dark:text-white">
                           {t("General.soon")}
                         </Badge>
                         <p className="text-sm font-medium">
@@ -66,7 +67,6 @@ export function AddressFormSection({
                         </p>
                       </div>
                     }
-                    className="absolute end-0.5 top-0.5"
                   />
                 </div>
               </FormControl>

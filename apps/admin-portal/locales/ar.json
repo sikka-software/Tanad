@@ -5022,6 +5022,7 @@
         "search_placeholder": "بحث عن منصة",
         "placeholder": "اختر المنصة",
         "required": "المنصة مطلوبة",
+        "no_items": "لا توجد منصات",
         "salla": "سلة",
         "zid": "زد",
         "shopify": "شوبفاي (Shopify)",

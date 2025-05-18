@@ -177,6 +177,9 @@ body {
 }
 
 @layer utilities {
+  .rounded-inner-05 {
+    border-radius: calc(var(--radius) - 0.125rem); /* 2px if 1rem = 16px */
+  }
   .rounded-inner-1 {
     border-radius: calc(var(--radius) - 0.25rem); /* 4px if 1rem = 16px */
   }

@@ -47,7 +47,7 @@ const createBranchSchema = (t: (key: string) => string) => {
       .optional()
       .nullable(),
     status: z.enum(CommonStatus, {
-      invalid_type_error: t("Branches.form.status.required"),
+      invalid_type_error: t("CommonStatus.required"),
     }),
 
     area: z.string().optional().nullable(),
@@ -339,11 +339,11 @@ export function BranchForm({
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Branches.form.status.label")}</FormLabel>
+                    <FormLabel>{t("CommonStatus.label")}</FormLabel>
                     <FormControl>
                       <BooleanTabs
-                        trueText={t("Branches.form.status.active")}
-                        falseText={t("Branches.form.status.inactive")}
+                        trueText={t("CommonStatus.active")}
+                        falseText={t("CommonStatus.inactive")}
                         value={field.value === "active"}
                         onValueChange={(newValue) => {
                           field.onChange(newValue ? "active" : "inactive");

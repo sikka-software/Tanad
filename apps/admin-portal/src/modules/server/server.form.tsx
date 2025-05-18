@@ -34,12 +34,12 @@ const createServerSchema = (t: (key: string) => string) => {
     provider: z.string().optional().or(z.literal("")),
     os: z.string().optional().or(z.literal("")),
     status: z.enum(CommonStatus, {
-      message: t("Servers.form.status.required"),
+      message: t("CommonStatus.required"),
     }),
     tags: z.array(z.string()).optional().or(z.literal("")),
     monthly_payment: z.number().optional().or(z.literal("")),
     annual_payment: z.number().optional().or(z.literal("")),
-    payment_cycle: z.string().min(1, t("Servers.form.payment_cycle.required")),
+    payment_cycle: z.string().min(1, t("PaymentCycles.required")),
     notes: z.any().optional().nullable(),
   });
   return ServerSelectSchema;
@@ -399,11 +399,11 @@ export function ServerForm({
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Servers.form.status.label")}</FormLabel>
+                  <FormLabel>{t("CommonStatus.label")}</FormLabel>
                   <FormControl>
                     <BooleanTabs
-                      trueText={t("Servers.form.status.active")}
-                      falseText={t("Servers.form.status.inactive")}
+                      trueText={t("CommonStatus.active")}
+                      falseText={t("CommonStatus.inactive")}
                       value={field.value === "active"}
                       onValueChange={(newValue) => {
                         field.onChange(newValue ? "active" : "inactive");

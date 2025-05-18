@@ -55,6 +55,7 @@ AddServerPage.messages = [
   "Servers",
   "General",
   "PaymentCycles",
+  "CommonStatus",
 ];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {

@@ -26,6 +26,7 @@ export interface UnitsInputProps {
   containerClassName?: string;
   inputClassName?: string;
   selectClassName?: string;
+  isolated?: boolean;
 }
 
 export default function UnitsInput({
@@ -36,6 +37,7 @@ export default function UnitsInput({
   containerClassName = "",
   inputClassName = "",
   selectClassName = "",
+  isolated = false,
 }: UnitsInputProps) {
   const id = useId();
   const {
@@ -58,7 +60,7 @@ export default function UnitsInput({
       <div className="flex rounded-md shadow-xs">
         <Input
           id={id}
-          className={"-me-px rounded-e-none shadow-none focus-visible:z-10 " + inputClassName}
+          className={"-me-px rounded-e-none shadow-none border-s-0 focus-visible:z-10 " + inputClassName}
           {...inputProps}
         />
         <Select
@@ -68,7 +70,8 @@ export default function UnitsInput({
           {...restSelectProps}
         >
           <SelectTrigger
-            className={cn("max-w-24 rounded-e-none", selectClassName)}
+            isolated={isolated}
+            className={cn("max-w-24 border-e-0 rounded-e-none", selectClassName)}
             disabled={inputProps.disabled}
           >
             <SelectValue placeholder={selectPlaceholder} />

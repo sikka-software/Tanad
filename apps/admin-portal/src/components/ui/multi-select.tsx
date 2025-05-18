@@ -232,7 +232,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
               {...props}
               onClick={handleTogglePopover}
               className={cn(
-                "flex h-auto min-h-10 w-full items-center justify-between rounded-md border bg-inherit p-1 hover:bg-inherit [&_svg]:pointer-events-auto",
+                "flex bg-input-background h-auto min-h-10 w-full items-center justify-between rounded-md border p-1 hover:bg-inherit [&_svg]:pointer-events-auto",
                 error && "form-button-input-invalid",
 
                 className,

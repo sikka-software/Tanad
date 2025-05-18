@@ -448,31 +448,13 @@ export function InvoiceForm({
         </form>
       </Form>
 
-      {/* <FormDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        title={t("Pages.Clients.add")}
-        formId="client-form"
-        cancelText={t("cancel")}
-        submitText={t("save")}
-        loadingSave={isClientSaving}
-      >
-        <ClientForm
-          formHtmlId="client-form"
-          nestedForm
-          onSuccess={() => {
-            setIsDialogOpen(false);
-            setIsClientSaving(false);
-          }}
-        />
-      </FormDialog> */}
       <FormDialog
         open={isNewProductDialogOpen}
         onOpenChange={setIsNewProductDialogOpen}
         title={t("Pages.Products.add")}
         formId="product-form"
-        cancelText={t("cancel")}
-        submitText={t("save")}
+        cancelText={t("General.cancel")}
+        submitText={t("General.save")}
         loadingSave={isSavingProduct}
       >
         <ProductForm

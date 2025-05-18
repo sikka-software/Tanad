@@ -165,7 +165,10 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                 </SidebarMenuSubButton>
                 {subItem.action && (
                   <SidebarMenuAction
-                    className="hover:border-primary absolute !end-1 top-1/2 -translate-y-1/2 cursor-pointer hover:border"
+                    className={cn(
+                      "hover:border-primary absolute !end-1 top-1/2 -translate-y-1/2 cursor-pointer hover:border",
+                      subItem.is_active && "hover:bg-secondary text-secondary",
+                    )}
                     onClick={(e) => {
                       e.stopPropagation();
                       e.preventDefault();
@@ -176,7 +179,7 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                     }}
                   >
                     <Plus className="!size-3" />
-                    <span className="sr-only">More</span>
+                    <span className="sr-only">Create New</span>
                   </SidebarMenuAction>
                 )}
               </SidebarMenuSubItem>
