@@ -141,6 +141,11 @@ interface MultiSelectProps<T = string>
    * Optional, defaults to false.
    */
   loading?: boolean;
+
+  /**
+   * If true, the multi-select won't use the useFormField hook
+   */
+  isolated?: boolean;
 }
 
 export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
@@ -161,6 +166,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
       getValueKey = (value: T) => (typeof value === "string" ? value : JSON.stringify(value)),
       isValueEqual = (a: T, b: T) => getValueKey(a) === getValueKey(b),
       loading = false,
+      isolated,
       ...props
     }: MultiSelectProps<T>,
     ref: React.Ref<HTMLButtonElement>,
@@ -168,7 +174,8 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const t = useTranslations();
     const locale = useLocale();
-    const { error } = useFormField();
+
+    const { error } = isolated ? { error: undefined } : useFormField();
 
     const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter") {

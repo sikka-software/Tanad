@@ -2,8 +2,8 @@ import { LabelProps } from "@radix-ui/react-label";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Plus } from "lucide-react";
 import * as React from "react";
-import { FieldError } from "react-hook-form";
 
+import { Button } from "@/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -12,14 +12,12 @@ import {
   CommandItem,
   CommandList,
 } from "@/ui/command";
+import { useFormField } from "@/ui/form";
 import { Label } from "@/ui/label";
 import { PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Skeleton } from "@/ui/skeleton";
 
 import { cn } from "@/lib/utils";
-
-import { Button } from "../button";
-import { useFormField } from "../form";
 
 type ComboboxAddTypes<T> = {
   labelKey?: keyof T | any;
@@ -83,11 +81,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
     const [selectedValue, setSelectedValue] = React.useState(defaultValue);
     const inputRef = React.useRef<HTMLInputElement>(null);
 
-    let error: FieldError | undefined;
-    if (!isolated) {
-      const { error: formError } = useFormField();
-      error = formError;
-    }
+    const { error } = isolated ? { error: undefined } : useFormField();
 
     React.useEffect(() => {
       setSelectedValue(defaultValue);

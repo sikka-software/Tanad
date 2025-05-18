@@ -1,7 +1,6 @@
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon, XIcon } from "lucide-react";
 import * as React from "react";
-import { FieldError } from "react-hook-form";
 
 import { cn } from "@/lib/utils";
 
@@ -33,12 +32,7 @@ function SelectTrigger({
   isolated?: boolean;
 }) {
   const triggerRef = React.useRef<HTMLButtonElement>(null);
-
-  let error: FieldError | undefined;
-  if (!isolated) {
-    const { error: formError } = useFormField();
-    error = formError;
-  }
+  const { error } = isolated ? { error: undefined } : useFormField();
 
   return (
     <SelectPrimitive.Trigger

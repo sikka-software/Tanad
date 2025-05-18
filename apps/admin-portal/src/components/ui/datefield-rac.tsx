@@ -11,7 +11,6 @@ import {
   TimeField as TimeFieldRac,
   TimeValue as TimeValueRac,
 } from "react-aria-components";
-import { FieldError } from "react-hook-form";
 
 import { cn } from "@/lib/utils";
 
@@ -70,11 +69,8 @@ function DateInput({
   unstyled = false,
   ...props
 }: Omit<DateInputProps, "children">) {
-  let error: FieldError | undefined;
-  if (!isolated) {
-    const { error: formError } = useFormField();
-    error = formError;
-  }
+  const { error } = isolated ? { error: undefined } : useFormField();
+
   return (
     <DateInputRac
       className={composeRenderProps(className, (className) =>

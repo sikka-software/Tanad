@@ -1,25 +1,13 @@
 "use client";
 
-import { Document, Page, PDFDownloadLink, Text, pdf } from "@react-pdf/renderer";
+import { pdf } from "@react-pdf/renderer";
 import { format } from "date-fns";
-import {
-  CalendarIcon,
-  Download,
-  Filter,
-  Search,
-  X,
-  Loader2,
-  ChevronDown,
-  DownloadIcon,
-  FileIcon,
-} from "lucide-react";
+import { Download, Filter, Search, X, Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState, useEffect, Fragment, useMemo } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
-import { Badge } from "@/ui/badge";
 import { Button } from "@/ui/button";
-import { Calendar } from "@/ui/calendar";
 import { DatePicker } from "@/ui/date-picker";
 import {
   DropdownMenu,
@@ -30,7 +18,7 @@ import {
 import IconButton from "@/ui/icon-button";
 import { Input } from "@/ui/inputs/input";
 import { Label } from "@/ui/label";
-import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
+import { MultiSelect } from "@/ui/multi-select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
@@ -208,6 +196,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                 <div className="flex flex-col gap-2">
                   <Label>{t("ActivityLogs.filters.date_range")}</Label>
                   <DatePicker
+                    isolated
                     placeholder={t("ActivityLogs.filters.select_date_range")}
                     date={filters.dateRange}
                     onSelect={(d) => {
@@ -216,13 +205,13 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                       }
                     }}
                     mode="range"
-                    isolated
                   />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{t("ActivityLogs.filters.user")}</label>
                   <MultiSelect
+                    isolated
                     options={
                       users?.map((user) => ({
                         id: user.id,
