@@ -160,9 +160,9 @@ export function useDeleteEmployee() {
 export function useBulkDeleteEmployees() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (ids: string[]) => {
-      console.log("ids", ids);
-      return bulkDeleteResource("/api/resource/employees", ids);
+    mutationFn: async (params: { ids: string[]; cascade?: boolean }) => {
+      console.log("params", params);
+      return bulkDeleteResource("/api/resource/employees", params.ids, { cascade: params.cascade });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });

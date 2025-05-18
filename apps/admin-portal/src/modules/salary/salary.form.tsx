@@ -9,21 +9,17 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Button } from "@/ui/button";
-import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import FormDialog from "@/ui/form-dialog";
 import { CurrencyInput } from "@/ui/inputs/currency-input";
 import { DateInput } from "@/ui/inputs/date-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
 import NotesSection from "@/forms/notes-section";
 
-import { generateDummyEmployee } from "@/lib/dummy-factory";
 import { validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
-import { EmployeeForm } from "@/employee/employee.form";
 import { useEmployees } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
 import { Employee } from "@/employee/employee.types";

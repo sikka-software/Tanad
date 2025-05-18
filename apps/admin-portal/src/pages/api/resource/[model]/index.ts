@@ -171,6 +171,25 @@ const modelMap: Record<string, ModelConfig> = {
         }
         return updatedEmployee;
       },
+      DELETE: async (supabase, user_id, req) => {
+        const { ids, cascade } = req.body;
+
+        if (!Array.isArray(ids)) {
+          throw new Error("Invalid request body. Expected array of ids.");
+        }
+
+        const { data, error } = await supabase.rpc("api_delete_employees", {
+          ids,
+          cascade: cascade || false,
+        });
+
+        if (error) {
+          console.error("Error deleting employees:", error);
+          throw error;
+        }
+
+        return { success: true };
+      },
     },
   },
   invoices: {

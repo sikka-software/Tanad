@@ -13,17 +13,22 @@ import {
 
 import { Button } from "./button";
 import { Input } from "./inputs/input";
+import { Checkbox } from "./checkbox";
 
 interface ConfirmDeleteProps {
   isDeleteDialogOpen: boolean;
   setIsDeleteDialogOpen: (open: boolean) => void;
   isDeleting: boolean;
-  handleConfirmDelete: () => void;
+  handleConfirmDelete: (options?: { cascade?: boolean }) => void;
   title: string;
   description: string;
   extraConfirm?: boolean;
   onCancel?: () => void;
+  children?: React.ReactNode;
+  showCascadeOption?: boolean;
+  cascadeDescription?: string;
 }
+
 const ConfirmDelete = ({
   isDeleteDialogOpen,
   setIsDeleteDialogOpen,
@@ -33,10 +38,14 @@ const ConfirmDelete = ({
   description,
   extraConfirm,
   onCancel,
+  children,
+  showCascadeOption,
+  cascadeDescription,
 }: ConfirmDeleteProps) => {
   const t = useTranslations();
   const locale = useLocale();
   const [confirmText, setConfirmText] = useState("");
+  const [cascadeDelete, setCascadeDelete] = useState(false);
 
   const confirmString = locale === "ar" ? "نعم" : "confirm";
 
@@ -46,6 +55,8 @@ const ConfirmDelete = ({
       onOpenChange={(open) => {
         if (!isDeleting) {
           setIsDeleteDialogOpen(open);
+          setCascadeDelete(false);
+          setConfirmText("");
         }
         if (!open) {
           onCancel?.();
@@ -69,6 +80,22 @@ const ConfirmDelete = ({
             />
           </>
         )}
+        {showCascadeOption && (
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="cascade"
+              checked={cascadeDelete}
+              onCheckedChange={(checked) => setCascadeDelete(checked as boolean)}
+            />
+            <label
+              htmlFor="cascade"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              {cascadeDescription || t("General.cascade_delete")}
+            </label>
+          </div>
+        )}
+        {children && children}
         <DialogFooter>
           <Button
             onClick={() => {
@@ -80,7 +107,7 @@ const ConfirmDelete = ({
             {t("General.cancel")}
           </Button>
           <Button
-            onClick={handleConfirmDelete}
+            onClick={() => handleConfirmDelete({ cascade: cascadeDelete })}
             disabled={isDeleting || (extraConfirm && confirmText !== confirmString)}
             className="bg-destructive hover:bg-destructive/90 min-w-24 text-white"
           >

@@ -219,7 +219,8 @@
     "report_issue_title": "Report an Issue",
     "report_issue_description": "Help us by providing additional details about what happened.",
     "report_issue_thank_you": "Thank you for your report",
-    "report_issue_description_thank_you": "Our team has been notified and will investigate this issue soon."
+    "report_issue_description_thank_you": "Our team has been notified and will investigate this issue soon.",
+    "cascade_delete": "Delete related data"
   },
   "Flags": {
     "timezone_soon": {
@@ -3368,7 +3369,8 @@
       "notes": {
         "label": "Notes",
         "placeholder": "Enter notes"
-      }
+      },
+      "cascade_delete_description": "Also delete all requests associated with this employee"
     }
   },
   "Contacts": {

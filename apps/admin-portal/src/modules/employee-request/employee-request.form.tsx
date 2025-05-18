@@ -1,48 +1,41 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
-import { format } from "date-fns";
 import { createInsertSchema } from "drizzle-zod";
-import { CalendarIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { Button } from "@/ui/button";
-import { Calendar } from "@/ui/calendar";
-import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import FormDialog from "@/ui/form-dialog";
 import { DateInput } from "@/ui/inputs/date-input";
 import { Input } from "@/ui/inputs/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
 import NotesSection from "@/components/forms/notes-section";
 
-import { cn, getNotesValue, validateYearRange } from "@/lib/utils";
+import { getNotesValue, validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
-import { EmployeeForm } from "@/employee/employee.form";
+import EmployeeCombobox from "@/employee/employee.combobox";
 import { useEmployees } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
 
+import {
+  useCreateEmployeeRequest,
+  useUpdateEmployeeRequest,
+} from "@/employee-request/employee-request.hooks";
 import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
-
-import { employee_requests } from "@/db/schema";
-import useUserStore from "@/stores/use-user-store";
-
-import EmployeeCombobox from "../employee/employee.combobox";
-import { InvoiceStatus } from "../invoice/invoice.type";
-import { useCreateEmployeeRequest, useUpdateEmployeeRequest } from "./employee-request.hooks";
 import {
   EmployeeRequestCreateData,
   EmployeeRequestStatus,
   EmployeeRequestUpdateData,
-} from "./employee-request.type";
+} from "@/employee-request/employee-request.type";
+
+import { employee_requests } from "@/db/schema";
+import useUserStore from "@/stores/use-user-store";
 
 const createRequestSchema = (t: (key: string) => string) => {
   const RequestSelectSchema = createInsertSchema(employee_requests, {
@@ -126,16 +119,16 @@ export function EmployeeRequestForm({
     },
   });
 
-  const employeeOptions = employees.map((emp) => {
-    return {
-      label: `${emp.first_name} ${emp.last_name}`,
-      value: emp.email,
-      id: emp.id,
-    };
-  });
-
   const handleSubmit = async (data: EmployeeRequestFormValues) => {
     setIsLoadingSave(true);
+
+    const formatDate = (val: any) => {
+      if (!val) return undefined;
+      if (val instanceof Date) return val.toISOString().split("T")[0];
+      if (typeof val === "string") return val;
+      if (val && typeof val.toString === "function") return val.toString();
+      return val;
+    };
 
     // Convert dates to string format expected by the backend/type
     const baseSubmitData = {
@@ -143,8 +136,8 @@ export function EmployeeRequestForm({
       title: data.title.trim(),
       description: data.description?.trim() || undefined,
       notes: data.notes,
-      start_date: data.start_date.toString(),
-      end_date: data.end_date.toString(),
+      start_date: formatDate(data.start_date),
+      end_date: formatDate(data.end_date),
     };
 
     try {

@@ -104,16 +104,19 @@ export default function EmployeesPage() {
     moduleName: "Employees",
   });
 
-  const handleConfirmDelete = createDeleteHandler(deleteEmployees, {
-    loading: "Employees.loading.delete",
-    success: "Employees.success.delete",
-    error: "Employees.error.delete",
-    onSuccess: () => {
-      clearSelection();
-      setPendingDeleteIds([]);
-      setIsDeleteDialogOpen(false);
-    },
-  });
+  const handleConfirmDelete = createDeleteHandler(
+    (options?: { cascade?: boolean }) => deleteEmployees({ ids: pendingDeleteIds, cascade: options?.cascade }),
+    {
+      loading: "Employees.loading.delete",
+      success: "Employees.success.delete",
+      error: "Employees.error.delete",
+      onSuccess: () => {
+        clearSelection();
+        setPendingDeleteIds([]);
+        setIsDeleteDialogOpen(false);
+      },
+    }
+  );
 
   const storeData = useEmployeeStore((state) => state.data) || [];
   const setData = useEmployeeStore((state) => state.setData);
@@ -302,11 +305,13 @@ export default function EmployeesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
+          handleConfirmDelete={handleConfirmDelete}
           title={t("Employees.confirm_delete", { count: selectedRows.length })}
           description={t("Employees.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}
           onCancel={() => selectedRows.length === 1 && viewMode === "cards" && setSelectedRows([])}
+          showCascadeOption={true}
+          cascadeDescription={t("Employees.cascade_delete_description")}
         />
       </DataPageLayout>
     </div>
