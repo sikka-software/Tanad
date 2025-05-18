@@ -1,0 +1,1 @@
+CREATE TYPE "public"."employee_request_type" AS ENUM('leave', 'expense', 'document', 'other');

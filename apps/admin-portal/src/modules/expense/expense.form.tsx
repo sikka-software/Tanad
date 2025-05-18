@@ -33,12 +33,9 @@ export const createExpenseSchema = (t: (key: string) => string) => {
     expense_number: z
       .string({ message: t("Expenses.form.expense_number.required") })
       .min(1, t("Expenses.form.expense_number.required")),
-    description: z.string().optional(),
     amount: z.coerce
       .number({ message: t("Expenses.form.amount.required") })
       .min(0, t("Expenses.form.amount.required")),
-    incurred_at: z.any().optional(),
-    created_by: z.string().optional(),
     category: z
       .string({ message: t("Expenses.form.category.required") })
       .min(1, t("Expenses.form.category.required")),
@@ -50,8 +47,8 @@ export const createExpenseSchema = (t: (key: string) => string) => {
       .any()
       .optional()
       .superRefine(validateYearRange(t, 1800, 2200, "Expenses.form.issue_date.invalid")),
-    notes: z.any().optional().nullable(),
     status: z.enum(ExpenseStatus).default("draft"),
+    notes: z.any().optional().nullable(),
   });
 
   return ExpenseSelectSchema;
@@ -68,42 +65,32 @@ export function ExpenseForm({
   const t = useTranslations();
   const locale = useLocale();
   const user = useUserStore((state) => state.user);
-  const enterprise = useUserStore((state) => state.enterprise);
   const { mutate: createExpense } = useCreateExpense();
   const { mutate: updateExpense } = useUpdateExpense();
   const { data: expenses } = useExpenses();
 
-  const isLoading = useExpenseStore((state) => state.isLoading);
-  const setIsLoading = useExpenseStore((state) => state.setIsLoading);
+  const isLoadingSave = useExpenseStore((state) => state.isLoading);
+  const setIsLoadingSave = useExpenseStore((state) => state.setIsLoading);
 
   const form = useForm<ExpenseFormValues>({
     resolver: zodResolver(createExpenseSchema(t)),
     defaultValues: {
       ...defaultValues,
-      description: defaultValues?.description || "",
-      created_by: defaultValues?.created_by || "",
-      issue_date: defaultValues?.issue_date
-        ? typeof defaultValues.issue_date === "string"
-          ? parseDate(defaultValues.issue_date.split("T")[0])
-          : parseDate(new Date(defaultValues.issue_date).toISOString().split("T")[0])
-        : parseDate(new Date().toISOString().split("T")[0]),
-      due_date: defaultValues?.due_date
-        ? typeof defaultValues.due_date === "string"
-          ? parseDate(defaultValues.due_date.split("T")[0])
-          : parseDate(new Date(defaultValues.due_date).toISOString().split("T")[0])
-        : undefined,
+      issue_date: formatToYYYYMMDD(defaultValues?.issue_date),
+      due_date: formatToYYYYMMDD(defaultValues?.due_date),
       notes: getNotesValue(defaultValues),
     },
   });
 
   const handleSubmit = async (data: ExpenseFormValues) => {
-    setIsLoading(true);
+    setIsLoadingSave(true);
     if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
       return;
     }
+
     const payload = {
       ...data,
       due_date: formatToYYYYMMDD(data.due_date),
@@ -111,16 +98,16 @@ export function ExpenseForm({
     };
 
     try {
-      if (editMode) {
-        await updateExpense({ id: defaultValues?.id || "", data: payload });
+      if (editMode && defaultValues?.id) {
+        await updateExpense({ id: defaultValues.id, data: payload });
       } else {
         await createExpense(payload, {
           onSuccess: () => onSuccess?.(),
-          onError: () => setIsLoading(false),
+          onError: () => setIsLoadingSave(false),
         });
       }
     } catch (error) {
-      setIsLoading(false);
+      setIsLoadingSave(false);
     }
   };
 
@@ -135,11 +122,10 @@ export function ExpenseForm({
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          console.log("form errors ", form.formState.errors);
           form.handleSubmit(handleSubmit)(e);
         }}
       >
-        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
-        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
         <div className="form-container">
           <div className="form-fields-cols-2">
             <FormField
@@ -167,7 +153,7 @@ export function ExpenseForm({
                       }}
                       inputProps={{
                         placeholder: t("Expenses.form.expense_number.placeholder"),
-                        disabled: isLoading,
+                        disabled: isLoadingSave,
                         ...field,
                       }}
                     />
@@ -186,7 +172,7 @@ export function ExpenseForm({
                     <Input
                       placeholder={t("Expenses.form.category.placeholder")}
                       {...field}
-                      disabled={isLoading}
+                      disabled={isLoadingSave}
                     />
                   </FormControl>
                   <FormMessage />
@@ -212,7 +198,7 @@ export function ExpenseForm({
                       }
                       onChange={field.onChange}
                       onSelect={(e) => field.onChange(e)}
-                      disabled={isLoading}
+                      disabled={isLoadingSave}
                     />
                   </FormControl>
                   <FormMessage />
@@ -236,7 +222,7 @@ export function ExpenseForm({
                       }
                       onChange={field.onChange}
                       onSelect={(e) => field.onChange(e)}
-                      disabled={isLoading}
+                      disabled={isLoadingSave}
                     />
                   </FormControl>
                   <FormMessage />
@@ -258,7 +244,7 @@ export function ExpenseForm({
                       value={field.value ? parseFloat(String(field.value)) : undefined}
                       onChange={(value) => field.onChange(value?.toString() || "")}
                       placeholder={t("Expenses.form.amount.placeholder")}
-                      disabled={isLoading}
+                      disabled={isLoadingSave}
                     />
                   </FormControl>
                   <FormMessage />
@@ -276,7 +262,7 @@ export function ExpenseForm({
                     dir={locale === "ar" ? "rtl" : "ltr"}
                     onValueChange={field.onChange}
                     defaultValue={field.value}
-                    disabled={isLoading}
+                    disabled={isLoadingSave}
                     {...field}
                   >
                     <FormControl>

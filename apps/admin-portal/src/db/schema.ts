@@ -322,6 +322,12 @@ export const employee_request_status = pgEnum("employee_request_status", [
   "escalated",
   "archived",
 ]);
+export const employee_request_type = pgEnum("employee_request_type", [
+  "leave",
+  "expense",
+  "document",
+  "other",
+]);
 export const purchase_status = pgEnum("purchase_status", [
   "draft",
   "issued",
@@ -344,7 +350,6 @@ export const payment_cycle = pgEnum("payment_cycle", [
   "biweekly",
   "quarterly",
 ]);
-
 export const vehicle_ownership_status = pgEnum("vehicle_ownership_status", [
   "owned",
   "financed",
@@ -1267,7 +1272,7 @@ export const employee_requests = pgTable(
     updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
 
     employee_id: uuid().notNull(),
-    type: text().notNull(),
+    type: employee_request_type().notNull(),
     status: employee_request_status().default("draft").notNull(),
     title: text().notNull(),
     description: text(),

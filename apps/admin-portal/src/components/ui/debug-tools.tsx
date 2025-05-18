@@ -13,10 +13,6 @@ const DebugTools = () => {
   const membership = useUserStore((state) => state.membership);
   const permissions = useUserStore((state) => state.permissions);
 
-  // console.table(user, ["id", "email", "created_at", "updated_at"]);
-  // console.table(profile, ["id", "email", "created_at", "updated_at"]);
-  // console.table(membership, ["id", "email", "created_at", "updated_at"]);
-  // console.table(enterprise, ["id", "email", "created_at", "updated_at"]);
   return (
     <div className="fixed bottom-14 left-1 z-50 flex flex-col gap-2 p-4">
       <Popover>
@@ -37,10 +33,8 @@ const DebugTools = () => {
                 <div className="text-xs break-all">{profile?.id}</div>
               </div>
               <div>
-                <div className="text-xs font-bold">Enterprise</div>
-                <div className="text-xs break-all">
-                  {enterprise?.name} ({enterprise?.id})
-                </div>
+                <div className="text-xs font-bold">Enterprise ID</div>
+                <div className="text-xs break-all">{enterprise?.id}</div>
               </div>
               <div>
                 <div className="text-xs font-bold">Role ID</div>

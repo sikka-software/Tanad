@@ -87,10 +87,15 @@ export function createApiHandler({ tableName, customHandlers = {} }: Options) {
             return res.status(201).json(data);
           }
 
+          // Remove empty fields from the body to prevent invalid data insertion
+          const filteredBody = Object.fromEntries(
+            Object.entries(req.body).filter(([, value]) => value !== "" && value !== undefined),
+          );
+
           const { data: createdData, error: createError } = await supabase
             .from(tableName)
             .insert({
-              ...req.body,
+              ...filteredBody,
               user_id,
               enterprise_id,
             })

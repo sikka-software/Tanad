@@ -1,0 +1,1 @@
+ALTER TABLE "employee_requests" ALTER COLUMN "type" SET DATA TYPE "public"."employee_request_type" USING "type"::"public"."employee_request_type";

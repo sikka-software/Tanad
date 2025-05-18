@@ -15,6 +15,7 @@ import { Textarea } from "@/ui/textarea";
 
 import NotesSection from "@/components/forms/notes-section";
 
+import { formatToYYYYMMDD } from "@/lib/date-utils";
 import { getNotesValue, validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
@@ -31,6 +32,8 @@ import useEmployeeRequestsStore from "@/employee-request/employee-request.store"
 import {
   EmployeeRequestCreateData,
   EmployeeRequestStatus,
+  EmployeeRequestType,
+  EmployeeRequestTypeProps,
   EmployeeRequestUpdateData,
 } from "@/employee-request/employee-request.type";
 
@@ -43,12 +46,11 @@ const createRequestSchema = (t: (key: string) => string) => {
       .string()
       .uuid({ message: t("EmployeeRequests.form.employee.required") })
       .nonempty({ message: t("EmployeeRequests.form.employee.required") }),
-    type: z.enum(["leave", "expense", "document", "other"]),
-    status: z.enum(EmployeeRequestStatus).optional(),
     title: z.string({ message: t("EmployeeRequests.form.title.required") }).min(1, {
       message: t("EmployeeRequests.form.title.required"),
     }),
-    description: z.string().optional(),
+    type: z.enum(EmployeeRequestType).default("other"),
+    status: z.enum(EmployeeRequestStatus).default("draft"),
     start_date: z
       .any()
       .refine((val) => val, {
@@ -66,14 +68,13 @@ const createRequestSchema = (t: (key: string) => string) => {
       .superRefine(validateYearRange(t, 1800, 2200, "EmployeeRequests.form.date_range.end.invalid"))
       .optional(),
 
-    amount: z.number().optional(),
+    amount: z.number().optional().nullable(),
     notes: z.any().optional().nullable(),
   });
   return RequestSelectSchema;
 };
 
-type EmployeeRequestFormSchema = ReturnType<typeof createRequestSchema>;
-export type EmployeeRequestFormValues = z.input<EmployeeRequestFormSchema>;
+export type EmployeeRequestFormValues = z.input<ReturnType<typeof createRequestSchema>>;
 
 export function EmployeeRequestForm({
   formHtmlId,
@@ -99,76 +100,45 @@ export function EmployeeRequestForm({
   const isLoadingSave = useEmployeeRequestsStore((state) => state.isLoading);
   const setIsLoadingSave = useEmployeeRequestsStore((state) => state.setIsLoading);
 
-  // Define literal types here, now that `t` is available
-  const concreteSchema = createRequestSchema(t);
-  type EmployeeRequestType = z.input<typeof concreteSchema>["type"];
-
   const form = useForm<EmployeeRequestFormValues>({
-    resolver: zodResolver(concreteSchema),
+    resolver: zodResolver(createRequestSchema(t)),
     mode: "onChange",
     defaultValues: {
-      employee_id: defaultValues?.employee_id || "",
-      type: (defaultValues?.type || "leave") as EmployeeRequestType,
-      status: defaultValues?.status || "draft",
-      title: defaultValues?.title || "",
-      description: defaultValues?.description || "",
-      start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
-      end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
-      amount: defaultValues?.amount || undefined,
+      ...defaultValues,
+      start_date: formatToYYYYMMDD(defaultValues?.start_date),
+      end_date: formatToYYYYMMDD(defaultValues?.end_date),
       notes: getNotesValue(defaultValues),
     },
   });
 
   const handleSubmit = async (data: EmployeeRequestFormValues) => {
     setIsLoadingSave(true);
+    if (!user?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      return;
+    }
 
-    const formatDate = (val: any) => {
-      if (!val) return undefined;
-      if (val instanceof Date) return val.toISOString().split("T")[0];
-      if (typeof val === "string") return val;
-      if (val && typeof val.toString === "function") return val.toString();
-      return val;
-    };
-
-    // Convert dates to string format expected by the backend/type
-    const baseSubmitData = {
+    const payload = {
       ...data,
-      title: data.title.trim(),
-      description: data.description?.trim() || undefined,
-      notes: data.notes,
-      start_date: formatDate(data.start_date),
-      end_date: formatDate(data.end_date),
+      type: data.type as EmployeeRequestTypeProps,
+      start_date: formatToYYYYMMDD(data.start_date),
+      end_date: formatToYYYYMMDD(data.end_date),
     };
 
     try {
-      if (editMode) {
-        // Ensure we only proceed if we have a valid id
-        if (!defaultValues?.id) {
-          console.error("Missing id for update");
-          setIsLoadingSave(false);
-          toast.error(t("General.error_operation"), {
-            description: t("EmployeeRequests.error.update"), // Or a more specific error
-          });
-          return; // Stop execution if critical data is missing
-        }
-
-        // Prepare update payload - `baseSubmitData` matches EmployeeRequestFormValues (zod output)
-        // EmployeeRequestUpdateData allows partial updates and matches the zod schema structure
-        const updatePayload: EmployeeRequestUpdateData = baseSubmitData;
-
-        await updateEmployeeRequest({ id: defaultValues.id, data: updatePayload });
+      if (editMode && defaultValues?.id) {
+        await updateEmployeeRequest({ id: defaultValues.id, data: payload });
         onSuccess?.();
       } else {
-        // For create, prepare data without user_id
-        const createPayload = baseSubmitData as EmployeeRequestCreateData;
-        await createEmployeeRequest(createPayload);
-        onSuccess?.();
+        await createEmployeeRequest(payload, {
+          onSuccess: () => onSuccess?.(),
+          onError: () => setIsLoadingSave(false),
+        });
       }
     } catch (error) {
       setIsLoadingSave(false);
-      toast.error(t("General.error_operation"), {
-        description: t("EmployeeRequests.error.create"),
-      });
     }
   };
 

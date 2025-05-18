@@ -136,7 +136,7 @@ export const CommandSelect = React.forwardRef<HTMLButtonElement, CommandSelectTy
                       : "bg-background px-3",
                     ariaInvalid &&
                       "ring-destructive/20 dark:ring-destructive/40 border-destructive",
-                    inCell && "ring-none h-10 rounded-none border-none shadow-none bg-transparent",
+                    inCell && "ring-none h-10 rounded-none border-none bg-transparent shadow-none",
                     buttonClassName,
                   )}
                 >
