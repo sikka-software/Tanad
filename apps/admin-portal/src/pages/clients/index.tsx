@@ -247,12 +247,14 @@ ClientsPage.messages = [
 ];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        ClientsPage.messages,
-      ),
-    },
-  };
+  try {
+    const messages = pick(
+      (await import(`../../../locales/${locale}.json`)).default,
+      ClientsPage.messages,
+    );
+    return { props: { messages } };
+  } catch (error) {
+    console.error("Error loading messages:", error);
+    return { props: { messages: {} } };
+  }
 };

@@ -232,12 +232,14 @@ export default function DepartmentsPage() {
 DepartmentsPage.messages = ["Metadata", "Notes", "Pages", "Departments", "General", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        DepartmentsPage.messages,
-      ),
-    },
-  };
+  try {
+    const messages = pick(
+      (await import(`../../../locales/${locale}.json`)).default,
+      DepartmentsPage.messages,
+    );
+    return { props: { messages } };
+  } catch (error) {
+    console.error("Error loading messages:", error);
+    return { props: { messages: {} } };
+  }
 };

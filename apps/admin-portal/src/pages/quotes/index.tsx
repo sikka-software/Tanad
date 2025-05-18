@@ -227,13 +227,16 @@ export default function QuotesPage() {
 }
 
 QuotesPage.messages = ["Metadata", "Notes", "Pages", "Quotes", "General", "ProductsFormSection"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        QuotesPage.messages,
-      ),
-    },
-  };
+  try {
+    const messages = pick(
+      (await import(`../../../locales/${locale}.json`)).default,
+      QuotesPage.messages,
+    );
+    return { props: { messages } };
+  } catch (error) {
+    console.error("Error loading messages:", error);
+    return { props: { messages: {} } };
+  }
 };

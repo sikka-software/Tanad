@@ -49,12 +49,14 @@ export default function AddExpensePage() {
 AddExpensePage.messages = ["Metadata", "Notes", "Pages", "Expenses", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddExpensePage.messages,
-      ),
-    },
-  };
+  try {
+    const messages = pick(
+      (await import(`../../../locales/${locale}.json`)).default,
+      AddExpensePage.messages,
+    );
+    return { props: { messages } };
+  } catch (error) {
+    console.error("Error loading messages:", error);
+    return { props: { messages: {} } };
+  }
 };

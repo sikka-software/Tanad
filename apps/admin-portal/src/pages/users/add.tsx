@@ -47,12 +47,14 @@ export default function AddUserPage() {
 AddUserPage.messages = ["Metadata", "Notes", "Pages", "Users", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddUserPage.messages,
-      ),
-    },
-  };
+  try {
+    const messages = pick(
+      (await import(`../../../locales/${locale}.json`)).default,
+      AddUserPage.messages,
+    );
+    return { props: { messages } };
+  } catch (error) {
+    console.error("Error loading messages:", error);
+    return { props: { messages: {} } };
+  }
 };
