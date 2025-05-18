@@ -55,13 +55,12 @@ export default function OnlineStoresPage() {
   // Delete Dialog
   const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
   const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+  const pendingDeleteIds = moduleHooks.usePendingDeleteIds();
+  const setPendingDeleteIds = moduleHooks.useSetPendingDeleteIds();
   // Selected Rows
   const selectedRows = moduleHooks.useSelectedRows();
   const setSelectedRows = moduleHooks.useSetSelectedRows();
   const clearSelection = moduleHooks.useClearSelection();
-  // Column Visibility
-  const columnVisibility = moduleHooks.useColumnVisibility();
-  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
   // Sorting
   const sortRules = moduleHooks.useSortRules();
   const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
@@ -138,6 +137,11 @@ export default function OnlineStoresPage() {
   if (!canRead) {
     return <NoPermission />;
   }
+
+  useEffect(() => {
+    setPendingDeleteIds(selectedRows);
+  }, [selectedRows, setPendingDeleteIds]);
+
   return (
     <div>
       <CustomPageMeta
@@ -216,7 +220,7 @@ export default function OnlineStoresPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
           title={t("OnlineStores.confirm_delete", { count: selectedRows.length })}
           description={t("OnlineStores.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}

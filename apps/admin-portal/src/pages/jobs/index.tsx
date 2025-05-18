@@ -3,7 +3,7 @@ import { Briefcase, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -40,7 +40,6 @@ export default function JobsPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<JobUpdateData | null>(null);
-  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   const canRead = moduleHooks.useCanRead();
   const canCreate = moduleHooks.useCanCreate();
@@ -50,13 +49,12 @@ export default function JobsPage() {
 
   const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
   const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+  const pendingDeleteIds = moduleHooks.usePendingDeleteIds();
+  const setPendingDeleteIds = moduleHooks.useSetPendingDeleteIds();
 
   const selectedRows = moduleHooks.useSelectedRows();
   const setSelectedRows = moduleHooks.useSetSelectedRows();
   const clearSelection = moduleHooks.useClearSelection();
-
-  const columnVisibility = moduleHooks.useColumnVisibility();
-  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
 
   const viewMode = moduleHooks.useViewMode();
   const sortRules = moduleHooks.useSortRules();
@@ -124,6 +122,10 @@ export default function JobsPage() {
   if (!canRead) {
     return <NoPermission />;
   }
+
+  useEffect(() => {
+    setPendingDeleteIds(selectedRows);
+  }, [selectedRows, setPendingDeleteIds]);
 
   return (
     <div>

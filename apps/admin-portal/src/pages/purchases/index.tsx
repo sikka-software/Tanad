@@ -43,7 +43,6 @@ export default function PurchasesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionablePurchase, setActionablePurchase] = useState<PurchaseUpdateData | null>(null);
-  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   // Permissions
   const canRead = moduleHooks.useCanRead();
@@ -54,13 +53,13 @@ export default function PurchasesPage() {
   // Delete Dialog
   const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
   const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+  const pendingDeleteIds = moduleHooks.usePendingDeleteIds();
+  const setPendingDeleteIds = moduleHooks.useSetPendingDeleteIds();
   // Selected Rows
   const selectedRows = moduleHooks.useSelectedRows();
   const setSelectedRows = moduleHooks.useSetSelectedRows();
   const clearSelection = moduleHooks.useClearSelection();
-  // Column Visibility
-  const columnVisibility = moduleHooks.useColumnVisibility();
-  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
+
   // Sorting
   const sortRules = moduleHooks.useSortRules();
   const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
@@ -139,6 +138,10 @@ export default function PurchasesPage() {
   if (!canRead) {
     return <NoPermission />;
   }
+
+  useEffect(() => {
+    setPendingDeleteIds(selectedRows);
+  }, [selectedRows, setPendingDeleteIds]);
 
   return (
     <div>

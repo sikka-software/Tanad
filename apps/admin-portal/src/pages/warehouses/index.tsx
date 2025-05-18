@@ -53,6 +53,8 @@ export default function WarehousesPage() {
   // Delete Dialog
   const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
   const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+  const pendingDeleteIds = moduleHooks.usePendingDeleteIds();
+  const setPendingDeleteIds = moduleHooks.useSetPendingDeleteIds();
   // Selected Rows
   const selectedRows = moduleHooks.useSelectedRows();
   const setSelectedRows = moduleHooks.useSetSelectedRows();
@@ -137,6 +139,10 @@ export default function WarehousesPage() {
     return <NoPermission />;
   }
 
+  useEffect(() => {
+    setPendingDeleteIds(selectedRows);
+  }, [selectedRows, setPendingDeleteIds]);
+
   return (
     <div>
       <CustomPageMeta
@@ -215,7 +221,7 @@ export default function WarehousesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => handleConfirmDelete(pendingDeleteIds)}
           title={t("Warehouses.confirm_delete", { count: selectedRows.length })}
           description={t("Warehouses.delete_description", { count: selectedRows.length })}
           extraConfirm={selectedRows.length > 4}

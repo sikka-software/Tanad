@@ -41,7 +41,6 @@ export default function SalariesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<SalaryUpdateData | null>(null);
-  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   // Permissions
   const canRead = moduleHooks.useCanRead();
@@ -52,13 +51,12 @@ export default function SalariesPage() {
   // Delete Dialog
   const isDeleteDialogOpen = moduleHooks.useIsDeleteDialogOpen();
   const setIsDeleteDialogOpen = moduleHooks.useSetIsDeleteDialogOpen();
+  const pendingDeleteIds = moduleHooks.usePendingDeleteIds();
+  const setPendingDeleteIds = moduleHooks.useSetPendingDeleteIds();
   // Selected Rows
   const selectedRows = moduleHooks.useSelectedRows();
   const setSelectedRows = moduleHooks.useSetSelectedRows();
   const clearSelection = moduleHooks.useClearSelection();
-  // Column Visibility
-  const columnVisibility = moduleHooks.useColumnVisibility();
-  const setColumnVisibility = moduleHooks.useSetColumnVisibility();
   // Sorting
   const sortRules = moduleHooks.useSortRules();
   const sortCaseSensitive = moduleHooks.useSortCaseSensitive();
@@ -138,6 +136,10 @@ export default function SalariesPage() {
   if (!canRead) {
     return <NoPermission />;
   }
+
+  useEffect(() => {
+    setPendingDeleteIds(selectedRows);
+  }, [selectedRows, setPendingDeleteIds]);
 
   return (
     <div>
