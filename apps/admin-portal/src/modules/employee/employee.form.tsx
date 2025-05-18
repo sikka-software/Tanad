@@ -23,6 +23,7 @@ import { createClient } from "@/utils/supabase/component";
 import NotesSection from "@/components/forms/notes-section";
 import SalaryFormSection from "@/components/forms/salary-form-section";
 
+import { formatToYYYYMMDD } from "@/lib/date-utils";
 import { addressSchema } from "@/lib/schemas/address.schema";
 import { metadataSchema } from "@/lib/schemas/metadata.schema";
 import { getNotesValue } from "@/lib/utils";
@@ -103,13 +104,13 @@ export const createEmployeeFormSchema = (t: (key: string) => string) => {
       .refine((val) => !val || val.length === 10, {
         message: t("Employees.form.national_id.exact_length"),
       }),
-    eqama_id: z.string().optional(),
+    eqama_id: z.string().optional().nullable(),
     gender: z.string().optional(),
-    marital_status: z.string().optional(),
-    education_level: z.string().optional(),
-    employee_number: z.string().optional(),
-    onboarding_status: z.string().optional(),
-    offboarding_status: z.string().optional(),
+    marital_status: z.string().optional().nullable(),
+    education_level: z.string().optional().nullable(),
+    employee_number: z.string().optional().nullable(),
+    onboarding_status: z.string().optional().nullable(),
+    offboarding_status: z.string().optional().nullable(),
     emergency_contact: z
       .object({
         name: z.string().optional(),
@@ -180,27 +181,12 @@ export function EmployeeForm({
           ) || undefined,
       notes: getNotesValue(defaultValues) || "",
       nationality: defaultValues?.nationality || "",
-      hire_date: defaultValues?.hire_date ? parseDate(defaultValues.hire_date) : undefined,
-      birth_date: defaultValues?.birth_date ? parseDate(defaultValues.birth_date) : undefined,
-      termination_date: defaultValues?.termination_date
-        ? parseDate(defaultValues.termination_date)
-        : undefined,
+      hire_date: formatToYYYYMMDD(defaultValues?.hire_date),
+      birth_date: formatToYYYYMMDD(defaultValues?.birth_date),
+      termination_date: formatToYYYYMMDD(defaultValues?.termination_date),
       national_id: defaultValues?.national_id || "",
-      eqama_id: defaultValues?.eqama_id || "",
       gender: defaultValues?.gender || "male",
-      short_address: defaultValues?.short_address || "",
-      additional_number: defaultValues?.additional_number || "",
-      street_name: defaultValues?.street_name || "",
-      building_number: defaultValues?.building_number || "",
-      city: defaultValues?.city || "",
-      region: defaultValues?.region || "",
-      country: defaultValues?.country || "",
-      zip_code: defaultValues?.zip_code || "",
       marital_status: defaultValues?.marital_status || "single",
-      education_level: defaultValues?.education_level || "",
-      employee_number: defaultValues?.employee_number || "",
-      onboarding_status: defaultValues?.onboarding_status || "",
-      offboarding_status: defaultValues?.offboarding_status || "",
       emergency_contact:
         typeof defaultValues?.emergency_contact === "object" &&
         defaultValues?.emergency_contact !== null &&
@@ -225,6 +211,12 @@ export function EmployeeForm({
 
   const handleSubmit = async (data: EmployeeFormInput) => {
     setIsEmployeeSaving(true);
+    if (!user?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      return;
+    }
     let submissionData: EmployeeFormOutput;
     try {
       submissionData = formSchema.parse(data);
@@ -274,24 +266,9 @@ export function EmployeeForm({
           ...submissionData,
           user_id: user?.id || "",
           enterprise_id: membership?.enterprise_id || "",
-          termination_date:
-            submissionData.termination_date &&
-            typeof submissionData.termination_date.toString === "function"
-              ? submissionData.termination_date.toString()
-              : undefined,
-          birth_date:
-            submissionData.birth_date && typeof submissionData.birth_date.toString === "function"
-              ? submissionData.birth_date.toString()
-              : undefined,
-          hire_date:
-            submissionData.hire_date && typeof submissionData.hire_date.toString === "function"
-              ? submissionData.hire_date.toString()
-              : undefined,
-          first_name: submissionData.first_name.trim(),
-          last_name: submissionData.last_name.trim(),
-          email: submissionData.email.trim(),
-          phone: submissionData.phone?.trim() || undefined,
-          notes: submissionData.notes,
+          termination_date: formatToYYYYMMDD(submissionData.termination_date),
+          birth_date: formatToYYYYMMDD(submissionData.birth_date),
+          hire_date: formatToYYYYMMDD(submissionData.hire_date),
           salary: (submissionData.salary || []).map((comp) => ({
             ...comp,
             amount: comp.amount,
@@ -587,12 +564,12 @@ export function EmployeeForm({
                     <FormLabel>{t("Employees.form.onboarding_status.label")}</FormLabel>
                     <Select
                       key={field.value}
-                      value={field.value}
+                      value={field.value ?? ""}
                       onValueChange={(val) => field.onChange(val)}
                       dir={locale === "ar" ? "rtl" : "ltr"}
                     >
                       <FormControl>
-                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
+                        <SelectTrigger onClear={() => field.onChange("")} value={field.value ?? ""}>
                           <SelectValue
                             placeholder={t("Employees.form.onboarding_status.placeholder")}
                           />
@@ -618,7 +595,7 @@ export function EmployeeForm({
                   <FormItem>
                     <FormLabel>{t("Employees.form.offboarding_status.label")}</FormLabel>
                     <Select
-                      value={field.value}
+                      value={field.value ?? ""}
                       onValueChange={(val) => {
                         if (val === field.value) {
                           field.onChange("");
@@ -629,7 +606,7 @@ export function EmployeeForm({
                       dir={locale === "ar" ? "rtl" : "ltr"}
                     >
                       <FormControl>
-                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
+                        <SelectTrigger onClear={() => field.onChange("")} value={field.value ?? ""}>
                           <SelectValue
                             placeholder={t("Employees.form.offboarding_status.placeholder")}
                           />
@@ -670,7 +647,13 @@ export function EmployeeForm({
                   <FormItem>
                     <FormLabel>{t("Employees.form.eqama_id.label")}</FormLabel>
                     <FormControl>
-                      <DigitsInput maxLength={10} disabled={isEmployeeSaving} {...field} />
+                      <DigitsInput
+                        maxLength={10}
+                        disabled={isEmployeeSaving}
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

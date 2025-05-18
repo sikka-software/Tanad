@@ -10,4 +10,9 @@ export type EmployeeCreateData = Database["public"]["Tables"]["employees"]["Inse
     amount: number;
   }[];
 };
-export type EmployeeUpdateData = Database["public"]["Tables"]["employees"]["Update"];
+export type EmployeeUpdateData = Database["public"]["Tables"]["employees"]["Update"] & {
+  salary: {
+    type: string;
+    amount: number;
+  }[];
+};

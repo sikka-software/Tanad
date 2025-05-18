@@ -43,31 +43,34 @@ import useUserStore from "@/stores/use-user-store";
 const createRequestSchema = (t: (key: string) => string) => {
   const RequestSelectSchema = createInsertSchema(employee_requests, {
     employee_id: z
-      .string()
+      .string({ message: t("EmployeeRequests.form.employee.required") })
       .uuid({ message: t("EmployeeRequests.form.employee.required") })
       .nonempty({ message: t("EmployeeRequests.form.employee.required") }),
     title: z.string({ message: t("EmployeeRequests.form.title.required") }).min(1, {
       message: t("EmployeeRequests.form.title.required"),
     }),
-    type: z.enum(EmployeeRequestType).default("other"),
-    status: z.enum(EmployeeRequestStatus).default("draft"),
+    type: z.enum(EmployeeRequestType, {
+      message: t("EmployeeRequests.form.type.required"),
+    }),
+    status: z.enum(EmployeeRequestStatus, {
+      message: t("EmployeeRequests.form.status.required"),
+    }),
     start_date: z
       .any()
       .refine((val) => val, {
-        message: t("EmployeeRequests.form.date_range.start.required"),
+        message: t("EmployeeRequests.form.start_date.required"),
       })
-      .superRefine(
-        validateYearRange(t, 1800, 2200, "EmployeeRequests.form.date_range.start.invalid"),
-      )
-      .optional(),
+      .superRefine(validateYearRange(t, 1800, 2200, "EmployeeRequests.form.start_date.invalid"))
+      .optional()
+      .nullable(),
     end_date: z
       .any()
       .refine((val) => val, {
-        message: t("EmployeeRequests.form.date_range.end.required"),
+        message: t("EmployeeRequests.form.end_date.required"),
       })
-      .superRefine(validateYearRange(t, 1800, 2200, "EmployeeRequests.form.date_range.end.invalid"))
-      .optional(),
-
+      .superRefine(validateYearRange(t, 1800, 2200, "EmployeeRequests.form.end_date.invalid"))
+      .optional()
+      .nullable(),
     amount: z.number().optional().nullable(),
     notes: z.any().optional().nullable(),
   });
@@ -90,7 +93,6 @@ export function EmployeeRequestForm({
   const enterprise = useUserStore((state) => state.enterprise);
 
   const { data: employees = [], isLoading: isFetchingEmployees } = useEmployees();
-  const setIsLoadingCreateEmployee = useEmployeeStore((state) => state.setIsLoading);
   const isLoadingCreateEmployee = useEmployeeStore((state) => state.isLoading);
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
 
@@ -141,13 +143,6 @@ export function EmployeeRequestForm({
       setIsLoadingSave(false);
     }
   };
-
-  const requestTypes = [
-    { label: t("EmployeeRequests.form.type.leave"), value: "leave" },
-    { label: t("EmployeeRequests.form.type.expense"), value: "expense" },
-    { label: t("EmployeeRequests.form.type.document"), value: "document" },
-    { label: t("EmployeeRequests.form.type.other"), value: "other" },
-  ] as const;
 
   if (typeof window !== "undefined") {
     (window as any).employeeRequestForm = form;
@@ -202,9 +197,9 @@ export function EmployeeRequestForm({
                           <SelectValue placeholder={t("EmployeeRequests.form.type.placeholder")} />
                         </SelectTrigger>
                         <SelectContent>
-                          {requestTypes.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              {type.label}
+                          {EmployeeRequestType.map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {t(`EmployeeRequests.form.type.${type}`)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -224,6 +219,7 @@ export function EmployeeRequestForm({
                   <FormControl>
                     <Textarea
                       {...field}
+                      value={field.value ?? ""}
                       placeholder={t("EmployeeRequests.form.description.placeholder")}
                       disabled={isLoadingSave}
                     />
@@ -282,10 +278,10 @@ export function EmployeeRequestForm({
                 name="start_date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("EmployeeRequests.form.date_range.start")}</FormLabel>
+                    <FormLabel>{t("EmployeeRequests.form.start_date.label")}</FormLabel>
                     <FormControl>
                       <DateInput
-                        placeholder={t("EmployeeRequests.form.date_range.start")}
+                        placeholder={t("EmployeeRequests.form.start_date.placeholder")}
                         value={
                           typeof field.value === "string"
                             ? parseDate(field.value)
@@ -305,10 +301,10 @@ export function EmployeeRequestForm({
                 name="end_date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("EmployeeRequests.form.date_range.end")}</FormLabel>
+                    <FormLabel>{t("EmployeeRequests.form.end_date.label")}</FormLabel>
                     <FormControl>
                       <DateInput
-                        placeholder={t("EmployeeRequests.form.date_range.end")}
+                        placeholder={t("EmployeeRequests.form.end_date.placeholder")}
                         value={
                           typeof field.value === "string"
                             ? parseDate(field.value)
@@ -336,6 +332,7 @@ export function EmployeeRequestForm({
                       type="number"
                       step="0.01"
                       {...field}
+                      value={field.value ?? ""}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
                       placeholder={t("EmployeeRequests.form.amount.placeholder")}
                       disabled={isLoadingSave}

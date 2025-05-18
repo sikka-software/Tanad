@@ -37,12 +37,12 @@ const useEmployeeRequestColumns = (
 
     {
       accessorKey: "start_date",
-      header: t("EmployeeRequests.form.date_range.start"),
+      header: t("EmployeeRequests.form.start_date.label"),
       cell: ({ row }) => useFormatDate(row.original.start_date),
     },
     {
       accessorKey: "end_date",
-      header: t("EmployeeRequests.form.date_range.end"),
+      header: t("EmployeeRequests.form.end_date.label"),
       cell: ({ row }) => useFormatDate(row.original.end_date),
     },
     {

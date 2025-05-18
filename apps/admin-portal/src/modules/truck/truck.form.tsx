@@ -94,6 +94,7 @@ export function TruckForm({
   const form = useForm<TruckFormValues>({
     resolver: zodResolver(createTruckSchema(t)),
     defaultValues: {
+      ...defaultValues,
       name: defaultValues?.name || "",
       make: defaultValues?.make || "",
       model: defaultValues?.model || "",

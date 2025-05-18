@@ -2671,6 +2671,7 @@
       "type": {
         "label": "نوع الطلب",
         "placeholder": "اختر نوع الطلب",
+        "required": "نوع الطلب مطلوب",
         "leave": "إجازة",
         "expense": "مصروفات",
         "document": "وثيقة",
@@ -2687,10 +2688,15 @@
         "placeholder": "أدخل وصف الطلب",
         "required": "الوصف مطلوب"
       },
-      "date_range": {
-        "label": "الفترة الزمنية",
-        "start": "تاريخ البدء",
-        "end": "تاريخ الانتهاء"
+      "start_date": {
+        "label": "تاريخ البدء",
+        "placeholder": "أدخل تاريخ البدء",
+        "required": "تاريخ البدء مطلوب"
+      },
+      "end_date": {
+        "label": "تاريخ الانتهاء",
+        "placeholder": "أدخل تاريخ الانتهاء",
+        "required": "تاريخ الانتهاء مطلوب"
       },
       "amount": {
         "label": "المبلغ",
@@ -2710,6 +2716,7 @@
       "status": {
         "label": "الحالة",
         "placeholder": "اختر الحالة",
+        "required": "الحالة مطلوبة",
         "draft": "مسودة",
         "submitted": "مرفوض",
         "under_review": "قيد المراجعة",
