@@ -13,7 +13,6 @@ import { Input } from "@/ui/inputs/input";
 import NumberInput from "@/ui/inputs/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
-import { metadataSchema } from "@/lib/schemas/metadata.schema";
 import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps, PaymentCycle } from "@/types/common.type";
@@ -37,11 +36,23 @@ export const createCarSchema = (t: (key: string) => string) => {
       message: t("Forms.must_be_number"),
     }),
     color: z.string().optional(),
-    vin: z.string().optional(),
+    vin: z
+      .string()
+      .optional()
+      .refine((val) => !val || /^[A-Za-z0-9]+$/.test(val), {
+        message: t("Vehicles.form.vin.invalid"),
+      })
+      .refine((val) => !val || val.length === 17, {
+        message: t("Vehicles.form.vin.exact_length"),
+      }),
     code: z.string().optional(),
     license_country: z.string().optional(),
     license_plate: z.string().optional(),
-    ownership_status: z.enum(VehicleOwnershipStatus).default("owned"),
+    ownership_status: z
+      .enum(VehicleOwnershipStatus, {
+        message: t("Vehicles.form.ownership_status.required"),
+      })
+      .default("owned"),
     monthly_payment: z.string().optional(),
     daily_payment: z.string().optional(),
     weekly_payment: z.string().optional(),

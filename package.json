@@ -9,7 +9,7 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "admin": "infisical run --env=dev -- pnpm --filter @tanad/admin exec next dev --turbopack --port 3037"
+    "admin": "infisical run --env=dev -- pnpm --filter @tanad/admin exec next dev --port 3037"
   },
   "devDependencies": {
     "prettier": "^3.5.3",

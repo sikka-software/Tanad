@@ -35,11 +35,23 @@ export const createTruckSchema = (t: (key: string) => string) => {
       message: t("Forms.must_be_number"),
     }),
     color: z.string().optional().or(z.literal("")),
-    vin: z.string().optional().or(z.literal("")),
+    vin: z
+      .string()
+      .optional()
+      .refine((val) => !val || /^[A-Za-z0-9]+$/.test(val), {
+        message: t("Vehicles.form.vin.invalid"),
+      })
+      .refine((val) => !val || val.length === 17, {
+        message: t("Vehicles.form.vin.exact_length"),
+      }),
     code: z.string().optional().or(z.literal("")),
     license_country: z.string().optional().or(z.literal("")),
     license_plate: z.string().optional().or(z.literal("")),
-    ownership_status: z.enum(VehicleOwnershipStatus).default("owned"),
+    ownership_status: z
+      .enum(VehicleOwnershipStatus, {
+        message: t("Vehicles.form.ownership_status.required"),
+      })
+      .default("owned"),
     monthly_payment: z.string().optional().or(z.literal("")),
     daily_payment: z.string().optional().or(z.literal("")),
     weekly_payment: z.string().optional().or(z.literal("")),

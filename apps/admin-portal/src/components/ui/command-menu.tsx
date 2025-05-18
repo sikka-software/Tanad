@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { VisuallyHidden } from "react-aria";
 
 import {
   Command,
@@ -15,7 +16,7 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/ui/command";
-import { Dialog, DialogContent } from "@/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/ui/dialog";
 
 import { useMainStore } from "@/hooks/main.store";
 
@@ -35,7 +36,6 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
   const { openCommandMenu, setOpenCommandMenu } = useMainStore();
   const t = useTranslations();
   const locale = useLocale();
-  const tGeneral = useTranslations("General");
 
   // Define all shortcuts and their corresponding paths
   const shortcuts: ShortcutCommand[] = [
@@ -93,14 +93,17 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
 
   return (
     <Dialog open={openCommandMenu} onOpenChange={setOpenCommandMenu}>
+      <VisuallyHidden>
+        <DialogTitle>{t("General.search")}</DialogTitle>
+      </VisuallyHidden>
       <DialogContent className="max-w-xl overflow-hidden p-0" dir={locale === "ar" ? "rtl" : "ltr"}>
         <Command
           className="[&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-item]_svg]:w-5] [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5"
           dir={dir}
         >
-          <CommandInput placeholder={tGeneral("search")} />
+          <CommandInput placeholder={t("General.search")} />
           <CommandList>
-            <CommandEmpty>{tGeneral("no_results")}</CommandEmpty>
+            <CommandEmpty>{t("General.no_results")}</CommandEmpty>
             {commandList.map((group, groupIndex) => (
               <div key={groupIndex}>
                 <CommandGroup heading={t(group.heading)}>
