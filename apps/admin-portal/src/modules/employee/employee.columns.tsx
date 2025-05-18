@@ -38,6 +38,7 @@ const useEmployeeColumns = (
     {
       accessorKey: "phone",
       header: t("Employees.form.phone.label"),
+      cell: ({ getValue }) => <div dir="ltr">{getValue() as string}</div>,
     },
     {
       accessorKey: "birth_date",

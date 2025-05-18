@@ -30,9 +30,7 @@ const useCompanyColumns = (
     {
       accessorKey: "phone",
       header: t("Companies.form.phone.label"),
-      cell: ({ row }) => {
-        return <span dir="ltr"> {row.original.phone}</span>;
-      },
+      cell: ({ getValue }) => <div dir="ltr">{getValue() as string}</div>,
     },
     {
       accessorKey: "website",

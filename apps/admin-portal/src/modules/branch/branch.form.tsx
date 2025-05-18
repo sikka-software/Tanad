@@ -246,6 +246,7 @@ export function BranchForm({
                     <FormControl>
                       <CodeInput
                         onSerial={() => {
+                          console.log("serial");
                           const nextNumber = (branches?.length || 0) + 1;
                           const paddedNumber = String(nextNumber).padStart(4, "0");
                           form.setValue("code", `BR-${paddedNumber}`);
@@ -263,8 +264,9 @@ export function BranchForm({
                         inputProps={{
                           placeholder: t("Branches.form.code.placeholder"),
                           disabled: isSavingBranch,
+                          ...field,
                         }}
-                      ></CodeInput>
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

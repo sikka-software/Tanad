@@ -259,6 +259,7 @@ export function OfficeForm({
                         inputProps={{
                           disabled: isLoading,
                           placeholder: t("Offices.form.code.placeholder"),
+                          ...field,
                         }}
                       />
                     </FormControl>

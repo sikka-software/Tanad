@@ -28,10 +28,12 @@ const useVendorColumns = (
     {
       accessorKey: "phone",
       header: t("Vendors.form.phone.label"),
+      cell: ({ getValue }) => <div dir="ltr">{getValue() as string}</div>,
     },
     {
       accessorKey: "city",
       header: t("Forms.city.label"),
+      enableHiding: true,
     },
     {
       accessorKey: "region",

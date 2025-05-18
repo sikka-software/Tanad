@@ -66,6 +66,7 @@ const useWarehouseColumns = (
     {
       accessorKey: "phone",
       header: t("Warehouses.form.phone.label"),
+      cell: ({ getValue }) => <div dir="ltr">{getValue() as string}</div>,
     },
     {
       accessorKey: "area",

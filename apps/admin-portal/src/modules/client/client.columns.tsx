@@ -25,7 +25,7 @@ const useCompanyColumns = (
     {
       accessorKey: "phone",
       header: t("Clients.form.phone.label"),
-      cell: ({ row }) => <span dir="ltr">{row.original.phone}</span>,
+      cell: ({ getValue }) => <div dir="ltr">{getValue() as string}</div>,
     },
     {
       accessorKey: "company_name",

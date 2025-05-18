@@ -5,6 +5,8 @@ import { z } from "zod";
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
+import PhoneInput from "@/components/ui/inputs/phone-input";
+
 import CodeCell from "@/tables/code-cell";
 import StatusCell from "@/tables/status-cell";
 import TimestampCell from "@/tables/timestamp-cell";
@@ -67,6 +69,7 @@ const useBranchColumns = (
     {
       accessorKey: "phone",
       header: t("Branches.form.phone.label"),
+      cell: ({ getValue }) => <div dir="ltr">{getValue() as string}</div>,
     },
     {
       accessorKey: "manager",
@@ -102,6 +105,7 @@ const useBranchColumns = (
     {
       accessorKey: "city",
       header: t("Forms.city.label"),
+      enableHiding: true,
     },
     {
       accessorKey: "region",
