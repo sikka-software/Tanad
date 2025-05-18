@@ -1,4 +1,4 @@
-import { Briefcase, Plus, Search } from "lucide-react";
+import { Briefcase, Edit, Plus, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useMemo } from "react";
 import { FieldError, UseFormReturn } from "react-hook-form";
@@ -16,7 +16,9 @@ import { JobListingFormValues } from "@/job-listing/job-listing.form";
 
 import { Job } from "@/job/job.type";
 
+import { Button } from "../ui/button";
 import { EmptyState } from "../ui/empty-state";
+import { Skeleton } from "../ui/skeleton";
 
 interface JobListingJobsSelectionProps {
   editMode?: boolean;
@@ -25,7 +27,9 @@ interface JobListingJobsSelectionProps {
   jobs: Job[] | undefined;
   selectedJobs: string[];
   handleJobSelect: (jobId: string) => void;
-  currency: any;
+  formCurrency: any;
+  loadingJobs?: boolean;
+  onEditJob: (job: Job) => void;
 }
 
 const JobListingJobsSelection = ({
@@ -35,10 +39,13 @@ const JobListingJobsSelection = ({
   jobs,
   selectedJobs,
   handleJobSelect,
-  currency,
+  formCurrency,
+  onEditJob,
+  loadingJobs,
 }: JobListingJobsSelectionProps) => {
   const t = useTranslations();
   const [searchTerm, setSearchTerm] = useState("");
+  const currency = useAppCurrencySymbol().symbol;
 
   const filteredJobs = useMemo(() => {
     if (!jobs) return [];
@@ -90,46 +97,66 @@ const JobListingJobsSelection = ({
           render={() => (
             <FormItem>
               <div className="grid gap-4 md:grid-cols-1 @min-[500px]/jobs-section:grid-cols-3 @min-[800px]/jobs-section:grid-cols-4">
-                {filteredJobs.length > 0 &&
-                  filteredJobs.map((job: Job) => (
-                    <div
-                      key={job.id}
-                      className={`cursor-pointer rounded-lg border p-4 transition-all ${
-                        selectedJobs.includes(job.id)
-                          ? "border-primary bg-primary/5"
-                          : "hover:shadow-md"
-                      }`}
-                      onClick={() => handleJobSelect(job.id)}
-                    >
-                      <div className="mb-2 flex flex-row justify-between">
-                        <span className="text-sm text-gray-500">
-                          {job.occupied_positions}/{job.total_positions}
-                        </span>
-                        {selectedJobs.includes(job.id) && (
-                          <div className="bg-primary size-3 rounded-full" />
-                        )}
-                      </div>
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h4 className="font-semibold">{job.title}</h4>
-                          <p className="text-sm text-gray-500">{t(`Jobs.form.type.${job.type}`)}</p>
+                {loadingJobs
+                  ? Array.from({ length: 10 }).map((_, index) => (
+                      <Skeleton key={index} className="h-42 w-full" />
+                    ))
+                  : filteredJobs.length > 0 &&
+                    filteredJobs.map((job: Job) => (
+                      <div
+                        key={job.id}
+                        className={`group relative cursor-pointer overflow-hidden rounded-lg border p-4 transition-all ${
+                          selectedJobs.includes(job.id)
+                            ? "border-primary bg-primary/5"
+                            : "hover:shadow-md"
+                        }`}
+                        onClick={() => handleJobSelect(job.id)}
+                      >
+                        <div className="mb-2 flex flex-row justify-between">
+                          <span className="text-sm text-gray-500">
+                            {job.occupied_positions}/{job.total_positions}
+                          </span>
+                          {selectedJobs.includes(job.id) && (
+                            <div className="bg-primary size-3 rounded-full" />
+                          )}
+                        </div>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h4 className="font-semibold">{job.title}</h4>
+                            <p className="text-sm text-gray-500">
+                              {t(`Jobs.form.type.${job.type}`)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-2 space-y-1">
+                          {job.department && (
+                            <p className="text-sm text-gray-600">{job.department}</p>
+                          )}
+                          {job.location && <p className="text-sm text-gray-600">{job.location}</p>}
+                          {job.salary && (
+                            <div className="flex flex-row items-center gap-1 text-sm text-gray-600">
+                              <span>{MoneyFormatter(job.salary, false)}</span>
+                              <span>{formCurrency || currency}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="absolute end-1 bottom-1 -translate-x-10 translate-y-10 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100">
+                          <Button
+                            variant="ghost"
+                            size="icon_sm"
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEditJob(job);
+                            }}
+                          >
+                            <Edit />
+                          </Button>
                         </div>
                       </div>
-                      <div className="mt-2 space-y-1">
-                        {job.department && (
-                          <p className="text-sm text-gray-600">{job.department}</p>
-                        )}
-                        {job.location && <p className="text-sm text-gray-600">{job.location}</p>}
-                        {job.salary && (
-                          <div className="flex flex-row items-center gap-1 text-sm text-gray-600">
-                            <span>{MoneyFormatter(job.salary, false)}</span>
-                            <span>{useAppCurrencySymbol(currency || "sar").symbol}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                {filteredJobs.length === 0 && (
+                    ))}
+                {!loadingJobs && filteredJobs.length === 0 && (
                   <div className="col-span-full">
                     <EmptyState
                       title={t("Jobs.create_first.title")}

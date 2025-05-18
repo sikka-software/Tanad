@@ -14,6 +14,7 @@ import { Quote, QuoteStatus } from "@/quote/quote.type";
 
 const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string) => void) => {
   const t = useTranslations();
+  const currency = useAppCurrencySymbol().symbol;
 
   const columns: ExtendedColumnDef<Quote>[] = [
     {
@@ -55,7 +56,7 @@ const useQuoteColumns = (handleEdit?: (id: string, field: string, value: string)
         return (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
             {MoneyFormatter(row.getValue("subtotal"))}
-            {useAppCurrencySymbol().symbol}
+            {currency}
           </span>
         );
       },

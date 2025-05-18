@@ -37,37 +37,7 @@ export function StatCard({ title, value, loading, link, additionalText, icon }: 
               {title}
             </CardTitle>
           </div>
-          <motion.div
-            initial={{ x: -27, y: -27, opacity: 0 }}
-            animate={isHovered ? "hover" : "rest"}
-            variants={{
-              rest: { x: -27, y: -27, opacity: 0 },
-              hover: { x: -17, y: -17, opacity: 1 },
-            }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            // className="absolute -end-3 top-1/2 flex -translate-y-1/2 items-center justify-center group-hover:z-10"
-          >
-            <Link href={linkToAdd || "/dashboard"}>
-              <Button
-                size="icon_sm"
-                variant="outline"
-                className={
-                  "relative cursor-pointer rounded-e-none rounded-t-none border-e-0 border-t-0 bg-transparent group-hover:z-10"
-                }
-                // className="absolute end-0 top-0 cursor-pointer rounded-e-none rounded-t-none border-e-0 border-t-0 opacity-0 transition-opacity group-hover:opacity-100"
-                style={{
-                  borderStartEndRadius: "var(--radius)",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  // router.push(linkToAdd || "/dashboard");
-                }}
-              >
-                <Plus className="size-4" />
-              </Button>
-            </Link>
-          </motion.div>
+          <CornerButton isHovered={isHovered} linkToAdd={linkToAdd || "/dashboard"} />
         </CardHeader>
         <CardContent className="p-4">
           {loading ? (
@@ -91,3 +61,45 @@ export function StatCard({ title, value, loading, link, additionalText, icon }: 
     <Card className="group h-full">{cardContent}</Card>
   );
 }
+
+export const CornerButton = ({
+  isHovered,
+  linkToAdd,
+}: {
+  isHovered: boolean;
+  linkToAdd: string;
+}) => {
+  return (
+    <motion.div
+      initial={{ x: -27, y: -27, opacity: 0 }}
+      animate={isHovered ? "hover" : "rest"}
+      variants={{
+        rest: { x: -27, y: -27, opacity: 0 },
+        hover: { x: -17, y: -17, opacity: 1 },
+      }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      // className="absolute -end-3 top-1/2 flex -translate-y-1/2 items-center justify-center group-hover:z-10"
+    >
+      <Link href={linkToAdd}>
+        <Button
+          size="icon_sm"
+          variant="outline"
+          className={
+            "relative cursor-pointer rounded-e-none rounded-t-none border-e-0 border-t-0 bg-transparent group-hover:z-10"
+          }
+          // className="absolute end-0 top-0 cursor-pointer rounded-e-none rounded-t-none border-e-0 border-t-0 opacity-0 transition-opacity group-hover:opacity-100"
+          style={{
+            borderStartEndRadius: "var(--radius)",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            // e.preventDefault();
+            // router.push(linkToAdd || "/dashboard");
+          }}
+        >
+          <Plus className="size-4" />
+        </Button>
+      </Link>
+    </motion.div>
+  );
+};

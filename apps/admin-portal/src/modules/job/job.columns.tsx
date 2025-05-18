@@ -15,6 +15,7 @@ import { Job } from "./job.type";
 
 const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unknown) => void) => {
   const t = useTranslations();
+  const currency = useAppCurrencySymbol({ usd: { className: "-ms-1" } }).symbol;
 
   const columns: ExtendedColumnDef<Job>[] = [
     {
@@ -55,7 +56,7 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
         props.row.original.salary ? (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
             {MoneyFormatter(props.row.original.salary)}
-            {useAppCurrencySymbol({ usd: { className: "-ms-1" } }).symbol}
+            {currency}
           </span>
         ) : (
           "N/A"

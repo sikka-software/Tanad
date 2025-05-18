@@ -41,6 +41,8 @@ import useJobStore from "@/job/job.store";
 import { job_listings, offices } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
+import { JobUpdateData } from "../job/job.type";
+
 const createJobListingSchema = (t: (key: string) => string) => {
   const JobListingSelectSchema = createInsertSchema(job_listings, {
     title: z.string().min(1, t("JobListings.form.title.required")),
@@ -300,6 +302,8 @@ export function JobListingForm({
     form.setValue("jobs", jobIds);
   }, [defaultValues?.jobs]);
 
+  const [actionableJob, setActionableJob] = useState<JobUpdateData | null>(null);
+
   return (
     <>
       <Form {...form}>
@@ -349,26 +353,33 @@ export function JobListingForm({
             loadingDepartments={isLoadingDepartments}
           />
           <JobListingJobsSelection
+            loadingJobs={isLoadingJobs}
             editMode={editMode}
-            currency={form.watch("currency")}
+            formCurrency={form.watch("currency")}
             setIsJobDialogOpen={setIsJobDialogOpen}
             form={form}
             jobs={jobs}
             selectedJobs={selectedJobs}
             handleJobSelect={handleJobSelect}
+            onEditJob={(job) => {
+              setActionableJob(job);
+              setIsJobDialogOpen(true);
+            }}
           />
         </form>
       </Form>
       <FormDialog
         open={isJobDialogOpen}
         onOpenChange={setIsJobDialogOpen}
-        title={t("Pages.Jobs.add")}
+        title={actionableJob ? t("Pages.Jobs.edit") : t("Pages.Jobs.add")}
         formId="job-form"
         loadingSave={isJobSaving}
       >
         <JobForm
           nestedForm
+          editMode={actionableJob ? true : false}
           formHtmlId="job-form"
+          defaultValues={actionableJob}
           onSuccess={() => {
             setIsJobDialogOpen(false);
             setIsJobSaving(false);

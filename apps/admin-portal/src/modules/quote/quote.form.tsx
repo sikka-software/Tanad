@@ -314,7 +314,7 @@ export function QuoteForm({
                 name="tax_rate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Quotes.tax_rate")}</FormLabel>
+                    <FormLabel>{t("Quotes.tax_rate.label")}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -416,69 +416,12 @@ export function QuoteForm({
             title={t("Quotes.products.title")}
             isError={form.formState.errors.items as FieldError}
           />
-          {/* <FormSectionHeader
-            title={t("Quotes.products.title")}
-            onCreate={() =>
-              append({ product_id: undefined, description: "", quantity: 1, unit_price: 0 })
-            }
-            onCreateText={t("Quotes.products.add_product")}
-          />
-          <div className="form-container">
-            <div className="space-y-2">
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <TableRow key={headerGroup.id}>
-                        {headerGroup.headers.map((header) => (
-                          <TableHead key={header.id}>
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                          </TableHead>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHeader>
-                  <TableBody>
-                    {table.getRowModel().rows.length ? (
-                      table.getRowModel().rows.map((row) => (
-                        <TableRow key={row.id}>
-                          {row.getVisibleCells().map((cell) => (
-                            <TableCell key={cell.id}>
-                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={columns.length} className="h-24 text-center">
-                          {t("Quotes.products.no_products")}
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
 
-            <div className="mt-4 grid gap-2 md:grid-cols-3 md:justify-items-end">
-              <div className="flex items-center justify-between md:col-span-1 md:col-start-3">
-                <span className="text-sm font-medium">{t("Quotes.subtotal")}</span>
-                <span className="text-sm">${subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex items-center justify-between md:col-span-1 md:col-start-3">
-                <span className="text-sm font-medium">
-                  {t("Quotes.tax")} ({watchedTaxRate}%)
-                </span>
-                <span className="text-sm">${tax.toFixed(2)}</span>
-              </div>
-              <div className="flex items-center justify-between md:col-span-1 md:col-start-3">
-                <span className="text-sm font-medium">{t("Quotes.total")}</span>
-                <span className="text-sm font-bold">${total.toFixed(2)}</span>
-              </div>
-            </div>
-          </div> */}
-          <NotesSection inDialog={editMode} control={form.control} title={t("Quotes.notes")} />
+          <NotesSection
+            inDialog={editMode}
+            control={form.control}
+            title={t("Quotes.form.notes.label")}
+          />
         </form>
       </Form>
 

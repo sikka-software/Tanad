@@ -15,6 +15,7 @@ const useExpenseColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
+  const currency = useAppCurrencySymbol().symbol;
 
   const columns: ExtendedColumnDef<Expense>[] = [
     {
@@ -38,7 +39,7 @@ const useExpenseColumns = (
         return (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
             {MoneyFormatter(row.getValue("amount"))}
-            {useAppCurrencySymbol().symbol}
+            {currency}
           </span>
         );
       },

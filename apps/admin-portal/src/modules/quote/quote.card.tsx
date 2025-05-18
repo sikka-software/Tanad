@@ -21,6 +21,8 @@ const QuoteCard = ({
   const t = useTranslations();
   const { mutate: updateQuote } = useUpdateQuote();
 
+  const currency = useAppCurrencySymbol({ sar: { className: "size-4" } }).symbol;
+
   const data = useQuoteStore((state) => state.data);
   const setData = useQuoteStore((state) => state.setData);
 
@@ -58,7 +60,7 @@ const QuoteCard = ({
             {MoneyFormatter(
               (quote.subtotal || 0) + ((quote.subtotal || 0) * (quote.tax_rate || 0)) / 100 || 0,
             )}{" "}
-            {useAppCurrencySymbol({ sar: { className: "size-4" } }).symbol}
+            {currency}
           </span>
         </div>
         <div className="border-t pt-2">

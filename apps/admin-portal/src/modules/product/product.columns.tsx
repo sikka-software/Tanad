@@ -12,6 +12,7 @@ import { Product } from "@/product/product.type";
 
 const useProductColumns = () => {
   const t = useTranslations();
+  const currency = useAppCurrencySymbol().symbol;
 
   const columns: ExtendedColumnDef<Product>[] = [
     {
@@ -28,7 +29,7 @@ const useProductColumns = () => {
       cell: (props: CellContext<Product, unknown>) => (
         <span className="flex flex-row items-center gap-1 text-sm font-medium">
           {MoneyFormatter(props.row.original.price)}
-          {useAppCurrencySymbol().symbol}
+          {currency}
         </span>
       ),
     },

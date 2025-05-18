@@ -40,6 +40,7 @@ const JobListingOptionsSection = ({
   const t = useTranslations();
   const lang = useLocale();
   const [selectedCurrency, setSelectedCurrency] = useState<string>("");
+  // const { currency: storeCurrency } = useAppCurrencySymbol();
   return (
     <div>
       <FormSectionHeader inDialog={inDialog} title={t("JobListings.options.title")} />
@@ -60,6 +61,7 @@ const JobListingOptionsSection = ({
                   setSelectedCurrency(val);
                 }}
                 value={field.value || selectedCurrency}
+                // defaultValue={storeCurrency}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -71,7 +73,7 @@ const JobListingOptionsSection = ({
                     <SelectItem key={currency} value={currency}>
                       <div className="flex flex-row items-center gap-2">
                         <span>{t(`Settings.preferences.currency.${currency}`)}</span>
-                        {useAppCurrencySymbol().symbol}
+                        {currency}
                       </div>
                     </SelectItem>
                   ))}
