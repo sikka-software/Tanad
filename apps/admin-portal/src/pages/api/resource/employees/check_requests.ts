@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
+
 import createClient from "@/utils/supabase/api";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -29,4 +30,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error("Error in check_requests handler:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
-} 
+}

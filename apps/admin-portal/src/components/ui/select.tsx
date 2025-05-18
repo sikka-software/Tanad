@@ -47,7 +47,7 @@ function SelectTrigger({
       asChild={onClear && !!props.value}
       {...props}
     >
-      <div className="relative flex flex-row justify-between w-full items-center">
+      <div className="relative flex w-full flex-row items-center justify-between">
         {children}
         {onClear && props.value ? (
           <button

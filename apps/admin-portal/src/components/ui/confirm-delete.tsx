@@ -12,8 +12,8 @@ import {
 } from "@/ui/dialog";
 
 import { Button } from "./button";
-import { Input } from "./inputs/input";
 import { Checkbox } from "./checkbox";
+import { Input } from "./inputs/input";
 
 interface ConfirmDeleteProps {
   isDeleteDialogOpen: boolean;
@@ -89,7 +89,7 @@ const ConfirmDelete = ({
             />
             <label
               htmlFor="cascade"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
               {cascadeDescription || t("General.cascade_delete")}
             </label>

@@ -173,14 +173,18 @@ export function useBulkDeleteEmployees() {
       }
 
       const checkData = await checkResponse.json();
-      
+
       // If there are requests but cascade is not enabled, throw an error
       if (checkData.has_requests && !params.cascade) {
-        throw new Error(`Cannot delete employees with ${checkData.request_count} associated requests. Please use cascade delete.`);
+        throw new Error(
+          `Cannot delete employees with ${checkData.request_count} associated requests. Please use cascade delete.`,
+        );
       }
 
       // Proceed with deletion
-      return await bulkDeleteResource("/api/resource/employees", params.ids, { cascade: params.cascade });
+      return await bulkDeleteResource("/api/resource/employees", params.ids, {
+        cascade: params.cascade,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });

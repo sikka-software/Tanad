@@ -11,9 +11,10 @@ export async function bulkDeleteResource(
     });
 
     // Read the response body if it exists
-    const responseBody = response.headers.get("content-length") !== "0" && response.body
-      ? await response.json().catch(() => null)
-      : null;
+    const responseBody =
+      response.headers.get("content-length") !== "0" && response.body
+        ? await response.json().catch(() => null)
+        : null;
 
     if (!response.ok) {
       throw new Error(responseBody?.message || "Failed to delete resources");

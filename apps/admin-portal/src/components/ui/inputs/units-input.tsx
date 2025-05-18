@@ -60,7 +60,9 @@ export default function UnitsInput({
       <div className="flex rounded-md shadow-xs">
         <Input
           id={id}
-          className={"-me-px rounded-e-none shadow-none border-s-0 focus-visible:z-10 " + inputClassName}
+          className={
+            "-me-px rounded-e-none border-s-0 shadow-none focus-visible:z-10 " + inputClassName
+          }
           {...inputProps}
         />
         <Select
@@ -71,7 +73,7 @@ export default function UnitsInput({
         >
           <SelectTrigger
             isolated={isolated}
-            className={cn("max-w-24 border-e-0 rounded-e-none", selectClassName)}
+            className={cn("max-w-24 rounded-e-none border-e-0", selectClassName)}
             disabled={inputProps.disabled}
           >
             <SelectValue placeholder={selectPlaceholder} />
