@@ -23,8 +23,6 @@ const DepartmentsTable = ({
 }: ModuleTableProps<Department>) => {
   const t = useTranslations();
 
-  const columns = useDepartmentColumns();
-
   const { mutateAsync: updateDepartment } = useUpdateDepartment();
 
   const setData = useDepartmentStore((state) => state.setData);
@@ -35,6 +33,7 @@ const DepartmentsTable = ({
     await updateDepartment({ id: rowId, data: { [columnId]: value } });
   };
 
+  const columns = useDepartmentColumns(handleEdit);
   const canEditDepartment = useUserStore((state) => state.hasPermission("departments.update"));
   const canDuplicateDepartment = useUserStore((state) =>
     state.hasPermission("departments.duplicate"),

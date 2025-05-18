@@ -11,6 +11,8 @@ import {
 } from "@/ui/dropdown-menu";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
+import StatusCell from "@/components/tables/status-cell";
+
 import TimestampCell from "@/tables/timestamp-cell";
 
 import { useOffices } from "@/office/office.hooks";
@@ -22,7 +24,9 @@ import { useBranches } from "@/branch/branch.hooks";
 import { useUpdateDepartment } from "@/department/department.hooks";
 import { Department } from "@/department/department.type";
 
-const useDepartmentColumns = () => {
+const useDepartmentColumns = (
+  handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
+) => {
   const t = useTranslations();
   const { data: offices } = useOffices();
   const { data: branches } = useBranches();
@@ -118,6 +122,27 @@ const useDepartmentColumns = () => {
       header: t("Metadata.updated_at.label"),
       noPadding: true,
       cell: ({ getValue }) => <TimestampCell timestamp={getValue() as string} />,
+    },
+    {
+      accessorKey: "status",
+      maxSize: 80,
+      header: t("CommonStatus.label"),
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const status = getValue() as string;
+        const rowId = row.original.id;
+        return (
+          <StatusCell
+            status={status}
+            statusOptions={[
+              { label: t("CommonStatus.active"), value: "active" },
+              { label: t("CommonStatus.inactive"), value: "inactive" },
+            ]}
+            onStatusChange={async (value) => handleEdit?.(rowId, "status", value)}
+          />
+        );
+      },
     },
   ];
 

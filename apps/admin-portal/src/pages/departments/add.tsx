@@ -47,7 +47,14 @@ export default function AddDepartmentPage() {
   );
 }
 
-AddDepartmentPage.messages = ["Metadata", "Notes", "Pages", "Departments", "General"];
+AddDepartmentPage.messages = [
+  "Metadata",
+  "Notes",
+  "Pages",
+  "Departments",
+  "General",
+  "CommonStatus",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   try {
