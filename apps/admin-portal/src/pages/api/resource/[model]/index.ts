@@ -188,7 +188,7 @@ const modelMap: Record<string, ModelConfig> = {
           throw error;
         }
 
-        return { success: true };
+        return data;
       },
     },
   },

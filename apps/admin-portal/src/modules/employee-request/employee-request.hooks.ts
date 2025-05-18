@@ -176,7 +176,7 @@ export function useUpdateEmployeeRequest() {
 export function useDeleteEmployeeRequest() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => deleteResourceById(`/api/resource/employee-requests/${id}`),
+    mutationFn: (id: string) => deleteResourceById(`/api/resource/employee_requests/${id}`),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
       queryClient.removeQueries({ queryKey: employeeRequestKeys.detail(variables) });
@@ -190,7 +190,7 @@ export function useDeleteEmployeeRequest() {
 export function useBulkDeleteEmployeeRequests() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/employee-requests", ids),
+    mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/employee_requests", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() }),
     meta: {
       toast: { success: "EmployeeRequests.success.delete", error: "EmployeeRequests.error.delete" },
