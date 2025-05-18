@@ -86,8 +86,11 @@ const createSalarySchema = (t: (key: string) => string) => {
       .superRefine(validateYearRange(t, 1800, 2200, "Salaries.form.payment_date.invalid")),
     payment_frequency: z.string().min(1, t("Salaries.form.payment_frequency.required")),
 
-    amount: z.coerce.number().positive(t("Salaries.form.amount.positive")),
-    // z.number().optional().or(z.literal(""))
+    amount: z.coerce
+      .number({
+        message: t("Salaries.form.amount.required"),
+      })
+      .positive(t("Salaries.form.amount.positive")),
     deductions: z
       .array(createDeductionSchema(t))
       .transform((arr) => arr.filter((item) => item.type.trim() !== "" || item.amount !== 0))
