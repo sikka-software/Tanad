@@ -124,7 +124,7 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
                   disabled={disabled}
                   aria-expanded={open}
                   className={cn(
-                    "ring-offset-background !bg-input-background focus-visible:ring-ring inline-flex h-9 w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+                    "ring-offset-background !bg-input-background focus-visible:ring-ring inline-flex h-9 w-full items-center justify-between rounded-md border py-2 text-sm font-normal shadow-xs transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
                     "bg-background px-3",
                     error &&
                       "ring-destructive/20 dark:ring-destructive/40 border-destructive rounded-b-none",
