@@ -3,6 +3,7 @@
  * Provides dummy data generation for testing ZATCA Phase 1 implementation
  */
 import { generateZatcaQRString } from "./zatca-utils";
+import { generateZatcaXml } from "./zatca-xml";
 
 /**
  * Valid ZATCA seller names for testing
@@ -139,4 +140,62 @@ export function generateTestInvoice(
       },
     ],
   };
+}
+
+/**
+ * Generate test XML for a ZATCA Phase 2 invoice
+ */
+export function generateTestZatcaXml() {
+  const testData = generateTestInvoiceData();
+
+  return generateZatcaXml({
+    invoiceNumber: `ZATCA-${Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, "0")}`,
+    issueDate: new Date().toISOString(),
+    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    invoiceType: "SIMPLIFIED",
+
+    sellerName: testData.sellerName,
+    sellerVatNumber: testData.vatNumber,
+    sellerAddress: {
+      street: "King Fahd Road",
+      buildingNumber: "8091",
+      city: "Riyadh",
+      postalCode: "12214",
+      countryCode: "SA",
+    },
+
+    buyerName: "Test Customer",
+    buyerVatNumber: generateTestVatNumber(),
+    buyerAddress: {
+      street: "Prince Mohammed Bin Salman Road",
+      buildingNumber: "3458",
+      city: "Jeddah",
+      postalCode: "23715",
+      countryCode: "SA",
+    },
+
+    paymentMeans: {
+      code: "10", // Cash payment
+      description: "Cash payment",
+    },
+
+    items: [
+      {
+        name: "Test Product",
+        description: "ZATCA Phase 2 Test Product",
+        quantity: 1,
+        unitPrice: testData.subtotal,
+        vatRate: testData.taxRate,
+        vatAmount: testData.vatAmount,
+        subtotal: testData.subtotal,
+        total: testData.total,
+      },
+    ],
+
+    subtotal: testData.subtotal,
+    vatAmount: testData.vatAmount,
+    total: testData.total,
+  });
 }
