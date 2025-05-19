@@ -24,6 +24,7 @@ import NumberInputWithButtons from "@/ui/inputs/number-input-buttons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
+import { formatToYYYYMMDD } from "@/lib/date-utils";
 import { validateYearRange } from "@/lib/utils";
 
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
@@ -51,14 +52,16 @@ import useUserStore from "@/stores/use-user-store";
 
 const createJobFormSchema = (t: (key: string) => string) => {
   const JobSelectSchema = createInsertSchema(jobs, {
-    title: z.string().min(1, t("Jobs.form.title.required")),
-    description: z.string().optional(),
-    requirements: z.string().optional(),
-    responsibilities: z.string().optional(),
-    benefits: z.string().optional(),
-    location: z.string().optional(),
-    department: z.string().optional(),
-    type: z.string().min(1, t("Jobs.form.type.required")),
+    title: z
+      .string({
+        message: t("Jobs.form.title.required"),
+      })
+      .min(1, t("Jobs.form.title.required")),
+    type: z
+      .string({
+        message: t("Jobs.form.type.required"),
+      })
+      .min(1, t("Jobs.form.type.required")),
     salary: z
       .string()
       .optional()
@@ -66,7 +69,6 @@ const createJobFormSchema = (t: (key: string) => string) => {
         (val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0),
         t("Jobs.form.salary.invalid"),
       ),
-
     start_date: z
       .any()
       .optional()
@@ -76,11 +78,11 @@ const createJobFormSchema = (t: (key: string) => string) => {
       .optional()
       .superRefine(validateYearRange(t, 1800, 2200, "Jobs.form.end_date.invalid")),
 
-    status: z.enum(CommonStatus, {
-      invalid_type_error: t("Jobs.form.status.required"),
-    }),
-    total_positions: z.coerce.number().optional(),
-    occupied_positions: z.coerce.number().optional(),
+    // status: z.enum(CommonStatus, {
+    //   invalid_type_error: t("Jobs.form.status.required"),
+    // }),
+
+    total_positions: z.coerce.string().optional().default("1"),
   });
 
   return JobSelectSchema;
@@ -124,20 +126,9 @@ function JobForm({
   const form = useForm<JobFormValues>({
     resolver: zodResolver(createJobFormSchema(t)),
     defaultValues: {
-      title: defaultValues?.title || "",
-      description: defaultValues?.description || "",
-      requirements: defaultValues?.requirements || "",
-      responsibilities: defaultValues?.responsibilities || "",
-      benefits: defaultValues?.benefits || "",
-      location: defaultValues?.location || "",
-      department: defaultValues?.department || "",
-      type: defaultValues?.type || "full_time",
+      ...defaultValues,
       salary: defaultValues?.salary ? String(defaultValues.salary) : undefined,
-      start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
-      end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
       status: defaultValues?.status || "active",
-      total_positions: defaultValues?.total_positions || 1,
-      occupied_positions: defaultValues?.occupied_positions || 0,
     },
   });
 
@@ -160,61 +151,24 @@ function JobForm({
     }
 
     try {
-      if (editMode) {
+      if (editMode && defaultValues?.id) {
         await updateJob(
+          { id: defaultValues.id, data },
           {
-            id: defaultValues?.id || "",
-            data: {
-              ...data,
-              title: data.title.trim(),
-              description: data.description?.trim() || null,
-              requirements: data.requirements?.trim() || null,
-              responsibilities: data.responsibilities?.trim() || null,
-              benefits: data.benefits?.trim() || null,
-              location: data.location?.trim() || null,
-              department: data.department?.trim() || null,
-              type: data.type.trim(),
-              salary: data.salary ? parseFloat(data.salary) : null,
-              status: data.status,
-              start_date: data.start_date?.toString() || null,
-              end_date: data.end_date?.toString() || null,
-              total_positions: data.total_positions || 1,
-            },
-          },
-          {
-            onSuccess: async (response) => {
-              if (onSuccess) {
-                onSuccess();
-              }
-            },
+            onSuccess: () => onSuccess?.(),
+            onError: () => setIsSavingJob(false),
           },
         );
       } else {
         await createJob(
           {
             ...data,
-            user_id: user?.id,
-            enterprise_id: enterprise?.id || "",
-            title: data.title.trim(),
-            description: data.description?.trim() || null,
-            requirements: data.requirements?.trim() || null,
-            responsibilities: data.responsibilities?.trim() || null,
-            benefits: data.benefits?.trim() || null,
-            location: data.location?.trim() || null,
-            department: data.department?.trim() || null,
-            type: data.type.trim(),
-            salary: data.salary ? parseFloat(data.salary) : null,
-            status: data.status,
-            start_date: data.start_date?.toString() || null,
-            end_date: data.end_date?.toString() || null,
-            total_positions: data.total_positions || 1,
+            start_date: formatToYYYYMMDD(data.start_date),
+            end_date: formatToYYYYMMDD(data.end_date),
           },
           {
-            onSuccess: async (response) => {
-              if (onSuccess) {
-                onSuccess();
-              }
-            },
+            onSuccess: () => onSuccess?.(),
+            onError: () => setIsSavingJob(false),
           },
         );
       }
@@ -406,10 +360,7 @@ function JobForm({
                 <FormLabel>{t("Jobs.form.total_positions.label")}</FormLabel>
                 <FormControl>
                   <NumberInputWithButtons
-                    value={(() => {
-                      const numberToParse: number = field.value || 1;
-                      return numberToParse;
-                    })()}
+                    value={field.value ? parseInt(field.value) : 1}
                     minValue={0}
                     onChange={(numericValue) => {
                       if (isNaN(numericValue)) {
@@ -477,6 +428,7 @@ function JobForm({
                     placeholder={t("Jobs.form.description.placeholder")}
                     className="min-h-[100px]"
                     {...field}
+                    value={field.value || ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -495,6 +447,7 @@ function JobForm({
                     placeholder={t("Jobs.form.requirements.placeholder")}
                     className="min-h-[100px]"
                     {...field}
+                    value={field.value || ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -513,6 +466,7 @@ function JobForm({
                     placeholder={t("Jobs.form.responsibilities.placeholder")}
                     className="min-h-[100px]"
                     {...field}
+                    value={field.value || ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -531,6 +485,7 @@ function JobForm({
                     placeholder={t("Jobs.form.benefits.placeholder")}
                     className="min-h-[100px]"
                     {...field}
+                    value={field.value || ""}
                   />
                 </FormControl>
                 <FormMessage />

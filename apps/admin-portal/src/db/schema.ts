@@ -1158,6 +1158,8 @@ export const jobs = pgTable(
     benefits: text(),
     total_positions: numeric().default("0").notNull(),
     occupied_positions: numeric().default("0").notNull(),
+    location_id: uuid(),
+    location_type: text(),
   },
   (table) => [
     index("idx_jobs_enterprise_id").using(
@@ -1167,6 +1169,19 @@ export const jobs = pgTable(
     index("jobs_department_idx").using("btree", table.department.asc().nullsLast().op("text_ops")),
     index("jobs_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
     index("jobs_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    check(
+      "jobs_location_type_check",
+      sql`(location_type IS NULL) OR location_type = ANY (ARRAY['office'::text, 'branch'::text, 'warehouse'::text])`,
+    ),
+    check(
+      "jobs_location_id_type_consistency_check",
+      sql`((location_id IS NULL AND location_type IS NULL) OR (location_id IS NOT NULL AND location_type IS NOT NULL))`,
+    ),
+    index("jobs_location_poly_idx").using(
+      "btree",
+      table.location_type.asc().nullsLast(),
+      table.location_id.asc().nullsLast(),
+    ),
   ],
 );
 
