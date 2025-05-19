@@ -29,8 +29,8 @@ import useUserStore from "@/stores/use-user-store";
 export const createCarSchema = (t: (key: string) => string) => {
   const CarSelectSchema = createInsertSchema(cars, {
     name: z.string().min(1, t("Cars.form.name.required")),
-    make: z.string().optional(),
-    model: z.string().optional(),
+    make: z.string().min(1, t("Vehicles.form.make.required")),
+    model: z.string().min(1, t("Vehicles.form.model.required")),
     year: z.number({
       invalid_type_error: t("Forms.must_be_number"),
       message: t("Forms.must_be_number"),
@@ -53,26 +53,20 @@ export const createCarSchema = (t: (key: string) => string) => {
         message: t("Vehicles.form.ownership_status.required"),
       })
       .default("owned"),
-    monthly_payment: z.string().optional(),
-    daily_payment: z.string().optional(),
-    weekly_payment: z.string().optional(),
-    annual_payment: z.string().optional(),
+    monthly_payment: z.coerce.number({ invalid_type_error: t("Forms.must_be_number") }).nullable().optional(),
+    daily_payment: z.coerce.number({ invalid_type_error: t("Forms.must_be_number") }).nullable().optional(),
+    weekly_payment: z.coerce.number({ invalid_type_error: t("Forms.must_be_number") }).nullable().optional(),
+    annual_payment: z.coerce.number({ invalid_type_error: t("Forms.must_be_number") }).nullable().optional(),
     payment_cycle: z.enum(PaymentCycle).default("monthly"),
     status: z.enum(VehicleStatus).optional(),
     notes: z.any().optional().nullable(),
+    purchase_price: z.coerce.number({ invalid_type_error: t("Forms.must_be_number") }).nullable().optional(),
   });
 
   return CarSelectSchema;
 };
 
 export type CarFormValues = z.input<ReturnType<typeof createCarSchema>>;
-
-export interface CarFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  defaultValues?: CarUpdateData | null;
-  editMode?: boolean;
-}
 
 export function CarForm({
   formHtmlId,
@@ -90,25 +84,18 @@ export function CarForm({
   const { mutate: updateCar } = useUpdateCar();
 
   const isLoading = useCarStore((state) => state.isLoading);
-  const setIsLoading = useCarStore((state) => state.setIsLoading);
+  const setIsLoadingSave = useCarStore((state) => state.setIsLoading);
 
   const form = useForm<CarFormValues>({
     resolver: zodResolver(createCarSchema(t)),
     defaultValues: {
-      name: defaultValues?.name || "",
-      make: defaultValues?.make || "",
-      model: defaultValues?.model || "",
-      year: defaultValues?.year,
+      ...defaultValues,
       color: defaultValues?.color || "",
       vin: defaultValues?.vin || "",
       code: defaultValues?.code || "",
       license_country: defaultValues?.license_country || "",
       license_plate: defaultValues?.license_plate || "",
       ownership_status: defaultValues?.ownership_status || "owned",
-      monthly_payment: defaultValues?.monthly_payment?.toString() || "",
-      daily_payment: defaultValues?.daily_payment?.toString() || "",
-      weekly_payment: defaultValues?.weekly_payment?.toString() || "",
-      annual_payment: defaultValues?.annual_payment?.toString() || "",
       payment_cycle: defaultValues?.payment_cycle || "monthly",
       status: defaultValues?.status || "active",
       notes: getNotesValue(defaultValues),
@@ -116,7 +103,7 @@ export function CarForm({
   });
 
   const handleSubmit = async (data: CarFormValues) => {
-    setIsLoading(true);
+    setIsLoadingSave(true);
     if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
@@ -125,73 +112,26 @@ export function CarForm({
     }
 
     try {
-      if (editMode) {
+      if (editMode && defaultValues?.id) {
         await updateCar(
+          { id: defaultValues.id, data },
           {
-            id: defaultValues?.id || "",
-            data: {
-              name: data.name.trim(),
-              make: data.make?.trim() || "",
-              model: data.model?.trim() || "",
-              year: data.year,
-              color: data.color?.trim() || "",
-              vin: data.vin?.trim() || "",
-              code: data.code?.trim() || "",
-              notes: data.notes || "",
-              license_country: data.license_country?.trim() || "",
-              license_plate: data.license_plate?.trim() || "",
-              status: data.status,
-              ownership_status: data.ownership_status,
-              monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
-            },
-          },
-          {
-            onSuccess: async (response) => {
-              if (onSuccess) {
-                onSuccess();
-              }
-            },
+            onSuccess: () => onSuccess?.(),
+            onError: () => setIsLoadingSave(false),
           },
         );
       } else {
-        await createCar(
-          {
-            name: data.name.trim(),
-            make: data.make?.trim() || "",
-            model: data.model?.trim() || "",
-            year: data.year,
-            color: data.color?.trim(),
-            vin: data.vin?.trim(),
-            code: data.code?.trim(),
-            license_country: data.license_country?.trim(),
-            license_plate: data.license_plate?.trim(),
-            ownership_status: data.ownership_status,
-            monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
-            status: data.status || "active",
-            notes: data.notes,
-            user_id: user?.id,
-            enterprise_id: enterprise?.id || "",
-          },
-
-          {
-            onSuccess: async (response) => {
-              if (onSuccess) {
-                onSuccess();
-              }
-            },
-          },
-        );
+        await createCar(data, {
+          onSuccess: () => onSuccess?.(),
+          onError: () => setIsLoadingSave(false),
+        });
       }
     } catch (error) {
-      setIsLoading(false);
+      setIsLoadingSave(false);
       console.error("Failed to save car:", error);
-      toast.error(t("General.error_operation"), {
-        description: t("Cars.error.create"),
-      });
     }
   };
 
-  // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
     (window as any).carForm = form;
   }
@@ -203,6 +143,7 @@ export function CarForm({
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          console.log(form.getValues());
           form.handleSubmit(handleSubmit)(e);
         }}
       >
@@ -353,12 +294,11 @@ export function CarForm({
                       <FormLabel>{t("PaymentCycles.daily_payment.label")}</FormLabel>
                       <FormControl>
                         <CurrencyInput
+                          {...field}
+                          value={field.value ?? undefined}
                           placeholder={t("PaymentCycles.daily_payment.placeholder")}
                           disabled={isLoading}
-                          {...field}
                           showCommas={true}
-                          value={field.value ? parseFloat(String(field.value)) : undefined}
-                          onChange={(value) => field.onChange(value?.toString() || "")}
                         />
                       </FormControl>
                       <FormMessage />
@@ -377,12 +317,11 @@ export function CarForm({
                       <FormLabel>{t("PaymentCycles.weekly_payment.label")}</FormLabel>
                       <FormControl>
                         <CurrencyInput
+                          {...field}
+                          value={field.value ?? undefined}
                           placeholder={t("PaymentCycles.weekly_payment.placeholder")}
                           disabled={isLoading}
-                          {...field}
                           showCommas={true}
-                          value={field.value ? parseFloat(String(field.value)) : undefined}
-                          onChange={(value) => field.onChange(value?.toString() || "")}
                         />
                       </FormControl>
                       <FormMessage />
@@ -401,12 +340,11 @@ export function CarForm({
                       <FormLabel>{t("PaymentCycles.monthly_payment.label")}</FormLabel>
                       <FormControl>
                         <CurrencyInput
+                          {...field}
+                          value={field.value ?? undefined}
                           placeholder={t("PaymentCycles.monthly_payment.placeholder")}
                           disabled={isLoading}
-                          {...field}
                           showCommas={true}
-                          value={field.value ? parseFloat(String(field.value)) : undefined}
-                          onChange={(value) => field.onChange(value?.toString() || "")}
                         />
                       </FormControl>
                       <FormMessage />
@@ -425,12 +363,11 @@ export function CarForm({
                       <FormLabel>{t("PaymentCycles.annual_payment.label")}</FormLabel>
                       <FormControl>
                         <CurrencyInput
+                          {...field}
+                          value={field.value ?? undefined}
                           placeholder={t("PaymentCycles.annual_payment.placeholder")}
                           disabled={isLoading}
-                          {...field}
                           showCommas={true}
-                          value={field.value ? parseFloat(String(field.value)) : undefined}
-                          onChange={(value) => field.onChange(value?.toString() || "")}
                         />
                       </FormControl>
                       <FormMessage />

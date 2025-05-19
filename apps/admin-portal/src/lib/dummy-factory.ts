@@ -170,8 +170,8 @@ export const generateDummyCar = () => {
     form.setValue("model", dummyData.email);
     form.setValue("year", dummyData.randomNumber(4));
     form.setValue("color", dummyData.randomString);
-    form.setValue("vin", dummyData.randomNumber(17));
-    form.setValue("code", dummyData.randomNumber(3));
+    form.setValue("vin", dummyData.randomStringLength(17));
+    form.setValue("code", dummyData.randomStringLength(5));
     form.setValue("license_country", dummyData.randomString);
     form.setValue("license_plate", dummyData.randomString);
     form.setValue("notes", dummyData.state);

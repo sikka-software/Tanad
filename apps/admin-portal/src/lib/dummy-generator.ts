@@ -268,12 +268,23 @@ export const generateDummyData = () => {
       Math.floor(Math.random() * 255),
     pick: (array: any[]) => array[Math.floor(Math.random() * array.length)],
     stringNumber: String(Math.random().toString(36).substring(2, 15)),
+
     expense_category:
       fakeExpenseCategories[Math.floor(Math.random() * fakeExpenseCategories.length)],
+
     randomString: Math.random().toString(36).substring(2, 15),
+    randomStringLength: (length: number = 10) => {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      let result = "";
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    },
 
     randomNumber: (length: number) => Math.floor(Math.random() * 10 ** length),
     randomDate: generateRandomDate(),
+
     employee_status: fakeEmployeeStatus[Math.floor(Math.random() * fakeEmployeeStatus.length)],
     employee_department:
       fakeEmployeeDepartments[Math.floor(Math.random() * fakeEmployeeDepartments.length)],

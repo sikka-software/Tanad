@@ -4211,15 +4211,18 @@
     "form": {
       "make": {
         "label": "الشركة المصنعة",
-        "placeholder": "مثال: Toyota, Ford"
+        "placeholder": "مثال: Toyota, Ford",
+        "required": "الشركة المصنعة مطلوبة"
       },
       "model": {
         "label": "الموديل",
-        "placeholder": "مثال: Camry, Mustang"
+        "placeholder": "مثال: Camry, Mustang",
+        "required": "الموديل مطلوب"
       },
       "year": {
         "label": "سنة الصنع",
-        "placeholder": "مثال: 2023"
+        "placeholder": "مثال: 2023",
+        "required": "سنة الصنع مطلوبة"
       },
       "color": {
         "label": "اللون",
