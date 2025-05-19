@@ -65,6 +65,7 @@ export function ExpenseForm({
   const t = useTranslations();
   const locale = useLocale();
   const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
   const { mutate: createExpense } = useCreateExpense();
   const { mutate: updateExpense } = useUpdateExpense();
   const { data: expenses } = useExpenses();
@@ -126,6 +127,9 @@ export function ExpenseForm({
           form.handleSubmit(handleSubmit)(e);
         }}
       >
+        <input hidden type="text" value={user?.id} {...form.register("user_id")} />
+        <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
+
         <div className="form-container">
           <div className="form-fields-cols-2">
             <FormField

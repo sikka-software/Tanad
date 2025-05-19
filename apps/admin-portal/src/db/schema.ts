@@ -606,7 +606,7 @@ export const invoice_items = pgTable(
     description: text().notNull(),
     quantity: numeric({ precision: 10, scale: 2 }).default("1").notNull(),
     unit_price: numeric({ precision: 10, scale: 2 }).notNull(),
-    amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
+    amount: numeric({ precision: 13, scale: 2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
     invoice_id: uuid().notNull(),
     product_id: uuid(),
   },
@@ -1150,7 +1150,7 @@ export const jobs = pgTable(
     location: varchar({ length: 255 }),
     department: varchar({ length: 255 }),
     type: varchar({ length: 50 }).notNull(),
-    salary: numeric({ precision: 10, scale: 2 }),
+    salary: numeric({ precision: 13, scale: 2 }),
     status: common_status().default("active"),
     start_date: date(),
     end_date: date(),
@@ -1278,7 +1278,7 @@ export const employee_requests = pgTable(
     description: text(),
     start_date: date(),
     end_date: date(),
-    amount: numeric({ precision: 10, scale: 2 }),
+    amount: numeric({ precision: 13, scale: 2 }),
     attachments: jsonb().default([]),
     notes: jsonb(),
   },
@@ -1389,8 +1389,8 @@ export const quote_items = pgTable(
     ),
     description: text().notNull(),
     quantity: numeric({ precision: 10, scale: 2 }).default("1").notNull(),
-    unit_price: numeric({ precision: 10, scale: 2 }).notNull(),
-    amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
+    unit_price: numeric({ precision: 13, scale: 2 }).notNull(),
+    amount: numeric({ precision: 13, scale: 2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
     quote_id: uuid().notNull(),
     product_id: uuid(),
   },
@@ -1532,7 +1532,7 @@ export const expenses = pgTable(
 
     // Rest
     description: text(),
-    amount: numeric({ precision: 10, scale: 2 }).notNull(),
+    amount: numeric({ precision: 13, scale: 2 }).notNull(),
     incurred_at: date().default(sql`CURRENT_DATE`),
     created_by: uuid(),
     category: text().notNull(),
@@ -1640,7 +1640,7 @@ export const cars = pgTable(
     annual_payment: numeric({ precision: 10, scale: 2 }),
     payment_cycle: payment_cycle(),
     purchase_date: date(),
-    purchase_price: numeric({ precision: 10, scale: 2 }),
+    purchase_price: numeric({ precision: 13, scale: 2 }),
     notes: jsonb(),
   },
   (table) => [
@@ -1765,14 +1765,14 @@ export const invoices = pgTable(
     issue_date: date().default(sql`CURRENT_DATE`),
     due_date: date(),
     status: invoice_status().default("draft").notNull(),
-    subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
+    subtotal: numeric({ precision: 13, scale: 2 }).default("0").notNull(),
     tax_rate: numeric({ precision: 5, scale: 2 }).default("0"),
-    tax_amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
+    tax_amount: numeric({ precision: 13, scale: 2 }).generatedAlwaysAs(sql`
 CASE
     WHEN (tax_rate IS NULL) THEN (0)::numeric
     ELSE round((subtotal * tax_rate), 2)
 END`),
-    total: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
+    total: numeric({ precision: 13, scale: 2 }).generatedAlwaysAs(sql`
 CASE
     WHEN (tax_rate IS NULL) THEN subtotal
     ELSE round((subtotal * ((1)::numeric + tax_rate)), 2)
@@ -1952,9 +1952,9 @@ export const products = pgTable(
 
     name: text().notNull(),
     description: text(),
-    price: numeric({ precision: 10, scale: 2 }).notNull(),
+    price: numeric({ precision: 13, scale: 2 }).notNull(),
     sku: text(),
-    cost: numeric({ precision: 10, scale: 2 }),
+    cost: numeric({ precision: 13, scale: 2 }),
     stock_quantity: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
     unit: text(),
     status: common_status().default("active"),
@@ -1987,16 +1987,16 @@ export const quotes = pgTable(
     issue_date: date().notNull(),
     expiry_date: date().notNull(),
     status: quote_status().default("draft").notNull(),
-    subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
+    subtotal: numeric({ precision: 13, scale: 2 }).default("0").notNull(),
     tax_rate: numeric({ precision: 5, scale: 2 }).default("0"),
     notes: jsonb(),
     client_id: uuid().notNull(),
-    tax_amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
+    tax_amount: numeric({ precision: 13, scale: 2 }).generatedAlwaysAs(sql`
 CASE
     WHEN (tax_rate IS NULL) THEN (0)::numeric
     ELSE round((subtotal * tax_rate), 2)
 END`),
-    total: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
+    total: numeric({ precision: 13, scale: 2 }).generatedAlwaysAs(sql`
 CASE
     WHEN (tax_rate IS NULL) THEN subtotal
     ELSE round((subtotal * ((1)::numeric + tax_rate)), 2)
@@ -2029,7 +2029,7 @@ export const purchases = pgTable(
     updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
 
     description: text(),
-    amount: numeric({ precision: 10, scale: 2 }).notNull(),
+    amount: numeric({ precision: 13, scale: 2 }).notNull(),
     incurred_at: date().default(sql`CURRENT_DATE`),
     created_by: uuid(),
     category: text().notNull(),
@@ -2067,7 +2067,7 @@ export const salaries = pgTable(
     updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
     notes: jsonb(),
     employee_id: uuid().notNull(),
-    amount: numeric({ precision: 10, scale: 2 }).notNull(),
+    amount: numeric({ precision: 13, scale: 2 }).notNull(),
     currency: text().default("USD").notNull(),
     payment_frequency: text().default("monthly").notNull(),
     start_date: date().notNull(),

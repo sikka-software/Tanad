@@ -85,6 +85,15 @@ export function CurrencyInput({
     // Remove any existing commas from whole part
     const cleanWholePart = wholePart.replace(/,/g, "");
 
+    // // Check if the value exceeds 99,000,000,000
+    // const testNum = cleanWholePart
+    //   ? Number(cleanWholePart + (decimalPart ? `.${decimalPart.slice(0, 2)}` : ""))
+    //   : undefined;
+    // if (testNum !== undefined && !isNaN(testNum) && testNum > 99000000000) {
+    //   // Optionally, you could show a toast or error here
+    //   return;
+    // }
+
     // Format the whole part with commas if showCommas is true
     let formattedValue = cleanWholePart;
     if (showCommas && cleanWholePart) {
