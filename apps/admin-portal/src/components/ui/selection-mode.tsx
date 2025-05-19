@@ -39,7 +39,7 @@ const SelectionMode = ({ store, isDeleting }: SelectionModeProps) => {
           disabled={isDeleting}
         >
           <X className="h-4 w-4" />
-          {t("General.clear")}
+          {t("General.cancel")}
         </Button>
         <Button
           variant="destructive"

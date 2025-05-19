@@ -222,7 +222,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     };
 
     return (
-      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={modalPopover}>
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} >
         <PopoverTrigger asChild>
           {loading ? (
             <Skeleton className="min-h-10 w-full" />

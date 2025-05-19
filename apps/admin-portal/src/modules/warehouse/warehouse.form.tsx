@@ -12,6 +12,8 @@ import { Input } from "@/ui/inputs/input";
 import PhoneInput from "@/ui/inputs/phone-input";
 import UnitsInput from "@/ui/inputs/units-input";
 
+import BooleanTabs from "@/components/ui/boolean-tabs";
+
 import { AddressFormSection } from "@/forms/address-form-section";
 import NotesSection from "@/forms/notes-section";
 
@@ -36,10 +38,7 @@ const createWarehouseSchema = (t: (key: string) => string) => {
       .string()
       .email({ message: t("Warehouses.form.email.invalid") })
       .optional(),
-    manager: z
-      .string({ invalid_type_error: t("Warehouses.form.manager.invalid_uuid") })
-      .optional()
-      .nullable(),
+    manager: z.string().optional().nullable(),
     status: z.enum(CommonStatus, {
       message: t("CommonStatus.required"),
     }),
@@ -255,6 +254,25 @@ export function WarehouseForm({
             />
             <FormField
               control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Warehouses.form.email.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      dir="ltr"
+                      {...field}
+                      type="email"
+                      disabled={isLoading}
+                      placeholder={t("Warehouses.form.email.placeholder")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="phone"
               render={({ field }) => (
                 <FormItem>
@@ -343,6 +361,28 @@ export function WarehouseForm({
                   </FormItem>
                 );
               }}
+            />
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("CommonStatus.label")}</FormLabel>
+                  <FormControl>
+                    <BooleanTabs
+                      disabled={isLoading}
+                      trueText={t("CommonStatus.active")}
+                      falseText={t("CommonStatus.inactive")}
+                      value={field.value === "active"}
+                      onValueChange={(newValue) => {
+                        field.onChange(newValue ? "active" : "inactive");
+                      }}
+                      listClassName="w-full"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
           </div>
         </div>

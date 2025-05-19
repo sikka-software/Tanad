@@ -35,6 +35,7 @@ const CodeInput = ({ onSerial, onRandom, inCell, inputProps }: CodeInputProps) =
             size="icon_sm"
             type="button"
             variant="ghost"
+            disabled={inputProps?.disabled}
             className={cn(
               "absolute end-0.5 top-0.5 cursor-pointer",
               inCell && "top-1 opacity-50 transition-opacity hover:opacity-100",

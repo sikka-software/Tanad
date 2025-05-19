@@ -47,7 +47,15 @@ export default function AddWarehousePage() {
   );
 }
 
-AddWarehousePage.messages = ["Metadata", "Notes", "Pages", "Warehouses", "Forms", "General"];
+AddWarehousePage.messages = [
+  "Metadata",
+  "Notes",
+  "Pages",
+  "Warehouses",
+  "Forms",
+  "General",
+  "CommonStatus",
+];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   try {

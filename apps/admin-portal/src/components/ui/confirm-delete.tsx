@@ -96,7 +96,7 @@ const ConfirmDelete = ({
           </div>
         )}
         {children && children}
-        <DialogFooter>
+        <DialogFooter className="!flex !flex-row !items-center !justify-between md:!justify-end">
           <Button
             onClick={() => {
               setIsDeleteDialogOpen(false);

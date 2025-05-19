@@ -478,7 +478,6 @@ export function CarForm({
                       onChange={field.onChange}
                       disabled={isLoading}
                       dir={lang === "ar" ? "rtl" : "ltr"}
-                      ariaInvalid={false}
                       texts={{
                         placeholder: t("Forms.country.placeholder"),
                         searchPlaceholder: t("Forms.country.search_placeholder"),
