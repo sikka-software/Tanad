@@ -16,7 +16,7 @@ import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@
 import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps, PaymentCycle, VehicleStatus } from "@/types/common.type";
-import { VehicleOwnershipStatus } from "@/types/vehicle.types";
+import { VehicleOwnershipStatus, VehicleSchema } from "@/types/vehicle.types";
 
 import { useCreateTruck, useUpdateTruck } from "@/truck/truck.hooks";
 import useTruckStore from "@/truck/truck.store";
@@ -27,51 +27,13 @@ import useUserStore from "@/stores/use-user-store";
 
 export const createTruckSchema = (t: (key: string) => string) => {
   const TruckSelectSchema = createInsertSchema(trucks, {
-    name: z.string().min(1, t("Trucks.form.name.required")),
-    make: z.string().optional().or(z.literal("")),
-    model: z.string().optional().or(z.literal("")),
-    year: z.number({
-      invalid_type_error: t("Forms.must_be_number"),
-      message: t("Forms.must_be_number"),
-    }),
-    color: z.string().optional().or(z.literal("")),
-    vin: z
-      .string()
-      .optional()
-      .refine((val) => !val || /^[A-Za-z0-9]+$/.test(val), {
-        message: t("Vehicles.form.vin.invalid"),
-      })
-      .refine((val) => !val || val.length === 17, {
-        message: t("Vehicles.form.vin.exact_length"),
-      }),
-    code: z.string().optional().or(z.literal("")),
-    license_country: z.string().optional().or(z.literal("")),
-    license_plate: z.string().optional().or(z.literal("")),
-    ownership_status: z
-      .enum(VehicleOwnershipStatus, {
-        message: t("Vehicles.form.ownership_status.required"),
-      })
-      .default("owned"),
-    monthly_payment: z.string().optional().or(z.literal("")),
-    daily_payment: z.string().optional().or(z.literal("")),
-    weekly_payment: z.string().optional().or(z.literal("")),
-    annual_payment: z.string().optional().or(z.literal("")),
-    payment_cycle: z.enum(PaymentCycle).default("monthly"),
-    status: z.enum(VehicleStatus).optional(),
-    notes: z.any().optional().nullable(),
+    ...VehicleSchema,
   });
 
   return TruckSelectSchema;
 };
 
 export type TruckFormValues = z.input<ReturnType<typeof createTruckSchema>>;
-
-export interface TruckFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  defaultValues?: TruckUpdateData | null;
-  editMode?: boolean;
-}
 
 export function TruckForm({
   formHtmlId,
@@ -89,26 +51,13 @@ export function TruckForm({
   const { mutate: updateTruck } = useUpdateTruck();
 
   const isLoading = useTruckStore((state) => state.isLoading);
-  const setIsLoading = useTruckStore((state) => state.setIsLoading);
+  const setIsLoadingSave = useTruckStore((state) => state.setIsLoading);
 
   const form = useForm<TruckFormValues>({
     resolver: zodResolver(createTruckSchema(t)),
     defaultValues: {
       ...defaultValues,
-      name: defaultValues?.name || "",
-      make: defaultValues?.make || "",
-      model: defaultValues?.model || "",
-      year: defaultValues?.year,
-      color: defaultValues?.color || "",
-      vin: defaultValues?.vin || "",
-      code: defaultValues?.code || "",
-      license_country: defaultValues?.license_country || "",
-      license_plate: defaultValues?.license_plate || "",
       ownership_status: defaultValues?.ownership_status || "owned",
-      monthly_payment: defaultValues?.monthly_payment?.toString() || "",
-      daily_payment: defaultValues?.daily_payment?.toString() || "",
-      weekly_payment: defaultValues?.weekly_payment?.toString() || "",
-      annual_payment: defaultValues?.annual_payment?.toString() || "",
       payment_cycle: defaultValues?.payment_cycle || "monthly",
       status: defaultValues?.status || "active",
       notes: getNotesValue(defaultValues),
@@ -116,7 +65,7 @@ export function TruckForm({
   });
 
   const handleSubmit = async (data: TruckFormValues) => {
-    setIsLoading(true);
+    setIsLoadingSave(true);
     if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
@@ -125,65 +74,22 @@ export function TruckForm({
     }
 
     try {
-      if (editMode) {
+      if (editMode && defaultValues?.id) {
         await updateTruck(
+          { id: defaultValues.id, data },
           {
-            id: defaultValues?.id || "",
-            data: {
-              name: data.name.trim(),
-              make: data.make?.trim() || "",
-              model: data.model?.trim() || "",
-              year: data.year,
-              color: data.color?.trim() || "",
-              vin: data.vin?.trim() || "",
-              code: data.code?.trim() || "",
-              status: data.status,
-              notes: data.notes || "",
-              license_country: data.license_country?.trim() || "",
-              license_plate: data.license_plate?.trim() || "",
-              ownership_status: data.ownership_status,
-              monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
-            },
-          },
-          {
-            onSuccess: async (response) => {
-              if (onSuccess) {
-                onSuccess();
-              }
-            },
+            onSuccess: () => onSuccess?.(),
+            onError: () => setIsLoadingSave(false),
           },
         );
       } else {
-        await createTruck(
-          {
-            name: data.name.trim(),
-            make: data.make?.trim() || "",
-            model: data.model?.trim() || "",
-            year: data.year,
-            color: data.color?.trim() || "",
-            vin: data.vin?.trim() || "",
-            code: data.code?.trim() || "",
-            license_country: data.license_country?.trim() || "",
-            license_plate: data.license_plate?.trim() || "",
-            ownership_status: data.ownership_status,
-            monthly_payment: data.monthly_payment ? parseFloat(data.monthly_payment) : null,
-            status: data.status || "active",
-            notes: data.notes || "",
-            user_id: user?.id || "",
-            enterprise_id: enterprise?.id || "",
-          },
-
-          {
-            onSuccess: async (response) => {
-              if (onSuccess) {
-                onSuccess();
-              }
-            },
-          },
-        );
+        await createTruck(data, {
+          onSuccess: () => onSuccess?.(),
+          onError: () => setIsLoadingSave(false),
+        });
       }
     } catch (error) {
-      setIsLoading(false);
+      setIsLoadingSave(false);
       console.error("Failed to save truck:", error);
       toast.error(t("General.error_operation"), {
         description: t("Trucks.error.create"),
@@ -239,7 +145,7 @@ export function TruckForm({
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage t={t} />
                 </FormItem>
               )}
             />
@@ -255,9 +161,10 @@ export function TruckForm({
                       placeholder={t("Trucks.form.code.placeholder")}
                       disabled={isLoading}
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage t={t} />
                 </FormItem>
               )}
             />
@@ -274,7 +181,7 @@ export function TruckForm({
                       disabled={isLoading}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage t={t} />
                 </FormItem>
               )}
             />
@@ -291,9 +198,14 @@ export function TruckForm({
                       value={field.value}
                       onValueChange={(val) => field.onChange(val)}
                       dir={lang === "ar" ? "rtl" : "ltr"}
+                      disabled={isLoading}
                     >
                       <FormControl>
-                        <SelectTrigger onClear={() => field.onChange("")} value={field.value}>
+                        <SelectTrigger
+                          disabled={isLoading}
+                          onClear={() => field.onChange("")}
+                          value={field.value}
+                        >
                           <SelectValue
                             placeholder={t("Vehicles.form.ownership_status.placeholder")}
                           />
@@ -308,7 +220,7 @@ export function TruckForm({
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage t={t} />
                 </FormItem>
               )}
             />
@@ -338,7 +250,7 @@ export function TruckForm({
                         </SelectContent>
                       </Select>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage t={t} />
                   </FormItem>
                 )}
               />
@@ -362,7 +274,7 @@ export function TruckForm({
                           onChange={(value) => field.onChange(value?.toString() || "")}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage t={t} />
                     </FormItem>
                   )}
                 />
@@ -386,7 +298,7 @@ export function TruckForm({
                           onChange={(value) => field.onChange(value?.toString() || "")}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage t={t} />
                     </FormItem>
                   )}
                 />
@@ -410,7 +322,7 @@ export function TruckForm({
                           onChange={(value) => field.onChange(value?.toString() || "")}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage t={t} />
                     </FormItem>
                   )}
                 />
@@ -434,7 +346,7 @@ export function TruckForm({
                           onChange={(value) => field.onChange(value?.toString() || "")}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage t={t} />
                     </FormItem>
                   )}
                 />
@@ -452,7 +364,7 @@ export function TruckForm({
                       disabled={isLoading}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage t={t} />
                 </FormItem>
               )}
             />
@@ -469,7 +381,7 @@ export function TruckForm({
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage t={t} />
                 </FormItem>
               )}
             />
@@ -492,7 +404,7 @@ export function TruckForm({
                       }}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage t={t} />
                 </FormItem>
               )}
             />
@@ -507,9 +419,10 @@ export function TruckForm({
                       placeholder={t("Vehicles.form.color.placeholder")}
                       disabled={isLoading}
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage t={t} />
                 </FormItem>
               )}
             />
@@ -521,9 +434,9 @@ export function TruckForm({
               <FormItem>
                 <FormLabel>{t("Vehicles.form.vin.label")}</FormLabel>
                 <FormControl>
-                  <DigitsInput disabled={isLoading} {...field} />
+                  <DigitsInput disabled={isLoading} {...field} value={field.value ?? ""} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage t={t} />
               </FormItem>
             )}
           />
@@ -548,7 +461,7 @@ export function TruckForm({
                       }}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage t={t} />
                 </FormItem>
               )}
             />
@@ -564,9 +477,10 @@ export function TruckForm({
                       placeholder={t("Vehicles.form.license_plate.placeholder")}
                       disabled={isLoading}
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage t={t} />
                 </FormItem>
               )}
             />

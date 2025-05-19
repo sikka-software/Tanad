@@ -12,7 +12,7 @@ import useUserStore from "@/stores/use-user-store";
 import useTruckColumns from "./truck.columns";
 import { useUpdateTruck } from "./truck.hooks";
 import useTruckStore from "./truck.store";
-import { Truck } from "./truck.type";
+import { Truck, TruckUpdateData } from "./truck.type";
 
 const TrucksTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Truck>) => {
   const t = useTranslations();
@@ -23,7 +23,7 @@ const TrucksTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateTruck({ id: rowId, data: { [columnId]: value } });
+    await updateTruck({ id: rowId, data: { [columnId]: value } as TruckUpdateData });
   };
 
   const columns = useTruckColumns(handleEdit);

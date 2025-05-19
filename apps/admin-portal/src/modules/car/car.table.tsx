@@ -12,7 +12,7 @@ import useUserStore from "@/stores/use-user-store";
 import useCarColumns from "./car.columns";
 import { useUpdateCar } from "./car.hooks";
 import useCarStore from "./car.store";
-import { Car } from "./car.type";
+import { Car, CarUpdateData } from "./car.type";
 
 const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Car>) => {
   const t = useTranslations();
@@ -22,7 +22,7 @@ const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateCar({ id: rowId, data: { [columnId]: value } });
+    await updateCar({ id: rowId, data: { [columnId]: value } as CarUpdateData });
   };
 
   const columns = useCarColumns(handleEdit);

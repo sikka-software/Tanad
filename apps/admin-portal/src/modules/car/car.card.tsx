@@ -7,6 +7,7 @@ import { VehicleStatus, VehicleStatusProps } from "@/types/common.type";
 import { useUpdateCar } from "@/car/car.hooks";
 import useCarStore from "@/car/car.store";
 import { Car } from "@/car/car.type";
+import { CarUpdateData } from "@/car/car.type";
 
 const CarCard = ({
   car,
@@ -23,7 +24,7 @@ const CarCard = ({
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateCar({ id: rowId, data: { [columnId]: value } });
+    await updateCar({ id: rowId, data: { [columnId]: value } as CarUpdateData });
   };
 
   return (

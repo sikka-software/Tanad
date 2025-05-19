@@ -122,7 +122,14 @@ function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
   );
 }
 
-function FormMessage({ className, children, ...rest }: React.ComponentProps<"p">) {
+function FormMessage({
+  className,
+  children,
+  t,
+  ...rest
+}: React.ComponentProps<"p"> & {
+  t?: (key: string) => string;
+}) {
   const { error, formMessageId } = useFormField();
   const body = error ? String(error?.message ?? "") : children;
 
@@ -147,7 +154,7 @@ function FormMessage({ className, children, ...rest }: React.ComponentProps<"p">
           // "absolute start-2 top-[19px] -translate-y-[4px]"
         >
           {" "}
-          {body}
+          {t && typeof body === "string" ? t(body) : body}
         </span>
       </motion.p>
     </AnimatePresence>

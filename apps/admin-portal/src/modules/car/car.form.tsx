@@ -35,7 +35,6 @@ export const createCarSchema = (t: (key: string) => string) => {
       invalid_type_error: t("Forms.must_be_number"),
       message: t("Forms.must_be_number"),
     }),
-    color: z.string().optional(),
     vin: z
       .string()
       .optional()
@@ -44,23 +43,20 @@ export const createCarSchema = (t: (key: string) => string) => {
       })
       .refine((val) => !val || val.length === 17, {
         message: t("Vehicles.form.vin.exact_length"),
-      }),
-    code: z.string().optional(),
-    license_country: z.string().optional(),
-    license_plate: z.string().optional(),
+      }).nullable,
     ownership_status: z
       .enum(VehicleOwnershipStatus, {
         message: t("Vehicles.form.ownership_status.required"),
       })
       .default("owned"),
-    monthly_payment: z.coerce.number({ invalid_type_error: t("Forms.must_be_number") }).nullable().optional(),
-    daily_payment: z.coerce.number({ invalid_type_error: t("Forms.must_be_number") }).nullable().optional(),
-    weekly_payment: z.coerce.number({ invalid_type_error: t("Forms.must_be_number") }).nullable().optional(),
-    annual_payment: z.coerce.number({ invalid_type_error: t("Forms.must_be_number") }).nullable().optional(),
+
+    monthly_payment: z.string({ message: t("Forms.must_be_number") }).optional(),
+    daily_payment: z.string({ message: t("Forms.must_be_number") }).optional(),
+    weekly_payment: z.string({ message: t("Forms.must_be_number") }).optional(),
+    annual_payment: z.string({ message: t("Forms.must_be_number") }).optional(),
     payment_cycle: z.enum(PaymentCycle).default("monthly"),
     status: z.enum(VehicleStatus).optional(),
     notes: z.any().optional().nullable(),
-    purchase_price: z.coerce.number({ invalid_type_error: t("Forms.must_be_number") }).nullable().optional(),
   });
 
   return CarSelectSchema;
@@ -90,12 +86,15 @@ export function CarForm({
     resolver: zodResolver(createCarSchema(t)),
     defaultValues: {
       ...defaultValues,
-      color: defaultValues?.color || "",
       vin: defaultValues?.vin || "",
       code: defaultValues?.code || "",
       license_country: defaultValues?.license_country || "",
       license_plate: defaultValues?.license_plate || "",
       ownership_status: defaultValues?.ownership_status || "owned",
+      monthly_payment: defaultValues?.monthly_payment || undefined,
+      daily_payment: defaultValues?.daily_payment || undefined,
+      weekly_payment: defaultValues?.weekly_payment || undefined,
+      annual_payment: defaultValues?.annual_payment || undefined,
       payment_cycle: defaultValues?.payment_cycle || "monthly",
       status: defaultValues?.status || "active",
       notes: getNotesValue(defaultValues),
@@ -195,6 +194,7 @@ export function CarForm({
                       placeholder={t("Cars.form.code.placeholder")}
                       disabled={isLoading}
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -295,10 +295,10 @@ export function CarForm({
                       <FormControl>
                         <CurrencyInput
                           {...field}
-                          value={field.value ?? undefined}
                           placeholder={t("PaymentCycles.daily_payment.placeholder")}
                           disabled={isLoading}
                           showCommas={true}
+                          value={field.value ? Number(field.value) : undefined}
                         />
                       </FormControl>
                       <FormMessage />
@@ -318,10 +318,10 @@ export function CarForm({
                       <FormControl>
                         <CurrencyInput
                           {...field}
-                          value={field.value ?? undefined}
                           placeholder={t("PaymentCycles.weekly_payment.placeholder")}
                           disabled={isLoading}
                           showCommas={true}
+                          value={field.value ? Number(field.value) : undefined}
                         />
                       </FormControl>
                       <FormMessage />
@@ -341,10 +341,10 @@ export function CarForm({
                       <FormControl>
                         <CurrencyInput
                           {...field}
-                          value={field.value ?? undefined}
                           placeholder={t("PaymentCycles.monthly_payment.placeholder")}
                           disabled={isLoading}
                           showCommas={true}
+                          value={field.value ? Number(field.value) : undefined}
                         />
                       </FormControl>
                       <FormMessage />
@@ -364,10 +364,10 @@ export function CarForm({
                       <FormControl>
                         <CurrencyInput
                           {...field}
-                          value={field.value ?? undefined}
                           placeholder={t("PaymentCycles.annual_payment.placeholder")}
                           disabled={isLoading}
                           showCommas={true}
+                          value={field.value ? Number(field.value) : undefined}
                         />
                       </FormControl>
                       <FormMessage />
@@ -444,6 +444,7 @@ export function CarForm({
                       placeholder={t("Vehicles.form.color.placeholder")}
                       disabled={isLoading}
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -458,7 +459,7 @@ export function CarForm({
               <FormItem>
                 <FormLabel>{t("Vehicles.form.vin.label")}</FormLabel>
                 <FormControl>
-                  <DigitsInput disabled={isLoading} {...field} />
+                  <DigitsInput disabled={isLoading} {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -500,6 +501,7 @@ export function CarForm({
                       placeholder={t("Vehicles.form.license_plate.placeholder")}
                       disabled={isLoading}
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />

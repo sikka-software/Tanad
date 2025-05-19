@@ -4,7 +4,12 @@ import ModuleCard from "@/components/cards/module-card";
 
 import { useUpdateEmployee } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
-import { Employee, EmployeeStatus, EmployeeStatusProps } from "@/employee/employee.types";
+import {
+  Employee,
+  EmployeeStatus,
+  EmployeeStatusProps,
+  EmployeeUpdateData,
+} from "@/employee/employee.types";
 
 const EmployeeCard = ({
   employee,
@@ -23,7 +28,7 @@ const EmployeeCard = ({
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateEmployee({ id: rowId, data: { [columnId]: value } });
+    await updateEmployee({ id: rowId, data: { [columnId]: value } as EmployeeUpdateData });
   };
 
   return (

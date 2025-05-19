@@ -83,18 +83,19 @@ export default function EmployeesPage() {
   const getFilteredDataClient = moduleHooks.useGetFilteredData();
   const getSortedDataClient = moduleHooks.useGetSortedData();
 
-  const { data: employeesFromHook, isLoading, error } = useEmployees();
+  const { data: employees, isLoading, error } = useEmployees();
   const { mutateAsync: deleteEmployees, isPending: isDeleting } = useBulkDeleteEmployees();
   const { mutate: duplicateEmployee } = useDuplicateEmployee();
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
-    data: employeesFromHook,
+    data: employees,
     setSelectedRows,
     setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem,
+    setActionableItem: (item: Employee | null) =>
+      setActionableItem(item as unknown as EmployeeUpdateData | null),
     duplicateMutation: duplicateEmployee,
     moduleName: "Employees",
   });
@@ -118,10 +119,10 @@ export default function EmployeesPage() {
   const setData = useEmployeeStore((state) => state.setData);
 
   useEffect(() => {
-    if (employeesFromHook && setData) {
-      setData(employeesFromHook);
+    if (employees && setData) {
+      setData(employees);
     }
-  }, [employeesFromHook, setData]);
+  }, [employees, setData]);
 
   const columnFiltersConfigForTable = useMemo((): ColumnFilter[] => {
     return filterConditions.map((condition) => ({
@@ -246,7 +247,7 @@ export default function EmployeesPage() {
   return (
     <div>
       <CustomPageMeta title={t("Pages.Employees.title")} />
-      <DataPageLayout count={employeesFromHook?.length} itemsText={t("Pages.Employees.title")}>
+      <DataPageLayout count={employees?.length} itemsText={t("Pages.Employees.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode store={useEmployeeStore} isDeleting={isDeleting} />
         ) : (
@@ -259,7 +260,7 @@ export default function EmployeesPage() {
             onAddClick={canCreate ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Employees.add")}
             searchPlaceholder={t("Pages.Employees.search")}
-            hideOptions={employeesFromHook?.length === 0}
+            hideOptions={employees?.length === 0}
           />
         )}
 

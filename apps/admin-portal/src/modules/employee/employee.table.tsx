@@ -9,7 +9,7 @@ import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateEmployee } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
-import { Employee } from "@/employee/employee.types";
+import { Employee, EmployeeUpdateData } from "@/employee/employee.types";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -38,7 +38,7 @@ const EmployeesTable = ({
       setData?.(
         (data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)),
       );
-      await updateEmployee({ id: rowId, data: { [columnId]: value } });
+      await updateEmployee({ id: rowId, data: { [columnId]: value } as EmployeeUpdateData });
     },
     [data, setData, updateEmployee],
   );
