@@ -3797,7 +3797,7 @@
       },
       "nationality": {
         "label": "الجنسية",
-        "placeholder": "أدخل الجنسية"
+        "placeholder": "اختر الجنسية"
       },
       "job": {
         "label": "الوظيفة",

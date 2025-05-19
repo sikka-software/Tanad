@@ -4,6 +4,8 @@ import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
+import CountryInput from "@/components/ui/inputs/country-input";
+
 import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
@@ -108,6 +110,28 @@ const useEmployeeColumns = (
       accessorKey: "nationality",
       header: t("Employees.form.nationality.label"),
       maxSize: 100,
+      noPadding: true,
+      enableEditing: false,
+      cell: ({ getValue, row }) => {
+        const nationality = getValue() as string;
+        console.log(row.original);
+        return (
+          <CountryInput
+            value={nationality}
+            onChange={(e) => handleEdit?.(row.id, "nationality", e)}
+            inCell
+            defaultValue={row.original.nationality || ""}
+            isolated
+            dir={locale === "ar" ? "rtl" : "ltr"}
+            labelKey={locale === "ar" ? "arabic_label" : "label"}
+            texts={{
+              placeholder: t("Employees.form.nationality.placeholder"),
+              searchPlaceholder: t("Forms.country.search_placeholder"),
+              noItems: t("Forms.country.no_items"),
+            }}
+          />
+        );
+      },
     },
     {
       accessorKey: "created_at",

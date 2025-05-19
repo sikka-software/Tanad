@@ -55,6 +55,8 @@ type CountryInputTypes<T> = {
   renderSelected?: (item: T) => React.ReactNode;
   ariaInvalid?: boolean;
   filter?: (value: string, search: string) => number;
+  isolated?: boolean;
+  inCell?: boolean;
 };
 const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
   (
@@ -73,13 +75,16 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
       onChange: onValueChange,
       filter,
       disabled,
+      isolated,
+      inCell,
       ...props
     },
     ref,
   ) => {
     const [open, setOpen] = React.useState(false);
     const containerRef = React.useRef<HTMLDivElement>(null);
-    const { error } = useFormField();
+
+    const { error } = isolated ? { error: undefined } : useFormField();
 
     function getProperty<T>(obj: T, key: string | ((item: T) => string)): any {
       if (typeof key === "function") return key(obj);
@@ -128,32 +133,40 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
                     "bg-background px-3",
                     error &&
                       "ring-destructive/20 dark:ring-destructive/40 border-destructive rounded-b-none",
-                    // inCell && "h-10 rounded-none border-none",
+                    inCell && "h-10 rounded-none border-none !bg-transparent !shadow-none",
                     // buttonClassName,
                   )}
                 >
-                  {selectedItem
-                    ? renderSelected
-                      ? renderSelected(selectedItem)
-                      : getProperty(selectedItem, dir === "rtl" ? "arabic_label" : "label")
-                    : props.texts?.placeholder || ". . ."}
+                  {selectedItem ? (
+                    renderSelected ? (
+                      renderSelected(selectedItem)
+                    ) : (
+                      getProperty(selectedItem, dir === "rtl" ? "arabic_label" : "label")
+                    )
+                  ) : (
+                    <span className={cn("text-sm", inCell && "text-muted-foreground")}>
+                      {props.texts?.placeholder || ". . ."}
+                    </span>
+                  )}
 
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={cn(
-                      "size-4 transition-all",
-                      !props.preview ? "visible opacity-100" : "invisible opacity-0",
-                    )}
-                    aria-label="Chevron down icon"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
+                  {!inCell && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={cn(
+                        "size-4 transition-all",
+                        !props.preview ? "visible opacity-100" : "invisible opacity-0",
+                      )}
+                      aria-label="Chevron down icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  )}
                 </Button>
               </div>
             )}
@@ -161,7 +174,8 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
           <PopoverContent
             align="start"
             className={cn(
-              "w-[var(--radix-popover-trigger-width)] p-0",
+              "p-0",
+              inCell ? "max-w-[200px]" : "w-[var(--radix-popover-trigger-width)]",
               props.helperText && "-mt-4",
               popoverClassName,
             )}
