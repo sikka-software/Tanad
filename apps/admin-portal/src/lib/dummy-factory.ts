@@ -84,15 +84,15 @@ export const generateDummyTruck = () => {
   const dummyData = generateDummyData();
   const form = (window as any).truckForm;
   if (form) {
-    form.setValue("name", dummyData.first_name);
-    form.setValue("make", dummyData.last_name);
-    form.setValue("model", dummyData.email);
-    form.setValue("year", dummyData.randomNumber(4));
-    form.setValue("color", dummyData.randomString);
-    form.setValue("vin", dummyData.randomString);
-    form.setValue("code", dummyData.randomString);
+    form.setValue("name", dummyData.full_name);
+    form.setValue("make", dummyData.car_maker);
+    form.setValue("model", dummyData.car_model);
+    form.setValue("year", dummyData.randomDate.getFullYear());
+    form.setValue("color", dummyData.car_color);
+    form.setValue("vin", dummyData.randomStringLength(17));
+    form.setValue("code", dummyData.randomStringLength(5));
     form.setValue("license_country", dummyData.randomString);
-    form.setValue("license_plate", dummyData.randomString);
+    form.setValue("license_plate", dummyData.car_plate);
     form.setValue("notes", dummyData.state);
   }
 };
@@ -165,15 +165,15 @@ export const generateDummyCar = () => {
   const dummyData = generateDummyData();
   const form = (window as any).carForm;
   if (form) {
-    form.setValue("name", dummyData.first_name);
-    form.setValue("make", dummyData.last_name);
-    form.setValue("model", dummyData.email);
-    form.setValue("year", dummyData.randomNumber(4));
-    form.setValue("color", dummyData.randomString);
+    form.setValue("name", dummyData.full_name);
+    form.setValue("make", dummyData.car_maker);
+    form.setValue("model", dummyData.car_model);
+    form.setValue("year", dummyData.randomDate.getFullYear());
+    form.setValue("color", dummyData.car_color);
     form.setValue("vin", dummyData.randomStringLength(17));
     form.setValue("code", dummyData.randomStringLength(5));
     form.setValue("license_country", dummyData.randomString);
-    form.setValue("license_plate", dummyData.randomString);
+    form.setValue("license_plate", dummyData.car_plate);
     form.setValue("notes", dummyData.state);
   }
 };
