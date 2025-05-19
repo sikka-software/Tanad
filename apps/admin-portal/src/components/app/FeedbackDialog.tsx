@@ -3,7 +3,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
-// UI
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/ui/dialog";
 import { Textarea } from "@/ui/textarea";
 
@@ -29,16 +28,18 @@ export function FeedbackDialog({ onOpenChange }: FeedbackDialogProps) {
 
     setIsSubmitting(true);
     try {
-      // TODO: call an api to send the feedback via email via n8n
-      // const { error } = await supabase.from("feedback").insert([
-      //   {
-      //     user_id: user?.id,
-      //     email: user?.email,
-      //     message: feedback.trim(),
-      //   },
-      // ]);
+      await fetch("https://n8n.sikka.io/webhook-test/feedback-form", {
+        method: "POST",
+        headers: {
+          "x-form-secret": process.env.N8N_FORM_SECRET || "",
+          "Content-Type": "application/json",
+        },
 
-      // if (error) throw error;
+        body: JSON.stringify({
+          email: user?.email,
+          message: feedback.trim(),
+        }),
+      });
 
       toast.success(t("Feedback.feedback_submitted"), {
         description: t("Feedback.thank_you_feedback"),
@@ -61,6 +62,7 @@ export function FeedbackDialog({ onOpenChange }: FeedbackDialogProps) {
       </DialogHeader>
       <form onSubmit={handleSubmit} className="space-y-4">
         <Textarea
+          isolated
           placeholder={t("Feedback.feedback_placeholder")}
           value={feedback}
           onChange={(e) => setFeedback(e.target.value)}
