@@ -221,9 +221,6 @@ function JobForm({
     } catch (error) {
       setIsSavingJob(false);
       console.error("Failed to save job:", error);
-      toast.error(t("General.error_operation"), {
-        description: t("Jobs.error.create"),
-      });
     }
   };
 

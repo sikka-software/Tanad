@@ -53,7 +53,6 @@ type CountryInputTypes<T> = {
   onChange?: (selectedValue: string) => void;
   renderOption?: (item: T) => React.ReactNode;
   renderSelected?: (item: T) => React.ReactNode;
-  ariaInvalid?: boolean;
   filter?: (value: string, search: string) => number;
   isolated?: boolean;
   inCell?: boolean;
@@ -68,7 +67,6 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
       dir,
       labelProps,
       inputProps,
-      ariaInvalid,
       renderOption,
       renderSelected,
       value: controlledValue,
