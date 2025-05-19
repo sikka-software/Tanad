@@ -48,6 +48,10 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
     {
       accessorKey: "location",
       header: t("Jobs.form.location.label"),
+      cell: ({ getValue }) => {
+        const location = getValue() as string;
+        return location ? location : "N/A";
+      },
     },
     {
       accessorKey: "salary",
@@ -55,7 +59,7 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
       cell: (props: CellContext<Job, unknown>) =>
         props.row.original.salary ? (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
-            {MoneyFormatter(props.row.original.salary)}
+            {MoneyFormatter(Number(props.row.original.salary))}
             {currency}
           </span>
         ) : (

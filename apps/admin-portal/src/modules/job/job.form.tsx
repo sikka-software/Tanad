@@ -24,6 +24,8 @@ import NumberInputWithButtons from "@/ui/inputs/number-input-buttons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
+import renderLocationOption from "@/components/app/location-options";
+
 import { formatToYYYYMMDD } from "@/lib/date-utils";
 import { validateYearRange } from "@/lib/utils";
 
@@ -49,6 +51,11 @@ import useOnlineStoreStore from "@/online-store/online-store.store";
 
 import { jobs } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
+
+import { useBranches } from "../branch/branch.hooks";
+import { useOffices } from "../office/office.hooks";
+import { useOnlineStores } from "../online-store/online-store.hooks";
+import { useWarehouses } from "../warehouse/warehouse.hooks";
 
 const createJobFormSchema = (t: (key: string) => string) => {
   const JobSelectSchema = createInsertSchema(jobs, {
@@ -102,7 +109,16 @@ function JobForm({
   const locale = useLocale();
   const queryClient = useQueryClient();
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
+
   const { data: departments = [], isLoading: isFetchingDepartments } = useDepartments();
+  const { data: offices = [], isLoading: isFetchingOffices } = useOffices();
+  const { data: warehouses = [], isLoading: isFetchingWarehouses } = useWarehouses();
+  const { data: branches = [], isLoading: isFetchingBranches } = useBranches();
+  const { data: onlineStores = [], isLoading: isFetchingOnlineStores } = useOnlineStores();
+
+  const isFetchingLocations =
+    isFetchingOffices || isFetchingWarehouses || isFetchingBranches || isFetchingOnlineStores;
+
   const setIsSavingDepartment = useDepartmentStore((state) => state.setIsLoading);
   const isSavingDepartment = useDepartmentStore((state) => state.isLoading);
 
@@ -129,6 +145,7 @@ function JobForm({
       ...defaultValues,
       salary: defaultValues?.salary ? String(defaultValues.salary) : undefined,
       status: defaultValues?.status || "active",
+      location: defaultValues?.location || null,
     },
   });
 
@@ -140,6 +157,34 @@ function JobForm({
       })),
     [departments],
   );
+
+  const locationOptions = useMemo(() => {
+    let officesOptions = offices.map((location) => ({
+      id: location.id,
+      label: location.name,
+      value: location.id,
+      metadata: { type: "office" as const },
+    }));
+    let warehousesOptions = warehouses.map((location) => ({
+      id: location.id,
+      label: location.name,
+      value: location.id,
+      metadata: { type: "warehouse" as const },
+    }));
+    let branchesOptions = branches.map((location) => ({
+      id: location.id,
+      label: location.name,
+      value: location.id,
+      metadata: { type: "branch" as const },
+    }));
+    let onlineStoresOptions = onlineStores.map((location) => ({
+      id: location.id,
+      label: location.domain_name,
+      value: location.id,
+      metadata: { type: "online_store" as const },
+    }));
+    return [...officesOptions, ...warehousesOptions, ...branchesOptions, ...onlineStoresOptions];
+  }, [offices, warehouses, branches, onlineStores]);
 
   const handleSubmit = async (data: JobFormValues) => {
     setIsSavingJob(true);
@@ -282,8 +327,8 @@ function JobForm({
                   <FormControl>
                     <ComboboxAdd
                       dir={locale === "ar" ? "rtl" : "ltr"}
-                      data={departmentOptions}
-                      isLoading={isFetchingDepartments}
+                      data={locationOptions}
+                      isLoading={isFetchingLocations}
                       defaultValue={field.value || ""}
                       onChange={(value) => field.onChange(value || null)}
                       texts={{
@@ -293,8 +338,8 @@ function JobForm({
                       }}
                       addText={t("Pages.Locations.add")}
                       onAddClick={() => setIsChooseLocationDialogOpen(true)}
+                      renderOption={(option) => renderLocationOption(option, t)}
                     />
-                    {/* <Input placeholder={t("Jobs.form.location.placeholder")} {...field} /> */}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
