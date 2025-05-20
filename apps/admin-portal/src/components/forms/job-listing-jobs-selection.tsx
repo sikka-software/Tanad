@@ -135,7 +135,7 @@ const JobListingJobsSelection = ({
                           {job.location && <p className="text-sm text-gray-600">{job.location}</p>}
                           {job.salary && (
                             <div className="flex flex-row items-center gap-1 text-sm text-gray-600">
-                              <span>{MoneyFormatter(job.salary, false)}</span>
+                              <span>{MoneyFormatter(Number(job.salary), false)}</span>
                               <span>{formCurrency || currency}</span>
                             </div>
                           )}

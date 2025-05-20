@@ -125,7 +125,7 @@ const QueryGlobalToast = () => {
         }
 
         // Delete Mutation
-        if (mutationFnName.startsWith("useDelete")) {
+        if (mutationFnName.startsWith("useDelete") || mutationFnName.startsWith("useBulkDelete")) {
           const status = event.mutation.state.status;
           console.log("useDelete hook status", status);
           if (status === "pending") {

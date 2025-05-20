@@ -9,12 +9,12 @@ interface TableSkeletonProps {
 const TableSkeleton = ({ columns, rows }: TableSkeletonProps) => {
   return (
     <div className="overflow-x-auto">
-      <Table className="min-w-screen w-auto">
+      <Table className="w-auto min-w-screen">
         <TableHeader>
           <TableRow>
             {columns.map((column, index) => (
               <TableHead key={index} className="min-w-[90px] p-1">
-                <Skeleton className="h-6 rounded-md w-full min-w-[90px]" />
+                <Skeleton className="h-6 w-full min-w-[90px] rounded-md" />
               </TableHead>
             ))}
           </TableRow>
@@ -24,7 +24,7 @@ const TableSkeleton = ({ columns, rows }: TableSkeletonProps) => {
             <TableRow key={rowIndex}>
               {columns.map((_, colIndex) => (
                 <TableCell key={colIndex} className="min-w-[90px] p-1">
-                  <Skeleton className="h-7 rounded-md w-full min-w-[90px]" />
+                  <Skeleton className="h-7 w-full min-w-[90px] rounded-md" />
                 </TableCell>
               ))}
             </TableRow>

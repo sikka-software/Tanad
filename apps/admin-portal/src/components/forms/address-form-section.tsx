@@ -158,7 +158,6 @@ export function AddressFormSection({
                   onChange={field.onChange}
                   disabled={disabled}
                   dir={dir}
-                  ariaInvalid={false}
                   texts={{
                     placeholder: t("Forms.country.placeholder"),
                     searchPlaceholder: t("Forms.country.search_placeholder"),

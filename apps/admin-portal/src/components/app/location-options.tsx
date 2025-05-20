@@ -78,7 +78,7 @@ const renderLocationCell = (
   }
   return (
     <div className="flex flex-col">
-      <span className="flex items-center gap-2 text-">
+      <span className="text- flex items-center gap-2">
         {typeIcon}
         {label}
       </span>

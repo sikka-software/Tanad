@@ -93,7 +93,6 @@ export function DateInputField({
           <Group className="w-full">
             <DateInput
               isolated={isolated}
-            
               className={cn(
                 "bg-input-background rounded-e-none",
                 error && "rounded-bl-none rtl:rounded-br-none",

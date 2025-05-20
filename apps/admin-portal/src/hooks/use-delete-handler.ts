@@ -20,9 +20,7 @@ export const useDeleteHandler = () => {
     mutationFn: MutationFn<TVariables>,
     options: DeleteHandlerOptions<TVariables>,
   ) => {
-    console.log("calling createfdeletehandler");
     return async (variables: TVariables) => {
-      console.log("cvars", variables);
       const toastId = toast.loading(t("General.loading_operation"), {
         description: t(options.loading),
       });

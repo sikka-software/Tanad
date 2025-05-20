@@ -23,7 +23,7 @@ const JobCard = ({
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateJob({ id: rowId, data: { [columnId]: value } });
+    await updateJob({ id: rowId, data: { [columnId]: value } as Job });
   };
 
   return (
