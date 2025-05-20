@@ -2,7 +2,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { createApiHandler } from "@/lib/api-handler";
 import type { Database } from "@/lib/database.types";
 
 // ModelConfig for single-resource endpoints
@@ -55,7 +54,56 @@ const modelMap: Record<string, ModelConfig> = {
   clients: { tableName: "clients" },
   department_locations: { tableName: "department_locations" },
   employees: { tableName: "employees" },
-  invoices: { tableName: "invoices" },
+  invoices: {
+    tableName: "invoices",
+    customHandlers: {
+      GET: async (supabase, user_id, req, id) => {
+        // Fetch the invoice
+        const { data: invoice, error } = await supabase
+          .from("invoices")
+          .select("*")
+          .eq("id", id)
+          .maybeSingle();
+
+        if (error) throw error;
+        if (!invoice) throw new Error("Invoice not found");
+
+        // Fetch the related items from invoice_items table
+        const { data: items, error: itemsError } = await supabase
+          .from("invoice_items")
+          .select("id, description, quantity, unit_price, product_id")
+          .eq("invoice_id", id);
+
+        if (itemsError) {
+          console.error("Error fetching invoice items:", itemsError);
+          throw itemsError;
+        }
+
+        console.log("Fetched invoice items:", items); // Debug log
+
+        // If client_id exists, fetch client data
+        let client = null;
+        if (invoice.client_id) {
+          const { data: clientData, error: clientError } = await supabase
+            .from("clients")
+            .select("*")
+            .eq("id", invoice.client_id)
+            .maybeSingle();
+
+          if (!clientError) {
+            client = clientData;
+          }
+        }
+
+        // Return the invoice with items and client data
+        return {
+          ...invoice,
+          items: items || [], // Include the items array
+          client,
+        };
+      },
+    },
+  },
   quotes: { tableName: "quotes" },
   job_listings: {
     tableName: "job_listings",
