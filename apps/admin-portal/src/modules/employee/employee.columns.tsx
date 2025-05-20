@@ -53,12 +53,12 @@ const useEmployeeColumns = (
       accessorKey: "birth_date",
       filterFn: dateTableFilterFn,
       header: t("Employees.form.birth_date.label"),
-      // noPadding: true,
       enableEditing: false,
       cell: ({ row }) => useFormatDate(row.original.birth_date),
     },
     {
       accessorKey: "hire_date",
+      enableEditing: false,
       header: t("Employees.form.hire_date.label"),
       cell: ({ row }) => useFormatDate(row.original.hire_date),
       filterFn: dateTableFilterFn,

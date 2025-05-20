@@ -34,7 +34,7 @@ import {
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useLocale, useTranslations } from "next-intl";
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
@@ -377,8 +377,8 @@ function SheetTable<
   } = props;
 
   const t = useTranslations();
-  const locale = useLocale();
 
+  const tableRef = useRef<HTMLTableElement>(null);
   /**
    * Ensure a minimum of 30 rows are displayed, padding with empty rows if needed.
    */
@@ -587,20 +587,6 @@ function SheetTable<
     [disabledColumns, disabledRows, findTableRow, cellOriginalContent, onEdit],
   );
 
-  /**
-   * Group data by `headerKey` (top-level only).
-   * Sub-rows are handled by TanStack expansions.
-   */
-  const groupedData = React.useMemo(() => {
-    const out: Record<string, T[]> = {};
-    data.forEach((row) => {
-      const key = row.headerKey || "ungrouped";
-      if (!out[key]) out[key] = [];
-      out[key].push(row);
-    });
-    return out;
-  }, [data]);
-
   const parentRef = React.useRef<HTMLDivElement>(null);
 
   const tableRows = table.getRowModel().rows;
@@ -742,7 +728,7 @@ function SheetTable<
               <TableCell
                 key={rowId + colKey + String(cell.getValue() ?? "")}
                 className={cn(
-                  "tiny-scrollbar group relative overflow-scroll border",
+                  "tiny-scrollbar group focus:outline-primary relative overflow-scroll border focus:outline-2 focus:-outline-offset-2",
                   {
                     "bg-muted": isDisabled,
                     "bg-destructive/25": errorMsg,
@@ -831,7 +817,7 @@ function SheetTable<
 
   return (
     <div ref={parentRef} className="relative max-h-[calc(100vh-7.6rem)] overflow-auto p-0 pb-2">
-      <Table id={id} style={{ minWidth: totalMinWidth }}>
+      <Table ref={tableRef} id={id} style={{ minWidth: totalMinWidth }}>
         {showHeader && (
           <TableHeader className="relative">
             <TableRow className="border-none">
