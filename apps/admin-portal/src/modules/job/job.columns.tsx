@@ -1,10 +1,12 @@
 import { CellContext } from "@tanstack/react-table";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { useMemo } from "react";
 
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
-import { renderLocationCell } from "@/components/app/location-options";
+import { renderLocationCell, renderLocationOption } from "@/components/app/location-options";
+import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 
 import SelectCell from "@/tables/select-cell";
 import StatusCell from "@/tables/status-cell";
@@ -13,11 +15,48 @@ import TimestampCell from "@/tables/timestamp-cell";
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
 import { useFormatDate } from "@/lib/date-utils";
 
+import { useBranches } from "../branch/branch.hooks";
+import { useDepartments } from "../department/department.hooks";
+import { useOffices } from "../office/office.hooks";
+import { useOnlineStores } from "../online-store/online-store.hooks";
+import { useWarehouses } from "../warehouse/warehouse.hooks";
 import { Job } from "./job.type";
 
 const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unknown) => void) => {
   const t = useTranslations();
+  const lang = useLocale();
   const currency = useAppCurrencySymbol({ usd: { className: "-ms-1" } }).symbol;
+
+  const { data: departments = [], isLoading: isFetchingDepartments } = useDepartments();
+  const { data: offices = [], isLoading: isFetchingOffices } = useOffices();
+  const { data: warehouses = [], isLoading: isFetchingWarehouses } = useWarehouses();
+  const { data: branches = [], isLoading: isFetchingBranches } = useBranches();
+  const { data: onlineStores = [], isLoading: isFetchingOnlineStores } = useOnlineStores();
+
+  const isFetchingLocations =
+    isFetchingOffices || isFetchingWarehouses || isFetchingBranches || isFetchingOnlineStores;
+
+  const locationOptions = useMemo(() => {
+    let officesOptions = offices.map((location) => ({
+      id: location.id,
+      label: location.name,
+      value: location.id,
+      metadata: { type: "office" as const },
+    }));
+    let warehousesOptions = warehouses.map((location) => ({
+      id: location.id,
+      label: location.name,
+      value: location.id,
+      metadata: { type: "warehouse" as const },
+    }));
+    let branchesOptions = branches.map((location) => ({
+      id: location.id,
+      label: location.name,
+      value: location.id,
+      metadata: { type: "branch" as const },
+    }));
+    return [...officesOptions, ...warehousesOptions, ...branchesOptions];
+  }, [offices, warehouses, branches]);
 
   const columns: ExtendedColumnDef<Job>[] = [
     {
@@ -31,7 +70,7 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
       enableEditing: false,
       cell: ({ getValue, row }) => (
         <SelectCell
-          onChange={(value) => handleEdit?.(row.id, "type", value)}
+          onChange={async (value) => handleEdit?.(row.id, "type", value)}
           cellValue={getValue()}
           options={[
             { label: t("Jobs.form.type.full_time"), value: "full_time" },
@@ -51,40 +90,54 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
       accessorKey: "location",
       header: t("Jobs.form.location.label"),
       enableEditing: false,
+
       cell: ({ row }) => {
-        const location = row.original.location;
-        const locationName = (row.original as Job & { location_name?: string }).location_name;
-        const locationType = (row.original as Job).location_type;
-
-        //         id
-        // :
-        // "9afe39c7-70f7-45c8-bed0-2bc7c50418f5"
-        // label
-        // :
-        // "DMM"
-        // metadata
-        // :
-        // {type: 'branch'}
-        // value
-        // :
-        // "9afe39c7-70f7-45c8-bed0-2bc7c50418f5"
-        return renderLocationCell(
-          locationType as "office" | "branch" | "warehouse",
-          location || "",
-          t,
+        return (
+          <ComboboxAdd
+            isolated
+            data={locationOptions}
+            defaultValue={row.original.location || ""}
+            valueKey="value"
+            labelKey="label"
+            onChange={(selectedValue) => {
+              const selectedOption = locationOptions.find((opt) => opt.value === selectedValue);
+              if (selectedOption) {
+              } else {
+              }
+            }}
+            texts={{
+              placeholder: t("Jobs.form.location.placeholder"),
+              searchPlaceholder: t("Pages.Jobs.search"),
+              noItems: t("Pages.Jobs.no_jobs_found"),
+            }}
+            isLoading={isFetchingLocations}
+            renderOption={(option) => renderLocationOption(option, t)}
+            renderSelected={(item) => {
+              if (!item) {
+                const currentId = row.original.location;
+                const foundOption = locationOptions.find((opt) => opt.value === currentId);
+                return foundOption ? foundOption.label : t("Jobs.form.location.placeholder");
+              }
+              return item.label;
+            }}
+            addText={t("Pages.Locations.add")}
+            // onAddClick={() => {
+            //   setIsChooseLocationDialogOpen(true);
+            // }}
+            dir={lang === "ar" ? "rtl" : "ltr"}
+          />
         );
-        // if (locationName) {
-        //   return locationName;
-        // }
-
-        // if (locationId && locationType) {
-        //   return `${locationType}: ${locationId}`;
-        // }
-        // if (locationId) {
-        //   return locationId;
-        // }
-        // return "N/A";
       },
+
+      // cell: ({ row }) => {
+      //   const location = row.original.location;
+      //   const locationType = (row.original as Job).location_type;
+      //   return renderLocationCell(
+      //     locationType as "office" | "branch" | "warehouse",
+      //     location || "",
+      //     t,
+      //   );
+      // },
     },
     {
       accessorKey: "salary",
@@ -96,7 +149,7 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
             {currency}
           </span>
         ) : (
-          "N/A"
+          "-"
         ),
     },
     {

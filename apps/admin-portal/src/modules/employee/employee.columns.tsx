@@ -76,10 +76,10 @@ const useEmployeeColumns = (
             }}
             texts={{
               placeholder: ". . .",
-              searchPlaceholder: t("Pages.Employees.search"),
+              searchPlaceholder: t("Pages.Jobs.search"),
               noItems: t("Pages.Jobs.no_jobs_found"),
             }}
-            addText={t("Pages.Employees.add")}
+            addText={t("Pages.Jobs.add")}
             renderOption={(option) => {
               return (
                 <div className="flex flex-row items-center justify-between gap-2">

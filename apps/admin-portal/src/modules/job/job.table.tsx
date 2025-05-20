@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import React from "react";
+import React, { useCallback } from "react";
 
 import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
@@ -20,11 +20,17 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
   const { mutate: updateJob } = useUpdateJob();
   const setData = useJobsStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateJob({ id: rowId, data: { [columnId]: value } as Job });
-  };
+  const handleEdit = useCallback(
+    async (rowId: string, columnId: string, value: unknown) => {
+      if (columnId === "id") return;
+      setData?.(
+        (data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)),
+      );
+      await updateJob({ id: rowId, data: { [columnId]: value } as Job });
+    },
+    [data, setData, updateJob],
+  );
+
   const columns = useJobColumns(handleEdit);
 
   const selectedRows = useJobsStore((state) => state.selectedRows);
@@ -55,7 +61,7 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
     }
   };
 
-  if (!isLoading) {
+  if (isLoading) {
     return (
       <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={12} />
     );

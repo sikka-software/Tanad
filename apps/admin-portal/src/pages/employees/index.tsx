@@ -42,10 +42,9 @@ export default function EmployeesPage() {
   const t = useTranslations();
   const router = useRouter();
 
-  // This is unique to employees page. Not all modules index pages fetch secondary modules.
-  const { data: jobs } = useJobs();
-
   const columns = useEmployeeColumns();
+
+  const { data: jobs } = useJobs();
 
   const moduleHooks = createModuleStoreHooks(useEmployeeStore, "employees");
 
@@ -124,40 +123,6 @@ export default function EmployeesPage() {
     }
   }, [employees, setData]);
 
-  const columnFiltersConfigForTable = useMemo((): ColumnFilter[] => {
-    return filterConditions.map((condition) => ({
-      id: condition.field,
-      value: {
-        // Pass the complex object as the filter value
-        filterValue: condition.value,
-        operator: condition.operator,
-        type: condition.type,
-      },
-    }));
-  }, [filterConditions]);
-
-  const handleColumnFiltersChange: OnChangeFn<ColumnFiltersState> = useCallback(
-    (updaterOrValue) => {
-      let newTanStackFilters: ColumnFiltersState;
-      if (typeof updaterOrValue === "function") {
-        newTanStackFilters = updaterOrValue(columnFiltersConfigForTable);
-      } else {
-        newTanStackFilters = updaterOrValue;
-      }
-
-      const newStoreFilters: FilterCondition[] = newTanStackFilters.map((tf: ColumnFilter) => ({
-        id: Date.now() + Math.random(),
-        field: tf.id,
-        value: String(tf.value ?? ""),
-        operator: "contains",
-        type: "text",
-        conjunction: "and",
-      }));
-      setFilterConditions(newStoreFilters);
-    },
-    [columnFiltersConfigForTable, setFilterConditions],
-  );
-
   const filteredDataForCards = useMemo(() => {
     return getFilteredDataClient(storeData);
   }, [storeData, getFilteredDataClient, searchQuery, filterConditions]);
@@ -165,50 +130,6 @@ export default function EmployeesPage() {
   const sortedDataForCards = useMemo(() => {
     return getSortedDataClient(filteredDataForCards);
   }, [filteredDataForCards, getSortedDataClient, sortRules]);
-
-  const tanstackSorting = useMemo(
-    () => sortRules.map((rule) => ({ id: rule.field, desc: rule.direction === "desc" })),
-    [sortRules],
-  );
-
-  const handleTanstackSortingChange = useCallback(
-    (
-      updater:
-        | ((prev: { id: string; desc: boolean }[]) => { id: string; desc: boolean }[])
-        | { id: string; desc: boolean }[],
-    ) => {
-      let nextSorting = typeof updater === "function" ? updater(tanstackSorting) : updater;
-      const newSortRules = nextSorting.map((s: { id: string; desc: boolean }) => ({
-        field: s.id,
-        direction: (s.desc ? "desc" : "asc") as "asc" | "desc",
-      }));
-      setSortRules(newSortRules);
-    },
-    [tanstackSorting, setSortRules],
-  );
-
-  const handleTanstackGlobalFilterChange = useCallback(
-    (updater: string | ((old: string) => string)) => {
-      if (typeof updater === "function") {
-        setSearchQuery(updater(searchQuery));
-      } else {
-        setSearchQuery(updater);
-      }
-    },
-    [searchQuery, setSearchQuery],
-  );
-
-  const handleSetIsDeleteDialogOpenForSelection = useCallback(
-    (open: boolean) => {
-      if (open) setPendingDeleteIds(selectedRows);
-      setIsDeleteDialogOpen(open);
-    },
-    [selectedRows, setIsDeleteDialogOpen, setPendingDeleteIds],
-  );
-
-  const handleAddClickForEmptyList = useCallback(() => {
-    router.push(router.pathname + "/add");
-  }, [router]);
 
   const handleFormSuccess = useCallback(() => {
     setIsFormDialogOpen(false);

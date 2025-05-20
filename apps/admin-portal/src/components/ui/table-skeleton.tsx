@@ -8,28 +8,30 @@ interface TableSkeletonProps {
 
 const TableSkeleton = ({ columns, rows }: TableSkeletonProps) => {
   return (
-    <Table className="overflow-y-auto">
-      <TableHeader>
-        <TableRow>
-          {columns.map((column, index) => (
-            <TableHead key={index} className="min-w-[40px]">
-              <Skeleton className="h-4 w-full min-w-[40px]" />
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {Array.from({ length: rows }).map((_, rowIndex) => (
-          <TableRow key={rowIndex}>
-            {columns.map((_, colIndex) => (
-              <TableCell key={colIndex} className="min-w-[40px]">
-                <Skeleton className="h-4 w-full min-w-[40px]" />
-              </TableCell>
+    <div className="overflow-x-auto">
+      <Table className="min-w-screen w-auto">
+        <TableHeader>
+          <TableRow>
+            {columns.map((column, index) => (
+              <TableHead key={index} className="min-w-[90px] p-1">
+                <Skeleton className="h-6 rounded-md w-full min-w-[90px]" />
+              </TableHead>
             ))}
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {Array.from({ length: rows }).map((_, rowIndex) => (
+            <TableRow key={rowIndex}>
+              {columns.map((_, colIndex) => (
+                <TableCell key={colIndex} className="min-w-[90px] p-1">
+                  <Skeleton className="h-7 rounded-md w-full min-w-[90px]" />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
 

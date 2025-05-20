@@ -29,7 +29,7 @@ import { renderLocationOption } from "@/components/app/location-options";
 import { formatToYYYYMMDD } from "@/lib/date-utils";
 import { validateYearRange } from "@/lib/utils";
 
-import { CommonStatus, ModuleFormProps } from "@/types/common.type";
+import { ModuleFormProps } from "@/types/common.type";
 
 import { OfficeForm } from "@/office/office.form";
 
@@ -86,9 +86,6 @@ const createJobFormSchema = (t: (key: string) => string) => {
       .superRefine(validateYearRange(t, 1800, 2200, "Jobs.form.end_date.invalid")),
     location_id: z.string(),
     location_type: z.string(),
-    // status: z.enum(CommonStatus, {
-    //   invalid_type_error: t("Jobs.form.status.required"),
-    // }),
 
     total_positions: z.coerce.string().optional().default("1"),
   });

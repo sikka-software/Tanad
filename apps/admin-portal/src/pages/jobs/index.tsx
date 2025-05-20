@@ -1,3 +1,4 @@
+import { ColumnFilter } from "@tanstack/react-table";
 import { pick } from "lodash";
 import { Briefcase, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
@@ -94,13 +95,34 @@ export default function JobsPage() {
     },
   });
 
+  const storeData = useJobsStore((state) => state.data) || [];
+  const setData = useJobsStore((state) => state.setData);
+
+  useEffect(() => {
+    if (jobs && setData) {
+      setData(jobs);
+    }
+  }, [jobs, setData]);
+
+  const columnFiltersConfigForTable = useMemo((): ColumnFilter[] => {
+    return filterConditions.map((condition) => ({
+      id: condition.field,
+      value: {
+        // Pass the complex object as the filter value
+        filterValue: condition.value,
+        operator: condition.operator,
+        type: condition.type,
+      },
+    }));
+  }, [filterConditions]);
+
   const filteredData = useMemo(() => {
-    return getFilteredData(jobs || []);
-  }, [jobs, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
+    return getFilteredData(storeData);
+  }, [storeData, getFilteredData, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedData = useMemo(() => {
     return getSortedData(filteredData);
-  }, [filteredData, sortRules, sortCaseSensitive, sortNullsFirst]);
+  }, [filteredData, getSortedData, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const tanstackSorting = useMemo(
     () => sortRules.map((rule) => ({ id: rule.field, desc: rule.direction === "desc" })),
