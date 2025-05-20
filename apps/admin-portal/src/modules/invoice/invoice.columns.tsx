@@ -1,4 +1,6 @@
+import { Eye } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
@@ -10,14 +12,14 @@ import TimestampCell from "@/tables/timestamp-cell";
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
 import { useFormatDate } from "@/lib/date-utils";
 
-import { Invoice } from "@/invoice/invoice.type";
-import { InvoiceStatus } from "@/invoice/invoice.type";
+import { Invoice, InvoiceStatus } from "@/invoice/invoice.type";
 
 const useInvoiceColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
   const currency = useAppCurrencySymbol().symbol;
+  const router = useRouter();
 
   const columns: ExtendedColumnDef<Invoice>[] = [
     //invoice_number
@@ -26,23 +28,32 @@ const useInvoiceColumns = (
       accessorKey: "invoice_number",
       header: t("Invoices.form.invoice_number.label"),
       cell: ({ getValue, row }) => (
-        <CodeCell
-          onChange={(e) => handleEdit?.(row.id, "invoice_number", e.target.value)}
-          onRandom={() => {
-            const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            let randomCode = "";
-            for (let i = 0; i < 5; i++) {
-              randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
-            }
-            handleEdit?.(row.id, "invoice_number", `INV-${randomCode}`);
-          }}
-          onSerial={() => {
-            const paddedNumber = String(row.index + 1).padStart(4, "0");
-            handleEdit?.(row.id, "invoice_number", `INV-${paddedNumber}`);
-          }}
-          code={getValue() as string}
-          onCodeChange={() => console.log("changing")}
-        />
+        <div className="flex items-center justify-between">
+          <CodeCell
+            onChange={(e) => handleEdit?.(row.id, "invoice_number", e.target.value)}
+            onRandom={() => {
+              const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+              let randomCode = "";
+              for (let i = 0; i < 5; i++) {
+                randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+              }
+              handleEdit?.(row.id, "invoice_number", `INV-${randomCode}`);
+            }}
+            onSerial={() => {
+              const paddedNumber = String(row.index + 1).padStart(4, "0");
+              handleEdit?.(row.id, "invoice_number", `INV-${paddedNumber}`);
+            }}
+            code={getValue() as string}
+            onCodeChange={() => console.log("changing")}
+          />
+          <button
+            className="ml-2 rounded-full p-1 hover:bg-gray-100"
+            onClick={() => router.push(`/invoices/${row.original.id}`)}
+            title={t("General.view")}
+          >
+            <Eye className="h-4 w-4 text-gray-500" />
+          </button>
+        </div>
       ),
     },
     //client.name

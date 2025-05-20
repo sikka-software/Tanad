@@ -1,7 +1,7 @@
 import { CalendarIcon, Download } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
@@ -16,6 +16,8 @@ import { generateZatcaXml } from "@/lib/zatca/zatca-xml";
 
 import { useInvoiceById } from "@/invoice/invoice.hooks";
 
+import { useClient } from "@/modules/client/client.hooks";
+
 export default function InvoiceDetailPage() {
   const t = useTranslations();
   const locale = useLocale();
@@ -24,6 +26,31 @@ export default function InvoiceDetailPage() {
   const { id } = router.query;
   const { data: invoice, isLoading, error } = useInvoiceById(id as string);
   const [isGeneratingXml, setIsGeneratingXml] = useState(false);
+  const [clientData, setClientData] = useState<any>(null);
+
+  // Fetch client data if needed
+  const { data: clientFromHook } = useClient(invoice?.client_id || "");
+
+  useEffect(() => {
+    if (invoice?.client) {
+      // Client data is already included in the invoice
+      setClientData(invoice.client);
+    } else if (clientFromHook && invoice?.client_id) {
+      // Client data fetched separately
+      setClientData(clientFromHook);
+    }
+  }, [invoice, clientFromHook]);
+
+  console.log("invoice", invoice);
+  // Debug client data availability
+  console.log(
+    "Client info:",
+    invoice?.client,
+    "Client ID:",
+    invoice?.client_id,
+    "Fetched client:",
+    clientData,
+  );
 
   if (isLoading) {
     return (
@@ -39,11 +66,14 @@ export default function InvoiceDetailPage() {
   if (error || !invoice) {
     return (
       <div className="container py-8" dir={dir}>
-        <h1 className="text-2xl font-bold">{t("Invoices.detail.notFound")}</h1>
+        <h1 className="text-2xl font-bold">{t("Invoices.detail_notFound")}</h1>
         <p className="text-muted-foreground mt-4">{t("Invoices.detail.notFoundDescription")}</p>
       </div>
     );
   }
+
+  // Use clientData for display and XML generation
+  const client = clientData || invoice.client;
 
   const handleDownloadXml = () => {
     if (!invoice) return;
@@ -66,13 +96,13 @@ export default function InvoiceDetailPage() {
           postalCode: "12345",
         },
 
-        buyerName: invoice.client?.name || "Client",
-        buyerVatNumber: invoice.client?.additional_number || undefined,
-        buyerAddress: invoice.client
+        buyerName: client?.name || "Client",
+        buyerVatNumber: client?.additional_number || undefined,
+        buyerAddress: client
           ? {
-              street: invoice.client.street_name || "",
-              city: invoice.client.city || "",
-              countryCode: invoice.client.country || "SA",
+              street: client.street_name || "",
+              city: client.city || "",
+              countryCode: client.country || "SA",
             }
           : undefined,
         items: invoice.items
@@ -127,14 +157,13 @@ export default function InvoiceDetailPage() {
           submit_form: t("Invoices.detail.edit"),
           cancel: t("Invoices.detail.cancel"),
         }}
-        dummyButton={() => router.push(`/invoices/edit/${invoice.id}`)}
       />
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>{t("Invoices.detail.invoiceDetails")}</CardTitle>
+              <CardTitle>{t("Invoices.invoice_details")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
@@ -185,10 +214,18 @@ export default function InvoiceDetailPage() {
                   {t("Invoices.detail.client")}
                 </div>
                 <div className="font-medium">
-                  {invoice.client?.name || t("Invoices.detail.unknownClient")}
+                  {client?.name || t("Invoices.detail.unknownClient")}
                 </div>
-                {invoice.client?.email && <div className="text-sm">{invoice.client.email}</div>}
-                {invoice.client?.phone && <div className="text-sm">{invoice.client.phone}</div>}
+                {client?.email && <div className="text-sm">{client.email}</div>}
+                {client?.phone && <div className="text-sm">{client.phone}</div>}
+                {client?.additional_number && (
+                  <div className="text-sm">
+                    <span className="text-muted-foreground mr-1">
+                      {t("Clients.vat_number", { fallback: "VAT Number" })}:
+                    </span>
+                    {client.additional_number}
+                  </div>
+                )}
               </div>
 
               <Separator className="my-6" />
@@ -270,13 +307,15 @@ export default function InvoiceDetailPage() {
                     <div className="text-muted-foreground text-sm font-medium">
                       {t("Invoices.zatca.sellerName")}
                     </div>
-                    <div className="text-sm">{invoice.seller_name}</div>
+                    <div className="text-sm font-semibold text-green-800">
+                      {invoice.seller_name}
+                    </div>
                   </div>
                   <div>
                     <div className="text-muted-foreground text-sm font-medium">
                       {t("Invoices.zatca.vatNumber")}
                     </div>
-                    <div className="text-sm">{invoice.vat_number}</div>
+                    <div className="text-sm font-semibold text-green-800">{invoice.vat_number}</div>
                   </div>
                 </div>
 
@@ -286,7 +325,7 @@ export default function InvoiceDetailPage() {
 
                 <div className="pt-2">
                   <button
-                    className="text-primary hover:text-primary/90 flex w-full items-center justify-center rounded-md border border-green-300 bg-white py-2 text-sm font-medium transition-colors"
+                    className="text-primary hover:text-primary/90 flex w-full items-center justify-center rounded-md border border-green-300 bg-green-50 py-2 text-sm font-medium transition-colors"
                     onClick={handleDownloadXml}
                     disabled={isGeneratingXml}
                   >

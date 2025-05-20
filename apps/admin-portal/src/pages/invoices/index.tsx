@@ -23,8 +23,8 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import InvoiceCard from "@/invoice/invoice.card";
 import useInvoiceColumns from "@/invoice/invoice.columns";
 import { InvoiceForm } from "@/invoice/invoice.form";
-import { useInvoices, useBulkDeleteInvoices, useDuplicateInvoice } from "@/invoice/invoice.hooks";
-import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/invoice/invoice.options";
+import { useBulkDeleteInvoices, useDuplicateInvoice, useInvoices } from "@/invoice/invoice.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/invoice/invoice.options";
 import useInvoiceStore from "@/invoice/invoice.store";
 import InvoicesTable from "@/invoice/invoice.table";
 import { InvoiceUpdateData } from "@/invoice/invoice.type";
@@ -84,6 +84,9 @@ export default function InvoicesPage() {
     duplicateMutation: duplicateInvoice,
     previewAction: (id: string) => {
       window.open(`/pay/${id}`, "_blank");
+    },
+    viewAction: (id: string) => {
+      router.push(`/invoices/${id}`);
     },
     moduleName: "Invoices",
   });

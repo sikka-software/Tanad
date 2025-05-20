@@ -1,5 +1,4 @@
 import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
 interface UseDataTableActionsProps<T extends { id: string }> {
   data?: T[];
@@ -10,6 +9,7 @@ interface UseDataTableActionsProps<T extends { id: string }> {
   duplicateMutation: (id: string, options?: any) => void;
   moduleName: string;
   previewAction?: (id: string) => void;
+  viewAction?: (id: string) => void;
   setPendingDeleteIds?: (ids: string[]) => void;
 }
 
@@ -22,6 +22,7 @@ export function useDataTableActions<T extends { id: string }>({
   duplicateMutation,
   moduleName,
   previewAction,
+  viewAction,
   setPendingDeleteIds,
 }: UseDataTableActionsProps<T>) {
   const t = useTranslations();
@@ -40,6 +41,10 @@ export function useDataTableActions<T extends { id: string }>({
 
     if (action === "preview") {
       previewAction?.(rowId);
+    }
+
+    if (action === "view") {
+      viewAction?.(rowId);
     }
 
     if (action === "duplicate") {
