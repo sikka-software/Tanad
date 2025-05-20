@@ -1,4 +1,4 @@
-import { parseDate } from "@internationalized/date";
+import { CalendarDate, parseDate } from "@internationalized/date";
 import { useLocale, useTranslations } from "next-intl";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
@@ -59,8 +59,20 @@ const useEmployeeColumns = (
             inCell
             placeholder={t("Employees.form.birth_date.placeholder")}
             value={row.original.birth_date ? parseDate(row.original.birth_date) : null}
-            onChange={(e) => handleEdit?.(row.id, "birth_date", e)}
-            onSelect={(e) => handleEdit?.(row.id, "birth_date", e)}
+            onChange={(e) => {
+              let newBirthDate: string | null = null;
+              if (e instanceof CalendarDate) {
+                newBirthDate = e.toString();
+              }
+              handleEdit?.(row.id, "birth_date", newBirthDate);
+            }}
+            onSelect={(e) => {
+              let selectedBirthDate: string | null = null;
+              if (e instanceof CalendarDate) {
+                selectedBirthDate = e.toString();
+              }
+              handleEdit?.(row.id, "birth_date", selectedBirthDate);
+            }}
             // disabled={isEmployeeSaving}
           />
         );
