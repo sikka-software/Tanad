@@ -84,6 +84,7 @@ const createJobFormSchema = (t: (key: string) => string) => {
       .any()
       .optional()
       .superRefine(validateYearRange(t, 1800, 2200, "Jobs.form.end_date.invalid")),
+    location: z.string(),
     location_id: z.string(),
     location_type: z.string(),
 
@@ -145,7 +146,7 @@ function JobForm({
       location_type: defaultValues?.location_type || "",
       salary: defaultValues?.salary ? String(defaultValues.salary) : undefined,
       status: defaultValues?.status || "active",
-      location: defaultValues?.location || null,
+      location: defaultValues?.location || "",
     },
   });
 
@@ -182,6 +183,7 @@ function JobForm({
 
   const handleSubmit = async (data: JobFormValues) => {
     setIsSavingJob(true);
+    console.log("data", data);
     if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
@@ -315,7 +317,7 @@ function JobForm({
 
             <FormField
               control={form.control}
-              name="location_id"
+              name="location"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>{t("Jobs.form.location.label")}</FormLabel>
@@ -333,11 +335,11 @@ function JobForm({
                         form.setValue("location_type", selectedOption.metadata.type, {
                           shouldValidate: true,
                         });
-                        form.setValue("location", selectedOption.label, { shouldValidate: true });
+                        form.setValue("location_id", selectedOption.id, { shouldValidate: true });
                       } else {
                         field.onChange("");
                         form.setValue("location_type", "", { shouldValidate: true });
-                        form.setValue("location", "", { shouldValidate: true });
+                        form.setValue("location_id", "", { shouldValidate: true });
                       }
                     }}
                     texts={{
