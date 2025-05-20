@@ -90,11 +90,12 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
       accessorKey: "location",
       header: t("Jobs.form.location.label"),
       enableEditing: false,
-
+      noPadding: true,
       cell: ({ row }) => {
         return (
           <ComboboxAdd
             isolated
+            inCell
             data={locationOptions}
             defaultValue={row.original.location || ""}
             valueKey="value"
@@ -102,24 +103,16 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
             onChange={(selectedValue) => {
               const selectedOption = locationOptions.find((opt) => opt.value === selectedValue);
               if (selectedOption) {
-              } else {
+                handleEdit?.(row.id, "location", selectedOption.value);
               }
             }}
             texts={{
-              placeholder: t("Jobs.form.location.placeholder"),
-              searchPlaceholder: t("Pages.Jobs.search"),
-              noItems: t("Pages.Jobs.no_jobs_found"),
+              searchPlaceholder: t("Pages.Locations.search"),
+              noItems: t("Pages.Locations.no_locations_found"),
             }}
             isLoading={isFetchingLocations}
             renderOption={(option) => renderLocationOption(option, t)}
-            renderSelected={(item) => {
-              if (!item) {
-                const currentId = row.original.location;
-                const foundOption = locationOptions.find((opt) => opt.value === currentId);
-                return foundOption ? foundOption.label : t("Jobs.form.location.placeholder");
-              }
-              return item.label;
-            }}
+            renderSelected={(item) => renderLocationCell(item.metadata.type, item.label || "", t)}
             addText={t("Pages.Locations.add")}
             // onAddClick={() => {
             //   setIsChooseLocationDialogOpen(true);
@@ -128,16 +121,6 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
           />
         );
       },
-
-      // cell: ({ row }) => {
-      //   const location = row.original.location;
-      //   const locationType = (row.original as Job).location_type;
-      //   return renderLocationCell(
-      //     locationType as "office" | "branch" | "warehouse",
-      //     location || "",
-      //     t,
-      //   );
-      // },
     },
     {
       accessorKey: "salary",

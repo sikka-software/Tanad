@@ -15,12 +15,14 @@ import { dateTableFilterFn } from "@/lib/table-filter-fns";
 import { Employee, EmployeeStatus } from "@/employee/employee.types";
 
 import { useJobs } from "@/job/job.hooks";
+import useJobStore from "@/job/job.store";
 
 const useEmployeeColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
 ) => {
   const t = useTranslations();
   const { data: jobs, isLoading: isFetchingJobs } = useJobs();
+  const setIsJobDialogOpen = useJobStore((state) => state.setIsFormDialogOpen);
   const locale = useLocale();
 
   const columns: ExtendedColumnDef<Employee>[] = [
@@ -102,6 +104,9 @@ const useEmployeeColumns = (
                 </div>
               );
             }}
+            onAddClick={() => {
+              setIsJobDialogOpen(true);
+            }}
           />
         );
       },
@@ -114,7 +119,6 @@ const useEmployeeColumns = (
       enableEditing: false,
       cell: ({ getValue, row }) => {
         const nationality = getValue() as string;
-        console.log(row.original);
         return (
           <CountryInput
             value={nationality}
@@ -125,7 +129,7 @@ const useEmployeeColumns = (
             dir={locale === "ar" ? "rtl" : "ltr"}
             labelKey={locale === "ar" ? "arabic_label" : "label"}
             texts={{
-              placeholder: t("Employees.form.nationality.placeholder"),
+              placeholder: ". . .",
               searchPlaceholder: t("Forms.country.search_placeholder"),
               noItems: t("Forms.country.no_items"),
             }}

@@ -141,7 +141,9 @@ export function EmployeeForm({
   const isDepartmentSaving = useDepartmentStore((state) => state.isLoading);
   const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
 
-  const [isJobDialogOpen, setIsJobDialogOpen] = useState(false);
+  const isJobDialogOpen = useJobStore((state) => state.isFormDialogOpen);
+  const setIsJobDialogOpen = useJobStore((state) => state.setIsFormDialogOpen);
+
   const { data: jobs, isLoading: isFetchingJobs } = useJobs();
   const isJobSaving = useJobStore((state) => state.isLoading);
 

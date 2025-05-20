@@ -135,7 +135,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
                     "bg-input-background px-3",
                     error &&
                       "ring-destructive/20 dark:ring-destructive/40 border-destructive rounded-b-none",
-                    inCell && "h-10 rounded-none border-none",
+                    inCell && "h-10 rounded-none border-none bg-transparent",
                     buttonClassName,
                   )}
                 >

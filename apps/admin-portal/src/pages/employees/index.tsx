@@ -38,6 +38,9 @@ import { Employee, EmployeeUpdateData } from "@/employee/employee.types";
 
 import { useJobs } from "@/job/job.hooks";
 
+import JobForm from "@/modules/job/job.form";
+import useJobStore from "@/modules/job/job.store";
+
 export default function EmployeesPage() {
   const t = useTranslations();
   const router = useRouter();
@@ -51,6 +54,10 @@ export default function EmployeesPage() {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<EmployeeUpdateData | null>(null);
   const [hasRequests, setHasRequests] = useState(false);
+
+  const isJobDialogOpen = useJobStore((state) => state.isFormDialogOpen);
+  const setIsJobDialogOpen = useJobStore((state) => state.setIsFormDialogOpen);
+  const loadingSaveJob = useJobStore((state) => state.isLoading);
 
   // Permissions
   const canRead = moduleHooks.useCanRead();
@@ -233,6 +240,16 @@ export default function EmployeesPage() {
             defaultValues={actionableItem}
             editMode={true}
           />
+        </FormSheet>
+
+        <FormSheet
+          open={isJobDialogOpen}
+          onOpenChange={setIsJobDialogOpen}
+          title={t("Pages.Jobs.add")}
+          formId="job-form"
+          loadingSave={loadingSaveJob}
+        >
+          <JobForm formHtmlId={"job-form"} onSuccess={() => setIsJobDialogOpen(false)} />
         </FormSheet>
 
         <ConfirmDelete
