@@ -262,7 +262,11 @@ export default function EmployeesPage() {
           extraConfirm={selectedRows.length > 4}
           onCancel={() => selectedRows.length === 1 && viewMode === "cards" && setSelectedRows([])}
           showCascadeOption={hasRequests}
-          cascadeDescription={t("Employees.cascade_delete_description")}
+          cascadeDescription={
+            selectedRows.length > 1
+              ? t("Employees.cascade_delete_description_multiple")
+              : t("Employees.cascade_delete_description")
+          }
         />
       </DataPageLayout>
     </div>

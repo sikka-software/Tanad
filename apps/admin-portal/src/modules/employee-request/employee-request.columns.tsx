@@ -34,6 +34,11 @@ const useEmployeeRequestColumns = (
       accessorKey: "title",
       header: t("EmployeeRequests.form.title.label"),
     },
+    {
+      accessorKey: "employee_id",
+      header: t("EmployeeRequests.form.employee.label"),
+      cell: ({ row }) => row.original.employee_id,
+    },
 
     {
       accessorKey: "start_date",

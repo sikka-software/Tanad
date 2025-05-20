@@ -108,7 +108,11 @@ const ConfirmDelete = ({
           </Button>
           <Button
             onClick={() => handleConfirmDelete({ cascade: cascadeDelete })}
-            disabled={isDeleting || (extraConfirm && confirmText !== confirmString)}
+            disabled={
+              isDeleting ||
+              (extraConfirm && confirmText !== confirmString) ||
+              (showCascadeOption && !cascadeDelete)
+            }
             className="bg-destructive hover:bg-destructive/90 min-w-24 text-white"
           >
             {isDeleting ? (
