@@ -1,23 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createInsertSchema } from "drizzle-zod";
-import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/inputs/input";
-import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
 
-import renderLocationOption, { LocationOption } from "@/components/app/location-options";
+import { renderLocationOption } from "@/components/app/location-options";
 import { ComboboxAdd } from "@/components/ui/comboboxes/combobox-add";
 
 import NotesSection from "@/forms/notes-section";
-
-import { convertToPascalCase } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 

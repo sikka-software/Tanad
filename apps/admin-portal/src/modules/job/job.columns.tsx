@@ -4,6 +4,8 @@ import { useTranslations } from "next-intl";
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
 
+import { renderLocationCell } from "@/components/app/location-options";
+
 import SelectCell from "@/tables/select-cell";
 import StatusCell from "@/tables/status-cell";
 import TimestampCell from "@/tables/timestamp-cell";
@@ -48,9 +50,40 @@ const useJobColumns = (handleEdit?: (rowId: string, columnId: string, value: unk
     {
       accessorKey: "location",
       header: t("Jobs.form.location.label"),
-      cell: ({ getValue }) => {
-        const location = getValue() as string;
-        return location ? location : "N/A";
+      enableEditing: false,
+      cell: ({ row }) => {
+        const location = row.original.location;
+        const locationName = (row.original as Job & { location_name?: string }).location_name;
+        const locationType = (row.original as Job).location_type;
+
+        //         id
+        // :
+        // "9afe39c7-70f7-45c8-bed0-2bc7c50418f5"
+        // label
+        // :
+        // "DMM"
+        // metadata
+        // :
+        // {type: 'branch'}
+        // value
+        // :
+        // "9afe39c7-70f7-45c8-bed0-2bc7c50418f5"
+        return renderLocationCell(
+          locationType as "office" | "branch" | "warehouse",
+          location || "",
+          t,
+        );
+        // if (locationName) {
+        //   return locationName;
+        // }
+
+        // if (locationId && locationType) {
+        //   return `${locationType}: ${locationId}`;
+        // }
+        // if (locationId) {
+        //   return locationId;
+        // }
+        // return "N/A";
       },
     },
     {

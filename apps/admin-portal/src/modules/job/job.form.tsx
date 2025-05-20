@@ -24,7 +24,7 @@ import NumberInputWithButtons from "@/ui/inputs/number-input-buttons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
-import renderLocationOption from "@/components/app/location-options";
+import { renderLocationOption } from "@/components/app/location-options";
 
 import { formatToYYYYMMDD } from "@/lib/date-utils";
 import { validateYearRange } from "@/lib/utils";
@@ -84,7 +84,8 @@ const createJobFormSchema = (t: (key: string) => string) => {
       .any()
       .optional()
       .superRefine(validateYearRange(t, 1800, 2200, "Jobs.form.end_date.invalid")),
-
+    location_id: z.string(),
+    location_type: z.string(),
     // status: z.enum(CommonStatus, {
     //   invalid_type_error: t("Jobs.form.status.required"),
     // }),
@@ -143,6 +144,8 @@ function JobForm({
     resolver: zodResolver(createJobFormSchema(t)),
     defaultValues: {
       ...defaultValues,
+      location_id: defaultValues?.location_id || "",
+      location_type: defaultValues?.location_type || "",
       salary: defaultValues?.salary ? String(defaultValues.salary) : undefined,
       status: defaultValues?.status || "active",
       location: defaultValues?.location || null,
@@ -177,14 +180,8 @@ function JobForm({
       value: location.id,
       metadata: { type: "branch" as const },
     }));
-    let onlineStoresOptions = onlineStores.map((location) => ({
-      id: location.id,
-      label: location.domain_name,
-      value: location.id,
-      metadata: { type: "online_store" as const },
-    }));
-    return [...officesOptions, ...warehousesOptions, ...branchesOptions, ...onlineStoresOptions];
-  }, [offices, warehouses, branches, onlineStores]);
+    return [...officesOptions, ...warehousesOptions, ...branchesOptions];
+  }, [offices, warehouses, branches]);
 
   const handleSubmit = async (data: JobFormValues) => {
     setIsSavingJob(true);
@@ -235,6 +232,7 @@ function JobForm({
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          console.log(form.getValues());
           form.handleSubmit(handleSubmit)(e);
         }}
       >
@@ -320,27 +318,54 @@ function JobForm({
 
             <FormField
               control={form.control}
-              name="location"
+              name="location_id"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
                   <FormLabel>{t("Jobs.form.location.label")}</FormLabel>
-                  <FormControl>
-                    <ComboboxAdd
-                      dir={locale === "ar" ? "rtl" : "ltr"}
-                      data={locationOptions}
-                      isLoading={isFetchingLocations}
-                      defaultValue={field.value || ""}
-                      onChange={(value) => field.onChange(value || null)}
-                      texts={{
-                        placeholder: t("Jobs.form.location.placeholder"),
-                        searchPlaceholder: t("Pages.Locations.search"),
-                        noItems: t("Pages.Locations.no_locations_found"),
-                      }}
-                      addText={t("Pages.Locations.add")}
-                      onAddClick={() => setIsChooseLocationDialogOpen(true)}
-                      renderOption={(option) => renderLocationOption(option, t)}
-                    />
-                  </FormControl>
+                  <ComboboxAdd
+                    data={locationOptions}
+                    defaultValue={field.value}
+                    valueKey="value"
+                    labelKey="label"
+                    onChange={(selectedValue) => {
+                      const selectedOption = locationOptions.find(
+                        (opt) => opt.value === selectedValue,
+                      );
+                      if (selectedOption) {
+                        field.onChange(selectedOption.value);
+                        form.setValue("location_type", selectedOption.metadata.type, {
+                          shouldValidate: true,
+                        });
+                        form.setValue("location", selectedOption.label, { shouldValidate: true });
+                      } else {
+                        field.onChange("");
+                        form.setValue("location_type", "", { shouldValidate: true });
+                        form.setValue("location", "", { shouldValidate: true });
+                      }
+                    }}
+                    texts={{
+                      placeholder: t("Jobs.form.location.placeholder"),
+                      searchPlaceholder: t("Pages.Jobs.search"),
+                      noItems: t("Pages.Jobs.no_jobs_found"),
+                    }}
+                    isLoading={isFetchingLocations}
+                    renderOption={(option) => renderLocationOption(option, t)}
+                    renderSelected={(item) => {
+                      if (!item) {
+                        const currentId = field.value;
+                        const foundOption = locationOptions.find((opt) => opt.value === currentId);
+                        return foundOption
+                          ? foundOption.label
+                          : t("Jobs.form.location.placeholder");
+                      }
+                      return item.label;
+                    }}
+                    addText={t("Pages.Locations.add")}
+                    onAddClick={() => {
+                      setIsChooseLocationDialogOpen(true);
+                    }}
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                  />
                   <FormMessage />
                 </FormItem>
               )}

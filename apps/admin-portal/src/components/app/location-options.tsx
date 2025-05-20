@@ -43,4 +43,47 @@ const renderLocationOption = (
   );
 };
 
-export default renderLocationOption;
+const renderLocationCell = (
+  type: "office" | "branch" | "warehouse",
+  label: string,
+  t: (key: string) => string,
+) => {
+  let typeLabel;
+  let typeIcon;
+  switch (type) {
+    case "office":
+      typeIcon = (
+        <div title={t("Pages.Offices.title")}>
+          <BuildingIcon className="!text-muted-foreground !size-3" />
+        </div>
+      );
+      typeLabel = type ? t("Pages.Offices.title") : "";
+      break;
+    case "branch":
+      typeIcon = (
+        <div title={t("Pages.Branches.title")}>
+          <StoreIcon className="!text-muted-foreground !size-3" />
+        </div>
+      );
+      typeLabel = type ? t("Pages.Branches.title") : "";
+      break;
+    case "warehouse":
+      typeIcon = (
+        <div title={t("Pages.Warehouses.title")}>
+          <WarehouseIcon className="!text-muted-foreground !size-3" />
+        </div>
+      );
+      typeLabel = type ? t("Pages.Warehouses.title") : "";
+      break;
+  }
+  return (
+    <div className="flex flex-col">
+      <span className="te flex items-center gap-2 text-xs">
+        {typeIcon}
+        {label}
+      </span>
+    </div>
+  );
+};
+
+export { renderLocationOption, renderLocationCell };

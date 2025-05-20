@@ -23,7 +23,7 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateJob({ id: rowId, data: { [columnId]: value } });
+    await updateJob({ id: rowId, data: { [columnId]: value } as Job });
   };
   const columns = useJobColumns(handleEdit);
 
@@ -55,7 +55,7 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
     }
   };
 
-  if (isLoading) {
+  if (!isLoading) {
     return (
       <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={12} />
     );

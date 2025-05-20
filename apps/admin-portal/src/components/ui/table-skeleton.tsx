@@ -8,12 +8,12 @@ interface TableSkeletonProps {
 
 const TableSkeleton = ({ columns, rows }: TableSkeletonProps) => {
   return (
-    <Table>
+    <Table className="overflow-y-auto">
       <TableHeader>
         <TableRow>
           {columns.map((column, index) => (
-            <TableHead key={index}>
-              <Skeleton className="h-4 w-full" />
+            <TableHead key={index} className="min-w-[40px]">
+              <Skeleton className="h-4 w-full min-w-[40px]" />
             </TableHead>
           ))}
         </TableRow>
@@ -22,8 +22,8 @@ const TableSkeleton = ({ columns, rows }: TableSkeletonProps) => {
         {Array.from({ length: rows }).map((_, rowIndex) => (
           <TableRow key={rowIndex}>
             {columns.map((_, colIndex) => (
-              <TableCell key={colIndex}>
-                <Skeleton className="h-4 w-full" />
+              <TableCell key={colIndex} className="min-w-[40px]">
+                <Skeleton className="h-4 w-full min-w-[40px]" />
               </TableCell>
             ))}
           </TableRow>
