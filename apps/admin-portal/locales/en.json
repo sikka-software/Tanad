@@ -1897,8 +1897,9 @@
   },
   "Invoices": {
     "title": "Invoices",
-    "add_new": "New Invoice",
+    "detail_notFound": "Invoice Not Found",
     "invoice_details": "Invoice Details",
+    "add_new": "New Invoice",
     "invoice_number": "Invoice #{number}",
     "enter_invoice_number": "Enter invoice number",
     "description": "Description",
@@ -2024,6 +2025,18 @@
       "no_products_found": "No products found",
       "add_new_product": "New Product",
       "product_description": "Product Description"
+    },
+    "zatca": {
+      "information": "Information",
+      "compliantQR": "Compliant QR",
+      "sellerName": "Seller Name",
+      "vatNumber": "VAT Number",
+      "generatingXml": "Generating XML...",
+      "downloadXml": "Download XML",
+      "xmlSuccess": "XML generated successfully",
+      "xmlSuccessDescription": "XML generated successfully",
+      "xmlError": "XML generation failed",
+      "xmlErrorDescription": "An error occurred while generating the XML"
     }
   },
   "Sales": {

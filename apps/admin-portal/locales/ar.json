@@ -2451,6 +2451,42 @@
         "label": "ملاحظات الفاتورة",
         "placeholder": "أدخل ملاحظاتك"
       }
+    },
+    "zatca": {
+      "information": "المعلومات",
+      "compliantQR": "الباركود المتوافق",
+      "sellerName": "اسم البائع",
+      "vatNumber": "رقم الضريبة",
+      "generatingXml": "جاري إنشاء الملف الإلكتروني",
+      "downloadXml": "تحميل الملف الإلكتروني",
+      "xmlSuccess": "تم إنشاء الملف الإلكتروني بنجاح",
+      "xmlSuccessDescription": "تم إنشاء الملف الإلكتروني بنجاح",
+      "xmlError": "فشل إنشاء الملف الإلكتروني",
+      "xmlErrorDescription": "حدث خطأ أثناء إنشاء الملف الإلكتروني"
+    },
+    "detail": {
+      "notFound": "لم يتم العثور على الفاتورة",
+      "notFoundDescription": "الفاتورة التي تبحث عنها لا توجد أو ليس لديك الصلاحية لعرضها",
+      "invoiceHash": "رقم الفاتورة: ",
+      "edit": "تعديل",
+      "cancel": "إلغاء",
+      "invoiceDetails": "تفاصيل الفاتورة",
+      "invoiceNumber": "رقم الفاتورة",
+      "status": "الحالة",
+      "issueDate": "تاريخ الإصدار",
+      "dueDate": "تاريخ الاستحقاق",
+      "name": "الاسم",
+      "client": "العميل",
+      "unknownClient": "عميل غير معروف",
+      "items": "العناصر",
+      "description": "الوصف",
+      "quantity": "الكمية",
+      "unitPrice": "سعر الوحدة",
+      "total": "الإجمالي",
+      "subtotal": "المجموع الفرعي",
+      "vat": "الضريبة",
+      "notes": "الملاحظات",
+      "noNotes": "لا يوجد ملاحظات"
     }
   },
   "ProductsFormSection": {
