@@ -53,55 +53,9 @@ const useEmployeeColumns = (
       accessorKey: "birth_date",
       filterFn: dateTableFilterFn,
       header: t("Employees.form.birth_date.label"),
-      noPadding: true,
+      // noPadding: true,
       enableEditing: false,
-      // cell: ({ row }) => useFormatDate(row.original.birth_date),
-      cell: ({ row }) => {
-        // Initialize local state from row.original.birth_date
-        // row.original.birth_date is expected to be an ISO string ("YYYY-MM-DD") or null.
-        const [birthDate, setBirthDate] = useState<CalendarDate | null>(() => {
-          if (row.original.birth_date) {
-            try {
-              return parseDate(row.original.birth_date);
-            } catch (error) {
-              console.error("Failed to parse initial birth_date:", row.original.birth_date, error);
-              return null; // Fallback if parsing fails
-            }
-          }
-          return null;
-        });
-        const [gg, setGG] = useState<string | null>(
-          row.original.birth_date ? dateFormatter.format(new Date(row.original.birth_date)) : null,
-        );
-
-        return (
-          <DateInput
-            isolated
-            inCell
-            placeholder={t("Employees.form.birth_date.placeholder")}
-            value={typeof gg === "string" ? dateFormatter.format(new Date(gg)) : (gg ?? null)}
-            // value={birthDate} // Bind to local CalendarDate state
-            onChange={(newCalendarDate: CalendarDate | null) => {
-              let newDate = dateFormatter.format(new Date(newCalendarDate?.toString() ?? ""));
-              // Update local state when DateInput changes (typing or calendar pick)
-
-              setGG(newDate);
-              console.log("newCalendarDate", newCalendarDate);
-              // setBirthDate(newCalendarDate);
-            }}
-            onBlur={() => {
-              // When focus is lost, convert local CalendarDate to ISO string and call handleEdit
-              const valueToStore = birthDate ? birthDate.toString() : null;
-              console.log("valueToStore", valueToStore);
-              // handleEdit?.(row.id, "birth_date", valueToStore);
-            }}
-            onSelect={(e) => {
-              handleEdit?.(row.id, "birth_date", e?.toString() ?? null);
-            }}
-            // disabled={isEmployeeSaving}
-          />
-        );
-      },
+      cell: ({ row }) => useFormatDate(row.original.birth_date),
     },
     {
       accessorKey: "hire_date",
@@ -112,6 +66,8 @@ const useEmployeeColumns = (
     {
       accessorKey: "job_id",
       header: t("Employees.form.job.label"),
+      maxSize: 200,
+      size: 200,
       noPadding: true,
       cell: ({ row }) => {
         const employee = row.original;
@@ -167,7 +123,7 @@ const useEmployeeColumns = (
     {
       accessorKey: "nationality",
       header: t("Employees.form.nationality.label"),
-      maxSize: 100,
+      maxSize: 150,
       noPadding: true,
       enableEditing: false,
       cell: ({ getValue, row }) => {
@@ -212,6 +168,7 @@ const useEmployeeColumns = (
       accessorKey: "status",
       header: t("Employees.form.status.label"),
       noPadding: true,
+      maxSize: 100,
       enableEditing: false,
       cell: ({ getValue, row }) => (
         <SelectCell
