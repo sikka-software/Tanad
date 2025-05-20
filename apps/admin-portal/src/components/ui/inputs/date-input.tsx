@@ -24,6 +24,7 @@ interface DatePickerProps {
   isolated?: boolean;
   mode?: "default" | "multiple" | "range" | "single";
   onChange?: (date: CalendarDate | null) => void;
+  onBlur?: () => void;
   value?: CalendarDate | null;
   inCell?: boolean;
 }
@@ -35,8 +36,10 @@ export function DateInputField({
   isolated = false,
   mode = "single",
   onChange,
+  onBlur,
   value,
   inCell = false,
+
   // ...props
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
@@ -80,10 +83,17 @@ export function DateInputField({
   return (
     <div className="flex w-full items-center">
       <I18nProvider locale={dateFieldLocale}>
-        <DateField value={value} isDisabled={disabled} className="w-full" onChange={onChange}>
+        <DateField
+          value={value}
+          isDisabled={disabled}
+          className="w-full"
+          onChange={onChange}
+          onBlur={onBlur}
+        >
           <Group className="w-full">
             <DateInput
               isolated={isolated}
+            
               className={cn(
                 "bg-input-background rounded-e-none",
                 error && "rounded-bl-none rtl:rounded-br-none",
@@ -103,7 +113,7 @@ export function DateInputField({
               error &&
                 "ring-destructive/20 dark:ring-destructive/40 border-destructive rounded-br-none rtl:rounded-bl-none",
               inCell &&
-                "me-0.5 !size-8 min-h-8 min-w-8 !rounded-md border-none bg-transparent shadow-none text-muted-foreground",
+                "text-muted-foreground me-0.5 !size-8 min-h-8 min-w-8 !rounded-md border-none bg-transparent shadow-none",
             )}
             tabIndex={-1}
             aria-label="Open calendar"

@@ -1,5 +1,7 @@
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
+import { useDateFormatter } from "react-aria";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
 import { ExtendedColumnDef } from "@/ui/sheet-table";
@@ -11,7 +13,7 @@ import { DateInput } from "@/components/ui/inputs/date-input";
 import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
-import { useFormatDate } from "@/lib/date-utils";
+import { formatToYYYYMMDD, useFormatDate } from "@/lib/date-utils";
 import { dateTableFilterFn } from "@/lib/table-filter-fns";
 
 import { Employee, EmployeeStatus } from "@/employee/employee.types";
@@ -27,6 +29,7 @@ const useEmployeeColumns = (
   const setIsJobDialogOpen = useJobStore((state) => state.setIsFormDialogOpen);
   const locale = useLocale();
 
+  const dateFormatter = useDateFormatter();
   const columns: ExtendedColumnDef<Employee>[] = [
     {
       accessorKey: "first_name",
@@ -51,27 +54,49 @@ const useEmployeeColumns = (
       filterFn: dateTableFilterFn,
       header: t("Employees.form.birth_date.label"),
       noPadding: true,
+      enableEditing: false,
       // cell: ({ row }) => useFormatDate(row.original.birth_date),
       cell: ({ row }) => {
+        // Initialize local state from row.original.birth_date
+        // row.original.birth_date is expected to be an ISO string ("YYYY-MM-DD") or null.
+        const [birthDate, setBirthDate] = useState<CalendarDate | null>(() => {
+          if (row.original.birth_date) {
+            try {
+              return parseDate(row.original.birth_date);
+            } catch (error) {
+              console.error("Failed to parse initial birth_date:", row.original.birth_date, error);
+              return null; // Fallback if parsing fails
+            }
+          }
+          return null;
+        });
+        const [gg, setGG] = useState<string | null>(
+          row.original.birth_date ? dateFormatter.format(new Date(row.original.birth_date)) : null,
+        );
+
         return (
           <DateInput
             isolated
             inCell
             placeholder={t("Employees.form.birth_date.placeholder")}
-            value={row.original.birth_date ? parseDate(row.original.birth_date) : null}
-            onChange={(e) => {
-              let newBirthDate: string | null = null;
-              if (e instanceof CalendarDate) {
-                newBirthDate = e.toString();
-              }
-              handleEdit?.(row.id, "birth_date", newBirthDate);
+            value={typeof gg === "string" ? dateFormatter.format(new Date(gg)) : (gg ?? null)}
+            // value={birthDate} // Bind to local CalendarDate state
+            onChange={(newCalendarDate: CalendarDate | null) => {
+              let newDate = dateFormatter.format(new Date(newCalendarDate?.toString() ?? ""));
+              // Update local state when DateInput changes (typing or calendar pick)
+
+              setGG(newDate);
+              console.log("newCalendarDate", newCalendarDate);
+              // setBirthDate(newCalendarDate);
+            }}
+            onBlur={() => {
+              // When focus is lost, convert local CalendarDate to ISO string and call handleEdit
+              const valueToStore = birthDate ? birthDate.toString() : null;
+              console.log("valueToStore", valueToStore);
+              // handleEdit?.(row.id, "birth_date", valueToStore);
             }}
             onSelect={(e) => {
-              let selectedBirthDate: string | null = null;
-              if (e instanceof CalendarDate) {
-                selectedBirthDate = e.toString();
-              }
-              handleEdit?.(row.id, "birth_date", selectedBirthDate);
+              handleEdit?.(row.id, "birth_date", e?.toString() ?? null);
             }}
             // disabled={isEmployeeSaving}
           />
