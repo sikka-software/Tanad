@@ -234,8 +234,7 @@ export default function InvoiceDetailPage() {
                 <div className="text-muted-foreground mb-2 text-sm font-medium">
                   {t("Invoices.detail.items")}
                 </div>
-                {console.log("Invoice data structure:", invoice)}
-                {console.log("Items present:", invoice.items)}
+
                 <div className="rounded-md border">
                   <table className="w-full text-sm">
                     <thead className="text-muted-foreground bg-muted text-left text-xs">

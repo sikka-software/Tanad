@@ -69,8 +69,11 @@ export function generateZatcaQRString({
   // Concatenate all TLV strings
   const tlvString = tag1 + tag2 + tag3 + tag4 + tag5;
 
+  // Convert the hex string back to bytes before base64 encoding
+  const buffer = Buffer.from(tlvString, "hex");
+
   // Return as base64 for QR code generation
-  return toBase64(tlvString);
+  return buffer.toString("base64");
 }
 
 /**
