@@ -1,3 +1,4 @@
+import { parseDate } from "@internationalized/date";
 import { useLocale, useTranslations } from "next-intl";
 
 import { ComboboxAdd } from "@/ui/comboboxes/combobox-add";
@@ -5,6 +6,7 @@ import { ExtendedColumnDef } from "@/ui/sheet-table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 import CountryInput from "@/components/ui/inputs/country-input";
+import { DateInput } from "@/components/ui/inputs/date-input";
 
 import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
@@ -46,9 +48,23 @@ const useEmployeeColumns = (
     },
     {
       accessorKey: "birth_date",
-      header: t("Employees.form.birth_date.label"),
-      cell: ({ row }) => useFormatDate(row.original.birth_date),
       filterFn: dateTableFilterFn,
+      header: t("Employees.form.birth_date.label"),
+      noPadding: true,
+      // cell: ({ row }) => useFormatDate(row.original.birth_date),
+      cell: ({ row }) => {
+        return (
+          <DateInput
+            isolated
+            inCell
+            placeholder={t("Employees.form.birth_date.placeholder")}
+            value={row.original.birth_date ? parseDate(row.original.birth_date) : null}
+            onChange={(e) => handleEdit?.(row.id, "birth_date", e)}
+            onSelect={(e) => handleEdit?.(row.id, "birth_date", e)}
+            // disabled={isEmployeeSaving}
+          />
+        );
+      },
     },
     {
       accessorKey: "hire_date",

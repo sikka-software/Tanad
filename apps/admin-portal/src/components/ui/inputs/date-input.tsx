@@ -25,6 +25,7 @@ interface DatePickerProps {
   mode?: "default" | "multiple" | "range" | "single";
   onChange?: (date: CalendarDate | null) => void;
   value?: CalendarDate | null;
+  inCell?: boolean;
 }
 
 export function DateInputField({
@@ -35,6 +36,7 @@ export function DateInputField({
   mode = "single",
   onChange,
   value,
+  inCell = false,
   // ...props
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
@@ -85,6 +87,7 @@ export function DateInputField({
               className={cn(
                 "bg-input-background rounded-e-none",
                 error && "rounded-bl-none rtl:rounded-br-none",
+                inCell && "!rounded-none border-none bg-transparent shadow-none",
               )}
             />
           </Group>
@@ -99,6 +102,8 @@ export function DateInputField({
               "bg-input-background flex !size-9 min-w-9 items-center justify-center rounded-s-none border-s-0 p-0 shadow-xs",
               error &&
                 "ring-destructive/20 dark:ring-destructive/40 border-destructive rounded-br-none rtl:rounded-bl-none",
+              inCell &&
+                "me-0.5 !size-8 min-h-8 min-w-8 !rounded-md border-none bg-transparent shadow-none text-muted-foreground",
             )}
             tabIndex={-1}
             aria-label="Open calendar"
