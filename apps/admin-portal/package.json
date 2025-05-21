@@ -155,6 +155,7 @@
     "@types/node": "^22",
     "@types/nprogress": "^0.2.3",
     "@types/pg": "^8.15.2",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/throttle-debounce": "^5.0.2",

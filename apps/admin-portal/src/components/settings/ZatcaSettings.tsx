@@ -1,5 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { createClient } from "@/utils/supabase/component";
@@ -13,11 +13,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/inputs/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
 import useUserStore from "@/stores/use-user-store";
+
+// Type for ZATCA settings
+interface ZatcaSettingsType {
+  zatca_enabled?: boolean;
+  zatca_seller_name?: string;
+  zatca_vat_number?: string;
+}
 
 export function ZatcaSettings() {
   const t = useTranslations();
@@ -26,10 +33,21 @@ export function ZatcaSettings() {
   const { profile, fetchUserAndProfile } = useUserStore();
 
   // ZATCA settings state
-  const [zatcaEnabled, setZatcaEnabled] = useState<boolean>(true);
-  const [sellerName, setSellerName] = useState<string>("Mansour");
-  const [vatNumber, setVatNumber] = useState<string>("123456789012345");
+  const [zatcaEnabled, setZatcaEnabled] = useState<boolean>(false);
+  const [sellerName, setSellerName] = useState<string>("");
+  const [vatNumber, setVatNumber] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Fetch existing settings from profile
+  useEffect(() => {
+    if (profile) {
+      // Get ZATCA settings from user_settings JSONB field
+      const userSettings = (profile.user_settings as Record<string, any>) || {};
+      setZatcaEnabled(userSettings.zatca_enabled || false);
+      setSellerName(userSettings.zatca_seller_name || "");
+      setVatNumber(userSettings.zatca_vat_number || "");
+    }
+  }, [profile]);
 
   const handleSaveSettings = async () => {
     if (!profile) return;
@@ -37,14 +55,10 @@ export function ZatcaSettings() {
     setIsLoading(true);
 
     try {
-      // Get current settings or initialize empty object
-      const currentSettings = {
-        zatca_enabled: zatcaEnabled,
-        zatca_seller_name: sellerName,
-        zatca_vat_number: vatNumber,
-      };
+      // Get current user_settings
+      const currentSettings = (profile.user_settings as Record<string, any>) || {};
 
-      // Update settings with ZATCA values
+      // Update the ZATCA settings
       const updatedSettings = {
         ...currentSettings,
         zatca_enabled: zatcaEnabled,
@@ -52,10 +66,12 @@ export function ZatcaSettings() {
         zatca_vat_number: vatNumber,
       };
 
-      // Update profile settings in the database
+      // Update profile with new settings
       const { error } = await supabase
         .from("profiles")
-        .update({ settings: updatedSettings })
+        .update({
+          user_settings: updatedSettings,
+        })
         .eq("id", profile.id);
 
       if (error) throw error;
