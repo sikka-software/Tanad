@@ -2,13 +2,7 @@ name: Deploy PR to Production
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: "Branch to deploy"
-        required: true
-      pr_number:
-        description: "PR number for tagging"
-        required: true
+    # No inputs needed - will use the selected branch automatically
 
 env:
   NODE_VERSION: "21.x"
@@ -25,7 +19,24 @@ jobs:
       - uses: actions/checkout@v4
         with:
           clean: true
-          ref: ${{ inputs.branch }}
+          # Uses the branch selected in GitHub UI
+          ref: ${{ github.ref_name }}
+
+      - name: Extract PR number or generate tag
+        id: extract-info
+        run: |
+          # Try to extract PR number from branch name (common pattern like feature/123-description)
+          PR_NUM=$(echo "${{ github.ref_name }}" | grep -oE '[0-9]+' | head -1)
+
+          if [ -n "$PR_NUM" ]; then
+            # If PR number found, use it
+            echo "TAG=admin-pr$PR_NUM" >> $GITHUB_OUTPUT
+          else
+            # If no PR number, use branch name and timestamp
+            TIMESTAMP=$(date +%Y%m%d%H%M%S)
+            SAFE_BRANCH=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9]/-/g')
+            echo "TAG=admin-$SAFE_BRANCH-$TIMESTAMP" >> $GITHUB_OUTPUT
+          fi
 
       - uses: Infisical/secrets-action@v1.0.9
         with:
@@ -49,7 +60,7 @@ jobs:
           context: .
           file: Dockerfile.admin
           push: true
-          tags: ghcr.io/sikka-software/tanad:admin-pr${{ inputs.pr_number }}
+          tags: ghcr.io/sikka-software/tanad:${{ steps.extract-info.outputs.TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
