@@ -62,7 +62,7 @@ NEXT_TELEMETRY_DISABLED=1" > /app/apps/admin-portal/.env
 
 # Install dependencies
 RUN set -e && \
-    pnpm install --frozen-lockfile
+    pnpm install --no-frozen-lockfile
 
 # Build landing
 RUN set -e && \
