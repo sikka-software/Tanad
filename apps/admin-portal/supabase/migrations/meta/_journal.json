@@ -680,6 +680,13 @@
       "when": 1747662303065,
       "tag": "0096_oval_white_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "7",
+      "when": 1748008923935,
+      "tag": "0097_overconfident_lady_mastermind",
+      "breakpoints": true
     }
   ]
 }

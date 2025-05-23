@@ -245,7 +245,7 @@ export function InvoiceForm({
           zatca_enabled: zatcaEnabled,
           seller_name: zatcaEnabled ? sellerName : undefined,
           vat_number: zatcaEnabled ? vatNumber : undefined,
-          tax_amount: taxAmount,
+          // tax_amount: taxAmount,
         };
 
         await updateInvoice(
@@ -276,7 +276,7 @@ export function InvoiceForm({
             zatca_enabled: zatcaEnabled,
             seller_name: zatcaEnabled ? sellerName : undefined,
             vat_number: zatcaEnabled ? vatNumber : undefined,
-            tax_amount: taxAmount,
+            // tax_amount: taxAmount,
           },
           {
             onSuccess: async (response) => {
