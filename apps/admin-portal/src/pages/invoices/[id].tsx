@@ -146,7 +146,7 @@ export default function InvoiceDetailPage() {
   };
 
   return (
-    <div className="container py-8" dir={dir}>
+    <div dir={dir}>
       <PageTitle
         formButtons
         formId="invoice-form"
@@ -159,7 +159,7 @@ export default function InvoiceDetailPage() {
         }}
       />
 
-      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="p-4">
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
@@ -287,7 +287,7 @@ export default function InvoiceDetailPage() {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        {/* <div className="space-y-6">
           {invoice.zatca_enabled && (
             <Card className="border-green-100 bg-green-50">
               <CardHeader className="pb-3">
@@ -363,8 +363,10 @@ export default function InvoiceDetailPage() {
               )}
             </CardContent>
           </Card>
-        </div>
+        </div> */}
       </div>
     </div>
   );
 }
+
+

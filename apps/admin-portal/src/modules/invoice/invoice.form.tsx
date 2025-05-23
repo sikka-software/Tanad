@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 import NotesSection from "@/components/forms/notes-section";
 import ProductsFormSection from "@/components/forms/products-form-section";
+import OptionsTabs from "@/components/ui/options-tabs";
 
 import { getNotesValue, validateYearRange } from "@/lib/utils";
 import { calculateVAT } from "@/lib/zatca/zatca-utils";
@@ -397,11 +398,20 @@ export function InvoiceForm({
                   <FormItem>
                     <FormLabel>{t("Invoices.form.tax_rate.label")} (%)</FormLabel>
                     <FormControl>
-                      <NumberInput
+                      <OptionsTabs<number>
+                        options={[
+                          { label: "0%", value: 0 },
+                          { label: "5%", value: 0.05 },
+                          { label: "10%", value: 0.1 },
+                          { label: "15%", value: 0.15 },
+                          { label: "20%", value: 0.2 },
+                        ]}
+                        value={field.value || 0}
+                        onValueChange={field.onChange}
                         disabled={isSavingInvoice}
-                        placeholder={t("Forms.zip_code.placeholder")}
-                        {...field}
-                        value={field.value || ""}
+                        containerClassName="w-full"
+                        listClassName="w-full"
+                        buttonClassName="flex-1"
                       />
                     </FormControl>
                     <FormMessage />
