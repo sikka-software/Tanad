@@ -26,7 +26,7 @@ import { ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { useCreateEnterprise, useUpdateEnterprise } from "./enterprise.hooks";
+import { useUpdateEnterprise } from "./enterprise.hooks";
 import useEnterpriseStore from "./enterprise.store";
 import { EnterpriseCreateData, EnterpriseUpdateData } from "./enterprise.type";
 
@@ -73,7 +73,6 @@ export const EnterpriseForm: React.FC<
   const user = useUserStore((state) => state.user);
   const enterpriseStoreContext = useUserStore((state) => state.enterprise); // Renamed to avoid conflict with enterprise store
 
-  const { mutateAsync: createEnterprise } = useCreateEnterprise();
   const { mutateAsync: updateEnterprise } = useUpdateEnterprise();
 
   const isLoading = useEnterpriseStore((state) => state.isLoading);
@@ -200,6 +199,20 @@ export const EnterpriseForm: React.FC<
       return;
     }
 
+    // This form is intended for editing existing enterprises.
+    // defaultValues.id must be present and editMode should be true.
+    if (!editMode || !defaultValues?.id) {
+      toast.error(t("General.form_submission_error"), {
+        // Consider creating a specific translation key for this message
+        description: "Enterprise data is incomplete or form is not configured for editing.",
+      });
+      console.error(
+        "EnterpriseForm: Update failed. 'editMode' must be true and 'defaultValues.id' must be provided for this form."
+      );
+      setIsLoading(false);
+      return;
+    }
+
     const rawSubmissionData: EnterpriseFormValues = {
       ...data,
       // id is already part of 'data' if in editMode due to defaultValues
@@ -207,23 +220,16 @@ export const EnterpriseForm: React.FC<
     };
 
     try {
-      if (editMode && defaultValues?.id) {
-        const updateData = pickRelevantKeys(rawSubmissionData) as EnterpriseUpdateData;
-        await updateEnterprise({ id: defaultValues.id, data: updateData });
-        toast.success(t("Enterprise.form.update_success"));
-        onSuccess?.();
-      } else {
-        const { id, ...formDataForCreate } = rawSubmissionData; // id might be present from form state, remove for create
-        const createDataPayload = pickRelevantKeys(formDataForCreate) as EnterpriseCreateData;
-        await createEnterprise(createDataPayload);
-        toast.success(t("Enterprise.form.create_success"));
-        onSuccess?.();
-      }
+      // Logic is now only for update
+      const updateData = pickRelevantKeys(rawSubmissionData) as EnterpriseUpdateData;
+      await updateEnterprise({ id: defaultValues.id, data: updateData });
+      toast.success(t("Enterprise.form.update_success"));
+      onSuccess?.();
     } catch (error: any) {
       toast.error(t("General.form_submission_error"), {
         description: error.message || t("General.unknown_error"),
       });
-      console.error("Failed to save enterprise:", error);
+      console.error("Failed to update enterprise:", error); // Changed console log message
     } finally {
       setIsLoading(false);
     }
