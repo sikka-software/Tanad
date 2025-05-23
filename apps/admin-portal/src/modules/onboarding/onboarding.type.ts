@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import type { enterprises } from "@/db/schema";
 
 export type Enterprise = {
@@ -10,6 +12,13 @@ export type Enterprise = {
 };
 
 export type EnterpriseCreateData = Pick<Enterprise, "name" | "email" | "industry" | "size">;
+
+export const enterpriseCreateSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  industry: z.string().min(1, "Industry is required"),
+  size: z.string().min(1, "Size is required"),
+});
 
 export const INDUSTRY_OPTIONS = [
   { label: "Technology", value: "technology" },

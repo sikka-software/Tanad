@@ -3,6 +3,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
 
 import { EnterpriseCreateData } from "../onboarding/onboarding.type";
+import {
+  fetchEnterprises,
+  fetchEnterpriseById,
+  createEnterprise,
+  updateEnterprise,
+  deleteEnterprise,
+  bulkDeleteEnterprises,
+} from "./enterprise.service";
+import { EnterpriseUpdateData } from "./enterprise.type";
 
 export const enterpriseKeys = {
   all: ["enterprises"] as const,
@@ -15,18 +24,14 @@ export const enterpriseKeys = {
 export function useEnterprises() {
   return useQuery({
     queryKey: enterpriseKeys.lists(),
-    queryFn: () => {
-      // TODO: Implement fetchEnterprises
-    },
+    queryFn: fetchEnterprises,
   });
 }
 
 export function useEnterprise(id: string) {
   return useQuery({
     queryKey: enterpriseKeys.detail(id),
-    queryFn: () => {
-      // TODO: Implement fetchEnterpriseById
-    },
+    queryFn: () => fetchEnterpriseById(id),
     enabled: !!id,
   });
 }
@@ -34,9 +39,7 @@ export function useEnterprise(id: string) {
 export function useCreateEnterprise() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (newEnterprise: EnterpriseCreateData) => {
-      // TODO: Implement createEnterprise
-    },
+    mutationFn: createEnterprise,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: enterpriseKeys.lists() }),
     meta: { toast: { success: "Enterprises.success.create", error: "Enterprises.error.create" } },
   });
@@ -45,13 +48,38 @@ export function useCreateEnterprise() {
 export function useUpdateEnterprise() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: EnterpriseUpdateData }) => {
-      // TODO: Implement updateEnterprise
-    },
+    mutationFn: ({ id, data }: { id: string; data: EnterpriseUpdateData }) =>
+      updateEnterprise(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: enterpriseKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: enterpriseKeys.lists() });
     },
     meta: { toast: { success: "Enterprises.success.update", error: "Enterprises.error.update" } },
+  });
+}
+
+export function useDeleteEnterprise() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteEnterprise,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: enterpriseKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: enterpriseKeys.details() });
+    },
+    meta: { toast: { success: "Enterprises.success.delete", error: "Enterprises.error.delete" } },
+  });
+}
+
+export function useBulkDeleteEnterprises() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bulkDeleteEnterprises,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: enterpriseKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: enterpriseKeys.details() });
+    },
+    meta: {
+      toast: { success: "Enterprises.success.bulkDelete", error: "Enterprises.error.bulkDelete" },
+    },
   });
 }
