@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { deleteResourceById, bulkDeleteResource } from "@/lib/api";
 
-import { EnterpriseCreateData } from "../onboarding/onboarding.type";
 import {
   fetchEnterprises,
   fetchEnterpriseById,
@@ -11,7 +10,7 @@ import {
   deleteEnterprise,
   bulkDeleteEnterprises,
 } from "./enterprise.service";
-import { EnterpriseUpdateData } from "./enterprise.type";
+import { EnterpriseCreateData, EnterpriseUpdateData } from "./enterprise.type";
 
 export const enterpriseKeys = {
   all: ["enterprises"] as const,

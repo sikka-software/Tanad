@@ -1,7 +1,6 @@
 import { createClient } from "@/utils/supabase/component";
 
-import { EnterpriseCreateData } from "../onboarding/onboarding.type";
-import { EnterpriseUpdateData } from "./enterprise.type";
+import { EnterpriseCreateData, EnterpriseUpdateData } from "./enterprise.type";
 
 const supabase = createClient();
 
