@@ -1,5 +1,4 @@
 import { useTranslations } from "next-intl";
-import { toast } from "sonner";
 
 interface UseDataTableActionsProps<T extends { id: string }> {
   data?: T[];

@@ -1,5 +1,4 @@
 import { useTranslations } from "next-intl";
-import React from "react";
 
 import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";

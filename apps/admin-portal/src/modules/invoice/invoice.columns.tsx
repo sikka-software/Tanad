@@ -10,8 +10,7 @@ import TimestampCell from "@/tables/timestamp-cell";
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
 import { useFormatDate } from "@/lib/date-utils";
 
-import { Invoice } from "@/invoice/invoice.type";
-import { InvoiceStatus } from "@/invoice/invoice.type";
+import { Invoice, InvoiceStatus } from "@/invoice/invoice.type";
 
 const useInvoiceColumns = (
   handleEdit?: (rowId: string, columnId: string, value: unknown) => void,
@@ -26,23 +25,23 @@ const useInvoiceColumns = (
       accessorKey: "invoice_number",
       header: t("Invoices.form.invoice_number.label"),
       cell: ({ getValue, row }) => (
-        <CodeCell
-          onChange={(e) => handleEdit?.(row.id, "invoice_number", e.target.value)}
-          onRandom={() => {
-            const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            let randomCode = "";
-            for (let i = 0; i < 5; i++) {
-              randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
-            }
-            handleEdit?.(row.id, "invoice_number", `INV-${randomCode}`);
-          }}
-          onSerial={() => {
-            const paddedNumber = String(row.index + 1).padStart(4, "0");
-            handleEdit?.(row.id, "invoice_number", `INV-${paddedNumber}`);
-          }}
-          code={getValue() as string}
-          onCodeChange={() => console.log("changing")}
-        />
+          <CodeCell
+            onChange={(e) => handleEdit?.(row.id, "invoice_number", e.target.value)}
+            onRandom={() => {
+              const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+              let randomCode = "";
+              for (let i = 0; i < 5; i++) {
+                randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+              }
+              handleEdit?.(row.id, "invoice_number", `INV-${randomCode}`);
+            }}
+            onSerial={() => {
+              const paddedNumber = String(row.index + 1).padStart(4, "0");
+              handleEdit?.(row.id, "invoice_number", `INV-${paddedNumber}`);
+            }}
+            code={getValue() as string}
+            onCodeChange={() => console.log("changing")}
+          />
       ),
     },
     //client.name

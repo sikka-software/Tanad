@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
+import { useRouter } from "next/router";
 
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
 
@@ -17,8 +17,6 @@ import {
   InvoiceUpdateData,
 } from "@/invoice/invoice.type";
 
-import useUserStore from "@/stores/use-user-store";
-
 const InvoiceCard = ({
   invoice,
   onActionClicked,
@@ -27,6 +25,7 @@ const InvoiceCard = ({
   onActionClicked: (action: string, id: string) => void;
 }) => {
   const t = useTranslations();
+  const router = useRouter();
   const { mutate: updateInvoice } = useUpdateInvoice();
   const data = useInvoiceStore((state) => state.data);
   const setData = useInvoiceStore((state) => state.setData);
@@ -51,6 +50,7 @@ const InvoiceCard = ({
       onDelete={() => onActionClicked("delete", invoice.id)}
       onDuplicate={() => onActionClicked("duplicate", invoice.id)}
       onPreview={() => onActionClicked("preview", invoice.id)}
+      onView={() => router.push(`/invoices/${invoice.id}`)}
     >
       <div>
         <h3 className="text-lg font-semibold">

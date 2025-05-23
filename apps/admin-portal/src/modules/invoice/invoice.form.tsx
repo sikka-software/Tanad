@@ -1,10 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { parseDate } from "@internationalized/date";
+import { CalendarDate, getLocalTimeZone, parseDate } from "@internationalized/date";
 import { createInsertSchema } from "drizzle-zod";
-import { useTranslations, useLocale } from "next-intl";
-import { useState, useEffect, useCallback } from "react";
-import React from "react";
-import { useForm, useFieldArray, FieldError, useWatch } from "react-hook-form";
+import { useLocale, useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
+import { FieldError, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -18,8 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import NotesSection from "@/components/forms/notes-section";
 import ProductsFormSection from "@/components/forms/products-form-section";
 
-import { formatToYYYYMMDD } from "@/lib/date-utils";
 import { getNotesValue, validateYearRange } from "@/lib/utils";
+import { calculateVAT } from "@/lib/zatca/zatca-utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -27,14 +26,13 @@ import ClientCombobox from "@/client/client.combobox";
 import { useClients } from "@/client/client.hooks";
 import useClientStore from "@/client/client.store";
 
-import { useInvoices } from "@/invoice/invoice.hooks";
-import { useCreateInvoice, useUpdateInvoice } from "@/invoice/invoice.hooks";
+import { useCreateInvoice, useInvoices, useUpdateInvoice } from "@/invoice/invoice.hooks";
 import useInvoiceStore from "@/invoice/invoice.store";
 import {
-  InvoiceUpdateData,
   InvoiceCreateData,
   InvoiceItem,
   InvoiceStatus,
+  InvoiceUpdateData,
 } from "@/invoice/invoice.type";
 
 import { ProductForm } from "@/product/product.form";
@@ -132,8 +130,20 @@ export function InvoiceForm({
     // ...defaultValues,
     client_id: defaultValues?.client_id || "",
     invoice_number: defaultValues?.invoice_number || "",
-    issue_date: defaultValues?.issue_date ? new Date(defaultValues.issue_date) : undefined,
-    due_date: defaultValues?.due_date ? new Date(defaultValues.due_date) : undefined,
+    issue_date: defaultValues?.issue_date
+      ? new CalendarDate(
+          new Date(defaultValues.issue_date).getFullYear(),
+          new Date(defaultValues.issue_date).getMonth() + 1,
+          new Date(defaultValues.issue_date).getDate(),
+        )
+      : undefined,
+    due_date: defaultValues?.due_date
+      ? new CalendarDate(
+          new Date(defaultValues.due_date).getFullYear(),
+          new Date(defaultValues.due_date).getMonth() + 1,
+          new Date(defaultValues.due_date).getDate(),
+        )
+      : undefined,
     status: defaultValues?.status || "draft",
     subtotal: defaultValues?.subtotal || 0,
     tax_rate: defaultValues?.tax_rate || 0,
@@ -152,6 +162,17 @@ export function InvoiceForm({
     resolver: zodResolver(createInvoiceSchema(t)),
     defaultValues: formDefaultValues,
   });
+
+  const taxAmount = calculateVAT(form.watch("subtotal") || 0, form.watch("tax_rate") || 0);
+
+  const [zatcaEnabled, setZatcaEnabled] = useState<boolean>(defaultValues?.zatca_enabled || false);
+  const [sellerName, setSellerName] = useState<string>(
+    defaultValues?.seller_name || "Mansour Company",
+  );
+  const [vatNumber, setVatNumber] = useState<string>(
+    defaultValues?.vat_number || "310122393500003",
+  );
+  const [showZatcaPreview, setShowZatcaPreview] = useState<boolean>(false);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -210,16 +231,27 @@ export function InvoiceForm({
 
     try {
       if (editMode && defaultValues?.id) {
+        const invoiceDataForUpdate = {
+          id: defaultValues.id as string,
+          client_id: data.client_id,
+          invoice_number: data.invoice_number,
+          issue_date: data.issue_date?.toDate(getLocalTimeZone()).toISOString(),
+          due_date: data.due_date?.toDate(getLocalTimeZone())?.toISOString() || null,
+          status: data.status,
+          subtotal: data.subtotal,
+          tax_rate: data.tax_rate,
+          notes: data.notes || null,
+          items: itemsPayload,
+          zatca_enabled: zatcaEnabled,
+          seller_name: zatcaEnabled ? sellerName : undefined,
+          vat_number: zatcaEnabled ? vatNumber : undefined,
+          tax_amount: taxAmount,
+        };
+
         await updateInvoice(
           {
             id: defaultValues.id as string,
-            data: {
-              ...data,
-              id: defaultValues.id as string,
-              issue_date: formatToYYYYMMDD(data.issue_date),
-              due_date: formatToYYYYMMDD(data.due_date),
-              items: itemsPayload,
-            },
+            data: invoiceDataForUpdate,
           },
           {
             onSuccess: async () => {
@@ -232,10 +264,19 @@ export function InvoiceForm({
       } else {
         await createInvoice(
           {
-            ...data,
-            issue_date: formatToYYYYMMDD(data.issue_date),
-            due_date: formatToYYYYMMDD(data.due_date),
+            client_id: data.client_id,
+            invoice_number: data.invoice_number,
+            issue_date: data.issue_date?.toDate(getLocalTimeZone()).toISOString(),
+            due_date: data.due_date?.toDate(getLocalTimeZone())?.toISOString() || null,
+            status: data.status,
+            subtotal: data.subtotal,
+            tax_rate: data.tax_rate,
+            notes: data.notes || null,
             items: itemsPayload,
+            zatca_enabled: zatcaEnabled,
+            seller_name: zatcaEnabled ? sellerName : undefined,
+            vat_number: zatcaEnabled ? vatNumber : undefined,
+            tax_amount: taxAmount,
           },
           {
             onSuccess: async (response) => {

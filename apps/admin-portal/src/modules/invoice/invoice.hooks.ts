@@ -4,10 +4,10 @@ import {
   bulkDeleteInvoices,
   createInvoice,
   deleteInvoice,
+  duplicateInvoice,
   fetchInvoiceById,
   fetchInvoices,
   updateInvoice,
-  duplicateInvoice,
 } from "@/invoice/invoice.service";
 import { InvoiceCreateData, InvoiceUpdateData } from "@/invoice/invoice.type";
 
@@ -89,5 +89,16 @@ export function useBulkDeleteInvoices() {
     mutationFn: bulkDeleteInvoices,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() }),
     meta: { toast: { success: "Invoices.success.delete", error: "Invoices.error.delete" } },
+  });
+}
+
+export function useInvoiceById(id: string) {
+  return useQuery({
+    queryKey: ["invoice", id],
+    queryFn: async () => {
+      if (!id) return null;
+      return fetchInvoiceById(id);
+    },
+    enabled: !!id,
   });
 }

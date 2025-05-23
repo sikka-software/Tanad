@@ -23,11 +23,11 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import InvoiceCard from "@/invoice/invoice.card";
 import useInvoiceColumns from "@/invoice/invoice.columns";
 import { InvoiceForm } from "@/invoice/invoice.form";
-import { useInvoices, useBulkDeleteInvoices, useDuplicateInvoice } from "@/invoice/invoice.hooks";
-import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/invoice/invoice.options";
+import { useBulkDeleteInvoices, useDuplicateInvoice, useInvoices } from "@/invoice/invoice.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/invoice/invoice.options";
 import useInvoiceStore from "@/invoice/invoice.store";
 import InvoicesTable from "@/invoice/invoice.table";
-import { InvoiceUpdateData } from "@/invoice/invoice.type";
+import { Invoice, InvoiceUpdateData } from "@/invoice/invoice.type";
 
 export default function InvoicesPage() {
   const t = useTranslations();
@@ -39,6 +39,20 @@ export default function InvoicesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableItem, setActionableItem] = useState<InvoiceUpdateData | null>(null);
+
+  // Convert Invoice to InvoiceUpdateData (handling zatca_enabled null to undefined)
+  const handleSetActionableItem = (item: Invoice | null) => {
+    if (!item) {
+      setActionableItem(null);
+      return;
+    }
+
+    const updateData: InvoiceUpdateData = {
+      ...item,
+      zatca_enabled: item.zatca_enabled === null ? undefined : item.zatca_enabled,
+    };
+    setActionableItem(updateData);
+  };
 
   // Permissions
   const canRead = moduleHooks.useCanRead();
@@ -80,10 +94,13 @@ export default function InvoicesPage() {
     setPendingDeleteIds,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem,
+    setActionableItem: handleSetActionableItem,
     duplicateMutation: duplicateInvoice,
     previewAction: (id: string) => {
       window.open(`/pay/${id}`, "_blank");
+    },
+    viewAction: (id: string) => {
+      router.push(`/invoices/${id}`);
     },
     moduleName: "Invoices",
   });
