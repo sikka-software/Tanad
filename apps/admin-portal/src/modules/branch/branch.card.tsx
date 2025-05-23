@@ -7,7 +7,7 @@ import { CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateBranch } from "@/branch/branch.hooks";
 import useBranchStore from "@/branch/branch.store";
-import { Branch } from "@/branch/branch.type";
+import { Branch, BranchUpdateData } from "@/branch/branch.type";
 
 const BranchCard = ({
   branch,
@@ -23,7 +23,7 @@ const BranchCard = ({
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateBranch({ id: rowId, data: { [columnId]: value } });
+    await updateBranch({ id: rowId, data: { [columnId]: value } as BranchUpdateData });
   };
 
   return (

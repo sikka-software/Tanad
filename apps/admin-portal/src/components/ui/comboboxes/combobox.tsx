@@ -1,5 +1,4 @@
 import { LabelProps } from "@radix-ui/react-label";
-import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as React from "react";
 
 import {
@@ -13,7 +12,7 @@ import {
 } from "@/ui/command";
 // import { HelperText } from "@/ui/helper-text";
 import { Label } from "@/ui/label";
-import { PopoverContent, PopoverTrigger } from "@/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Skeleton } from "@/ui/skeleton";
 
 import { cn } from "@/lib/utils";
@@ -99,7 +98,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
       >
         {props.label && <Label {...labelProps}>{props.label}</Label>}
 
-        <PopoverPrimitive.Root open={open} onOpenChange={handleOpenChange}>
+        <Popover open={open} onOpenChange={handleOpenChange}>
           <PopoverTrigger asChild className="h-9">
             {props.isLoading ? (
               <div className="">
@@ -238,7 +237,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
               </CommandList>
             </Command>
           </PopoverContent>
-        </PopoverPrimitive.Root>
+        </Popover>
       </div>
     );
   },

@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -12,6 +12,8 @@ import DigitsInput from "@/ui/inputs/digits-input";
 import { Input } from "@/ui/inputs/input";
 import NumberInput from "@/ui/inputs/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+
+import { customResolver } from "@/utils/form-utils";
 
 import { getNotesValue } from "@/lib/utils";
 
@@ -28,11 +30,16 @@ import useUserStore from "@/stores/use-user-store";
 
 export const createCarSchema = (t: (key: string) => string) => {
   const CarSelectSchema = createInsertSchema(cars, {
-    name: z.string().min(1, t("Cars.form.name.required")),
-    make: z.string().min(1, t("Vehicles.form.make.required")),
-    model: z.string().min(1, t("Vehicles.form.model.required")),
+    name: z
+      .string({ message: t("Cars.form.name.required") })
+      .min(1, { message: t("Cars.form.name.required") }),
+    make: z
+      .string({ message: t("Vehicles.form.make.required") })
+      .min(1, t("Vehicles.form.make.required")),
+    model: z
+      .string({ message: t("Vehicles.form.model.required") })
+      .min(1, t("Vehicles.form.model.required")),
     year: z.number({
-      invalid_type_error: t("Forms.must_be_number"),
       message: t("Forms.must_be_number"),
     }),
     vin: z

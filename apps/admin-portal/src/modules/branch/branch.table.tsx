@@ -12,7 +12,7 @@ import useUserStore from "@/stores/use-user-store";
 import useBranchColumns from "./branch.columns";
 import { useUpdateBranch } from "./branch.hooks";
 import useBranchStore from "./branch.store";
-import { Branch } from "./branch.type";
+import { Branch, BranchUpdateData } from "./branch.type";
 
 const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Branch>) => {
   const t = useTranslations();
@@ -24,7 +24,7 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateBranch({ id: rowId, data: { [columnId]: value } });
+    await updateBranch({ id: rowId, data: { [columnId]: value } as BranchUpdateData });
   };
   const columns = useBranchColumns(handleEdit);
 

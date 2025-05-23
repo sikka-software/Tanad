@@ -40,7 +40,11 @@ const createBranchSchema = (t: (key: string) => string) => {
     name: z.string().min(1, t("Branches.form.name.required")),
     code: z.string().min(1, t("Branches.form.code.required")),
     phone: z.string().optional().or(z.literal("")),
-    email: z.string().email().optional().or(z.literal("")),
+    email: z
+      .string()
+      .email({ message: t("Branches.form.email.invalid") })
+      .optional()
+      .or(z.literal("")),
     manager: z
       .string({ invalid_type_error: t("Branches.form.manager.invalid_uuid") })
       .uuid({ message: t("Branches.form.manager.invalid_uuid") })

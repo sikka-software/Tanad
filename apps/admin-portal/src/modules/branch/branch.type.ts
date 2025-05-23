@@ -1,5 +1,7 @@
-import { Database } from "@/lib/database.types";
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 
-export type Branch = Database["public"]["Tables"]["branches"]["Row"];
-export type BranchCreateData = Database["public"]["Tables"]["branches"]["Insert"];
-export type BranchUpdateData = Database["public"]["Tables"]["branches"]["Update"];
+import { branches } from "@/db/schema";
+
+export type Branch = InferSelectModel<typeof branches>;
+export type BranchCreateData = InferInsertModel<typeof branches>;
+export type BranchUpdateData = InferInsertModel<typeof branches>;

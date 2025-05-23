@@ -97,11 +97,10 @@ export default function InvoicesPage() {
     setActionableItem: handleSetActionableItem,
     duplicateMutation: duplicateInvoice,
     previewAction: (id: string) => {
-      window.open(`/pay/${id}`, "_blank");
+      // window.open(`/pay/${id}`, "_blank");
+      window.open(`/invoices/${id}`, "_blank");
     },
-    viewAction: (id: string) => {
-      router.push(`/invoices/${id}`);
-    },
+
     moduleName: "Invoices",
   });
 

@@ -1,4 +1,4 @@
-import { getLocalTimeZone, today } from "@internationalized/date";
+import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 import { CalendarIcon, CheckCircle, FileText, RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -229,7 +229,7 @@ export default function ZatcaInvoicePage() {
                       <DateInput
                         placeholder="Select issue date"
                         value={formMethods.watch("issueDate")}
-                        onChange={(date) => formMethods.setValue("issueDate", date)}
+                        onChange={(date) => formMethods.setValue("issueDate", date as CalendarDate)}
                       />
                     </div>
 
@@ -238,7 +238,7 @@ export default function ZatcaInvoicePage() {
                       <DateInput
                         placeholder="Select due date"
                         value={formMethods.watch("dueDate")}
-                        onChange={(date) => formMethods.setValue("dueDate", date)}
+                        onChange={(date) => formMethods.setValue("dueDate", date as CalendarDate)}
                       />
                     </div>
                   </div>

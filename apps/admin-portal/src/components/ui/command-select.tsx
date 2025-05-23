@@ -12,7 +12,7 @@ import {
   CommandList,
 } from "@/ui/command";
 import { Label } from "@/ui/label";
-import { PopoverContent, PopoverTrigger } from "@/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Skeleton } from "@/ui/skeleton";
 
 import { cn } from "@/lib/utils";
@@ -108,10 +108,7 @@ export const CommandSelect = React.forwardRef<HTMLButtonElement, CommandSelectTy
       >
         {props.label && <Label {...labelProps}>{props.label}</Label>}
 
-        <PopoverPrimitive.Root
-          open={open}
-          onOpenChange={props.disabled ? undefined : handleOpenChange}
-        >
+        <Popover open={open} onOpenChange={props.disabled ? undefined : handleOpenChange}>
           <PopoverTrigger disabled={props.disabled} asChild>
             {props.isLoading ? (
               <Skeleton className={cn("h-9 w-full", inCell && "h-10 rounded-none")} />
@@ -242,7 +239,7 @@ export const CommandSelect = React.forwardRef<HTMLButtonElement, CommandSelectTy
               </CommandList>
             </Command>
           </PopoverContent>
-        </PopoverPrimitive.Root>
+        </Popover>
       </div>
     );
   },
