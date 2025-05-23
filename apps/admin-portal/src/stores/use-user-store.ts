@@ -1,15 +1,12 @@
 import { User } from "@supabase/supabase-js";
 import { currencies } from "@tanad.config";
-import { InferSelectModel } from "drizzle-orm";
 import { create } from "zustand";
 
 import { createClient } from "@/utils/supabase/component";
 
 import { Database } from "@/lib/database.types";
 
-import { enterprises } from "@/db/schema";
-
-export type Enterprise = InferSelectModel<typeof enterprises>;
+import { Enterprise } from "@/modules/enterprise/enterprise.type";
 
 export type Membership = Database["public"]["Tables"]["memberships"]["Row"];
 export type Permission = Database["public"]["Tables"]["permissions"]["Row"];

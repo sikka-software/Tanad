@@ -670,7 +670,6 @@
       "description": "شغالين على ربط جميع الأوقات بالتقويم الهجري"
     }
   },
-
   "SEO": {
     "landing": {
       "title": "العمود الفقري لتجارتك",
@@ -1372,125 +1371,78 @@
     "failed_to_fetch": "فشل في جلب البيانات"
   },
   "Editor": {
-    "change_thumbnail": "تعديل إيقونة الرابط",
-    "link_title_required": "عنوان الرابط مطلوب",
-    "link_url_required": "الرابط مطلوب",
-    "link_url_invalid": "الرابط غير صالح",
-    "lock_link": {
-      "password_protected": {
-        "title": "محمي بكلمة مرور",
-        "description": "يمكنك إضافة كلمة مرور للرابط لمنع الوصول إليه إلا بعد إدخال كلمة المرور الصحيحة",
-        "invalid_password": "كلمة المرور غير صحيحة",
-        "password_required": "كلمة المرور مطلوبة"
-      },
-      "requires_date_of_birth": {
-        "title": "يتطلب الرابط تحديد التاريخ الميلادي",
-        "description": "يمكنك إضافة إلزامية تحديد التاريخ الميلادي للرابط لمنع الوصول إليه إلا بعد تحديد التاريخ الميلادي الصحيح",
-        "too_young": "أنت أصغر من الحد الأدنى للعمر المطلوب",
-        "day_required": "اليوم مطلوب",
-        "month_required": "الشهر مطلوب",
-        "year_required": "السنة مطلوبة"
-      },
-      "min_age": {
-        "label": "الحد الأدنى للعمر",
-        "placeholder": "أدخل الحد الأدنى للعمر"
-      }
-    },
     "try_lazim": {
       "title": "رابط طويل؟",
       "description": "جرب منصة لازم لتقصير الروابط الطويلة",
       "go_to_lazim": "يلا نبدأ"
-    },
-    "delivery_apps": {
-      "hungerstation": "هنجرستيشن",
-      "jahez": "جاهز",
-      "keeta": "كيتا",
-      "toyou": "تويو",
-      "careem": "كريم",
-      "mrsool": "مرسول"
-    },
-    "link_types": {
-      "link": "رابط",
-      "header": "عنوان",
-      "youtube": "فيديو",
-      "delivery-apps": "تطبيقات التوصيل",
-      "document": "مستند",
-      "form": "إستبيان"
-    },
-    "thumbnail": {
-      "choose_icon": "اختر أيقونة",
-      "choose_image": "اختر صورة",
-      "icon_position": "موقع الأيقونة",
-      "position_start": "بداية النص",
-      "position_end": "نهاية النص"
-    },
-    "remove_thumbnail": "إزالة الصورة",
-    "failed_to_update_link": "فشل تحديث الصورة",
-    "header-added-successfully": "تم إضافة الفاصل بنجاح",
-    "failed-to-add-header": "فشل إضافة الفاصل",
-    "header-updated-successfully": "تم تحديث الفاصل بنجاح",
-    "failed-to-update-header": "فشل تحديث الفاصل",
-    "link-added-successfully": "تم إضافة الرابط بنجاح",
-    "failed-to-add-link": "فشل إضافة الرابط",
-    "link_updated_successfully": "تم تحديث الرابط بنجاح",
-    "failed-to-update-link": "فشل تحديث الرابط",
-    "title": "الروابط",
-    "link-status-updated-successfully": "تم تحديث حالة الرابط بنجاح",
-    "link-failed-to-update-status": "فشل تحديث حالة الرابط",
-    "header-status-updated-successfully": "تم تحديث حالة الفاصل بنجاح",
-    "header-failed-to-update-status": "فشل تحديث حالة الفاصل",
-    "confirm-delete-link": "تأكيد حذف الرابط",
-    "confirm-delete-header": "تأكيد حذف الفاصل",
-    "single_link_title": "عنوان الرابط",
-    "single_link_url": "الرابط",
-    "change-pukla": "تغيير البكلة",
-    "select_a_pukla": "إختر بكلة",
-    "success_deleting_link": "تم حذف الرابط بنجاح",
-    "error_deleting_link": "فشل حذف الرابط",
-    "error_deleting_header": "فشل حذف الفاصل",
-    "success_deleting_header": "تم حذف الفاصل بنجاح",
-    "order-updated-successfully": "تم ترتيب الروابط بنجاح",
-    "select_pukla": "إختر بكلة",
-    "description": "إدارة جميع روابطك الأخرى",
-    "add-header": "فاصل جديد",
-    "add-link": "رابط جديد",
-    "add-new-link": "إضافة الرابط",
-    "add-new-header": "إضافة فاصل جديد",
-    "add-button": "زر جديد",
-    "select_pukla_to_start_editing": "إختر بكلة للبدء في التعديل",
-    "link": "رابط",
-    "embed-video": "فيديو",
-    "document": "مستند",
-    "form": "إستبيان",
-    "delivery-apps": "تطبيقات التوصيل",
-    "no-items": "لم يتم العثور على عناصر",
-    "header": "فاصل",
-    "header-title": {
-      "label": "عنوان الفاصل",
-      "placeholder": "أدخل عنوان الفاصل"
-    },
-    "link-title": {
-      "label": "العنوان",
-      "placeholder": "عنوان الرابط"
-    },
-    "link-url": {
-      "label": "الرابط",
-      "placeholder": "https://example.com"
-    },
-    "no_items_found": "لم يتم العثور على عناصر",
-    "change_layout": "تغيير التصميم",
-    "default_layout": "افتراضي",
-    "double_height_layout": "ارتفاع مضاعف",
-    "half_width_layout": "نصف العرض",
-    "save": "حفظ",
-    "edit_pukla": "تعديل بكلة",
-    "slug": "الرابط المختصر",
-    "slug_already_taken": "هذا الرابط المختصر مستخدم بالفعل",
-    "pukla_updated_successfully": "تم تحديث بكلة بنجاح",
-    "square_layout": "مربع",
-    "layout_updated_successfully": "تم تحديث التصميم بنجاح",
-    "failed_to_update_layout": "فشل تحديث التصميم",
-    "search_icons": "البحث عن الأيقونات..."
+    }
+  },
+  "Enterprise": {
+    "form": {
+      "name": {
+        "label": "اسم المؤسسة",
+        "placeholder": "أدخل اسم المؤسسة",
+        "required": "اسم المؤسسة مطلوب"
+      },
+      "industry": {
+        "label": "الصناعة",
+        "placeholder": "أدخل الصناعة"
+      },
+      "founded": {
+        "label": "تاريخ التأسيس",
+        "placeholder": "أدخل تاريخ التأسيس"
+      },
+      "employees": {
+        "label": "عدد الموظفين",
+        "placeholder": "أدخل عدد الموظفين"
+      },
+      "website": {
+        "label": "الموقع الإلكتروني",
+        "placeholder": "أدخل الموقع الإلكتروني",
+        "invalid": "الموقع الإلكتروني غير صالح"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل البريد الإلكتروني",
+        "invalid": "البريد الإلكتروني غير صالح"
+      },
+      "phone": {
+        "label": "رقم الهاتف",
+        "placeholder": "أدخل رقم الهاتف"
+      },
+      "logo": {
+        "label": "شعار المؤسسة",
+        "placeholder": "اختر شعار المؤسسة",
+        "alt": "شعار المؤسسة",
+        "upload_failed": "فشل رفع الشعار"
+      },
+      "address": {
+        "label": "العنوان",
+        "placeholder": "أدخل عنوان المؤسسة"
+      },
+      "description": {
+        "label": "وصف المؤسسة",
+        "placeholder": "أدخل وصف المؤسسة"
+      },
+      "registration_country": {
+        "label": "بلد التسجيل",
+        "placeholder": "أدخل بلد التسجيل"
+      },
+      "registration_number": {
+        "label": "رقم التسجيل",
+        "placeholder": "أدخل رقم التسجيل"
+      },
+      "vat_enabled": {
+        "label": "تفعيل ضريبة القيمة المضافة",
+        "description": "تفعيل ضريبة القيمة المضافة للمؤسسة"
+      },
+      "vat_number": {
+        "label": "رقم ضريبة القيمة المضافة",
+        "placeholder": "أدخل رقم ضريبة القيمة المضافة"
+      },
+      "create_success": "تم إنشاء المؤسسة بنجاح",
+      "update_success": "تم تحديث المؤسسة بنجاح"
+    }
   },
   "Theme": {
     "title": "التصميم",

@@ -1,67 +1,122 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+// import { createInsertSchema } from "drizzle-zod"; // Will use this once enterprises schema is defined
 import { Loader2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import React from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 import { Button } from "@/ui/button";
+import { Checkbox } from "@/ui/checkbox";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/inputs/input";
-import { Label } from "@/ui/label";
+// import { Label } from "@/ui/label"; // This can be removed if using FormLabel everywhere
 import { Textarea } from "@/ui/textarea";
 
 import { createClient } from "@/utils/supabase/component";
 
-export type EnterpriseFormValues = {
-  id?: string;
-  name: string;
-  industry?: string;
-  founded?: string;
-  employees?: string;
-  website?: string;
-  email?: string;
-  phone?: string;
-  logo?: string;
-  address?: string;
-  description?: string;
-};
+import CountryInput from "@/components/ui/inputs/country-input";
 
-interface EnterpriseFormProps {
-  defaultValues: EnterpriseFormValues;
-  readOnly?: boolean;
-  loading?: boolean;
-  onSubmit: (values: EnterpriseFormValues) => void;
-  onCancel: () => void;
-  formId: string;
-}
+// import { useCreateEnterprise, useUpdateEnterprise } from "@/enterprise/enterprise.hooks"; // You will need to create these
+// import useEnterpriseStore from "@/enterprise/enterprise.store"; // You will need to create this
 
-export const EnterpriseForm: React.FC<EnterpriseFormProps> = ({
-  defaultValues,
-  readOnly = false,
-  loading = false,
-  onSubmit,
-  onCancel,
-  formId,
-}) => {
-  const { register, handleSubmit, setValue, watch, formState } = useForm<EnterpriseFormValues>({
-    defaultValues,
+import { ModuleFormProps } from "@/types/common.type";
+
+import useUserStore from "@/stores/use-user-store";
+
+import { useCreateEnterprise, useUpdateEnterprise } from "./enterprise.hooks";
+import useEnterpriseStore from "./enterprise.store";
+
+// Uncommented
+
+// Manually define the schema until `enterprises` is in `db/schema.ts`
+export const createEnterpriseSchema = (t: (key: string) => string) =>
+  z.object({
+    id: z.string().optional(), // Keep id for edit mode
+    user_id: z.string().optional(), // Added from CarForm example
+    enterprise_id: z.string().optional(), // Added from CarForm example
+    name: z.string().min(1, { message: t("Enterprise.form.name.required") }),
+    industry: z.string().optional(),
+    founded: z.string().optional(), // Consider z.date() or z.number() if appropriate
+    employees: z.string().optional(), // Consider z.number() if appropriate
+    website: z
+      .string()
+      .url({ message: t("Enterprise.form.website.invalid") })
+      .optional()
+      .or(z.literal("")),
+    email: z
+      .string()
+      .email({ message: t("Enterprise.form.email.invalid") })
+      .optional()
+      .or(z.literal("")),
+    phone: z.string().optional(),
+    logo: z.string().optional(),
+    address: z.string().optional(),
+    description: z.string().optional(),
+    registration_country: z.string().optional(),
+    registration_number: z.string().optional(),
+    vat_enabled: z.boolean().optional().default(false),
+    vat_number: z.string().optional(),
+  });
+
+export type EnterpriseFormValues = z.input<ReturnType<typeof createEnterpriseSchema>>;
+
+export const EnterpriseForm: React.FC<
+  ModuleFormProps<EnterpriseFormValues> & { readOnly?: boolean }
+> = ({ formHtmlId, onSuccess, defaultValues, readOnly = false, editMode }) => {
+  const t = useTranslations();
+  const lang = useLocale();
+
+  const user = useUserStore((state) => state.user);
+  const enterpriseStoreContext = useUserStore((state) => state.enterprise); // Renamed to avoid conflict with enterprise store
+
+  const { mutateAsync: createEnterprise } = useCreateEnterprise();
+  const { mutateAsync: updateEnterprise } = useUpdateEnterprise();
+
+  const isLoading = useEnterpriseStore((state) => state.isLoading);
+  const setIsLoading = useEnterpriseStore((state) => state.setIsLoading);
+
+  const form = useForm<EnterpriseFormValues>({
+    resolver: zodResolver(createEnterpriseSchema(t)),
+    defaultValues: {
+      id: defaultValues?.id,
+      user_id: defaultValues?.user_id || user?.id,
+      enterprise_id: defaultValues?.enterprise_id || enterpriseStoreContext?.id, // Use renamed context store
+      name: defaultValues?.name || "",
+      industry: defaultValues?.industry || "",
+      founded: defaultValues?.founded || "",
+      employees: defaultValues?.employees || "",
+      website: defaultValues?.website || "",
+      email: defaultValues?.email || "",
+      phone: defaultValues?.phone || "",
+      logo: defaultValues?.logo || "",
+      address: defaultValues?.address || "",
+      description: defaultValues?.description || "",
+      registration_country: defaultValues?.registration_country || "",
+      registration_number: defaultValues?.registration_number || "",
+      vat_enabled: defaultValues?.vat_enabled || false,
+      vat_number: defaultValues?.vat_number || "",
+    },
   });
   const [uploading, setUploading] = useState(false);
 
-  // Watch for logo value to show preview
-  const logoPath = watch("logo");
+  const logoPath = form.watch("logo");
   const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
 
-  // Generate signed URL for preview when logoPath changes
   React.useEffect(() => {
     async function getSignedUrl() {
       if (logoPath) {
         const supabase = createClient();
         const { data, error } = await supabase.storage
           .from("enterprise-images")
-          .createSignedUrl(logoPath, 60 * 60); // 1 hour
+          .createSignedUrl(logoPath, 60 * 60);
         if (data?.signedUrl) {
           setLogoPreviewUrl(data.signedUrl);
         } else {
           setLogoPreviewUrl(null);
+          if (error) console.warn("Error fetching signed URL for logo:", error.message);
         }
       } else {
         setLogoPreviewUrl(null);
@@ -76,83 +131,380 @@ export const EnterpriseForm: React.FC<EnterpriseFormProps> = ({
     setUploading(true);
     try {
       const supabase = createClient();
-      // Use enterprise id if available, fallback to 'unknown'
-      const enterpriseId = defaultValues.id || "unknown";
+      const enterpriseIdForPath = defaultValues?.id || enterpriseStoreContext?.id || "temp-id";
       const fileExt = file.name.split(".").pop();
-      const fileName = `logos/${enterpriseId}-${Date.now()}.${fileExt}`;
+      const fileName = `logos/${enterpriseIdForPath}-${Date.now()}.${fileExt}`;
       const { data, error } = await supabase.storage
         .from("enterprise-images")
         .upload(fileName, file);
       if (error) throw error;
-      // Store only the file path
-      setValue("logo", fileName, { shouldValidate: true });
-    } catch (err) {
-      alert("Failed to upload logo");
+      form.setValue("logo", fileName, { shouldValidate: true });
+    } catch (err: any) {
+      console.error("Failed to upload logo:", err);
+      toast.error(t("Enterprise.form.logo.upload_failed"), { description: err.message });
     } finally {
       setUploading(false);
     }
   };
 
+  const handleSubmitForm = async (data: EnterpriseFormValues) => {
+    setIsLoading(true);
+    if (!user?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    const submissionData: EnterpriseFormValues = {
+      ...data,
+      id: defaultValues?.id, // Ensure id is passed for updates if it's part of EnterpriseFormValues
+      user_id: user.id, // Always set user_id from current user
+      enterprise_id: data.enterprise_id || enterpriseStoreContext?.id, // Or however new enterprises are associated
+    };
+
+    try {
+      if (editMode && defaultValues?.id) {
+        await updateEnterprise(
+          { id: defaultValues.id, data: submissionData },
+          // { // Callbacks are often part of the mutateAsync promise .then() .catch() or handled by react-query's onSuccess/onError directly in the hook
+          //   onSuccess: () => {
+          //     toast.success(t("Enterprise.form.update_success"));
+          //     onSuccess?.();
+          //   },
+          //   onError: (error: any) => {
+          //     toast.error(t("Enterprise.form.update_error"), { description: error.message });
+          //   },
+          // }
+        );
+        toast.success(t("Enterprise.form.update_success"));
+        onSuccess?.();
+      } else {
+        // Remove id from submissionData if it's auto-generated by the DB for new records
+        const { id, ...createData } = submissionData;
+        await createEnterprise(createData as EnterpriseFormValues); // Cast if necessary, ensure type matches hook
+        toast.success(t("Enterprise.form.create_success"));
+        onSuccess?.();
+      }
+    } catch (error: any) {
+      toast.error(t("General.form_submission_error"), {
+        description: error.message || t("General.unknown_error"),
+      });
+      console.error("Failed to save enterprise:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="name">Enterprise Name</Label>
-          <Input readOnly={readOnly} id="name" {...register("name", { required: true })} />
+    <Form {...form}>
+      <form
+        id={formHtmlId || "enterprise-form"}
+        onSubmit={form.handleSubmit(handleSubmitForm)}
+        className="space-y-4"
+      >
+        <input hidden type="text" {...form.register("user_id")} />
+        <input hidden type="text" {...form.register("enterprise_id")} />
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Enterprise.form.name.label")} *</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t("Enterprise.form.name.placeholder")}
+                    {...field}
+                    readOnly={readOnly}
+                    disabled={isLoading || uploading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="industry"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Enterprise.form.industry.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t("Enterprise.form.industry.placeholder")}
+                    {...field}
+                    readOnly={readOnly}
+                    disabled={isLoading || uploading}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="founded"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Enterprise.form.founded.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t("Enterprise.form.founded.placeholder")}
+                    {...field}
+                    readOnly={readOnly}
+                    disabled={isLoading || uploading}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="employees"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Enterprise.form.employees.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t("Enterprise.form.employees.placeholder")}
+                    {...field}
+                    readOnly={readOnly}
+                    disabled={isLoading || uploading}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="website"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Enterprise.form.website.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t("Enterprise.form.website.placeholder")}
+                    {...field}
+                    readOnly={readOnly}
+                    disabled={isLoading || uploading}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Enterprise.form.email.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t("Enterprise.form.email.placeholder")}
+                    type="email"
+                    {...field}
+                    readOnly={readOnly}
+                    disabled={isLoading || uploading}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Enterprise.form.phone.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t("Enterprise.form.phone.placeholder")}
+                    {...field}
+                    readOnly={readOnly}
+                    disabled={isLoading || uploading}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="logo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Enterprise.form.logo.label")}</FormLabel>
+                <FormControl>
+                  <>
+                    {logoPreviewUrl && (
+                      <img
+                        src={logoPreviewUrl}
+                        alt={t("Enterprise.form.logo.alt")}
+                        className="mb-2 h-16 w-16 rounded-md border object-contain"
+                      />
+                    )}
+                    <Input
+                      type="file"
+                      id="logo-upload"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      readOnly={readOnly}
+                      disabled={isLoading || uploading}
+                      className="mb-2"
+                    />
+                    {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <Input
+                      type="text"
+                      className="hidden"
+                      readOnly
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="industry">Industry</Label>
-          <Input readOnly={readOnly} id="industry" {...register("industry")} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="founded">Founded</Label>
-          <Input readOnly={readOnly} id="founded" {...register("founded")} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="employees">Number of Employees</Label>
-          <Input readOnly={readOnly} id="employees" {...register("employees")} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="website">Website</Label>
-          <Input readOnly={readOnly} id="website" {...register("website")} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input readOnly={readOnly} id="email" {...register("email")} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone</Label>
-          <Input readOnly={readOnly} id="phone" {...register("phone")} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="logo">Logo</Label>
-          {logoPreviewUrl && (
-            <img
-              src={logoPreviewUrl}
-              alt="Enterprise Logo"
-              className="mb-2 h-16 w-16 rounded-md border object-contain"
-            />
+        <FormField
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("Enterprise.form.address.label")}</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder={t("Enterprise.form.address.placeholder")}
+                  {...field}
+                  readOnly={readOnly}
+                  disabled={isLoading || uploading}
+                  value={field.value ?? ""}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-          {!readOnly && (
-            <Input
-              type="file"
-              id="logo-upload"
-              accept="image/*"
-              onChange={handleLogoUpload}
-              disabled={uploading}
-            />
+        />
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("Enterprise.form.description.label")}</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder={t("Enterprise.form.description.placeholder")}
+                  {...field}
+                  rows={4}
+                  readOnly={readOnly}
+                  disabled={isLoading || uploading}
+                  value={field.value ?? ""}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-          <Input readOnly={true} id="logo" value={logoPath || ""} {...register("logo")} />
+        />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="registration_country"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Enterprise.form.registration_country.label")}</FormLabel>
+                <FormControl>
+                  <CountryInput
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    disabled={isLoading || uploading}
+                    dir={lang === "ar" ? "rtl" : "ltr"}
+                    texts={{
+                      placeholder: t("Forms.country.placeholder"),
+                      searchPlaceholder: t("Forms.country.search_placeholder"),
+                      noItems: t("Forms.country.no_items"),
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="registration_number"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Enterprise.form.registration_number.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t("Enterprise.form.registration_number.placeholder")}
+                    {...field}
+                    disabled={isLoading || uploading}
+                    value={field.value ?? ""}
+                    readOnly={readOnly}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="address">Address</Label>
-        <Input readOnly={readOnly} id="address" {...register("address")} />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea readOnly={readOnly} id="description" {...register("description")} rows={4} />
-      </div>
-    </form>
+
+        <FormField
+          control={form.control}
+          name="vat_enabled"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">
+                  {t("Enterprise.form.vat_enabled.label")}
+                </FormLabel>
+                <p className="text-muted-foreground text-sm">
+                  {t("Enterprise.form.vat_enabled.description")}
+                </p>
+              </div>
+              <FormControl>
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        {form.watch("vat_enabled") && (
+          <FormField
+            control={form.control}
+            name="vat_number"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Enterprise.form.vat_number.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t("Enterprise.form.vat_number.placeholder")}
+                    {...field}
+                    disabled={isLoading || uploading || !form.watch("vat_enabled")}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+      </form>
+    </Form>
   );
 };
