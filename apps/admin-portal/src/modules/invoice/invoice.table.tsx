@@ -1,5 +1,4 @@
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
 
 import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
@@ -17,7 +16,6 @@ import useInvoiceColumns from "./invoice.columns";
 
 const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Invoice>) => {
   const t = useTranslations();
-  const router = useRouter();
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
   const setData = useInvoiceStore((state) => state.setData);
 
@@ -85,15 +83,6 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     },
   };
 
-  // Enhance the onActionClicked to handle 'view' action
-  const handleAction = (action: string, rowId: string) => {
-    if (action === "view") {
-      router.push(`/invoices/${rowId}`);
-    } else {
-      onActionClicked?.(action, rowId);
-    }
-  };
-
   return (
     <SheetTable
       columns={columns}
@@ -111,7 +100,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       canPreviewAction={canPreviewInvoice}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={invoiceTableOptions}
-      onActionClicked={handleAction}
+      onActionClicked={onActionClicked}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={setColumnVisibility}
       texts={{
