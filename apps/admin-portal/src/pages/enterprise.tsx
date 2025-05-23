@@ -26,44 +26,45 @@ const EnterprisePage = () => {
   }
 
   const [isEditing, setIsEditing] = useState(false);
-  const [enterpriseData, setEnterpriseData] = useState(enterprise);
+  // const [enterpriseData, setEnterpriseData] = useState(enterprise);
   const [formData, setFormData] = useState(enterprise);
   const [isSaving, setIsSaving] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      const response = await fetch("/api/enterprise", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, id: enterprise.id }),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to update enterprise");
-      }
-      const updated = await response.json();
-      setEnterpriseData(updated);
-      setFormData(updated);
-      setIsEditing(false);
-      toast.success("Enterprise information updated", {
-        description: "The enterprise information has been successfully updated.",
-      });
-    } catch (err: any) {
-      toast.error("Failed to update enterprise", {
-        description: err.message,
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  // const handleSave = async () => {
+  //   setIsSaving(true);
+  //   try {
+  //     const response = await fetch("/api/enterprise", {
+  //       method: "PUT",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ ...formData, id: enterprise.id }),
+  //     });
+  //     if (!response.ok) {
+  //       const error = await response.json();
+  //       throw new Error(error.message || "Failed to update enterprise");
+  //     }
+  //     const updated = await response.json();
+  //     setEnterpriseData(updated);
+  //     setFormData(updated);
+  //     setIsEditing(false);
+  //     toast.success("Enterprise information updated", {
+  //       description: "The enterprise information has been successfully updated.",
+  //     });
+  //   } catch (err: any) {
+  //     toast.error("Failed to update enterprise", {
+  //       description: err.message,
+  //     });
+  //   } finally {
+  //     setIsSaving(false);
+  //   }
+  // };
 
-  const handleCancel = () => {
-    setFormData(enterpriseData);
-    setIsEditing(false);
-  };
+  // const handleCancel = () => {
+  //   setFormData(enterpriseData);
+  //   setIsEditing(false);
+  // };
 
+  console.log(enterprise);
   return (
     <div>
       <div className="mx-auto flex flex-col gap-4 p-4">
@@ -72,15 +73,15 @@ const EnterprisePage = () => {
             {enterprise.logo ? (
               <img
                 src={enterprise.logo}
-                alt={`${enterpriseData.name} logo`}
+                alt={`${enterprise.name} logo`}
                 className="h-16 w-16 rounded-md border object-contain"
               />
             ) : (
               <Asterisk className="h-16 w-16 rounded-md border object-contain p-2" />
             )}
             <div>
-              <CardTitle>{enterpriseData.name}</CardTitle>
-              <CardDescription>{enterpriseData.industry}</CardDescription>
+              <CardTitle>{enterprise.name}</CardTitle>
+              <CardDescription>{enterprise.industry}</CardDescription>
             </div>
           </div>
           {isEditing ? (
@@ -105,48 +106,39 @@ const EnterprisePage = () => {
           <CardContent>
             <EnterpriseForm
               defaultValues={{
-                ...formData,
-                industry: formData.industry ?? undefined,
-                email: formData.email ?? undefined,
-                logo: formData.logo ?? undefined,
-                website: undefined,
-                phone: undefined,
-                employees: undefined,
-                description: undefined,
-                address: undefined,
-                founded: undefined,
+                ...enterprise,
               }}
-              formId="enterprise-form"
+              formHtmlId="enterprise-form"
               readOnly={!isEditing}
-              loading={isSaving}
-              onSubmit={async (values) => {
-                setIsSaving(true);
-                try {
-                  const response = await fetch("/api/enterprise", {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ ...values, id: enterprise.id }),
-                  });
-                  if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || "Failed to update enterprise");
-                  }
-                  const updated = await response.json();
-                  setEnterpriseData(updated);
-                  setFormData(updated);
-                  setIsEditing(false);
-                  toast.success("Enterprise information updated", {
-                    description: "The enterprise information has been successfully updated.",
-                  });
-                } catch (err: any) {
-                  toast.error("Failed to update enterprise", {
-                    description: err.message,
-                  });
-                } finally {
-                  setIsSaving(false);
-                }
-              }}
-              onCancel={handleCancel}
+              // loading={isSaving}
+              // onSubmit={async (values) => {
+              //   setIsSaving(true);
+              //   try {
+              //     const response = await fetch("/api/enterprise", {
+              //       method: "PUT",
+              //       headers: { "Content-Type": "application/json" },
+              //       body: JSON.stringify({ ...values, id: enterprise.id }),
+              //     });
+              //     if (!response.ok) {
+              //       const error = await response.json();
+              //       throw new Error(error.message || "Failed to update enterprise");
+              //     }
+              //     const updated = await response.json();
+              //     setEnterpriseData(updated);
+              //     setFormData(updated);
+              //     setIsEditing(false);
+              //     toast.success("Enterprise information updated", {
+              //       description: "The enterprise information has been successfully updated.",
+              //     });
+              //   } catch (err: any) {
+              //     toast.error("Failed to update enterprise", {
+              //       description: err.message,
+              //     });
+              //   } finally {
+              //     setIsSaving(false);
+              //   }
+              // }}
+              // onCancel={handleCancel}
             />
           </CardContent>
         </Card>

@@ -174,14 +174,14 @@ export const EnterpriseForm: React.FC<
         // Handle empty strings for optional fields: convert to null if necessary
         // For now, let's assume Zod/Drizzle handles undefined correctly for optionals
         // and empty strings are valid if the column type allows.
-        if (key === 'email' && obj[key] === '') {
+        if (key === "email" && obj[key] === "") {
           newObj[key] = null; // Explicitly set empty email to null
-        } else if (key === 'founded') {
+        } else if (key === "founded") {
           // Assuming Zod coercion has already turned it into number | undefined
           // If it's undefined (e.g. from empty input), it will be omitted by `key in obj && obj[key] !== undefined`
           // If it's a number, it will be included.
           // If it needs to be null for empty string, Zod transform/preprocess is better.
-          newObj[key] = obj[key]; 
+          newObj[key] = obj[key];
         } else {
           newObj[key] = obj[key];
         }
@@ -209,9 +209,7 @@ export const EnterpriseForm: React.FC<
     try {
       if (editMode && defaultValues?.id) {
         const updateData = pickRelevantKeys(rawSubmissionData) as EnterpriseUpdateData;
-        await updateEnterprise(
-          { id: defaultValues.id, data: updateData },
-        );
+        await updateEnterprise({ id: defaultValues.id, data: updateData });
         toast.success(t("Enterprise.form.update_success"));
         onSuccess?.();
       } else {
@@ -329,7 +327,6 @@ export const EnterpriseForm: React.FC<
                     {...field}
                     readOnly={readOnly}
                     disabled={isLoading || uploading}
-                    value={field.value ?? ""}
                   />
                 </FormControl>
                 <FormMessage />
