@@ -1,4 +1,6 @@
+import { pick } from "lodash";
 import { CalendarIcon, Download } from "lucide-react";
+import { GetServerSideProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -9,9 +11,12 @@ import PageTitle from "@/ui/page-title";
 import { Separator } from "@/ui/separator";
 import { Skeleton } from "@/ui/skeleton";
 
+import { createClient } from "@/utils/supabase/server-props";
+
 import { ZatcaComplianceBadge } from "@/components/zatca/ZatcaComplianceBadge";
 import { ZatcaQRCode } from "@/components/zatca/ZatcaQRCode";
 
+import { getNotesValue } from "@/lib/utils";
 import { generateZatcaXml } from "@/lib/zatca/zatca-xml";
 
 import { useInvoiceById } from "@/invoice/invoice.hooks";
@@ -159,11 +164,11 @@ export default function InvoiceDetailPage() {
         }}
       />
 
-      <div className="p-4">
+      <div className="p-4 flex flex-col gap-4">
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>{t("Invoices.invoice_details")}</CardTitle>
+              <CardTitle>{t("Pages.Invoices.title")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
@@ -287,8 +292,8 @@ export default function InvoiceDetailPage() {
           </Card>
         </div>
 
-        {/* <div className="space-y-6">
-          {invoice.zatca_enabled && (
+        <div className="space-y-6">
+          {/* {invoice.zatca_enabled && ( */}
             <Card className="border-green-100 bg-green-50">
               <CardHeader className="pb-3">
                 <CardTitle className="text-green-800">{t("Invoices.zatca.information")}</CardTitle>
@@ -349,7 +354,7 @@ export default function InvoiceDetailPage() {
                 </div>
               </CardContent>
             </Card>
-          )}
+          {/* )} */}
 
           <Card>
             <CardHeader className="pb-3">
@@ -357,16 +362,57 @@ export default function InvoiceDetailPage() {
             </CardHeader>
             <CardContent>
               {invoice.notes ? (
-                <div className="text-sm">{invoice.notes as string}</div>
+                <div className="text-sm">{getNotesValue(invoice.notes)}</div>
               ) : (
                 <div className="text-muted-foreground text-sm">{t("Invoices.detail.noNotes")}</div>
               )}
             </CardContent>
           </Card>
-        </div> */}
+        </div>
       </div>
     </div>
   );
 }
 
+InvoiceDetailPage.messages = ["Metadata", "Notes", "Pages", "Invoices", "General"];
 
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { params, locale, req, res } = context;
+  const invoice_id = params?.id as string;
+
+  if (!invoice_id) {
+    return { notFound: true };
+  }
+
+  const supabase = createClient({ req, res, query: {}, resolvedUrl: "" });
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error(">>> Supabase auth error:", userError);
+    return { notFound: true };
+  }
+
+  try {
+    const invoiceData = await supabase.from("invoices").select("*").eq("id", invoice_id).single();
+
+    if (!invoiceData) {
+      return { notFound: true };
+    }
+
+    return {
+      props: {
+        messages: pick(
+          (await import(`../../../locales/${locale}.json`)).default,
+          InvoiceDetailPage.messages,
+        ),
+      },
+    };
+  } catch (error) {
+    console.error(">>> Error fetching invoice details directly:", error);
+    return { notFound: true };
+  }
+};
