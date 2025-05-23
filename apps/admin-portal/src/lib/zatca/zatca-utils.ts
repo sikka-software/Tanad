@@ -84,20 +84,38 @@ export function calculateVAT(subtotal: number, taxRate: number): number {
 }
 
 /**
- * Check if an invoice meets ZATCA Phase 1 requirements
+ * Check if an invoice meets ZATCA Phase 1 or Phase 2 requirements
+ * @param invoice The invoice object to check
+ * @param phase The ZATCA phase to check compliance for (1 or 2)
+ * @returns Object with compliance status and missing fields array
  */
-export function isZatcaCompliant(invoice: any): {
+export function isZatcaCompliant(
+  invoice: any,
+  phase: 1 | 2 = 1,
+): {
   compliant: boolean;
   missingFields: string[];
 } {
   const missingFields = [];
 
-  // Required fields for ZATCA Phase 1
+  // Required fields for both Phase 1 and Phase 2
   if (!invoice.seller_name) missingFields.push("Seller Name");
   if (!invoice.vat_number) missingFields.push("VAT Registration Number");
   if (!invoice.issue_date) missingFields.push("Invoice Date");
   if (invoice.total === undefined) missingFields.push("Invoice Total");
   if (invoice.tax_amount === undefined) missingFields.push("VAT Amount");
+
+  // Additional checks for Phase 2
+  if (phase === 2) {
+    if (!invoice.invoice_number) missingFields.push("Invoice Number");
+    if (!invoice.zatca_enabled) missingFields.push("ZATCA Enabled");
+
+    // Check for buyer information which is required for Phase 2
+    if (!invoice.client?.name) missingFields.push("Buyer Name");
+
+    // Additional checks could be added based on specific ZATCA Phase 2 requirements
+    // For example, checks for invoice type, currency code, etc.
+  }
 
   return {
     compliant: missingFields.length === 0,
