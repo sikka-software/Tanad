@@ -1,17 +1,20 @@
 import { pick } from "lodash";
 import { Plus, User } from "lucide-react";
 import { GetStaticProps } from "next";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import { buttonVariants } from "@/ui/button";
+import { Button, buttonVariants } from "@/ui/button";
 import DataModelList from "@/ui/data-model-list";
 import PageTitle from "@/ui/page-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
+import { cn } from "@/lib/utils";
 
 import { useCompanies } from "@/company/company.hooks";
 import { Company } from "@/company/company.type";
@@ -26,6 +29,7 @@ import { Vendor } from "@/vendor/vendor.type";
 
 export default function ContactsPage() {
   const t = useTranslations();
+  const locale = useLocale();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"clients" | "vendors">("clients");
 
@@ -33,8 +37,9 @@ export default function ContactsPage() {
   const { data: clients, isLoading: clientsLoading, error: clientsError } = useClients();
   const { data: vendors, isLoading: vendorsLoading, error: vendorsError } = useVendors();
 
+  console.log("clients", clients);
   return (
-    <div>
+    <div dir={locale === "ar" ? "rtl" : "ltr"}>
       <CustomPageMeta title={t("Contacts.title")} description={t("Contacts.description")} />
       <PageTitle
         texts={{
@@ -43,27 +48,33 @@ export default function ContactsPage() {
           cancel: t("General.cancel"),
         }}
         customButton={
-          <div className="flex gap-3">
-            <Link href="/clients/add" className={buttonVariants({ variant: "outline" })}>
-              {t("Contacts.add_client")}
-            </Link>
-            <Link href="/vendors/add" className={buttonVariants({ variant: "default" })}>
-              {t("Contacts.add_vendor")}
-            </Link>
-          </div>
+          <Popover>
+            <PopoverTrigger>
+              <Button className="sm">{t("Contacts.add_new")}</Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="flex max-w-[200px] flex-col gap-2 p-2">
+              <Link href="/clients/add" className={buttonVariants({ variant: "ghost" })}>
+                {t("Pages.Clients.add")}
+              </Link>
+              <Link href="/vendors/add" className={buttonVariants({ variant: "ghost" })}>
+                {t("Pages.Vendors.add")}
+              </Link>
+            </PopoverContent>
+          </Popover>
         }
       />
 
       <div className="p-4">
         <Tabs
+          dir={locale === "ar" ? "rtl" : "ltr"}
           defaultValue="clients"
           value={activeTab}
           onValueChange={(value) => setActiveTab(value as "clients" | "vendors")}
           className="mb-6"
         >
           <TabsList className="mb-4">
-            <TabsTrigger value="clients">{t("Contacts.clients_tab")}</TabsTrigger>
-            <TabsTrigger value="vendors">{t("Contacts.vendors_tab")}</TabsTrigger>
+            <TabsTrigger value="clients">{t("Pages.Clients.title")}</TabsTrigger>
+            <TabsTrigger value="vendors">{t("Pages.Vendors.title")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="clients">
@@ -118,7 +129,7 @@ export default function ContactsPage() {
   );
 }
 
-ContactsPage.messages = ["Metadata", "Pages", "General", "Contacts"];
+ContactsPage.messages = ["Metadata", "Pages", "General", "Contacts", "CommonStatus"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

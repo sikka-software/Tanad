@@ -16,7 +16,6 @@ export const FILTERABLE_FIELDS: FilterableField[] = [
   { id: "email", translationKey: "Companies.form.email.label", type: "text" },
   { id: "phone", translationKey: "Companies.form.phone.label", type: "text" },
   { id: "website", translationKey: "Companies.form.website.label", type: "text" },
-  { id: "address", translationKey: "Companies.form.address.label", type: "text" },
   { id: "city", translationKey: "Companies.form.city.label", type: "text" },
   { id: "state", translationKey: "Companies.form.state.label", type: "text" },
   { id: "zip_code", translationKey: "Companies.form.zip_code.label", type: "text" },

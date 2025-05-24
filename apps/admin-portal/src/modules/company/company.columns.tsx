@@ -35,20 +35,20 @@ const useCompanyColumns = (
     {
       accessorKey: "website",
       header: t("Companies.form.website.label"),
-      endIcon: ({ website }) => (
-        <IconButton
-          size="icon_sm"
-          variant="ghost"
-          className="absolute -end-0.5 -top-1.5 z-10 cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
-          onClick={() => window.open(`https://${website}`, "_blank")}
-          icon={<SquareArrowOutUpRight className="size-4" />}
-        />
-      ),
+      endIcon: ({ website }) => {
+        if (!website) return null;
+        return (
+          <IconButton
+            size="icon_sm"
+            variant="ghost"
+            className="absolute -end-1 top-1/2 z-10 -translate-y-1/2 cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+            onClick={() => window.open(`https://${website}`, "_blank")}
+            icon={<SquareArrowOutUpRight className="size-4" />}
+          />
+        );
+      },
     },
-    {
-      accessorKey: "address",
-      header: t("Forms.address.label"),
-    },
+
     {
       accessorKey: "city",
       header: t("Forms.city.label"),

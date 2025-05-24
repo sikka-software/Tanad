@@ -71,6 +71,11 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
           <AppSidebar />
           <CommandMenu dir={lang === "ar" ? "rtl" : "ltr"} />
           <Toaster
+            toastOptions={{
+              classNames: {
+                toast: lang === "ar" ? "!start-[32px] md:!start-auto" : "",
+              },
+            }}
             theme={theme as "light" | "dark"}
             richColors
             position={lang === "ar" ? "bottom-left" : "bottom-right"}

@@ -127,7 +127,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const [duplicated] = (await db
       .insert(table)
-      .values({ ...dataToDuplicate, user_id: user.id })
+      .values({ ...dataToDuplicate, created_at: new Date(), user_id: user.id })
       .returning()) as unknown as any[];
 
     return res.status(201).json(duplicated);
