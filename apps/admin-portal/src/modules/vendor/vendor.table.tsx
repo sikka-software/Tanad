@@ -12,7 +12,7 @@ import useUserStore from "@/stores/use-user-store";
 import useVendorColumns from "./vendor.columns";
 import { useUpdateVendor } from "./vendor.hooks";
 import useVendorStore from "./vendor.store";
-import { Vendor } from "./vendor.type";
+import { Vendor, VendorUpdateData } from "./vendor.type";
 
 const VendorsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Vendor>) => {
   const t = useTranslations("Vendors");
@@ -23,7 +23,7 @@ const VendorsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateVendor({ id: rowId, data: { [columnId]: value } });
+    await updateVendor({ id: rowId, data: { [columnId]: value } as VendorUpdateData });
   };
   const columns = useVendorColumns(handleEdit);
 

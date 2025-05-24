@@ -1,4 +1,4 @@
-import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { InferSelectModel, type InferInsertModel } from "drizzle-orm";
 
 import { branches } from "@/db/schema";
 

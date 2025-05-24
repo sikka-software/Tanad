@@ -7,7 +7,7 @@ import { CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateVendor } from "@/vendor/vendor.hooks";
 import useVendorStore from "@/vendor/vendor.store";
-import { Vendor } from "@/vendor/vendor.type";
+import { Vendor, VendorUpdateData } from "@/vendor/vendor.type";
 
 const VendorCard = ({
   vendor,
@@ -23,7 +23,7 @@ const VendorCard = ({
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateVendor({ id: rowId, data: { [columnId]: value } });
+    await updateVendor({ id: rowId, data: { [columnId]: value } as VendorUpdateData });
   };
 
   return (

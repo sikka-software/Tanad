@@ -113,6 +113,8 @@ export function VendorForm({
               country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
               notes: data.notes,
+              user_id: user?.id || "",
+              enterprise_id: enterprise?.id || "",
             },
           },
           {

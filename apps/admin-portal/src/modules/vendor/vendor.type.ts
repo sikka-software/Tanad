@@ -1,5 +1,7 @@
-import { Database } from "@/lib/database.types";
+import { InferSelectModel, type InferInsertModel } from "drizzle-orm";
 
-export type Vendor = Database["public"]["Tables"]["vendors"]["Row"];
-export type VendorCreateData = Database["public"]["Tables"]["vendors"]["Insert"];
-export type VendorUpdateData = Database["public"]["Tables"]["vendors"]["Update"];
+import { vendors } from "@/db/schema";
+
+export type Vendor = InferSelectModel<typeof vendors>;
+export type VendorCreateData = InferInsertModel<typeof vendors>;
+export type VendorUpdateData = InferInsertModel<typeof vendors>;
