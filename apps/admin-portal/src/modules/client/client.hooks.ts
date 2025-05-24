@@ -39,7 +39,10 @@ export function useCreateClient() {
   return useMutation({
     mutationFn: (newClient: ClientCreateData) => createClient(newClient),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: clientKeys.lists() }),
-    meta: { toast: { success: "Clients.success.create", error: "Clients.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Clients.success.create", error: "Clients.error.create" },
+    },
   });
 }
 
@@ -51,7 +54,10 @@ export function useUpdateClient() {
       queryClient.invalidateQueries({ queryKey: clientKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
     },
-    meta: { toast: { success: "Clients.success.update", error: "Clients.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Clients.success.update", error: "Clients.error.update" },
+    },
   });
 }
 
@@ -63,7 +69,10 @@ export function useDuplicateClient() {
       queryClient.invalidateQueries({ queryKey: clientKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
     },
-    meta: { toast: { success: "Clients.success.duplicate", error: "Clients.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Clients.success.duplicate", error: "Clients.error.duplicate" },
+    },
   });
 }
 
@@ -75,7 +84,10 @@ export function useDeleteClient() {
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
       queryClient.removeQueries({ queryKey: clientKeys.detail(variables) });
     },
-    meta: { toast: { success: "Clients.success.delete", error: "Clients.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Clients.success.delete", error: "Clients.error.delete" },
+    },
   });
 }
 // Hook for bulk deleting clients
@@ -84,6 +96,9 @@ export function useBulkDeleteClients() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/clients", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: clientKeys.lists() }),
-    meta: { toast: { success: "Clients.success.delete", error: "Clients.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Clients.success.delete", error: "Clients.error.delete" },
+    },
   });
 }

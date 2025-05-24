@@ -159,7 +159,10 @@ export function useCreateRole() {
       // Also invalidate the general custom roles list if used elsewhere
       queryClient.invalidateQueries({ queryKey: [...roleKeys.lists(), "custom"] });
     },
-    meta: { toast: { success: "Roles.success.create", error: "Roles.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Roles.success.create", error: "Roles.error.create" },
+    },
   });
 }
 
@@ -213,7 +216,10 @@ export function useUpdateRole() {
       queryClient.invalidateQueries({ queryKey: roleKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() });
     },
-    meta: { toast: { success: "Roles.success.update", error: "Roles.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Roles.success.update", error: "Roles.error.update" },
+    },
   });
 }
 
@@ -244,7 +250,10 @@ export function useDeleteRole() {
       queryClient.invalidateQueries({ queryKey: roleKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() }); // Also invalidate system roles
     },
-    meta: { toast: { success: "Roles.success.delete", error: "Roles.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Roles.success.delete", error: "Roles.error.delete" },
+    },
   });
 }
 
@@ -281,7 +290,10 @@ export function useBulkDeleteRoles() {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() }); // Also invalidate system roles
     },
-    meta: { toast: { success: "Roles.success.delete", error: "Roles.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Roles.success.delete", error: "Roles.error.delete" },
+    },
   });
 }
 
@@ -361,7 +373,10 @@ export function useDuplicateRole() {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() });
     },
-    meta: { toast: { success: "Roles.success.duplicate", error: "Roles.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Roles.success.duplicate", error: "Roles.error.duplicate" },
+    },
   });
 }
 

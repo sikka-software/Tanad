@@ -39,7 +39,10 @@ export function useCreateDomain() {
   return useMutation({
     mutationFn: (newDomain: DomainCreateData) => createDomain(newDomain),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: domainKeys.lists() }),
-    meta: { toast: { success: "Domains.success.create", error: "Domains.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Domains.success.create", error: "Domains.error.create" },
+    },
   });
 }
 
@@ -51,7 +54,10 @@ export function useUpdateDomain() {
       queryClient.invalidateQueries({ queryKey: domainKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: domainKeys.lists() });
     },
-    meta: { toast: { success: "Domains.success.update", error: "Domains.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Domains.success.update", error: "Domains.error.update" },
+    },
   });
 }
 
@@ -63,7 +69,10 @@ export function useDuplicateDomain() {
       queryClient.invalidateQueries({ queryKey: domainKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: domainKeys.lists() });
     },
-    meta: { toast: { success: "Domains.success.duplicate", error: "Domains.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Domains.success.duplicate", error: "Domains.error.duplicate" },
+    },
   });
 }
 
@@ -75,7 +84,10 @@ export function useDeleteDomain() {
       queryClient.invalidateQueries({ queryKey: domainKeys.lists() });
       queryClient.removeQueries({ queryKey: domainKeys.detail(variables) });
     },
-    meta: { toast: { success: "Domains.success.delete", error: "Domains.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Domains.success.delete", error: "Domains.error.delete" },
+    },
   });
 }
 
@@ -84,6 +96,9 @@ export function useBulkDeleteDomains() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/domains", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: domainKeys.lists() }),
-    meta: { toast: { success: "Domains.success.delete", error: "Domains.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Domains.success.delete", error: "Domains.error.delete" },
+    },
   });
 }

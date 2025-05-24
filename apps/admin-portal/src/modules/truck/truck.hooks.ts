@@ -43,7 +43,10 @@ export function useCreateTruck() {
   return useMutation({
     mutationFn: (newTruck: TruckCreateData) => createTruck(newTruck),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: truckKeys.lists() }),
-    meta: { toast: { success: "Trucks.success.create", error: "Trucks.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Trucks.success.create", error: "Trucks.error.create" },
+    },
   });
 }
 
@@ -57,7 +60,10 @@ export function useUpdateTruck() {
       queryClient.invalidateQueries({ queryKey: truckKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: truckKeys.lists() });
     },
-    meta: { toast: { success: "Trucks.success.update", error: "Trucks.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Trucks.success.update", error: "Trucks.error.update" },
+    },
   });
 }
 
@@ -70,7 +76,10 @@ export function useDuplicateTruck() {
       queryClient.invalidateQueries({ queryKey: truckKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: truckKeys.lists() });
     },
-    meta: { toast: { success: "Trucks.success.duplicate", error: "Trucks.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Trucks.success.duplicate", error: "Trucks.error.duplicate" },
+    },
   });
 }
 
@@ -85,7 +94,10 @@ export function useDeleteTruck() {
       queryClient.invalidateQueries({ queryKey: truckKeys.lists() });
       queryClient.removeQueries({ queryKey: truckKeys.detail(variables) });
     },
-    meta: { toast: { success: "Trucks.success.delete", error: "Trucks.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Trucks.success.delete", error: "Trucks.error.delete" },
+    },
   });
 }
 
@@ -96,6 +108,9 @@ export function useBulkDeleteTrucks() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/trucks", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: truckKeys.lists() }),
-    meta: { toast: { success: "Trucks.success.delete", error: "Trucks.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Trucks.success.delete", error: "Trucks.error.delete" },
+    },
   });
 }

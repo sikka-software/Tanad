@@ -44,7 +44,10 @@ export function useCreateBankAccount() {
   return useMutation({
     mutationFn: (newBankAccount: BankAccountCreateData) => createBankAccount(newBankAccount),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: bankAccountKeys.lists() }),
-    meta: { toast: { success: "BankAccounts.success.create", error: "BankAccounts.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "BankAccounts.success.create", error: "BankAccounts.error.create" },
+    },
   });
 }
 
@@ -58,7 +61,10 @@ export function useUpdateBankAccount() {
       queryClient.invalidateQueries({ queryKey: bankAccountKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: bankAccountKeys.lists() });
     },
-    meta: { toast: { success: "BankAccounts.success.update", error: "BankAccounts.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "BankAccounts.success.update", error: "BankAccounts.error.update" },
+    },
   });
 }
 
@@ -70,6 +76,9 @@ export function useDeleteBankAccount() {
       queryClient.invalidateQueries({ queryKey: bankAccountKeys.lists() });
       queryClient.removeQueries({ queryKey: bankAccountKeys.detail(variables) });
     },
-    meta: { toast: { success: "BankAccounts.success.delete", error: "BankAccounts.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "BankAccounts.success.delete", error: "BankAccounts.error.delete" },
+    },
   });
 }

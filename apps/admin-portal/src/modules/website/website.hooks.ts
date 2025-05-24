@@ -55,7 +55,10 @@ export function useCreateWebsite() {
       // Invalidate the list query to refetch
       queryClient.invalidateQueries({ queryKey: websiteKeys.lists() });
     },
-    meta: { toast: { success: "Websites.success.create", error: "Websites.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Websites.success.create", error: "Websites.error.create" },
+    },
   });
 }
 
@@ -116,7 +119,10 @@ export function useUpdateWebsite() {
 
       // Show success toast only if the mutation succeeded
     },
-    meta: { toast: { success: "Websites.success.update", error: "Websites.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Websites.success.update", error: "Websites.error.update" },
+    },
   });
 }
 
@@ -129,7 +135,10 @@ export function useDuplicateWebsite() {
       queryClient.invalidateQueries({ queryKey: websiteKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: websiteKeys.lists() });
     },
-    meta: { toast: { success: "Websites.success.duplicate", error: "Websites.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Websites.success.duplicate", error: "Websites.error.duplicate" },
+    },
   });
 }
 
@@ -144,7 +153,10 @@ export function useDeleteWebsite() {
       queryClient.invalidateQueries({ queryKey: websiteKeys.lists() });
       queryClient.removeQueries({ queryKey: websiteKeys.detail(variables) });
     },
-    meta: { toast: { success: "Websites.success.delete", error: "Websites.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Websites.success.delete", error: "Websites.error.delete" },
+    },
   });
 }
 
@@ -155,6 +167,9 @@ export function useBulkDeleteWebsites() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/websites", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: websiteKeys.lists() }),
-    meta: { toast: { success: "Websites.success.delete", error: "Websites.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Websites.success.delete", error: "Websites.error.delete" },
+    },
   });
 }

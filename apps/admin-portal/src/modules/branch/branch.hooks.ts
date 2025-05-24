@@ -43,7 +43,10 @@ export function useCreateBranch() {
   return useMutation({
     mutationFn: (newBranch: BranchCreateData) => createBranch(newBranch),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: branchKeys.lists() }),
-    meta: { toast: { success: "Branches.success.create", error: "Branches.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Branches.success.create", error: "Branches.error.create" },
+    },
   });
 }
 
@@ -101,7 +104,10 @@ export function useUpdateBranch() {
       queryClient.invalidateQueries({ queryKey: branchKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
     },
-    meta: { toast: { success: "Branches.success.update", error: "Branches.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Branches.success.update", error: "Branches.error.update" },
+    },
   });
 }
 
@@ -114,7 +120,10 @@ export function useDuplicateBranch() {
       queryClient.invalidateQueries({ queryKey: branchKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
     },
-    meta: { toast: { success: "Branches.success.duplicate", error: "Branches.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Branches.success.duplicate", error: "Branches.error.duplicate" },
+    },
   });
 }
 
@@ -129,7 +138,10 @@ export function useDeleteBranch() {
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
       queryClient.removeQueries({ queryKey: branchKeys.detail(variables) });
     },
-    meta: { toast: { success: "Branches.success.delete", error: "Branches.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Branches.success.delete", error: "Branches.error.delete" },
+    },
   });
 }
 
@@ -140,6 +152,9 @@ export function useBulkDeleteBranches() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/branches", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: branchKeys.lists() }),
-    meta: { toast: { success: "Branches.success.delete", error: "Branches.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Branches.success.delete", error: "Branches.error.delete" },
+    },
   });
 }

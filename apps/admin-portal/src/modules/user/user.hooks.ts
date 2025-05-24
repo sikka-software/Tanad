@@ -53,7 +53,10 @@ export function useCreateUser() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
-    meta: { toast: { success: "Users.success.create", error: "Users.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Users.success.create", error: "Users.error.create" },
+    },
   });
 }
 
@@ -63,7 +66,10 @@ export function useDuplicateUser() {
   return useMutation({
     mutationFn: (id: string) => duplicateUser(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.lists() }),
-    meta: { toast: { success: "Users.success.duplicate", error: "Users.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Users.success.duplicate", error: "Users.error.duplicate" },
+    },
   });
 }
 // Hook to update a user
@@ -73,7 +79,10 @@ export function useUpdateUser() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UserUpdateData }) => updateUser(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.lists() }),
-    meta: { toast: { success: "Users.success.update", error: "Users.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Users.success.update", error: "Users.error.update" },
+    },
   });
 }
 
@@ -84,7 +93,10 @@ export function useDeleteUser() {
   return useMutation({
     mutationFn: (id: string) => deleteUser(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.lists() }),
-    meta: { toast: { success: "Users.success.delete", error: "Users.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Users.success.delete", error: "Users.error.delete" },
+    },
   });
 }
 
@@ -95,7 +107,10 @@ export function useBulkDeleteUsers() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteUsers(ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.lists() }),
-    meta: { toast: { success: "Users.success.delete", error: "Users.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Users.success.delete", error: "Users.error.delete" },
+    },
   });
 }
 

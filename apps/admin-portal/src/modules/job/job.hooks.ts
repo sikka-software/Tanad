@@ -33,7 +33,10 @@ export function useCreateJob() {
   return useMutation({
     mutationFn: (job: JobCreateData) => createJob(job),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: jobKeys.lists() }),
-    meta: { toast: { success: "Jobs.success.create", error: "Jobs.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Jobs.success.create", error: "Jobs.error.create" },
+    },
   });
 }
 
@@ -45,7 +48,10 @@ export function useUpdateJob() {
       queryClient.invalidateQueries({ queryKey: jobKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
     },
-    meta: { toast: { success: "Jobs.success.update", error: "Jobs.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Jobs.success.update", error: "Jobs.error.update" },
+    },
   });
 }
 
@@ -58,7 +64,10 @@ export function useDuplicateJob() {
       queryClient.invalidateQueries({ queryKey: jobKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
     },
-    meta: { toast: { success: "Jobs.success.duplicate", error: "Jobs.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Jobs.success.duplicate", error: "Jobs.error.duplicate" },
+    },
   });
 }
 
@@ -70,7 +79,10 @@ export function useDeleteJob() {
       queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
       queryClient.removeQueries({ queryKey: jobKeys.detail(variables) });
     },
-    meta: { toast: { success: "Jobs.success.delete", error: "Jobs.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Jobs.success.delete", error: "Jobs.error.delete" },
+    },
   });
 }
 
@@ -79,6 +91,9 @@ export function useBulkDeleteJobs() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/jobs", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: jobKeys.lists() }),
-    meta: { toast: { success: "Jobs.success.delete", error: "Jobs.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Jobs.success.delete", error: "Jobs.error.delete" },
+    },
   });
 }

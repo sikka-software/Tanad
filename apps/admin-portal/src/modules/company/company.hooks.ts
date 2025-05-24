@@ -40,7 +40,10 @@ export function useCreateCompany() {
   return useMutation({
     mutationFn: (company: CompanyCreateData) => createCompany(company),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: companyKeys.lists() }),
-    meta: { toast: { success: "Companies.success.create", error: "Companies.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Companies.success.create", error: "Companies.error.create" },
+    },
   });
 }
 
@@ -53,7 +56,10 @@ export function useUpdateCompany() {
       queryClient.invalidateQueries({ queryKey: companyKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
     },
-    meta: { toast: { success: "Companies.success.update", error: "Companies.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Companies.success.update", error: "Companies.error.update" },
+    },
   });
 }
 
@@ -66,7 +72,10 @@ export function useDuplicateCompany() {
       queryClient.invalidateQueries({ queryKey: companyKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
     },
-    meta: { toast: { success: "Companies.success.duplicate", error: "Companies.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Companies.success.duplicate", error: "Companies.error.duplicate" },
+    },
   });
 }
 
@@ -79,7 +88,10 @@ export function useDeleteCompany() {
       queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
       queryClient.removeQueries({ queryKey: companyKeys.detail(variables) });
     },
-    meta: { toast: { success: "Companies.success.delete", error: "Companies.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Companies.success.delete", error: "Companies.error.delete" },
+    },
   });
 }
 
@@ -90,6 +102,7 @@ export function useBulkDeleteCompanies() {
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/companies", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: companyKeys.lists() }),
     meta: {
+      operation: "delete",
       toast: { success: "Companies.success.delete", error: "Companies.error.delete" },
     },
   });

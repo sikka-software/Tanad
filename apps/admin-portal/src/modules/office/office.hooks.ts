@@ -43,7 +43,10 @@ export function useCreateOffice() {
   return useMutation({
     mutationFn: (office: OfficeCreateData) => createOffice(office),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: officeKeys.lists() }),
-    meta: { toast: { success: "Offices.success.create", error: "Offices.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Offices.success.create", error: "Offices.error.create" },
+    },
   });
 }
 
@@ -56,7 +59,10 @@ export function useUpdateOffice() {
       queryClient.invalidateQueries({ queryKey: officeKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
     },
-    meta: { toast: { success: "Offices.success.update", error: "Offices.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Offices.success.update", error: "Offices.error.update" },
+    },
   });
 }
 
@@ -68,7 +74,10 @@ export function useDuplicateOffice() {
       queryClient.invalidateQueries({ queryKey: officeKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
     },
-    meta: { toast: { success: "Offices.success.duplicate", error: "Offices.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Offices.success.duplicate", error: "Offices.error.duplicate" },
+    },
   });
 }
 
@@ -81,7 +90,10 @@ export function useDeleteOffice() {
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
       queryClient.removeQueries({ queryKey: officeKeys.detail(variables) });
     },
-    meta: { toast: { success: "Offices.success.delete", error: "Offices.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Offices.success.delete", error: "Offices.error.delete" },
+    },
   });
 }
 
@@ -91,6 +103,9 @@ export function useBulkDeleteOffices() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/offices", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: officeKeys.lists() }),
-    meta: { toast: { success: "Offices.success.delete", error: "Offices.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Offices.success.delete", error: "Offices.error.delete" },
+    },
   });
 }

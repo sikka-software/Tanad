@@ -40,7 +40,10 @@ export function useCreateJobListing() {
   return useMutation({
     mutationFn: (data: JobListingCreateData) => createJobListing(data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() }),
-    meta: { toast: { success: "JobListings.success.create", error: "JobListings.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "JobListings.success.create", error: "JobListings.error.create" },
+    },
   });
 }
 
@@ -51,6 +54,7 @@ export function useDuplicateJobListing() {
     mutationFn: (id: string) => duplicateJobListing(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() }),
     meta: {
+      operation: "duplicate",
       toast: { success: "JobListings.success.duplicate", error: "JobListings.error.duplicate" },
     },
   });
@@ -67,6 +71,7 @@ export function useUpdateJobListing() {
       queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() });
     },
     meta: {
+      operation: "update",
       toast: { success: "JobListings.success.update", error: "JobListings.error.update" },
     },
   });
@@ -78,6 +83,9 @@ export function useBulkDeleteJobListings() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/job-listings", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() }),
-    meta: { toast: { success: "JobListings.success.delete", error: "JobListings.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "JobListings.success.delete", error: "JobListings.error.delete" },
+    },
   });
 }

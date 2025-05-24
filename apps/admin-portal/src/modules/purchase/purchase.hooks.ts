@@ -43,7 +43,10 @@ export function useCreatePurchase() {
   return useMutation({
     mutationFn: (newPurchase: PurchaseCreateData) => createPurchase(newPurchase),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() }),
-    meta: { toast: { success: "Purchases.success.create", error: "Purchases.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Purchases.success.create", error: "Purchases.error.create" },
+    },
   });
 }
 
@@ -102,7 +105,10 @@ export function useUpdatePurchase() {
       queryClient.invalidateQueries({ queryKey: purchaseKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() });
     },
-    meta: { toast: { success: "Purchases.success.update", error: "Purchases.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Purchases.success.update", error: "Purchases.error.update" },
+    },
   });
 }
 
@@ -115,7 +121,10 @@ export function useDuplicatePurchase() {
       queryClient.invalidateQueries({ queryKey: purchaseKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() });
     },
-    meta: { toast: { success: "Purchases.success.duplicate", error: "Purchases.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Purchases.success.duplicate", error: "Purchases.error.duplicate" },
+    },
   });
 }
 
@@ -130,7 +139,10 @@ export function useDeletePurchase() {
       queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() });
       queryClient.removeQueries({ queryKey: purchaseKeys.detail(variables) });
     },
-    meta: { toast: { success: "Purchases.success.delete", error: "Purchases.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Purchases.success.delete", error: "Purchases.error.delete" },
+    },
   });
 }
 
@@ -141,6 +153,9 @@ export function useBulkDeletePurchases() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/purchases", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: purchaseKeys.lists() }),
-    meta: { toast: { success: "Purchases.success.delete", error: "Purchases.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Purchases.success.delete", error: "Purchases.error.delete" },
+    },
   });
 }

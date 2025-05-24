@@ -48,6 +48,7 @@ export function useCreateDepartment() {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
     meta: {
+      operation: "create",
       toast: { success: "Departments.success.create", error: "Departments.error.create" },
     },
   });
@@ -65,6 +66,7 @@ export function useUpdateDepartment() {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
     meta: {
+      operation: "update",
       toast: { success: "Departments.success.update", error: "Departments.error.update" },
     },
   });
@@ -80,6 +82,7 @@ export function useDuplicateDepartment() {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
     meta: {
+      operation: "duplicate",
       toast: { success: "Departments.success.duplicate", error: "Departments.error.duplicate" },
     },
   });
@@ -94,7 +97,10 @@ export function useDeleteDepartment() {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
       queryClient.removeQueries({ queryKey: departmentKeys.detail(variables) });
     },
-    meta: { toast: { success: "Departments.success.delete", error: "Departments.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Departments.success.delete", error: "Departments.error.delete" },
+    },
   });
 }
 
@@ -107,6 +113,7 @@ export function useBulkDeleteDepartments() {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
     meta: {
+      operation: "delete",
       toast: { success: "Departments.success.delete", error: "Departments.error.delete" },
     },
   });

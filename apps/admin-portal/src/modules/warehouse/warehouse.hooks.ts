@@ -54,7 +54,10 @@ export function useCreateWarehouse() {
         newWarehouse,
       ]);
     },
-    meta: { toast: { success: "Warehouses.success.create", error: "Warehouses.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Warehouses.success.create", error: "Warehouses.error.create" },
+    },
   });
 }
 
@@ -71,6 +74,7 @@ export function useDuplicateWarehouse() {
       queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(newWarehouse.id) });
     },
     meta: {
+      operation: "duplicate",
       toast: { success: "Warehouses.success.duplicate", error: "Warehouses.error.duplicate" },
     },
   });
@@ -132,7 +136,10 @@ export function useUpdateWarehouse() {
       queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
     },
-    meta: { toast: { success: "Warehouses.success.update", error: "Warehouses.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Warehouses.success.update", error: "Warehouses.error.update" },
+    },
   });
 }
 
@@ -147,7 +154,10 @@ export function useDeleteWarehouse() {
       queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
       queryClient.removeQueries({ queryKey: warehouseKeys.detail(variables) });
     },
-    meta: { toast: { success: "Warehouses.success.delete", error: "Warehouses.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Warehouses.success.delete", error: "Warehouses.error.delete" },
+    },
   });
 }
 
@@ -158,6 +168,9 @@ export function useBulkDeleteWarehouses() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
     },
-    meta: { toast: { success: "Warehouses.success.delete", error: "Warehouses.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Warehouses.success.delete", error: "Warehouses.error.delete" },
+    },
   });
 }

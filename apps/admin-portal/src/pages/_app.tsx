@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import DebugTools from "@/ui/debug-tools";
 import { LoadingBar } from "@/ui/loading-bar";
 
-import QueryGlobalToast from "@/components/QueryGlobalToast";
 import ScrollToTop from "@/components/app/scroll-to-top";
 import SoonPage from "@/components/landing/soon-page";
 import AppLayout from "@/components/layouts/app-layout";
@@ -164,8 +163,6 @@ function AppContent({ Component, pageProps, router }: AppProps) {
         <SupabaseProvider>
           <QueryProvider>
             <AppLayout>
-              <QueryGlobalToast />
-
               <ScrollToTop />
               <Component {...pageProps} />
             </AppLayout>

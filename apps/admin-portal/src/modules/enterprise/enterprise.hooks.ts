@@ -40,7 +40,10 @@ export function useCreateEnterprise() {
   return useMutation({
     mutationFn: createEnterprise,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: enterpriseKeys.lists() }),
-    meta: { toast: { success: "Enterprises.success.create", error: "Enterprises.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Enterprises.success.create", error: "Enterprises.error.create" },
+    },
   });
 }
 
@@ -53,7 +56,10 @@ export function useUpdateEnterprise() {
       queryClient.invalidateQueries({ queryKey: enterpriseKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: enterpriseKeys.lists() });
     },
-    meta: { toast: { success: "Enterprises.success.update", error: "Enterprises.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Enterprises.success.update", error: "Enterprises.error.update" },
+    },
   });
 }
 
@@ -65,7 +71,10 @@ export function useDeleteEnterprise() {
       queryClient.invalidateQueries({ queryKey: enterpriseKeys.lists() });
       queryClient.invalidateQueries({ queryKey: enterpriseKeys.details() });
     },
-    meta: { toast: { success: "Enterprises.success.delete", error: "Enterprises.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Enterprises.success.delete", error: "Enterprises.error.delete" },
+    },
   });
 }
 
@@ -78,7 +87,11 @@ export function useBulkDeleteEnterprises() {
       queryClient.invalidateQueries({ queryKey: enterpriseKeys.details() });
     },
     meta: {
-      toast: { success: "Enterprises.success.bulkDelete", error: "Enterprises.error.bulkDelete" },
+      operation: "delete",
+      toast: {
+        success: "Enterprises.success.bulkDelete",
+        error: "Enterprises.error.bulkDelete",
+      },
     },
   });
 }

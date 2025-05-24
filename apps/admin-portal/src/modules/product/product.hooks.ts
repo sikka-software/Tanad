@@ -42,7 +42,10 @@ export function useCreateProduct() {
   return useMutation({
     mutationFn: (newProduct: ProductCreateData) => createProduct(newProduct),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: productKeys.lists() }),
-    meta: { toast: { success: "Products.success.create", error: "Products.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Products.success.create", error: "Products.error.create" },
+    },
   });
 }
 
@@ -52,7 +55,10 @@ export function useDuplicateProduct() {
   return useMutation({
     mutationFn: (id: string) => duplicateProduct(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: productKeys.lists() }),
-    meta: { toast: { success: "Products.success.duplicate", error: "Products.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Products.success.duplicate", error: "Products.error.duplicate" },
+    },
   });
 }
 
@@ -110,7 +116,10 @@ export function useUpdateProduct() {
       queryClient.invalidateQueries({ queryKey: productKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: productKeys.lists() });
     },
-    meta: { toast: { success: "Products.success.update", error: "Products.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Products.success.update", error: "Products.error.update" },
+    },
   });
 }
 
@@ -123,7 +132,10 @@ export function useDeleteProduct() {
       queryClient.invalidateQueries({ queryKey: productKeys.lists() });
       queryClient.removeQueries({ queryKey: productKeys.detail(variables) });
     },
-    meta: { toast: { success: "Products.success.delete", error: "Products.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Products.success.delete", error: "Products.error.delete" },
+    },
   });
 }
 export function useBulkDeleteProducts() {
@@ -131,6 +143,9 @@ export function useBulkDeleteProducts() {
   return useMutation({
     mutationFn: bulkDeleteProducts,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: productKeys.lists() }),
-    meta: { toast: { success: "Products.success.delete", error: "Products.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Products.success.delete", error: "Products.error.delete" },
+    },
   });
 }

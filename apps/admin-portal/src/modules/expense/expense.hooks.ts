@@ -42,7 +42,10 @@ export function useCreateExpense() {
   return useMutation({
     mutationFn: (expense: ExpenseCreateData) => createExpense(expense),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: expenseKeys.lists() }),
-    meta: { toast: { success: "Expenses.success.create", error: "Expenses.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Expenses.success.create", error: "Expenses.error.create" },
+    },
   });
 }
 
@@ -55,7 +58,10 @@ export function useUpdateExpense() {
       queryClient.invalidateQueries({ queryKey: expenseKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
     },
-    meta: { toast: { success: "Expenses.success.update", error: "Expenses.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Expenses.success.update", error: "Expenses.error.update" },
+    },
   });
 }
 
@@ -68,7 +74,10 @@ export function useDuplicateExpense() {
       queryClient.invalidateQueries({ queryKey: expenseKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
     },
-    meta: { toast: { success: "Expenses.success.duplicate", error: "Expenses.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Expenses.success.duplicate", error: "Expenses.error.duplicate" },
+    },
   });
 }
 
@@ -81,7 +90,10 @@ export function useDeleteExpense() {
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
       queryClient.removeQueries({ queryKey: expenseKeys.detail(variables) });
     },
-    meta: { toast: { success: "Expenses.success.delete", error: "Expenses.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Expenses.success.delete", error: "Expenses.error.delete" },
+    },
   });
 }
 
@@ -93,6 +105,9 @@ export function useBulkDeleteExpenses() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
     },
-    meta: { toast: { success: "Expenses.success.delete", error: "Expenses.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Expenses.success.delete", error: "Expenses.error.delete" },
+    },
   });
 }

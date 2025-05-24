@@ -41,7 +41,10 @@ export function useCreateInvoice() {
   return useMutation({
     mutationFn: (data: InvoiceCreateData) => createInvoice(data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() }),
-    meta: { toast: { success: "Invoices.success.create", error: "Invoices.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Invoices.success.create", error: "Invoices.error.create" },
+    },
   });
 }
 
@@ -54,7 +57,10 @@ export function useDuplicateInvoice() {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
       queryClient.invalidateQueries({ queryKey: invoiceKeys.detail(data.id) });
     },
-    meta: { toast: { success: "Invoices.success.duplicate", error: "Invoices.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Invoices.success.duplicate", error: "Invoices.error.duplicate" },
+    },
   });
 }
 
@@ -67,7 +73,10 @@ export function useUpdateInvoice() {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
     },
-    meta: { toast: { success: "Invoices.success.update", error: "Invoices.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Invoices.success.update", error: "Invoices.error.update" },
+    },
   });
 }
 
@@ -79,7 +88,10 @@ export function useDeleteInvoice() {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
       queryClient.removeQueries({ queryKey: invoiceKeys.detail(variables) });
     },
-    meta: { toast: { success: "Invoices.success.delete", error: "Invoices.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Invoices.success.delete", error: "Invoices.error.delete" },
+    },
   });
 }
 
@@ -88,7 +100,10 @@ export function useBulkDeleteInvoices() {
   return useMutation({
     mutationFn: bulkDeleteInvoices,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() }),
-    meta: { toast: { success: "Invoices.success.delete", error: "Invoices.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Invoices.success.delete", error: "Invoices.error.delete" },
+    },
   });
 }
 

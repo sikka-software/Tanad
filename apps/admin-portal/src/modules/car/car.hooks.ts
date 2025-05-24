@@ -33,7 +33,10 @@ export function useCreateCar() {
   return useMutation({
     mutationFn: (newCar: CarCreateData) => createCar(newCar),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: carKeys.lists() }),
-    meta: { toast: { success: "Cars.success.create", error: "Cars.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Cars.success.create", error: "Cars.error.create" },
+    },
   });
 }
 
@@ -45,7 +48,10 @@ export function useUpdateCar() {
       queryClient.invalidateQueries({ queryKey: carKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: carKeys.lists() });
     },
-    meta: { toast: { success: "Cars.success.update", error: "Cars.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Cars.success.update", error: "Cars.error.update" },
+    },
   });
 }
 
@@ -57,7 +63,10 @@ export function useDuplicateCar() {
       queryClient.invalidateQueries({ queryKey: carKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: carKeys.lists() });
     },
-    meta: { toast: { success: "Cars.success.duplicate", error: "Cars.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Cars.success.duplicate", error: "Cars.error.duplicate" },
+    },
   });
 }
 
@@ -70,7 +79,10 @@ export function useDeleteCar() {
       queryClient.invalidateQueries({ queryKey: carKeys.lists() });
       queryClient.removeQueries({ queryKey: carKeys.detail(variables) });
     },
-    meta: { toast: { success: "Cars.success.delete", error: "Cars.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Cars.success.delete", error: "Cars.error.delete" },
+    },
   });
 }
 
@@ -79,6 +91,9 @@ export function useBulkDeleteCars() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/cars", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: carKeys.lists() }),
-    meta: { toast: { success: "Cars.success.delete", error: "Cars.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Cars.success.delete", error: "Cars.error.delete" },
+    },
   });
 }

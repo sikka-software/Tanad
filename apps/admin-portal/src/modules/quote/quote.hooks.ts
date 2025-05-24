@@ -41,7 +41,10 @@ export function useCreateQuote() {
   return useMutation({
     mutationFn: (newQuote: QuoteCreateData) => createQuote(newQuote),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: quoteKeys.lists() }),
-    meta: { toast: { success: "Quotes.success.create", error: "Quotes.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Quotes.success.create", error: "Quotes.error.create" },
+    },
   });
 }
 
@@ -52,7 +55,10 @@ export function useDuplicateQuote() {
   return useMutation({
     mutationFn: (id: string) => duplicateQuote(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: quoteKeys.lists() }),
-    meta: { toast: { success: "Quotes.success.duplicate", error: "Quotes.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Quotes.success.duplicate", error: "Quotes.error.duplicate" },
+    },
   });
 }
 
@@ -65,6 +71,10 @@ export function useUpdateQuote() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: quoteKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
+    },
+    meta: {
+      operation: "update",
+      toast: { success: "Quotes.success.update", error: "Quotes.error.update" },
     },
   });
 }
@@ -79,7 +89,10 @@ export function useDeleteQuote() {
       queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
       queryClient.removeQueries({ queryKey: quoteKeys.detail(variables) });
     },
-    meta: { toast: { success: "Quotes.success.delete", error: "Quotes.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Quotes.success.delete", error: "Quotes.error.delete" },
+    },
   });
 }
 
@@ -90,6 +103,9 @@ export const useBulkDeleteQuotes = () => {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/quotes", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: quoteKeys.lists() }),
-    meta: { toast: { success: "Quotes.success.delete", error: "Quotes.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Quotes.success.delete", error: "Quotes.error.delete" },
+    },
   });
 };

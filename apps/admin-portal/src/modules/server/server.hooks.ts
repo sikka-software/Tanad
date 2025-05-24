@@ -52,7 +52,10 @@ export function useCreateServer() {
       return createServer(serverData);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: serverKeys.lists() }),
-    meta: { toast: { success: "Servers.success.create", error: "Servers.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Servers.success.create", error: "Servers.error.create" },
+    },
   });
 }
 
@@ -66,7 +69,10 @@ export function useUpdateServer() {
       queryClient.invalidateQueries({ queryKey: serverKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
     },
-    meta: { toast: { success: "Servers.success.update", error: "Servers.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Servers.success.update", error: "Servers.error.update" },
+    },
   });
 }
 
@@ -79,7 +85,10 @@ export function useDuplicateServer() {
       queryClient.invalidateQueries({ queryKey: serverKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
     },
-    meta: { toast: { success: "Servers.success.duplicate", error: "Servers.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Servers.success.duplicate", error: "Servers.error.duplicate" },
+    },
   });
 }
 
@@ -93,7 +102,10 @@ export function useDeleteServer() {
       queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
       queryClient.removeQueries({ queryKey: serverKeys.detail(variables) });
     },
-    meta: { toast: { success: "Servers.success.delete", error: "Servers.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Servers.success.delete", error: "Servers.error.delete" },
+    },
   });
 }
 
@@ -103,6 +115,9 @@ export function useBulkDeleteServers() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/servers", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: serverKeys.lists() }),
-    meta: { toast: { success: "Servers.success.delete", error: "Servers.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Servers.success.delete", error: "Servers.error.delete" },
+    },
   });
 }

@@ -48,7 +48,10 @@ export function useCreateOnlineStore() {
   return useMutation({
     mutationFn: (newOnlineStore: OnlineStoreCreateData) => createOnlineStore(newOnlineStore),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: onlineStoreKeys.lists() }),
-    meta: { toast: { success: "OnlineStores.success.create", error: "OnlineStores.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "OnlineStores.success.create", error: "OnlineStores.error.create" },
+    },
   });
 }
 
@@ -107,7 +110,10 @@ export function useUpdateOnlineStore() {
       queryClient.invalidateQueries({ queryKey: onlineStoreKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: onlineStoreKeys.lists() });
     },
-    meta: { toast: { success: "OnlineStores.success.update", error: "OnlineStores.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "OnlineStores.success.update", error: "OnlineStores.error.update" },
+    },
   });
 }
 
@@ -121,6 +127,7 @@ export function useDuplicateOnlineStore() {
       queryClient.invalidateQueries({ queryKey: onlineStoreKeys.lists() });
     },
     meta: {
+      operation: "duplicate",
       toast: { success: "OnlineStores.success.duplicate", error: "OnlineStores.error.duplicate" },
     },
   });
@@ -137,7 +144,10 @@ export function useDeleteOnlineStore() {
       queryClient.invalidateQueries({ queryKey: onlineStoreKeys.lists() });
       queryClient.removeQueries({ queryKey: onlineStoreKeys.detail(variables) });
     },
-    meta: { toast: { success: "OnlineStores.success.delete", error: "OnlineStores.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "OnlineStores.success.delete", error: "OnlineStores.error.delete" },
+    },
   });
 }
 
@@ -147,6 +157,9 @@ export function useBulkDeleteOnlineStores() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/online-stores", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: onlineStoreKeys.lists() }),
-    meta: { toast: { success: "OnlineStores.success.delete", error: "OnlineStores.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "OnlineStores.success.delete", error: "OnlineStores.error.delete" },
+    },
   });
 }

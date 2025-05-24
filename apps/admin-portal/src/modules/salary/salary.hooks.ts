@@ -42,7 +42,10 @@ export function useCreateSalary() {
   return useMutation({
     mutationFn: createSalary,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: salaryKeys.lists() }),
-    meta: { toast: { success: "Salaries.success.create", error: "Salaries.error.create" } },
+    meta: {
+      operation: "create",
+      toast: { success: "Salaries.success.create", error: "Salaries.error.create" },
+    },
   });
 }
 
@@ -53,7 +56,10 @@ export function useDuplicateSalary() {
   return useMutation({
     mutationFn: (id: string) => duplicateSalary(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: salaryKeys.lists() }),
-    meta: { toast: { success: "Salaries.success.duplicate", error: "Salaries.error.duplicate" } },
+    meta: {
+      operation: "duplicate",
+      toast: { success: "Salaries.success.duplicate", error: "Salaries.error.duplicate" },
+    },
   });
 }
 
@@ -67,7 +73,10 @@ export function useUpdateSalary() {
       queryClient.invalidateQueries({ queryKey: salaryKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
     },
-    meta: { toast: { success: "Salaries.success.update", error: "Salaries.error.update" } },
+    meta: {
+      operation: "update",
+      toast: { success: "Salaries.success.update", error: "Salaries.error.update" },
+    },
   });
 }
 
@@ -78,7 +87,10 @@ export function useDeleteSalary() {
   return useMutation({
     mutationFn: (id: string) => deleteResourceById(`/api/resource/salaries/${id}`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: salaryKeys.lists() }),
-    meta: { toast: { success: "Salaries.success.delete", error: "Salaries.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Salaries.success.delete", error: "Salaries.error.delete" },
+    },
   });
 }
 
@@ -89,6 +101,9 @@ export function useBulkDeleteSalaries() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteResource("/api/resource/salaries", ids),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: salaryKeys.lists() }),
-    meta: { toast: { success: "Salaries.success.delete", error: "Salaries.error.delete" } },
+    meta: {
+      operation: "delete",
+      toast: { success: "Salaries.success.delete", error: "Salaries.error.delete" },
+    },
   });
 }
