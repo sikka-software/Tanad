@@ -4,8 +4,6 @@ import { useTranslations } from "next-intl";
 import { ReactNode, useState } from "react";
 import { toast } from "sonner";
 
-import QueryGlobalToast from "@/components/QueryGlobalToast";
-
 interface QueryProviderProps {
   children: ReactNode;
 }
@@ -33,7 +31,6 @@ export function QueryProvider({ children }: QueryProviderProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <QueryGlobalToast />
       {children}
       {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
