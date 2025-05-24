@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const { version } = require("./package.json");
 
 const nextConfig: NextConfig = {
+  staticPageGenerationTimeout: 300, // Increase timeout to 5 minutes
   output: "standalone",
   async redirects() {
     return [
