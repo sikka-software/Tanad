@@ -110,6 +110,7 @@ const EnterprisePage = () => {
               }}
               formHtmlId="enterprise-form"
               readOnly={!isEditing}
+              editMode={isEditing}
               // loading={isSaving}
               // onSubmit={async (values) => {
               //   setIsSaving(true);

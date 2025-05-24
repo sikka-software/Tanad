@@ -687,6 +687,13 @@
       "when": 1748008923935,
       "tag": "0097_overconfident_lady_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 98,
+      "version": "7",
+      "when": 1748066651865,
+      "tag": "0098_clumsy_wildside",
+      "breakpoints": true
     }
   ]
 }

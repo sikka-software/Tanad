@@ -799,6 +799,7 @@ export type Database = {
           size: string | null
           vat_enabled: boolean | null
           vat_number: string | null
+          website: string | null
         }
         Insert: {
           address?: string | null
@@ -815,6 +816,7 @@ export type Database = {
           size?: string | null
           vat_enabled?: boolean | null
           vat_number?: string | null
+          website?: string | null
         }
         Update: {
           address?: string | null
@@ -831,6 +833,7 @@ export type Database = {
           size?: string | null
           vat_enabled?: boolean | null
           vat_number?: string | null
+          website?: string | null
         }
         Relationships: []
       }
