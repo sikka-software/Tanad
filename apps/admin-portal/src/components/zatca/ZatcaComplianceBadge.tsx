@@ -7,12 +7,13 @@ import { isZatcaCompliant } from "@/lib/zatca/zatca-utils";
 
 interface ZatcaComplianceBadgeProps {
   invoice: any;
+  phase?: 1 | 2;
   className?: string;
 }
 
-export function ZatcaComplianceBadge({ invoice, className }: ZatcaComplianceBadgeProps) {
+export function ZatcaComplianceBadge({ invoice, phase = 1, className }: ZatcaComplianceBadgeProps) {
   const t = useTranslations();
-  const { compliant, missingFields } = isZatcaCompliant(invoice);
+  const { compliant, missingFields } = isZatcaCompliant(invoice, phase);
 
   return (
     <TooltipProvider>
@@ -28,12 +29,22 @@ export function ZatcaComplianceBadge({ invoice, className }: ZatcaComplianceBadg
             {compliant ? (
               <>
                 <CheckCircle className="h-3.5 w-3.5" />
-                <span>{t("Invoices.zatca_compliant", { fallback: "ZATCA Compliant" })}</span>
+                <span>
+                  {phase === 2
+                    ? t("Invoices.zatca_phase2_compliant", { fallback: "ZATCA Phase 2 Compliant" })
+                    : t("Invoices.zatca_compliant", { fallback: "ZATCA Phase 1 Compliant" })}
+                </span>
               </>
             ) : (
               <>
                 <AlertCircle className="h-3.5 w-3.5" />
-                <span>{t("Invoices.zatca_incomplete", { fallback: "ZATCA Incomplete" })}</span>
+                <span>
+                  {phase === 2
+                    ? t("Invoices.zatca_phase2_incomplete", {
+                        fallback: "ZATCA Phase 2 Incomplete",
+                      })
+                    : t("Invoices.zatca_incomplete", { fallback: "ZATCA Phase 1 Incomplete" })}
+                </span>
               </>
             )}
           </div>
@@ -41,9 +52,13 @@ export function ZatcaComplianceBadge({ invoice, className }: ZatcaComplianceBadg
         <TooltipContent>
           {compliant ? (
             <p>
-              {t("Invoices.zatca_tooltip_compliant", {
-                fallback: "This invoice is ZATCA Phase 1 compliant",
-              })}
+              {phase === 2
+                ? t("Invoices.zatca_tooltip_phase2_compliant", {
+                    fallback: "This invoice is ZATCA Phase 2 compliant with UBL 2.1 XML",
+                  })
+                : t("Invoices.zatca_tooltip_compliant", {
+                    fallback: "This invoice is ZATCA Phase 1 compliant",
+                  })}
             </p>
           ) : (
             <div className="max-w-xs">

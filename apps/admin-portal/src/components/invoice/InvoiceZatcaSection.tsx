@@ -1,19 +1,23 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ZatcaComplianceBadge } from "@/components/zatca/ZatcaComplianceBadge";
 import { ZatcaQRCode } from "@/components/zatca/ZatcaQRCode";
+import { ZatcaXmlDownload } from "@/components/zatca/ZatcaXmlDownload";
 
 import { calculateVAT } from "@/lib/zatca/zatca-utils";
 
+import { Invoice } from "@/modules/invoice/invoice.type";
+
 interface InvoiceZatcaSectionProps {
-  invoice: any;
+  invoice: Invoice;
   className?: string;
 }
 
 export function InvoiceZatcaSection({ invoice, className }: InvoiceZatcaSectionProps) {
   const t = useTranslations();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState<"phase1" | "phase2">("phase1");
 
   // Return early if ZATCA is not enabled for this invoice
   if (!invoice.zatca_enabled) {
@@ -31,87 +35,140 @@ export function InvoiceZatcaSection({ invoice, className }: InvoiceZatcaSectionP
           <h3 className="text-lg font-medium">
             {t("Invoices.zatca_section_title", { fallback: "ZATCA Compliance" })}
           </h3>
-          <ZatcaComplianceBadge invoice={invoice} />
-        </div>
-
-        <div className="flex flex-col gap-6 md:flex-row">
-          {/* ZATCA QR Code */}
-          <div className="flex-shrink-0">
-            <ZatcaQRCode
-              sellerName={invoice.seller_name || ""}
-              vatNumber={invoice.vat_number || ""}
-              invoiceTimestamp={
-                invoice.issue_date
-                  ? new Date(invoice.issue_date).toISOString()
-                  : new Date().toISOString()
-              }
-              invoiceTotal={parseFloat((invoice.total || 0).toFixed(2))}
-              vatAmount={parseFloat(taxAmount.toFixed(2))}
-              size={120}
-            />
-          </div>
-
-          {/* ZATCA Details */}
-          <div className="flex-grow space-y-3">
-            <div>
-              <p className="text-muted-foreground text-sm">
-                {t("Invoices.zatca_seller_name", { fallback: "Seller Name" })}
-              </p>
-              <p className="font-medium">{invoice.seller_name || "-"}</p>
-            </div>
-
-            <div>
-              <p className="text-muted-foreground text-sm">
-                {t("Invoices.zatca_vat_number", { fallback: "VAT Registration Number" })}
-              </p>
-              <p className="font-medium">{invoice.vat_number || "-"}</p>
-            </div>
-
-            <div>
-              <p className="text-muted-foreground text-sm">
-                {t("Invoices.zatca_tax_amount", { fallback: "VAT Amount" })}
-              </p>
-              <p className="font-medium">{taxAmount.toFixed(2)} SAR</p>
-            </div>
+          <div className="flex items-center gap-2">
+            <ZatcaComplianceBadge invoice={invoice} phase={activeTab === "phase1" ? 1 : 2} />
+            <ZatcaXmlDownload invoice={invoice} />
           </div>
         </div>
 
-        {isExpanded && (
-          <div className="bg-muted/50 mt-4 rounded p-3 text-sm">
-            <p className="mb-2 font-medium">
-              {t("Invoices.zatca_qr_info", { fallback: "QR Code Information" })}:
-            </p>
-            <ul className="list-disc space-y-1 pl-5">
-              <li>
-                {t("Invoices.zatca_qr_info_1", {
-                  fallback: "This QR code complies with ZATCA Phase 1 requirements",
-                })}
-              </li>
-              <li>
-                {t("Invoices.zatca_qr_info_2", {
-                  fallback:
-                    "It contains seller name, VAT number, timestamp, invoice total, and VAT amount",
-                })}
-              </li>
-              <li>
-                {t("Invoices.zatca_qr_info_3", {
-                  fallback:
-                    "The data is encoded in TLV (Tag-Length-Value) format as required by ZATCA",
-                })}
-              </li>
-            </ul>
-          </div>
-        )}
-
-        <button
-          type="button"
-          className="text-primary hover:text-primary/80 text-sm font-medium underline-offset-4 hover:underline"
-          onClick={() => setIsExpanded(!isExpanded)}
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as "phase1" | "phase2")}
         >
-          {isExpanded
-            ? t("General.show_less", { fallback: "Show Less" })
-            : t("General.show_more", { fallback: "Show More" })}
-        </button>
+          <TabsList className="mb-4">
+            <TabsTrigger value="phase1">
+              {t("Invoices.zatca_phase1", { fallback: "Phase 1 (QR Code)" })}
+            </TabsTrigger>
+            <TabsTrigger value="phase2">
+              {t("Invoices.zatca_phase2", { fallback: "Phase 2 (UBL XML)" })}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="phase1" className="space-y-4">
+            <div className="flex flex-col gap-6 md:flex-row">
+              {/* ZATCA QR Code */}
+              <div className="flex-shrink-0">
+                <ZatcaQRCode
+                  sellerName={invoice.seller_name || ""}
+                  vatNumber={invoice.vat_number || ""}
+                  invoiceTimestamp={
+                    invoice.issue_date
+                      ? new Date(invoice.issue_date).toISOString()
+                      : new Date().toISOString()
+                  }
+                  invoiceTotal={parseFloat((invoice.total || 0).toFixed(2))}
+                  vatAmount={parseFloat(taxAmount.toFixed(2))}
+                  size={120}
+                />
+              </div>
+
+              {/* ZATCA Details */}
+              <div className="flex-grow space-y-3">
+                <div>
+                  <p className="text-muted-foreground text-sm">
+                    {t("Invoices.zatca_seller_name", { fallback: "Seller Name" })}
+                  </p>
+                  <p className="font-medium">{invoice.seller_name || "-"}</p>
+                </div>
+
+                <div>
+                  <p className="text-muted-foreground text-sm">
+                    {t("Invoices.zatca_vat_number", { fallback: "VAT Registration Number" })}
+                  </p>
+                  <p className="font-medium">{invoice.vat_number || "-"}</p>
+                </div>
+
+                <div>
+                  <p className="text-muted-foreground text-sm">
+                    {t("Invoices.zatca_tax_amount", { fallback: "VAT Amount" })}
+                  </p>
+                  <p className="font-medium">{taxAmount.toFixed(2)} SAR</p>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="phase2" className="space-y-4">
+            <div className="flex flex-col space-y-4">
+              <div className="bg-muted rounded-md p-4">
+                <p className="text-sm">
+                  {t("Invoices.zatca_phase2_explanation", {
+                    fallback:
+                      "ZATCA Phase 2 compliance requires generating a UBL 2.1 XML file with specific fields and structure. Use the 'Generate ZATCA XML' button to create and download the XML file for this invoice.",
+                  })}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                  <h4 className="mb-2 font-medium">
+                    {t("Invoices.zatca_invoice_details", { fallback: "Invoice Details" })}
+                  </h4>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-muted-foreground text-xs">
+                        {t("Invoices.invoice_number", { fallback: "Invoice Number" })}
+                      </p>
+                      <p className="text-sm">{invoice.invoice_number}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs">
+                        {t("Invoices.issue_date", { fallback: "Issue Date" })}
+                      </p>
+                      <p className="text-sm">
+                        {invoice.issue_date
+                          ? new Date(invoice.issue_date).toLocaleDateString()
+                          : "-"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs">
+                        {t("Invoices.total_amount", { fallback: "Total Amount" })}
+                      </p>
+                      <p className="text-sm">{invoice.total?.toFixed(2) || "0.00"} SAR</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="mb-2 font-medium">
+                    {t("Invoices.zatca_buyer_details", { fallback: "Buyer Details" })}
+                  </h4>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-muted-foreground text-xs">
+                        {t("Invoices.buyer_name", { fallback: "Buyer Name" })}
+                      </p>
+                      <p className="text-sm">{invoice.client?.name || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs">
+                        {t("Invoices.buyer_city", { fallback: "City" })}
+                      </p>
+                      <p className="text-sm">{invoice.client?.city || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs">
+                        {t("Invoices.buyer_country", { fallback: "Country" })}
+                      </p>
+                      <p className="text-sm">{invoice.client?.country || "Saudi Arabia"}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

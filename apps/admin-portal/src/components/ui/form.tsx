@@ -45,9 +45,36 @@ const FormField = <
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
-  const { getFieldState } = useFormContext();
-  const formState = useFormState({ name: fieldContext.name });
-  const fieldState = getFieldState(fieldContext.name, formState);
+
+  // Check if we're within a form context before using useFormContext
+  let formContext;
+  let formState;
+  let fieldState;
+
+  try {
+    formContext = useFormContext();
+    formState = useFormState({ name: fieldContext.name });
+
+    if (formContext && formContext.getFieldState) {
+      fieldState = formContext.getFieldState(fieldContext.name, formState);
+    } else {
+      // Fallback when not in form context
+      fieldState = {
+        invalid: false,
+        isDirty: false,
+        isTouched: false,
+        error: undefined,
+      };
+    }
+  } catch (error) {
+    // Handle case when useFormContext is called outside of form provider
+    fieldState = {
+      invalid: false,
+      isDirty: false,
+      isTouched: false,
+      error: undefined,
+    };
+  }
 
   if (!fieldContext) {
     throw new Error("useFormField should be used within <FormField>");
@@ -162,12 +189,12 @@ function FormMessage({
 }
 
 export {
-  useFormField,
   Form,
-  FormItem,
-  FormLabel,
   FormControl,
   FormDescription,
-  FormMessage,
   FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  useFormField,
 };
