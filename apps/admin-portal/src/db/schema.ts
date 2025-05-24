@@ -574,6 +574,7 @@ export const enterprises = pgTable(
     email: text(),
     industry: text(),
     founded: smallint(),
+    phone: text(),
     website: text(),
     registration_country: text(),
     registration_number: text(),

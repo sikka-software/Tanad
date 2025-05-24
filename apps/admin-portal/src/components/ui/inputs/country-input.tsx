@@ -55,6 +55,7 @@ type CountryInputTypes<T> = {
   filter?: (value: string, search: string) => number;
   isolated?: boolean;
   inCell?: boolean;
+  readOnly?: boolean;
 };
 const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
   (
@@ -72,6 +73,7 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
       onChange: onValueChange,
       filter,
       disabled,
+      readOnly,
       isolated,
       inCell,
       ...props
@@ -131,6 +133,9 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
                     error &&
                       "ring-destructive/20 dark:ring-destructive/40 border-destructive rounded-b-none",
                     inCell && "h-10 rounded-none border-none !bg-transparent !shadow-none",
+                    readOnly &&
+                      "h-10 rounded-none border-x-0 border-t border-b-transparent !bg-transparent p-0 !shadow-none",
+
                     // buttonClassName,
                   )}
                 >
@@ -146,7 +151,7 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
                     </span>
                   )}
 
-                  {!inCell && (
+                  {!inCell && !readOnly && (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className={cn(

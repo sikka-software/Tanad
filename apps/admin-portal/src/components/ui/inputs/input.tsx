@@ -16,7 +16,7 @@ function Input({ className, inCell, type, ...props }: InputProps) {
         "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive aria-invalid:rounded-b-none",
         !props.disabled &&
-          "bg-input-background transition-all read-only:cursor-default read-only:rounded-none read-only:border-x-0 read-only:border-t read-only:border-b-0 read-only:ps-0 read-only:shadow-none read-only:focus-visible:ring-0 read-only:focus-visible:outline-none",
+          "bg-input-background transition-all read-only:cursor-default read-only:rounded-none read-only:border-x-0 read-only:border-t read-only:border-b-transparent read-only:ps-0 read-only:shadow-none read-only:focus-visible:ring-0 read-only:focus-visible:outline-none",
         inCell && "!h-10 !rounded-none border-0 bg-transparent shadow-none",
         className,
       )}

@@ -794,6 +794,7 @@ export type Database = {
           industry: string | null
           logo: string | null
           name: string
+          phone: string | null
           registration_country: string | null
           registration_number: string | null
           size: string | null
@@ -811,6 +812,7 @@ export type Database = {
           industry?: string | null
           logo?: string | null
           name: string
+          phone?: string | null
           registration_country?: string | null
           registration_number?: string | null
           size?: string | null
@@ -828,6 +830,7 @@ export type Database = {
           industry?: string | null
           logo?: string | null
           name?: string
+          phone?: string | null
           registration_country?: string | null
           registration_number?: string | null
           size?: string | null

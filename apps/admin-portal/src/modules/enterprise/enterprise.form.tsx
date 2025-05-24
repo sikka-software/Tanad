@@ -41,7 +41,7 @@ export const createEnterpriseSchema = (t: (key: string) => string) =>
     name: z.string().min(1, { message: t("Enterprise.form.name.required") }),
     industry: z.string().optional(),
     founded: z.coerce.number().int().positive().optional(), // Changed to number, ensure it makes sense for your db
-    employees: z.string().optional(), // Consider z.number() if appropriate
+    size: z.string().optional(), // Consider z.number() if appropriate
     website: z
       .string()
       .url({ message: t("Enterprise.form.website.invalid") })
@@ -87,7 +87,7 @@ export const EnterpriseForm: React.FC<
       name: defaultValues?.name || "",
       industry: defaultValues?.industry || "",
       founded: defaultValues?.founded ? Number(defaultValues.founded) : undefined,
-      employees: defaultValues?.employees || "",
+      size: defaultValues?.size || "",
       website: defaultValues?.website || "",
       email: defaultValues?.email || "",
       phone: defaultValues?.phone || "",
@@ -191,6 +191,7 @@ export const EnterpriseForm: React.FC<
 
   const handleSubmitForm = async (data: EnterpriseFormValues) => {
     setIsLoading(true);
+    console.log(data);
     if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
@@ -199,30 +200,36 @@ export const EnterpriseForm: React.FC<
       return;
     }
 
-    // This form is intended for editing existing enterprises.
-    // defaultValues.id must be present and editMode should be true.
-    if (!editMode || !defaultValues?.id) {
-      toast.error(t("General.form_submission_error"), {
-        // Consider creating a specific translation key for this message
-        description: "Enterprise data is incomplete or form is not configured for editing.",
-      });
-      console.error(
-        "EnterpriseForm: Update failed. 'editMode' must be true and 'defaultValues.id' must be provided for this form."
-      );
-      setIsLoading(false);
-      return;
-    }
+    // // This form is intended for editing existing enterprises.
+    // // defaultValues.id must be present and editMode should be true.
+    // if (!editMode || !defaultValues?.id) {
+    //   toast.error(t("General.form_submission_error"), {
+    //     // Consider creating a specific translation key for this message
+    //     description: "Enterprise data is incomplete or form is not configured for editing.",
+    //   });
+    //   console.error(
+    //     "EnterpriseForm: Update failed. 'editMode' must be true and 'defaultValues.id' must be provided for this form."
+    //   );
+    //   setIsLoading(false);
+    //   return;
+    // }
 
-    const rawSubmissionData: EnterpriseFormValues = {
-      ...data,
-      // id is already part of 'data' if in editMode due to defaultValues
-      // user_id and enterprise_id are in 'data' if they were in defaultValues or set by form
-    };
+    // const rawSubmissionData: EnterpriseFormValues = {
+    //   ...data,
+    //   // id is already part of 'data' if in editMode due to defaultValues
+    //   // user_id and enterprise_id are in 'data' if they were in defaultValues or set by form
+    // };
+
+    const { enterprise_id, user_id, ...rest } = data;
 
     try {
       // Logic is now only for update
-      const updateData = pickRelevantKeys(rawSubmissionData) as EnterpriseUpdateData;
-      await updateEnterprise({ id: defaultValues.id, data: updateData });
+      await updateEnterprise({
+        id: enterpriseStoreContext?.id || "",
+        data: {
+          ...rest,
+        },
+      });
       toast.success(t("Enterprise.form.update_success"));
       onSuccess?.();
     } catch (error: any) {
@@ -304,13 +311,13 @@ export const EnterpriseForm: React.FC<
           />
           <FormField
             control={form.control}
-            name="employees"
+            name="size"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Enterprise.form.employees.label")}</FormLabel>
+                <FormLabel>{t("Enterprise.form.size.label")}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={t("Enterprise.form.employees.placeholder")}
+                    placeholder={t("Enterprise.form.size.placeholder")}
                     {...field}
                     readOnly={readOnly}
                     disabled={isLoading || uploading}
@@ -465,6 +472,7 @@ export const EnterpriseForm: React.FC<
                 <FormLabel>{t("Enterprise.form.registration_country.label")}</FormLabel>
                 <FormControl>
                   <CountryInput
+                    readOnly={readOnly}
                     value={field.value ?? ""}
                     onChange={field.onChange}
                     disabled={isLoading || uploading}
@@ -503,44 +511,23 @@ export const EnterpriseForm: React.FC<
 
         <FormField
           control={form.control}
-          name="vat_enabled"
+          name="vat_number"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">
-                  {t("Enterprise.form.vat_enabled.label")}
-                </FormLabel>
-                <p className="text-muted-foreground text-sm">
-                  {t("Enterprise.form.vat_enabled.description")}
-                </p>
-              </div>
+            <FormItem>
+              <FormLabel>{t("Enterprise.form.vat_number.label")}</FormLabel>
               <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                <Input
+                  placeholder={t("Enterprise.form.vat_number.placeholder")}
+                  {...field}
+                  readOnly={readOnly}
+                  disabled={isLoading || uploading}
+                  value={field.value ?? ""}
+                />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
-
-        {form.watch("vat_enabled") && (
-          <FormField
-            control={form.control}
-            name="vat_number"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Enterprise.form.vat_number.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t("Enterprise.form.vat_number.placeholder")}
-                    {...field}
-                    disabled={isLoading || uploading || !form.watch("vat_enabled")}
-                    value={field.value ?? ""}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
       </form>
     </Form>
   );

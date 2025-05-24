@@ -64,6 +64,10 @@ const EnterprisePage = () => {
   //   setIsEditing(false);
   // };
 
+  if (!enterprise) {
+    return <div>Error loading enterprise details</div>;
+  }
+
   console.log(enterprise);
   return (
     <div>
@@ -106,7 +110,15 @@ const EnterprisePage = () => {
           <CardContent>
             <EnterpriseForm
               defaultValues={{
-                ...enterprise,
+                email: enterprise.email || undefined,
+                website: enterprise.website || undefined,
+                name: enterprise.name,
+                industry: enterprise.industry || undefined,
+                founded: enterprise.founded || undefined,
+                registration_country: enterprise.registration_country || undefined,
+                registration_number: enterprise.registration_number || undefined,
+                vat_enabled: enterprise.vat_enabled || undefined,
+                // ...enterprise,
               }}
               formHtmlId="enterprise-form"
               readOnly={!isEditing}
