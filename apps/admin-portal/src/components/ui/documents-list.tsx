@@ -20,7 +20,7 @@ import {
 } from "@/ui/dialogs/alert-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 
-import { deleteDocument, getDocumentsByEntity } from "@/services/documents";
+import { deleteDocument, getDocumentsByEntity } from "@/document/document.service";
 
 interface DocumentListProps {
   entityId?: string;

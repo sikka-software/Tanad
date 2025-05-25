@@ -19,13 +19,13 @@ import { AddressFormSection } from "@/forms/address-form-section";
 
 import { getNotesValue } from "@/lib/utils";
 
-import { uploadDocument } from "@/services/documents";
-
 import { CommonStatus, ModuleFormProps } from "@/types/common.type";
 
 import { useCreateCompany, useUpdateCompany } from "@/company/company.hooks";
 import useCompanyStore from "@/company/company.store";
 import { CompanyCreateData, CompanyUpdateData } from "@/company/company.type";
+
+import { uploadDocument } from "@/document/document.service";
 
 import { companies } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
@@ -105,12 +105,12 @@ export function CompanyForm({
     try {
       let uploadedCount = 0;
       for (const doc of pendingDocuments) {
-        await uploadDocument({
-          ...doc,
-          entity_id: companyId,
-          entity_type: "company",
-        });
-        uploadedCount++;
+        // await uploadDocument({
+        //   ...doc,
+        //   entity_id: companyId,
+        //   entity_type: "company",
+        // });
+        // uploadedCount++;
         toast.loading(t("Documents.uploading"), {
           id: toastId,
           description: `${uploadedCount}/${pendingDocuments.length} ${t("Documents.files_uploaded")}`,

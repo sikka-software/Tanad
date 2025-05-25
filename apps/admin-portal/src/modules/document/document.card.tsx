@@ -1,4 +1,4 @@
-import { MapPin, User } from "lucide-react";
+import { Link, MapPin, User } from "lucide-react";
 import { useState } from "react";
 
 import { createHandleEdit } from "@/utils/module-utils";
@@ -45,7 +45,7 @@ const DocumentCard = ({
       <ModuleCard
         id={document.id}
         title={document.name}
-        subtitle={document.url || ""}
+        // subtitle={document.url || ""}
         currentStatus={document.status as CommonStatusProps}
         statuses={Object.values(CommonStatus) as CommonStatusProps[]}
         onStatusChange={(status: CommonStatusProps) => handleEdit(document.id, "status", status)}
@@ -59,6 +59,14 @@ const DocumentCard = ({
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <User className="h-4 w-4" />
               <span>{document.user_id}</span>
+            </div>
+          )}
+          {document.url && (
+            <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Link className="h-4 w-4" />
+              <a href={document.url} target="_blank" rel="noopener noreferrer" className="underline">
+                Link
+              </a>
             </div>
           )}
 
