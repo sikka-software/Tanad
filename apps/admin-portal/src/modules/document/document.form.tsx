@@ -10,7 +10,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/inputs/input";
 import { Textarea } from "@/ui/textarea";
 
-import { DocumentUploader, DocumentFile } from "@/components/ui/documents-uploader";
+import { ImageAndPdfUploader } from "@/components/comp-545";
+import { FileWithPreview } from "@/hooks/use-file-upload";
 
 import { uploadDocument as uploadDocumentService } from "@/document/document.service";
 
@@ -58,13 +59,12 @@ export function DocumentForm({
   const isSavingDocument = useDocumentStore((state) => state.isLoading);
   const setIsSavingDocument = useDocumentStore((state) => state.setIsLoading);
 
-  const [uploadedDocument, setUploadedDocument] = useState<DocumentFile | null>(
+  const [uploadedDocument, setUploadedDocument] = useState<FileWithPreview | null>(
     defaultValues?.url && defaultValues?.file_path && defaultValues?.name
       ? {
-          name: defaultValues.name,
           file: new File([], defaultValues.file_path),
-          url: defaultValues.url,
-          uploaded: true,
+          id: defaultValues.id || defaultValues.file_path,
+          preview: defaultValues.url,
         }
       : null,
   );
@@ -78,8 +78,8 @@ export function DocumentForm({
     },
   });
 
-  const handleDocumentsChange = (docs: DocumentFile[]) => {
-    setUploadedDocument(docs.length > 0 ? docs[0] : null);
+  const handleDocumentsChange = (files: FileWithPreview[]) => {
+    setUploadedDocument(files.length > 0 ? files[0] : null);
   };
 
   const handleSubmit = async (formData: DocumentFormValues) => {
@@ -122,7 +122,7 @@ export function DocumentForm({
           return;
         }
         setIsUploading(true);
-        const documentToUpload: DocumentFile = {
+        const documentToUpload: FileWithPreview = {
           file: uploadedDocument.file,
           name: formData.name.trim() || uploadedDocument.file.name,
           entity_type: "document",
@@ -169,13 +169,13 @@ export function DocumentForm({
     (window as any).documentForm = form;
   }
 
-  const existingDocsForUploader: DocumentFile[] = [];
+  const existingDocsForUploader: FileWithPreview[] = [];
   if (editMode && defaultValues?.url && defaultValues?.name && defaultValues?.file_path) {
     existingDocsForUploader.push({
       id: defaultValues.id,
       name: defaultValues.name,
       file: new File([], defaultValues.file_path),
-      url: defaultValues.url,
+      preview: defaultValues.url,
       entity_type: "document",
       uploaded: true,
     });
@@ -230,13 +230,13 @@ export function DocumentForm({
               )}
             />
             
-            <DocumentUploader
-              entityType="document"
-              entityId={defaultValues?.id || enterprise?.id}
-              onDocumentsChange={handleDocumentsChange}
-              existingDocuments={existingDocsForUploader}
-              disabled={isSavingDocument || isUploading || editMode}
+            <ImageAndPdfUploader
+              value={uploadedDocument ? [uploadedDocument] : []}
+              onChange={handleDocumentsChange}
+              accept="image/svg+xml,image/png,image/jpeg,image/jpg,image/gif,application/pdf"
+              maxSizeMB={2}
               maxFiles={1}
+              disabled={isSavingDocument || isUploading || editMode}
             />
           </div>
         </form>

@@ -340,6 +340,8 @@
     "Documents": {
       "title": "المستندات",
       "add": "إضافة مستند",
+      "edit": "تعديل المستند",
+      "delete": "حذف المستند",
       "no_documents": "لا يوجد مستندات",
       "document": "المستند",
       "document_description": "وصف المستند"
