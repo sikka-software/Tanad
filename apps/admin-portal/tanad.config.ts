@@ -64,7 +64,8 @@ export type TanadModules =
   | "storage"
   | "recruitment"
   | "bank_accounts"
-  | "individuals";
+  | "individuals"
+  | "documents";
 
 const ModulesOptions: Record<
   TanadModules,
@@ -98,6 +99,13 @@ const ModulesOptions: Record<
     dashboardOptions: {
       size: "sm",
     },
+  },
+  documents: {
+    icon: FileText,
+    label: "Pages.Documents.title",
+    translationKey: "Pages.Documents.title",
+    url: "/documents",
+    category: "Administration",
   },
   dashboard: {
     icon: LayoutDashboard,

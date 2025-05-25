@@ -374,11 +374,20 @@ function getInternetMenus(pathname: string): SidebarMenuGroupProps["items"] {
 function getSystemAdminMenus(pathname: string): SidebarMenuGroupProps["items"] {
   return [
     {
+      title: ModulesOptions.documents.label,
+      translationKey: ModulesOptions.documents.label,
+      url: ModulesOptions.documents.url,
+      icon: ModulesOptions.documents.icon,
+      is_active: pathname.startsWith(ModulesOptions.documents.url),
+      requiredPermission: "documents.read",
+    },
+    {
       title: ModulesOptions.users.label,
       translationKey: ModulesOptions.users.label,
       icon: ModulesOptions.users.icon,
       url: ModulesOptions.users.url,
       is_active: pathname.startsWith(ModulesOptions.users.url),
+      requiredPermission: "users.read",
     },
     {
       title: ModulesOptions.roles.label,
@@ -386,6 +395,7 @@ function getSystemAdminMenus(pathname: string): SidebarMenuGroupProps["items"] {
       icon: ModulesOptions.roles.icon,
       url: ModulesOptions.roles.url,
       is_active: pathname.startsWith(ModulesOptions.roles.url),
+      requiredPermission: "roles.read",
     },
   ];
 }
