@@ -19,6 +19,21 @@ export const generateDummySalary = () => {
   }
 };
 
+export const generateDummyIndividual = () => {
+  const dummyData = generateDummyData();
+  const form = (window as any).individualForm;
+  if (form) {
+    form.setValue("name", dummyData.full_name);
+    form.setValue("email", dummyData.email);
+    form.setValue("phone", dummyData.phone);
+    form.setValue("address", dummyData.address);
+    form.setValue("city", dummyData.city);
+    form.setValue("state", dummyData.state);
+    form.setValue("zip_code", dummyData.zip_code);
+    form.setValue("notes", dummyData.randomString);
+  }
+};
+
 export const generateDummyWarehouse = () => {
   const form = (window as any).warehouseForm;
   if (form) {

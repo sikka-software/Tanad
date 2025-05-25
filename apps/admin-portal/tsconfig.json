@@ -58,7 +58,8 @@
       "@/enterprise/*": ["./src/modules/enterprise/*"],
       "@/onboarding/*": ["./src/modules/onboarding/*"],
       "@/online-store/*": ["./src/modules/online-store/*"],
-      "@/permission/*": ["./src/modules/permission/*"]
+      "@/permission/*": ["./src/modules/permission/*"],
+      "@/individual/*": ["./src/modules/individual/*"]
     },
     "plugins": [
       {
