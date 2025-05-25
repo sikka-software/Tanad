@@ -30,7 +30,8 @@ export interface DocumentFile {
     | "warehouse"
     | "branch"
     | "office"
-    | "department";
+    | "department"
+    | "document";
   uploaded?: boolean;
 }
 
@@ -47,7 +48,8 @@ interface DocumentUploaderProps {
     | "warehouse"
     | "branch"
     | "office"
-    | "department";
+    | "department"
+    | "document";
   existingDocuments?: DocumentFile[];
   onDocumentsChange: (documents: DocumentFile[]) => void;
   disabled?: boolean;

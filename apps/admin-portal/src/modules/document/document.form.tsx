@@ -1,21 +1,24 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createInsertSchema } from "drizzle-zod";
 import { useTranslations, useLocale } from "next-intl";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import BooleanTabs from "@/ui/boolean-tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import CodeInput from "@/ui/inputs/code-input";
 import { Input } from "@/ui/inputs/input";
-import PhoneInput from "@/ui/inputs/phone-input";
 
 import NotesSection from "@/components/forms/notes-section";
+import { DocumentUploader, DocumentFile } from "@/components/ui/documents-uploader";
 
-import { CommonStatus, ModuleFormProps } from "@/types/common.type";
+import { uploadDocument as uploadDocumentService } from "@/services/documents";
 
-import { useDocuments, useCreateDocument, useUpdateDocument } from "@/document/document.hooks";
+// Assuming this is the correct path
+
+import { ModuleFormProps } from "@/types/common.type";
+
+import { useCreateDocument, useUpdateDocument } from "@/document/document.hooks";
 import useDocumentStore from "@/document/document.store";
 import { DocumentUpdateData, DocumentCreateData } from "@/document/document.type";
 
@@ -25,11 +28,8 @@ import useUserStore from "@/stores/use-user-store";
 const createDocumentSchema = (t: (key: string) => string) => {
   const DocumentSelectSchema = createInsertSchema(documents, {
     name: z.string().min(1, t("Documents.form.name.required")),
-    status: z.enum(CommonStatus, {
-      invalid_type_error: t("CommonStatus.required"),
-    }),
     notes: z.any().optional().nullable(),
-  });
+  }).pick({ name: true, notes: true }); // Only pick name and notes
   return DocumentSelectSchema;
 };
 
@@ -57,16 +57,25 @@ export function DocumentForm({
   const { mutate: createDocument } = useCreateDocument();
   const { mutate: updateDocument } = useUpdateDocument();
 
-  const { data: documents } = useDocuments();
-
   const isSavingDocument = useDocumentStore((state) => state.isLoading);
   const setIsSavingDocument = useDocumentStore((state) => state.setIsLoading);
+
+  const [uploadedDocument, setUploadedDocument] = useState<DocumentFile | null>(
+    defaultValues?.url && defaultValues?.file_path
+      ? {
+          name: defaultValues.name || "document",
+          file: new File([], defaultValues.file_path), // Placeholder, actual file not editable this way
+          url: defaultValues.url,
+          uploaded: true,
+        }
+      : null,
+  );
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<DocumentFormValues>({
     resolver: zodResolver(createDocumentSchema(t)),
     defaultValues: {
       name: defaultValues?.name || "",
-      status: defaultValues?.status || "active",
       notes:
         defaultValues?.notes &&
         typeof defaultValues.notes === "object" &&
@@ -76,44 +85,39 @@ export function DocumentForm({
     },
   });
 
-  const handleSubmit = async (data: DocumentFormValues) => {
+  const handleDocumentsChange = (docs: DocumentFile[]) => {
+    setUploadedDocument(docs.length > 0 ? docs[0] : null);
+  };
+
+  const handleSubmit = async (formData: DocumentFormValues) => {
     setIsSavingDocument(true);
-    if (!user?.id) {
+
+    if (!user?.id || !enterprise?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
       setIsSavingDocument(false);
       return;
     }
-    if (!enterprise?.id) {
-      toast.error(t("General.unauthorized"), {
-        description: t("General.no_enterprise_selected"),
-      });
-      setIsSavingDocument(false);
-      return;
-    }
-
-    const payload: DocumentCreateData = {
-      name: data.name.trim(),
-      url: data.url.trim(),
-      file_path: data.file_path.trim(),
-      entity_id: data.entity_id.trim(),
-      entity_type: data.entity_type.trim(),
-      notes: data.notes ?? null,
-      status: data.status,
-      user_id: user.id,
-      enterprise_id: enterprise.id,
-    };
 
     try {
-      if (editMode) {
-        if (!defaultValues?.id) {
-          throw new Error("Document ID is missing for update.");
-        }
+      if (editMode && defaultValues?.id) {
+        // Editing existing document: only name and notes can be changed.
+        // Ensure all required fields for DocumentUpdateData are present if it's strict,
+        // otherwise, this assumes backend handles partial update with just name/notes.
+        const payload = {
+          ...(defaultValues as DocumentUpdateData), // Spread defaultValues to satisfy strict type
+          name: formData.name.trim(),
+          notes: formData.notes ?? null,
+          // Ensure other required fields from DocumentUpdateData are maintained if not optional
+          // For example, if url, file_path, entity_id, entity_type, user_id, enterprise_id are non-optional in DocumentUpdateData
+          // they must be here. DefaultValues should provide them.
+        } as DocumentUpdateData; // Explicit cast after ensuring structure matches
+
         await updateDocument(
           {
             id: defaultValues.id,
-            data: payload as DocumentUpdateData, // Use filtered payload
+            data: payload,
           },
           {
             onSuccess: () => {
@@ -124,25 +128,69 @@ export function DocumentForm({
           },
         );
       } else {
-        await createDocument(payload, {
-          onSuccess: () => {
-            setIsSavingDocument(false);
-            if (onSuccess) onSuccess();
-          },
-          onError: () => setIsSavingDocument(false),
-        });
+        // Creating new document
+        if (!uploadedDocument || !uploadedDocument.file) {
+          toast.error(t("Documents.error.file_required")); // TODO: Add translation
+          setIsSavingDocument(false);
+          return;
+        }
+        setIsUploading(true);
+        const documentToUpload: DocumentFile = {
+          file: uploadedDocument.file,
+          name: formData.name.trim() || uploadedDocument.file.name,
+          entity_type: "document",
+          entity_id: enterprise.id, // uploadDocumentService uses this for the document's own entity_id if it's a top-level doc
+        };
+
+        const createdDocumentData = await uploadDocumentService(documentToUpload);
+        setIsUploading(false);
+
+        // uploadDocumentService created the doc with name, url, file_path.
+        // Now, if there are notes, update the created document with notes.
+        if (formData.notes && createdDocumentData?.id) {
+          await updateDocument(
+            {
+              id: createdDocumentData.id,
+              data: { notes: formData.notes } as DocumentUpdateData, // Only update notes
+            },
+            {
+              onSuccess: () => {
+                // This is a nested success, main success is below
+              },
+              onError: () => {
+                toast.error(t("Documents.error.update_notes_failed")); // TODO: Add translation
+                // Continue to main success/failure flow, notes update is best-effort here
+              },
+            },
+          );
+        }
+        setIsSavingDocument(false);
+        if (onSuccess) onSuccess();
       }
     } catch (error) {
       setIsSavingDocument(false);
+      setIsUploading(false);
       console.error("Failed to save document:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Documents.error.create"),
+        description: t("Documents.error.create"), // Or a more generic save error
       });
     }
   };
 
   if (typeof window !== "undefined") {
     (window as any).documentForm = form;
+  }
+
+  const existingDocsForUploader: DocumentFile[] = [];
+  if (editMode && defaultValues?.url && defaultValues?.name) {
+    existingDocsForUploader.push({
+      id: defaultValues.id,
+      name: defaultValues.name,
+      file: new File([], defaultValues.file_path || defaultValues.name), // Placeholder
+      url: defaultValues.url,
+      entity_type: "document",
+      uploaded: true,
+    });
   }
 
   return (
@@ -156,108 +204,41 @@ export function DocumentForm({
             form.handleSubmit(handleSubmit)(e);
           }}
         >
-          <input hidden type="text" value={user?.id} {...form.register("user_id")} />
-          <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
+          {/* Hidden fields for user_id and enterprise_id are not strictly needed if always sourced from store */}
+          {/* <input hidden type="text" value={user?.id} {...form.register("user_id")} /> */}
+          {/* <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} /> */}
           <div className="form-container">
-            <div className="form-fields-cols-2">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Documents.form.name.label")} *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t("Documents.form.name.placeholder")}
-                        {...field}
-                        disabled={isSavingDocument}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="url"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Documents.form.url.label")} *</FormLabel>
-                    <FormControl>
-                      <CodeInput
-                        onSerial={() => {
-                          console.log("serial");
-                          const nextNumber = (documents?.length || 0) + 1;
-                          const paddedNumber = String(nextNumber).padStart(4, "0");
-                          form.setValue("url", `BR-${paddedNumber}`);
-                        }}
-                        onRandom={() => {
-                          const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                          let randomCode = "";
-                          for (let i = 0; i < 5; i++) {
-                            randomCode += randomChars.charAt(
-                              Math.floor(Math.random() * randomChars.length),
-                            );
-                          }
-                          form.setValue("url", `BR-${randomCode}`);
-                        }}
-                        inputProps={{
-                          placeholder: t("Documents.form.url.placeholder"),
-                          disabled: isSavingDocument,
-                          ...field,
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="file_path"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Documents.form.file_path.label")}</FormLabel>
-                    <FormControl>
-                      <PhoneInput
-                        value={field.value || ""}
-                        onChange={field.onChange}
-                        disabled={isSavingDocument}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Documents.form.name.label")} *</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Documents.form.name.placeholder")}
+                      {...field}
+                      disabled={isSavingDocument || isUploading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("CommonStatus.label")}</FormLabel>
-                    <FormControl>
-                      <BooleanTabs
-                        trueText={t("CommonStatus.active")}
-                        falseText={t("CommonStatus.inactive")}
-                        value={field.value === "active"}
-                        onValueChange={(newValue) => {
-                          field.onChange(newValue ? "active" : "inactive");
-                        }}
-                        listClassName="w-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <DocumentUploader
+              entityType="document"
+              entityId={defaultValues?.id || enterprise?.id} // Context for the uploader, added optional chaining for enterprise
+              onDocumentsChange={handleDocumentsChange}
+              existingDocuments={existingDocsForUploader}
+              disabled={isSavingDocument || isUploading || editMode} // Disable uploader in edit mode
+              maxFiles={1}
+            />
           </div>
-
           <NotesSection
             inDialog={editMode || nestedForm}
             control={form.control}
-            title={t("Documents.form.notes.label")}
+            title={t("Documents.form.notes.label")} // Assuming notes becomes description
           />
         </form>
       </Form>
