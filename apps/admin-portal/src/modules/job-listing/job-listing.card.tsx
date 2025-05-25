@@ -21,13 +21,13 @@ const JobListingCard = ({
 }) => {
   const t = useTranslations();
   const { mutate: updateJobListing } = useUpdateJobListing();
-  const data = useJobListingStore((state) => state.data);
+  const storeData = useJobListingStore((state) => state.data);
   const setData = useJobListingStore((state) => state.setData);
 
   const handleEdit = createHandleEdit<JobListingWithJobs, JobListingUpdateData>(
     setData,
     updateJobListing,
-    data,
+    storeData as JobListingWithJobs[] | undefined,
   );
 
   useEffect(() => {
