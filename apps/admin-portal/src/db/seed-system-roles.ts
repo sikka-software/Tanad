@@ -136,6 +136,13 @@ const systemRolePermissions: Record<string, string[]> = {
     "quotes.duplicate",
     "quotes.export",
 
+    "individuals.read",
+    "individuals.create",
+    "individuals.delete",
+    "individuals.update",
+    "individuals.duplicate",
+    "individuals.export",
+
     "vendors.read",
     "vendors.create",
     "vendors.delete",

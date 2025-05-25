@@ -30,40 +30,6 @@ export type SidebarMenuGroupProps = {
   }[];
 };
 
-type Submenu = {
-  href: string;
-  label: string;
-  translationKey: string;
-  active?: boolean;
-  plusAction?: string;
-};
-
-type Menu = {
-  href: string;
-  label: string;
-  translationKey: string;
-  active?: boolean;
-  icon: LucideIcon;
-  submenus?: Submenu[];
-};
-
-type Group = {
-  groupLabel?: string;
-  groupLabelTranslationKey?: string;
-  icon: LucideIcon;
-  menus: Menu[];
-};
-
-type SimplifiedMenuItem = {
-  title: string;
-  items?: SimplifiedMenuItem[];
-};
-
-type SimplifiedMenu = {
-  group: string;
-  items: SimplifiedMenuItem[];
-};
-
 // Main menu items
 function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"] {
   return [
@@ -106,6 +72,14 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
         //   url: "/contacts",
         //   requiredPermission: "contacts.read",
         // },
+        {
+          title: ModulesOptions.individuals.label,
+          translationKey: ModulesOptions.individuals.label,
+          is_active: pathname.startsWith(ModulesOptions.individuals.url),
+          action: ModulesOptions.individuals.url + "/add",
+          url: ModulesOptions.individuals.url,
+          requiredPermission: "individuals.read",
+        },
         {
           title: ModulesOptions.companies.label,
           translationKey: ModulesOptions.companies.label,

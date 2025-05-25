@@ -25,14 +25,15 @@ import {
   Package,
   LucideIcon,
   Landmark,
+  User,
 } from "lucide-react";
 
 export type TanadModules =
-  | "users"
-  | "roles"
   | "dashboard"
   | "analytics"
   | "activity_logs"
+  | "users"
+  | "roles"
   | "sales"
   | "job_listings"
   | "companies"
@@ -62,7 +63,8 @@ export type TanadModules =
   | "trucks"
   | "storage"
   | "recruitment"
-  | "bank_accounts";
+  | "bank_accounts"
+  | "individuals";
 
 const ModulesOptions: Record<
   TanadModules,
@@ -327,6 +329,13 @@ const ModulesOptions: Record<
     label: "Pages.BankAccounts.title",
     translationKey: "Pages.BankAccounts.title",
     url: "/bank_accounts",
+    category: "Finance",
+  },
+  individuals: {
+    icon: User,
+    label: "Pages.Individuals.title",
+    translationKey: "Pages.Individuals.title",
+    url: "/individuals",
     category: "Finance",
   },
 };

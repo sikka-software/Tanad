@@ -701,6 +701,20 @@
       "when": 1748071225619,
       "tag": "0099_pale_shriek",
       "breakpoints": true
+    },
+    {
+      "idx": 100,
+      "version": "7",
+      "when": 1748149813629,
+      "tag": "0100_cuddly_bloodstrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 101,
+      "version": "7",
+      "when": 1748149864988,
+      "tag": "0101_tiny_black_panther",
+      "breakpoints": true
     }
   ]
 }

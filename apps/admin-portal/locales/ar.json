@@ -387,6 +387,16 @@
       "select": "اختر جهة إتصال",
       "no_contacts_found": "لا يوجد جهات إتصال"
     },
+    "Individuals": {
+      "title": "الأفراد",
+      "singular": "فرد",
+      "add": "إضافة فرد جديد",
+      "create": "إنشاء فرد",
+      "edit": "تعديل الفرد",
+      "search": "بحث عن فرد",
+      "select": "اختر فرد",
+      "no_individuals_found": "لا يوجد أفراد"
+    },
     "EmployeeRequests": {
       "title": "طلبات الموظفين",
       "singular": "طلب موظف",

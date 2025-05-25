@@ -916,6 +916,69 @@ export type Database = {
           },
         ]
       }
+      individuals: {
+        Row: {
+          additional_number: string | null
+          building_number: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          email: string
+          enterprise_id: string
+          id: string
+          name: string
+          notes: Json | null
+          phone: string
+          region: string | null
+          short_address: string | null
+          status: Database["public"]["Enums"]["common_status"] | null
+          street_name: string | null
+          updated_at: string
+          user_id: string
+          zip_code: string | null
+        }
+        Insert: {
+          additional_number?: string | null
+          building_number?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          email: string
+          enterprise_id: string
+          id?: string
+          name: string
+          notes?: Json | null
+          phone: string
+          region?: string | null
+          short_address?: string | null
+          status?: Database["public"]["Enums"]["common_status"] | null
+          street_name?: string | null
+          updated_at?: string
+          user_id: string
+          zip_code?: string | null
+        }
+        Update: {
+          additional_number?: string | null
+          building_number?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string
+          enterprise_id?: string
+          id?: string
+          name?: string
+          notes?: Json | null
+          phone?: string
+          region?: string | null
+          short_address?: string | null
+          status?: Database["public"]["Enums"]["common_status"] | null
+          street_name?: string | null
+          updated_at?: string
+          user_id?: string
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
       invoice_items: {
         Row: {
           amount: number | null
@@ -2688,6 +2751,7 @@ export type Database = {
         | "ONLINE_STORE"
         | "CAR"
         | "TRUCK"
+        | "INDIVIDUAL"
       app_permission:
         | "users.create"
         | "users.read"
@@ -2845,6 +2909,12 @@ export type Database = {
         | "trucks.update"
         | "trucks.export"
         | "trucks.duplicate"
+        | "individuals.read"
+        | "individuals.create"
+        | "individuals.delete"
+        | "individuals.update"
+        | "individuals.export"
+        | "individuals.duplicate"
       app_role: "superadmin" | "admin" | "accounting" | "hr" | "it"
       common_status: "active" | "inactive" | "draft" | "archived"
       employee_request_status:
@@ -3100,6 +3170,7 @@ export const Constants = {
         "ONLINE_STORE",
         "CAR",
         "TRUCK",
+        "INDIVIDUAL",
       ],
       app_permission: [
         "users.create",
@@ -3258,6 +3329,12 @@ export const Constants = {
         "trucks.update",
         "trucks.export",
         "trucks.duplicate",
+        "individuals.read",
+        "individuals.create",
+        "individuals.delete",
+        "individuals.update",
+        "individuals.export",
+        "individuals.duplicate",
       ],
       app_role: ["superadmin", "admin", "accounting", "hr", "it"],
       common_status: ["active", "inactive", "draft", "archived"],

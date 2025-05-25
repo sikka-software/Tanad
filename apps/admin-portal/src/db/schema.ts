@@ -89,6 +89,7 @@ export const activity_target_type = pgEnum("activity_target_type", [
   "ONLINE_STORE",
   "CAR",
   "TRUCK",
+  "INDIVIDUAL",
 ]);
 export const app_permission = pgEnum("app_permission", [
   "users.create",
@@ -247,6 +248,12 @@ export const app_permission = pgEnum("app_permission", [
   "trucks.update",
   "trucks.export",
   "trucks.duplicate",
+  "individuals.read",
+  "individuals.create",
+  "individuals.delete",
+  "individuals.update",
+  "individuals.export",
+  "individuals.duplicate",
 ]);
 export const app_role = pgEnum("app_role", ["superadmin", "admin", "accounting", "hr", "it"]);
 export const common_status = pgEnum("common_status", ["active", "inactive", "draft", "archived"]);
@@ -2203,6 +2210,43 @@ export const trucks = pgTable(
       foreignColumns: [usersInAuth.id],
       name: "trucks_user_id_users_id_fk",
     }),
+  ],
+);
+
+export const individuals = pgTable(
+  "individuals",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+
+    name: text().notNull(),
+    email: text().notNull(),
+    phone: text().notNull(),
+    short_address: text(),
+    additional_number: text(),
+    building_number: text(),
+    street_name: text(),
+    city: text(),
+    region: text(),
+    country: text(),
+    zip_code: text(),
+    status: common_status().default("active"),
+    notes: jsonb(),
+  },
+  (table) => [
+    index("idx_individuals_enterprise_id").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("individuals_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+    index("individuals_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("individuals_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
   ],
 );
 
