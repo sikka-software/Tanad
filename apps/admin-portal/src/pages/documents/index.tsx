@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { Globe, Plus } from "lucide-react";
+import { FileText, Globe, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -183,7 +183,7 @@ export default function DocumentsPage() {
                   title: t("Documents.create_first.title"),
                   description: t("Documents.create_first.description"),
                   add: t("Pages.Documents.add"),
-                  icons: [Globe, Plus, Globe],
+                  icons: [FileText, Plus, FileText],
                   onClick: () => router.push(router.pathname + "/add"),
                 }}
                 renderItem={(document) => (
