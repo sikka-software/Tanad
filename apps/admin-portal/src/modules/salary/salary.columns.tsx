@@ -9,7 +9,7 @@ import StatusCell from "@/components/tables/status-cell";
 import CurrencyCell from "@/tables/currency-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
-import { useFormatDate } from "@/lib/date-utils";
+import { useFormatDate } from "@/utils/date-utils";
 
 import { useEmployees } from "@/employee/employee.hooks";
 

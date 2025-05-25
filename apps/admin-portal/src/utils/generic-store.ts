@@ -1,8 +1,8 @@
 // stores/createGenericStore.ts
 import { create } from "zustand";
 
-import { applyFilters } from "@/lib/filter-utils";
-import { applySort } from "@/lib/sort-utils";
+import { applyFilters } from "@/utils/filter-utils";
+import { applySort } from "@/utils/sort-utils";
 
 import { BaseStates, BaseActions, SearchFilterFn } from "@/types/generic-store-types";
 

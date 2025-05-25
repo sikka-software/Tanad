@@ -7,7 +7,7 @@ import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
-import { useFormatDate } from "@/lib/date-utils";
+import { useFormatDate } from "@/utils/date-utils";
 
 import { Expense } from "@/expense/expense.type";
 

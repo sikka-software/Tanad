@@ -17,10 +17,9 @@ import LanguageSwitcher from "@/ui/language-switcher";
 import ThemeSwitcher from "@/ui/theme-switcher";
 
 import { createClient } from "@/utils/supabase/component";
+import { convertToTranslationKey } from "@/utils/text-utils";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-
-import { convertToTranslationKey } from "@/lib/text-utils";
 
 import useUserStore from "@/stores/use-user-store";
 

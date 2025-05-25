@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 import NotesSection from "@/components/forms/notes-section";
 
-import { formatToYYYYMMDD } from "@/lib/date-utils";
+import { formatToYYYYMMDD } from "@/utils/date-utils";
 import { getNotesValue } from "@/lib/utils";
 import { validateYearRange } from "@/lib/utils";
 

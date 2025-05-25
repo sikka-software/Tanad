@@ -26,7 +26,7 @@ import { Textarea } from "@/ui/textarea";
 
 import { renderLocationOption } from "@/components/app/location-options";
 
-import { formatToYYYYMMDD } from "@/lib/date-utils";
+import { formatToYYYYMMDD } from "@/utils/date-utils";
 import { validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";

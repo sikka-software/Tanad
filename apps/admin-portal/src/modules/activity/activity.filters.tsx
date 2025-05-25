@@ -22,7 +22,8 @@ import { MultiSelect } from "@/ui/multi-select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
-import { downloadCSV } from "@/lib/csv-utils";
+import { downloadCSV } from "@/utils/csv-utils";
+
 import { cn } from "@/lib/utils";
 
 import { useUsers } from "../user/user.hooks";

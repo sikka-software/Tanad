@@ -13,7 +13,7 @@ import { DateInput } from "@/components/ui/inputs/date-input";
 import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
-import { formatToYYYYMMDD, useFormatDate } from "@/lib/date-utils";
+import { formatToYYYYMMDD, useFormatDate } from "@/utils/date-utils";
 import { dateTableFilterFn } from "@/lib/table-filter-fns";
 
 import { Employee, EmployeeStatus } from "@/employee/employee.types";

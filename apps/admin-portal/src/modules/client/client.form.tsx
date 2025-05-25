@@ -129,6 +129,8 @@ export default function ClientForm({
               zip_code: typeof data.zip_code === "string" ? data.zip_code.trim() : null,
               status: data.status,
               notes: data.notes,
+              user_id: user?.id || "",
+              enterprise_id: enterprise?.id || "",
             },
           },
           {

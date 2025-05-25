@@ -9,7 +9,7 @@ import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateClient } from "@/client/client.hooks";
 import useClientStore from "@/client/client.store";
-import { Client } from "@/client/client.type";
+import { Client, ClientUpdateData } from "@/client/client.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -23,7 +23,7 @@ const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "id") return;
     setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateClient({ id: rowId, data: { [columnId]: value } });
+    await updateClient({ id: rowId, data: { [columnId]: value } as ClientUpdateData });
   };
 
   const columns = useClientColumns(handleEdit);

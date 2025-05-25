@@ -7,7 +7,7 @@ import CurrencyCell from "@/tables/currency-cell";
 import SelectCell from "@/tables/select-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
-import { useFormatDate } from "@/lib/date-utils";
+import { useFormatDate } from "@/utils/date-utils";
 
 import { EmployeeRequest, EmployeeRequestStatus } from "@/employee-request/employee-request.type";
 

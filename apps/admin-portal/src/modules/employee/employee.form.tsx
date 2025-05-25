@@ -21,7 +21,7 @@ import { createClient } from "@/utils/supabase/component";
 import NotesSection from "@/components/forms/notes-section";
 import SalaryFormSection from "@/components/forms/salary-form-section";
 
-import { formatToYYYYMMDD } from "@/lib/date-utils";
+import { formatToYYYYMMDD } from "@/utils/date-utils";
 import { addressSchema } from "@/lib/schemas/address.schema";
 import { metadataSchema } from "@/lib/schemas/metadata.schema";
 import { getNotesValue } from "@/lib/utils";

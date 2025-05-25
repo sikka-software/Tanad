@@ -13,7 +13,7 @@ import StatusCell from "@/tables/status-cell";
 import TimestampCell from "@/tables/timestamp-cell";
 
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
-import { useFormatDate } from "@/lib/date-utils";
+import { useFormatDate } from "@/utils/date-utils";
 
 import { useBranches } from "../branch/branch.hooks";
 import { useDepartments } from "../department/department.hooks";

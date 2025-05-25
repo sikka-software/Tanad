@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 
-import { useFormatDate } from "@/lib/date-utils";
+import { useFormatDate } from "@/utils/date-utils";
 
 const TimestampCell = ({ timestamp }: { timestamp: string }) => {
   const formattedDate = useFormatDate(timestamp);

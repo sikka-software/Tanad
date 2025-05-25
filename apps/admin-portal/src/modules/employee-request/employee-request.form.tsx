@@ -15,7 +15,7 @@ import { Textarea } from "@/ui/textarea";
 
 import NotesSection from "@/components/forms/notes-section";
 
-import { formatToYYYYMMDD } from "@/lib/date-utils";
+import { formatToYYYYMMDD } from "@/utils/date-utils";
 import { getNotesValue, validateYearRange } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
