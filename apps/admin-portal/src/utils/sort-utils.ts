@@ -10,7 +10,7 @@ const models = [
   "employee_requests",
   "salaries",
   "jobs",
-
+  "individuals",
   "companies",
   "departments",
   "job_listings",

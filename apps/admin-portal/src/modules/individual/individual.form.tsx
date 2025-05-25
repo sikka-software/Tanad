@@ -203,7 +203,29 @@ export default function IndividualForm({
           <input hidden type="text" value={user?.id} {...form.register("user_id")} />
           <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-container">
-            <div className="form-fields-cols-1">
+            <div className="form-fields-cols-2">
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Individuals.form.status.label")}</FormLabel>
+                    <FormControl>
+                      <BooleanTabs
+                        disabled={isSavingIndividual}
+                        trueText={t("Individuals.form.status.active")}
+                        falseText={t("Individuals.form.status.inactive")}
+                        value={field.value === "active"}
+                        onValueChange={(newValue) => {
+                          field.onChange(newValue ? "active" : "inactive");
+                        }}
+                        listClassName="w-full"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="name"
@@ -221,9 +243,7 @@ export default function IndividualForm({
                   </FormItem>
                 )}
               />
-            </div>
 
-            <div className="form-fields-cols-2">
               <FormField
                 control={form.control}
                 name="email"
@@ -254,64 +274,6 @@ export default function IndividualForm({
                         value={field.value || ""}
                         onChange={field.onChange}
                         disabled={isSavingIndividual}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {/* <FormField
-                control={form.control}
-                name="company"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Individuals.form.company.label")}</FormLabel>
-                    <FormControl>
-                      <ComboboxAdd
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        data={companyOptions}
-                        isLoading={isFetchingCompanies}
-                        defaultValue={field.value || ""}
-                        disabled={isSavingIndividual}
-                        valueKey="value"
-                        onChange={(value) => field.onChange(value || null)}
-                        texts={{
-                          placeholder: t("Individuals.form.company.placeholder"),
-                          searchPlaceholder: t("Pages.Companies.search"),
-                          noItems: t("Individuals.form.company.no_companies"),
-                        }}
-                        addText={t("Pages.Companies.add")}
-                        onAddClick={() => setIsCompanyDialogOpen(true)}
-                        renderOption={(item) => (
-                          <div>
-                            <p>{item.label}</p>
-                            <p className="text-muted-foreground text-xs">
-                              {item.email ? item.email : item.website}
-                            </p>
-                          </div>
-                        )}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("Individuals.form.status.label")}</FormLabel>
-                    <FormControl>
-                      <BooleanTabs
-                        disabled={isSavingIndividual}
-                        trueText={t("Individuals.form.status.active")}
-                        falseText={t("Individuals.form.status.inactive")}
-                        value={field.value === "active"}
-                        onValueChange={(newValue) => {
-                          field.onChange(newValue ? "active" : "inactive");
-                        }}
-                        listClassName="w-full"
                       />
                     </FormControl>
                     <FormMessage />
