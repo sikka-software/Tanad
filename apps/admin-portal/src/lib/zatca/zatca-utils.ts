@@ -122,3 +122,114 @@ export function isZatcaCompliant(
     missingFields,
   };
 }
+
+/**
+ * Generate a TLV-encoded QR code string for ZATCA Phase 2 compliance
+ * Phase 2 QR codes include additional fields like invoice hash and signature
+ * @param params The invoice parameters for Phase 2
+ * @returns Base64-encoded TLV string for QR code generation
+ */
+export function generateZatcaPhase2QRString({
+  sellerName,
+  vatNumber,
+  invoiceTimestamp,
+  invoiceTotal,
+  vatAmount,
+  invoiceHash,
+  digitalSignature,
+  publicKey,
+  certificateSignature,
+}: {
+  sellerName: string;
+  vatNumber: string;
+  invoiceTimestamp: string; // ISO format
+  invoiceTotal: number;
+  vatAmount: number;
+  invoiceHash: string; // SHA-256 hash of the invoice
+  digitalSignature: string; // Base64 encoded signature
+  publicKey: string; // Base64 encoded public key
+  certificateSignature: string; // Base64 encoded certificate signature
+}): string {
+  // ZATCA Phase 2 TLV Structure:
+  // Tag 1: Seller Name
+  const tag1 = encodeTLV(1, sellerName);
+
+  // Tag 2: VAT Registration Number
+  const tag2 = encodeTLV(2, vatNumber);
+
+  // Tag 3: Invoice Timestamp (ISO format)
+  const tag3 = encodeTLV(3, invoiceTimestamp);
+
+  // Tag 4: Invoice Total (with 2 decimal places)
+  const tag4 = encodeTLV(4, invoiceTotal.toFixed(2));
+
+  // Tag 5: VAT Amount (with 2 decimal places)
+  const tag5 = encodeTLV(5, vatAmount.toFixed(2));
+
+  // Tag 6: Invoice Hash (SHA-256 hash of the invoice XML)
+  const tag6 = encodeTLV(6, invoiceHash);
+
+  // Tag 7: Digital Signature (ECDSA signature)
+  const tag7 = encodeTLV(7, digitalSignature);
+
+  // Tag 8: Public Key (EC public key)
+  const tag8 = encodeTLV(8, publicKey);
+
+  // Tag 9: Certificate Signature (Signature of the certificate)
+  const tag9 = encodeTLV(9, certificateSignature);
+
+  // Concatenate all TLV strings
+  const tlvString = tag1 + tag2 + tag3 + tag4 + tag5 + tag6 + tag7 + tag8 + tag9;
+
+  // Convert the hex string back to bytes before base64 encoding
+  const buffer = Buffer.from(tlvString, "hex");
+
+  // Return as base64 for QR code generation
+  return buffer.toString("base64");
+}
+
+/**
+ * Generate mock Phase 2 QR code data for testing
+ * This generates placeholder values for digital signature components
+ */
+export function generateMockZatcaPhase2QRString({
+  sellerName,
+  vatNumber,
+  invoiceTimestamp,
+  invoiceTotal,
+  vatAmount,
+}: {
+  sellerName: string;
+  vatNumber: string;
+  invoiceTimestamp: string;
+  invoiceTotal: number;
+  vatAmount: number;
+}): string {
+  // Generate mock hash (in real implementation, this would be SHA-256 of the invoice)
+  const mockInvoiceHash =
+    "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==";
+
+  // Generate mock digital signature
+  const mockSignature =
+    "MEUCIGJHyGK5cAeINcYJ3jz7M8cHI6dXPbnmx0dmnUJ+COwIKAiEAwjLwW91YpSzI8MZgYlLrP/xk2vKlM8+JOFAKgE/tpA=";
+
+  // Generate mock public key
+  const mockPublicKey =
+    "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEJKy6hE02FE/+gOTz0LxcfRFCtPn7KhgzjL8RIRhtEYBIJxTFFdWXFIRzTSF7PBb1GzCJ2Kqhb1Q6nT+xQjvP7Q==";
+
+  // Generate mock certificate signature
+  const mockCertSignature =
+    "MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwGggCSABIIBYA==";
+
+  return generateZatcaPhase2QRString({
+    sellerName,
+    vatNumber,
+    invoiceTimestamp,
+    invoiceTotal,
+    vatAmount,
+    invoiceHash: mockInvoiceHash,
+    digitalSignature: mockSignature,
+    publicKey: mockPublicKey,
+    certificateSignature: mockCertSignature,
+  });
+}

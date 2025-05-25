@@ -2,6 +2,7 @@
  * ZATCA XML Utilities for Phase 2 E-Invoicing
  * Based on ZATCA Phase 2 requirements and UBL 2.1 standard
  */
+import { generateMockZatcaPhase2QRString } from "./zatca-utils";
 
 interface ZatcaInvoiceData {
   // Invoice identification
@@ -78,20 +79,100 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
     invoiceData.previousInvoiceHash ||
     "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==";
 
+  // Generate Phase 2 QR code
+  const qrCodeData = generateMockZatcaPhase2QRString({
+    sellerName: invoiceData.sellerName,
+    vatNumber: invoiceData.sellerVatNumber,
+    invoiceTimestamp: invoiceData.issueDate,
+    invoiceTotal: invoiceData.total,
+    vatAmount: invoiceData.vatAmount,
+  });
+
+  // Calculate VAT percentage dynamically from items
+  const vatPercentage = invoiceData.items.length > 0 ? invoiceData.items[0].vatRate : 15;
+
   // UBL 2.1 Invoice XML Template
   return `<?xml version="1.0" encoding="UTF-8"?>
 <Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
          xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
          xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
-         xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2">
+         xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2"
+         xmlns:sig="urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2"
+         xmlns:sac="urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2"
+         xmlns:sbc="urn:oasis:names:specification:ubl:schema:xsd:SignatureBasicComponents-2">
+
+  <!-- UBL Extensions for Phase 2 Signature -->
+  <ext:UBLExtensions>
+    <ext:UBLExtension>
+      <ext:ExtensionURI>urn:oasis:names:specification:ubl:dsig:enveloped:xades</ext:ExtensionURI>
+      <ext:ExtensionContent>
+        <!-- Signature placeholder for ZATCA Phase 2 -->
+        <sig:UBLDocumentSignatures xmlns:sig="urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2"
+                                  xmlns:sac="urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2"
+                                  xmlns:sbc="urn:oasis:names:specification:ubl:schema:xsd:SignatureBasicComponents-2">
+          <sac:SignatureInformation>
+            <cbc:ID>urn:oasis:names:specification:ubl:signature:1</cbc:ID>
+            <sbc:ReferencedSignatureID>urn:oasis:names:specification:ubl:signature:Invoice</sbc:ReferencedSignatureID>
+            <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="signature">
+              <ds:SignedInfo>
+                <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2006/12/xml-c14n11"/>
+                <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"/>
+                <ds:Reference Id="invoiceSignedData" URI="">
+                  <ds:Transforms>
+                    <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                    <ds:Transform Algorithm="http://www.w3.org/2006/12/xml-c14n11"/>
+                  </ds:Transforms>
+                  <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+                  <ds:DigestValue>[PLACEHOLDER_DIGEST_VALUE]</ds:DigestValue>
+                </ds:Reference>
+                <ds:Reference Type="http://www.w3.org/2000/09/xmldsig#SignatureProperties" URI="#xadesSignedProperties">
+                  <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+                  <ds:DigestValue>[PLACEHOLDER_SIGNED_PROPS_DIGEST]</ds:DigestValue>
+                </ds:Reference>
+              </ds:SignedInfo>
+              <ds:SignatureValue>[PLACEHOLDER_SIGNATURE_VALUE]</ds:SignatureValue>
+              <ds:KeyInfo>
+                <ds:X509Data>
+                  <ds:X509Certificate>[PLACEHOLDER_CERTIFICATE]</ds:X509Certificate>
+                </ds:X509Data>
+              </ds:KeyInfo>
+              <ds:Object>
+                <xades:QualifyingProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Target="#signature">
+                  <xades:SignedProperties Id="xadesSignedProperties">
+                    <xades:SignedSignatureProperties>
+                      <xades:SigningTime>[PLACEHOLDER_SIGNING_TIME]</xades:SigningTime>
+                      <xades:SigningCertificate>
+                        <xades:Cert>
+                          <xades:CertDigest>
+                            <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+                            <ds:DigestValue>[PLACEHOLDER_CERT_DIGEST]</ds:DigestValue>
+                          </xades:CertDigest>
+                          <xades:IssuerSerial>
+                            <ds:X509IssuerName>[PLACEHOLDER_ISSUER_NAME]</ds:X509IssuerName>
+                            <ds:X509SerialNumber>[PLACEHOLDER_SERIAL_NUMBER]</ds:X509SerialNumber>
+                          </xades:IssuerSerial>
+                        </xades:Cert>
+                      </xades:SigningCertificate>
+                    </xades:SignedSignatureProperties>
+                  </xades:SignedProperties>
+                </xades:QualifyingProperties>
+              </ds:Object>
+            </ds:Signature>
+          </sac:SignatureInformation>
+        </sig:UBLDocumentSignatures>
+      </ext:ExtensionContent>
+    </ext:UBLExtension>
+  </ext:UBLExtensions>
+
   <cbc:UBLVersionID>2.1</cbc:UBLVersionID>
   <cbc:ProfileID>reporting:1.0</cbc:ProfileID>
   <cbc:ID>${invoiceData.invoiceNumber}</cbc:ID>
   <cbc:UUID>${uuid}</cbc:UUID>
   <cbc:IssueDate>${formatDateOnly(invoiceData.issueDate)}</cbc:IssueDate>
   <cbc:IssueTime>${formatTimeOnly(invoiceData.issueDate)}</cbc:IssueTime>
-  <cbc:InvoiceTypeCode listID="UN/ECE 1001 Subset" listAgencyID="6">${invoiceTypeCode}</cbc:InvoiceTypeCode>
+  <cbc:InvoiceTypeCode name="${zatcaInvoiceCode}" listID="UN/ECE 1001 Subset" listAgencyID="6">${invoiceTypeCode}</cbc:InvoiceTypeCode>
   <cbc:DocumentCurrencyCode>${documentCurrencyCode}</cbc:DocumentCurrencyCode>
+  <cbc:TaxCurrencyCode>${documentCurrencyCode}</cbc:TaxCurrencyCode>
 
   <!-- ZATCA Additional Document References -->
   <cac:AdditionalDocumentReference>
@@ -107,6 +188,12 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
   <cac:AdditionalDocumentReference>
     <cbc:ID>KSA-2</cbc:ID>
     <cbc:DocumentDescription>${zatcaInvoiceCode}</cbc:DocumentDescription>
+  </cac:AdditionalDocumentReference>
+  <cac:AdditionalDocumentReference>
+    <cbc:ID>QR</cbc:ID>
+    <cac:Attachment>
+      <cbc:EmbeddedDocumentBinaryObject mimeCode="text/plain">${qrCodeData}</cbc:EmbeddedDocumentBinaryObject>
+    </cac:Attachment>
   </cac:AdditionalDocumentReference>
 
   <!-- Seller Information -->
@@ -199,7 +286,7 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
       <cbc:TaxAmount currencyID="${documentCurrencyCode}">${formatDecimal(invoiceData.vatAmount)}</cbc:TaxAmount>
       <cac:TaxCategory>
         <cbc:ID>S</cbc:ID>
-        <cbc:Percent>15</cbc:Percent>
+        <cbc:Percent>${vatPercentage}</cbc:Percent>
         <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
@@ -263,7 +350,7 @@ function getZatcaInvoiceTypeCode(invoiceType: "STANDARD" | "SIMPLIFIED"): string
  * Generate ZATCA invoice code (KSA-2) in format NNPNESB
  */
 function getZatcaInvoiceCode(invoiceType: "STANDARD" | "SIMPLIFIED"): string {
-  // ZATCA Invoice Code Structure: NNPNESB
+  // ZATCA Invoice Code Structure: NNPNESB (7 characters)
   // NN (position 1-2): Invoice subtype (01=Standard, 02=Simplified)
   // P (position 3): Third party invoice (0=False, 1=True)
   // N (position 4): Nominal supply (0=False, 1=True)

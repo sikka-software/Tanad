@@ -160,6 +160,39 @@ async function enhancedValidation(request: ZatcaValidationRequest): Promise<Zatc
     });
   }
 
+  // BR-KSA-68: Tax currency code validation
+  if (!xml.includes("<cbc:TaxCurrencyCode>")) {
+    validationMessages.push({
+      type: "ERROR",
+      code: "BR-KSA-68",
+      message: "يجب أن يكون الرمز الخاص بعملة الضريبة (BT-6) ضمناً في الفاتورة.",
+      path: "/Invoice/cbc:TaxCurrencyCode",
+    });
+  }
+
+  // BR-KSA-06: Invoice code (KSA-2) validation
+  const ksaCodeMatch = xml.match(
+    /<cbc:ID>KSA-2<\/cbc:ID>\s*<cbc:DocumentDescription>(\w+)<\/cbc:DocumentDescription>/,
+  );
+  if (!ksaCodeMatch) {
+    validationMessages.push({
+      type: "ERROR",
+      code: "BR-KSA-06",
+      message: "يجب أن يكون رمز الفاتورة (KSA-2) موجوداً وأن يتبع الهيكل التالي: NNPNESB",
+      path: "/Invoice/cac:AdditionalDocumentReference[cbc:ID='KSA-2']",
+    });
+  } else {
+    const invoiceCode = ksaCodeMatch[1];
+    if (!isValidZatcaInvoiceCode(invoiceCode)) {
+      validationMessages.push({
+        type: "ERROR",
+        code: "BR-KSA-06",
+        message: `يجب أن يكون رمز الفاتورة (KSA-2) موجوداً وأن يتبع الهيكل التالي: NNPNESB NN ( position 1 and2) = النوع الفرعي للفاتورة: - 01 للفاتورة الضريبية - 02 للفاتورة الضريبية المبسطة P (position 3) = فاتورة صادرة عن طرف ثالث ، 0 خطأ، 1 صحيح N (position 4) = فاتورة توريد مفترض ، 0 خطأ ، 1 صحيح E (position 5) = فاتورة تصدير، 0 خطأ، 1 صحيح S (position 6) = فاتورة موجزة، 0 خطأ، 1 صحيح B (position 7) = فاتورة ذاتية (فاتورة صادرة من العميل بالنيابة عن المورد). Current code: ${invoiceCode}`,
+        path: "/Invoice/cac:AdditionalDocumentReference[cbc:ID='KSA-2']/cbc:DocumentDescription",
+      });
+    }
+  }
+
   // Supplier party validation
   if (!xml.includes("<cac:AccountingSupplierParty>")) {
     validationMessages.push({
@@ -278,6 +311,37 @@ async function enhancedValidation(request: ZatcaValidationRequest): Promise<Zatc
     timestamp: new Date().toISOString(),
     requestId: `enhanced-${Date.now()}`,
   };
+}
+
+/**
+ * Validates ZATCA invoice code format (NNPNESB)
+ */
+function isValidZatcaInvoiceCode(code: string): boolean {
+  // Code must be exactly 7 characters
+  if (code.length !== 7) {
+    return false;
+  }
+
+  // All characters must be digits
+  if (!/^\d{7}$/.test(code)) {
+    return false;
+  }
+
+  // NN (position 1-2): Invoice subtype (01=Standard, 02=Simplified)
+  const subtype = code.substring(0, 2);
+  if (subtype !== "01" && subtype !== "02") {
+    return false;
+  }
+
+  // P, N, E, S, B (positions 3-7): Must be 0 or 1
+  for (let i = 2; i < 7; i++) {
+    const char = code.charAt(i);
+    if (char !== "0" && char !== "1") {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**
