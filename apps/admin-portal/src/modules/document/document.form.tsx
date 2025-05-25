@@ -133,6 +133,9 @@ export function DocumentForm({
         setIsUploading(false);
 
         if (createdDocumentData?.id) {
+          const prevDocs = useDocumentStore.getState().data || [];
+          useDocumentStore.getState().setData!([createdDocumentData, ...prevDocs]);
+
           await updateDocument(
             {
               id: createdDocumentData.id,

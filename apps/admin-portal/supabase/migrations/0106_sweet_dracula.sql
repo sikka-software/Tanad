@@ -1,0 +1,1 @@
+ALTER TABLE "documents" ALTER COLUMN "url" DROP NOT NULL;

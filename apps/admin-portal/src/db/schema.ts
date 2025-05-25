@@ -1244,7 +1244,7 @@ export const documents = pgTable(
 
     name: text().notNull(),
     description: text(),
-    url: text().notNull(),
+    url: text(), // Made nullable
     file_path: text().notNull(),
     entity_id: uuid().notNull(),
     entity_type: text().notNull(),

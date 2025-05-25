@@ -33,6 +33,7 @@ import { DocumentUpdateData } from "@/document/document.type";
 
 import DocumentCard from "@/modules/document/document.card";
 import useDocumentColumns from "@/modules/document/document.columns";
+import { createClient } from '@/utils/supabase/component';
 
 export default function DocumentsPage() {
   const t = useTranslations();
@@ -104,9 +105,25 @@ export default function DocumentsPage() {
   const storeData = useDocumentStore((state) => state.data) || [];
   const setData = useDocumentStore((state) => state.setData);
 
+  const supabase = createClient();
+
+  async function addSignedUrlsToDocuments(documents: any[]): Promise<any[]> {
+    return await Promise.all(
+      (documents || []).map(async (doc: any) => {
+        if (doc.file_path) {
+          const { data } = await supabase.storage
+            .from('enterprise-documents')
+            .createSignedUrl(doc.file_path, 3600);
+          return { ...doc, url: data?.signedUrl || '' };
+        }
+        return doc;
+      })
+    );
+  }
+
   useEffect(() => {
     if (documents && setData) {
-      setData(documents);
+      addSignedUrlsToDocuments(documents).then(setData);
     }
   }, [documents, setData]);
 

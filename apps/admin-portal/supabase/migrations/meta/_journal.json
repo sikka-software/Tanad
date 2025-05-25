@@ -743,6 +743,13 @@
       "when": 1748157278607,
       "tag": "0105_slim_major_mapleleaf",
       "breakpoints": true
+    },
+    {
+      "idx": 106,
+      "version": "7",
+      "when": 1748182328152,
+      "tag": "0106_sweet_dracula",
+      "breakpoints": true
     }
   ]
 }
