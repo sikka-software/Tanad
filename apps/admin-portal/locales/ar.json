@@ -337,6 +337,13 @@
     "Dashboard": { "title": "لوحة التحكم" },
     "Analytics": { "title": "التحليلات" },
     "Help": { "title": "المساعدة" },
+    "Documents": {
+      "title": "المستندات",
+      "add": "إضافة مستند",
+      "no_documents": "لا يوجد مستندات",
+      "document": "المستند",
+      "document_description": "وصف المستند"
+    },
     "Products": {
       "title": "المنتجات",
       "singular": "منتج",
@@ -2250,6 +2257,44 @@
     "contact": {
       "title": "تواصل معنا",
       "subtitle": "في خاطرك شي؟ حياك أرسل لنا رسالة "
+    }
+  },
+  "Documents": {
+    "create_first": {
+      "title": "ابدأ رحلة إدارة المستندات الاحترافية",
+      "description": "انطلق في عالم إدارة المستندات بكل ثقة! أنشئ أول مستند احترافي لك واستمتع بتجربة سهلة وفعالة لإدارة مستنداتك بكل احترافية"
+    },
+    "error": {
+      "file_required": "الملف مطلوب",
+      "create": "فشل في إنشاء المستند",
+      "update_description_failed": "فشل في تحديث وصف المستند"
+    },
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "required": "الاسم مطلوب",
+        "placeholder": "أدخل اسم المستند"
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "أدخل وصف المستند"
+      },
+      "url": {
+        "label": "رابط المستند"
+      },
+      "file_path": {
+        "label": "مسار الملف"
+      },
+      "entity_id": {
+        "label": "معرف الكيان"
+      }
+    },
+    "actions": {
+      "edit": "تعديل",
+      "delete": "حذف",
+      "duplicate": "نسخ",
+      "view": "عرض",
+      "archive": "أرشفة"
     }
   },
   "Products": {

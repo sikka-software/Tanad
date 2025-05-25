@@ -44,10 +44,10 @@ export const routeMap: RouteMap = {
     label: "Pages.OnlineStores.title",
     translationKey: "Pages.OnlineStores.title",
   },
-  // cars
   "/cars": { label: "Pages.Cars.title", translationKey: "Pages.Cars.title" },
-  // trucks
   "/trucks": { label: "Pages.Trucks.title", translationKey: "Pages.Trucks.title" },
+  "/individuals": { label: "Pages.Individuals.title", translationKey: "Pages.Individuals.title" },
+  "/documents": { label: "Pages.Documents.title", translationKey: "Pages.Documents.title" },
 };
 
 // Dynamic route patterns and their handling

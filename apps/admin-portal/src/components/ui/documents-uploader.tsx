@@ -104,7 +104,7 @@ export function DocumentUploader({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <Label>{t("Documents.title")}</Label>
+        <Label>{t("Pages.Documents.title")}</Label>
         <div className="relative">
           <Input
             type="file"
@@ -121,7 +121,7 @@ export function DocumentUploader({
             disabled={disabled || documents.length >= maxFiles}
           >
             <Plus className="me-2 h-4 w-4" />
-            {t("Documents.add_document")}
+            {t("Pages.Documents.add")}
           </Button>
         </div>
       </div>
@@ -138,7 +138,7 @@ export function DocumentUploader({
                       value={doc.name}
                       onChange={(e) => handleNameChange(index, e.target.value)}
                       className="h-8 flex-1"
-                      placeholder={t("Documents.document_name")}
+                      placeholder={t("Documents.form.name.placeholder")}
                       disabled={disabled || doc.uploaded}
                     />
                     <Button
@@ -160,8 +160,10 @@ export function DocumentUploader({
       ) : (
         <div className="flex h-[200px] flex-col items-center justify-center rounded-md border border-dashed">
           <Upload className="text-muted-foreground mb-2 h-8 w-8" />
-          <p className="text-muted-foreground text-sm">{t("Documents.no_documents")}</p>
-          <p className="text-muted-foreground mt-1 text-xs">{t("Documents.drag_or_click")}</p>
+          <p className="text-muted-foreground text-sm">{t("Documents.create_first.title")}</p>
+          <p className="text-muted-foreground mt-1 text-xs">
+            {t("Documents.create_first.description")}
+          </p>
         </div>
       )}
     </div>
