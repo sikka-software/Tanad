@@ -513,6 +513,7 @@ export type Database = {
       documents: {
         Row: {
           created_at: string
+          description: string | null
           enterprise_id: string
           entity_id: string
           entity_type: string
@@ -527,6 +528,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          description?: string | null
           enterprise_id: string
           entity_id: string
           entity_type: string
@@ -541,6 +543,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          description?: string | null
           enterprise_id?: string
           entity_id?: string
           entity_type?: string

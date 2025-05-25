@@ -1243,6 +1243,7 @@ export const documents = pgTable(
     updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
 
     name: text().notNull(),
+    description: text(),
     url: text().notNull(),
     file_path: text().notNull(),
     entity_id: uuid().notNull(),

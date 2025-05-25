@@ -736,6 +736,13 @@
       "when": 1748154719848,
       "tag": "0104_dapper_rockslide",
       "breakpoints": true
+    },
+    {
+      "idx": 105,
+      "version": "7",
+      "when": 1748157278607,
+      "tag": "0105_slim_major_mapleleaf",
+      "breakpoints": true
     }
   ]
 }
