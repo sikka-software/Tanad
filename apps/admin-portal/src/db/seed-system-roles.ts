@@ -45,6 +45,13 @@ const systemRolePermissions: Record<string, string[]> = {
     "roles.duplicate",
     "roles.export",
 
+    "documents.read",
+    "documents.create",
+    "documents.delete",
+    "documents.update",
+    "documents.duplicate",
+    "documents.export",
+
     "employees.read",
     "employees.create",
     "employees.delete",

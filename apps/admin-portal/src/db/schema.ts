@@ -254,6 +254,12 @@ export const app_permission = pgEnum("app_permission", [
   "individuals.update",
   "individuals.export",
   "individuals.duplicate",
+  "documents.read",
+  "documents.create",
+  "documents.delete",
+  "documents.update",
+  "documents.export",
+  "documents.duplicate",
 ]);
 export const app_role = pgEnum("app_role", ["superadmin", "admin", "accounting", "hr", "it"]);
 export const common_status = pgEnum("common_status", ["active", "inactive", "draft", "archived"]);

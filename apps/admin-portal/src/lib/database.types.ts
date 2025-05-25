@@ -512,7 +512,7 @@ export type Database = {
       }
       documents: {
         Row: {
-          created_at: string | null
+          created_at: string
           enterprise_id: string
           entity_id: string
           entity_type: string
@@ -521,12 +521,12 @@ export type Database = {
           name: string
           notes: Json | null
           status: Database["public"]["Enums"]["common_status"] | null
-          updated_at: string | null
+          updated_at: string
           url: string
           user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           enterprise_id: string
           entity_id: string
           entity_type: string
@@ -535,12 +535,12 @@ export type Database = {
           name: string
           notes?: Json | null
           status?: Database["public"]["Enums"]["common_status"] | null
-          updated_at?: string | null
+          updated_at?: string
           url: string
           user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           enterprise_id?: string
           entity_id?: string
           entity_type?: string
@@ -549,7 +549,7 @@ export type Database = {
           name?: string
           notes?: Json | null
           status?: Database["public"]["Enums"]["common_status"] | null
-          updated_at?: string | null
+          updated_at?: string
           url?: string
           user_id?: string
         }
@@ -2921,6 +2921,12 @@ export type Database = {
         | "individuals.update"
         | "individuals.export"
         | "individuals.duplicate"
+        | "documents.read"
+        | "documents.create"
+        | "documents.delete"
+        | "documents.update"
+        | "documents.export"
+        | "documents.duplicate"
       app_role: "superadmin" | "admin" | "accounting" | "hr" | "it"
       common_status: "active" | "inactive" | "draft" | "archived"
       employee_request_status:
@@ -3341,6 +3347,12 @@ export const Constants = {
         "individuals.update",
         "individuals.export",
         "individuals.duplicate",
+        "documents.read",
+        "documents.create",
+        "documents.delete",
+        "documents.update",
+        "documents.export",
+        "documents.duplicate",
       ],
       app_role: ["superadmin", "admin", "accounting", "hr", "it"],
       common_status: ["active", "inactive", "draft", "archived"],
