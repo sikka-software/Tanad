@@ -1,0 +1,1 @@
+ALTER TABLE "documents" ADD COLUMN "status" "common_status" DEFAULT 'active';

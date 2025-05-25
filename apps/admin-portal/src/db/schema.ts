@@ -1244,6 +1244,8 @@ export const documents = pgTable(
     entity_type: text().notNull(),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
+    status: common_status().default("active"),
+    notes: jsonb(),
   },
   (table) => [
     index("documents_entity_id_idx").using(

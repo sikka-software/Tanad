@@ -29,6 +29,7 @@
     "db:types": "tsx scripts/apply-types.ts",
     "db:update": "infisical run --env=dev -- tsx scripts/apply-types.ts && infisical run --env=dev -- tsx scripts/apply-rbac.ts && infisical run --env=dev -- tsx scripts/apply-triggers.ts && infisical run --env=dev -- drizzle-kit push && infisical run --env=dev -- tsx scripts/apply-policies.ts",
     "populate:roles": "infisical run --env=dev -- tsx src/db/seed-system-roles.ts",
+    "populate:tsconfig": "node scripts/prepare-tsconfig.js",
     "flow:sync": "pnpm db:generate && supabase db push --include-all && supabase gen types typescript --project-id vcbrjspzfsvzgtjndjat --schema public > src/lib/database.types.ts",
     "prettify": "prettier --write \"**/*.{js,jsx,ts,tsx,css}\""
   },

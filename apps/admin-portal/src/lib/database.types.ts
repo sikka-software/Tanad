@@ -519,6 +519,8 @@ export type Database = {
           file_path: string
           id: string
           name: string
+          notes: Json | null
+          status: Database["public"]["Enums"]["common_status"] | null
           updated_at: string | null
           url: string
           user_id: string
@@ -531,6 +533,8 @@ export type Database = {
           file_path: string
           id?: string
           name: string
+          notes?: Json | null
+          status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string | null
           url: string
           user_id: string
@@ -543,6 +547,8 @@ export type Database = {
           file_path?: string
           id?: string
           name?: string
+          notes?: Json | null
+          status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string | null
           url?: string
           user_id?: string
