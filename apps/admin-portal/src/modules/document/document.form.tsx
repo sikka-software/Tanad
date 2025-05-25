@@ -12,7 +12,7 @@ import { Textarea } from "@/ui/textarea";
 
 import { DocumentUploader, DocumentFile } from "@/components/ui/documents-uploader";
 
-import { uploadDocument as uploadDocumentService } from "@/services/documents";
+import { uploadDocument as uploadDocumentService } from "@/document/document.service";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -126,10 +126,10 @@ export function DocumentForm({
           file: uploadedDocument.file,
           name: formData.name.trim() || uploadedDocument.file.name,
           entity_type: "document",
-          entity_id: enterprise.id,
+          entity_id: enterprise?.id,
         };
 
-        const createdDocumentData = await uploadDocumentService(documentToUpload);
+        const createdDocumentData = await uploadDocumentService(documentToUpload, enterprise);
         setIsUploading(false);
 
         if (createdDocumentData?.id) {

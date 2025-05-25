@@ -11,7 +11,7 @@ import { Input } from "@/ui/inputs/input";
 import { Label } from "@/ui/label";
 import { ScrollArea } from "@/ui/scroll-area";
 
-import { uploadDocument } from "@/services/documents";
+import { deleteDocument } from "@/modules/document/document.service";
 
 export interface DocumentFile {
   id?: string;
@@ -95,10 +95,27 @@ export function DocumentUploader({
     onDocumentsChange(updatedDocuments);
   };
 
-  const handleRemoveFile = (index: number) => {
-    const updatedDocuments = documents.filter((_, i) => i !== index);
-    setDocuments(updatedDocuments);
-    onDocumentsChange(updatedDocuments);
+  const handleRemoveFile = async (index: number) => {
+    const docToRemove = documents[index];
+
+    if (docToRemove.id && docToRemove.uploaded) {
+      try {
+        await deleteDocument(docToRemove.id);
+        toast.success(t("Documents.delete_success"));
+        const updatedDocuments = documents.filter((_, i) => i !== index);
+        setDocuments(updatedDocuments);
+        onDocumentsChange(updatedDocuments);
+      } catch (error) {
+        console.error("Failed to delete document:", error);
+        toast.error(t("Documents.error.delete"), {
+          description: (error as Error)?.message || t("General.error_operation_desc"),
+        });
+      }
+    } else {
+      const updatedDocuments = documents.filter((_, i) => i !== index);
+      setDocuments(updatedDocuments);
+      onDocumentsChange(updatedDocuments);
+    }
   };
 
   return (
@@ -147,7 +164,7 @@ export function DocumentUploader({
                       size="icon"
                       className="h-8 w-8 flex-shrink-0"
                       onClick={() => handleRemoveFile(index)}
-                      disabled={disabled || doc.uploaded}
+                      disabled={disabled}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

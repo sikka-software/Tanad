@@ -32,6 +32,7 @@ type ModelConfig = {
 };
 
 const modelMap: Record<string, ModelConfig> = {
+  documents: { tableName: "documents" },
   branches: { tableName: "branches" },
   companies: { tableName: "companies" },
   jobs: { tableName: "jobs" },

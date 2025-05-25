@@ -1,4 +1,5 @@
 const models = [
+  "documents",
   "clients",
   "vendors",
   "offices",
