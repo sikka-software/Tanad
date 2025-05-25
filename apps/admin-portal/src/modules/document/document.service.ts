@@ -1,4 +1,4 @@
-import { Document, DocumentCreateData, DocumentUpdateData } from "@/document/document.type";
+import { Document, DocumentCreateData, DocumentUpdateData } from "./document.type";
 
 export async function fetchDocuments(): Promise<Document[]> {
   try {

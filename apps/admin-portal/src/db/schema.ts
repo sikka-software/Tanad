@@ -1231,19 +1231,17 @@ export const documents = pgTable(
   "documents",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
-    updated_at: timestamp({ withTimezone: true, mode: "string" }).default(
-      sql`timezone('utc'::text, now())`,
-    ),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+
     name: text().notNull(),
     url: text().notNull(),
     file_path: text().notNull(),
     entity_id: uuid().notNull(),
     entity_type: text().notNull(),
-    user_id: uuid().notNull(),
-    enterprise_id: uuid().notNull(),
+
     status: common_status().default("active"),
     notes: jsonb(),
   },

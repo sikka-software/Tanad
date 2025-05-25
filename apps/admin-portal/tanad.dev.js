@@ -33,6 +33,8 @@ const TanadModulesDirectories = [
   "truck",
   "recruitment",
   "bank-account",
+  "individual",
+  "document",
 ];
 
 module.exports = TanadModulesDirectories;

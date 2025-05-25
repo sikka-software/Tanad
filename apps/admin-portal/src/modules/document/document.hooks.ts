@@ -8,10 +8,9 @@ import {
   fetchDocuments,
   updateDocument,
   duplicateDocument,
-} from "@/document/document.service";
-import type { Document, DocumentCreateData, DocumentUpdateData } from "@/document/document.type";
+} from "./document.service";
+import type { Document, DocumentCreateData, DocumentUpdateData } from "./document.type";
 
-// Query keys for documents
 export const documentKeys = {
   all: ["documents"] as const,
   lists: () => [...documentKeys.all, "list"] as const,
@@ -20,7 +19,6 @@ export const documentKeys = {
   detail: (id: string) => [...documentKeys.details(), id] as const,
 };
 
-// Hook to fetch all documents
 export function useDocuments() {
   return useQuery({
     queryKey: documentKeys.lists(),
@@ -28,16 +26,14 @@ export function useDocuments() {
   });
 }
 
-// Hook to fetch a single document by ID
 export function useDocument(id: string) {
   return useQuery({
     queryKey: documentKeys.detail(id),
     queryFn: () => fetchDocumentById(id),
-    enabled: !!id, // Only run query if id is truthy
+    enabled: !!id,
   });
 }
 
-// Hook for creating a new document
 export function useCreateDocument() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -50,7 +46,6 @@ export function useCreateDocument() {
   });
 }
 
-// Hook for updating an existing document
 export function useUpdateDocument() {
   const queryClient = useQueryClient();
 
@@ -112,7 +107,6 @@ export function useUpdateDocument() {
   });
 }
 
-// Hook for duplicating a document
 export function useDuplicateDocument() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -128,7 +122,6 @@ export function useDuplicateDocument() {
   });
 }
 
-// Hook for deleting a document
 export function useDeleteDocument() {
   const queryClient = useQueryClient();
 
@@ -146,7 +139,6 @@ export function useDeleteDocument() {
   });
 }
 
-// Hook for bulk deleting documents
 export function useBulkDeleteDocuments() {
   const queryClient = useQueryClient();
 
