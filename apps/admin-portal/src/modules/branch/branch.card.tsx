@@ -1,5 +1,7 @@
 import { Mail, MapPin, Phone, User } from "lucide-react";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus } from "@/types/common.type";
@@ -20,11 +22,7 @@ const BranchCard = ({
   const data = useBranchStore((state) => state.data);
   const setData = useBranchStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateBranch({ id: rowId, data: { [columnId]: value } as BranchUpdateData });
-  };
+  const handleEdit = createHandleEdit<Branch, BranchUpdateData>(setData, updateBranch, data);
 
   return (
     <ModuleCard

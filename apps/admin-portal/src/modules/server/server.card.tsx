@@ -1,5 +1,7 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus } from "@/types/common.type";
@@ -7,7 +9,7 @@ import { CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateServer } from "@/server/server.hooks";
 import useServerStore from "@/server/server.store";
-import { Server } from "@/server/server.type";
+import { Server, ServerUpdateData } from "@/server/server.type";
 
 const ServerCard = ({
   server,
@@ -20,11 +22,7 @@ const ServerCard = ({
   const data = useServerStore((state) => state.data);
   const setData = useServerStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateServer({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Server, ServerUpdateData>(setData, updateServer, data);
 
   return (
     <ModuleCard

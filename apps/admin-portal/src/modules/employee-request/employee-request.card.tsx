@@ -1,5 +1,7 @@
 import { useTranslations } from "next-intl";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { Employee } from "@/employee/employee.types";
@@ -10,6 +12,7 @@ import {
   EmployeeRequest,
   EmployeeRequestStatus,
   EmployeeRequestStatusProps,
+  EmployeeRequestUpdateData,
 } from "@/employee-request/employee-request.type";
 
 const EmployeeRequestCard = ({
@@ -26,11 +29,11 @@ const EmployeeRequestCard = ({
   const data = useEmployeeRequestStore((state) => state.data);
   const setData = useEmployeeRequestStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateEmployeeRequest({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<EmployeeRequest, EmployeeRequestUpdateData>(
+    setData,
+    updateEmployeeRequest,
+    data,
+  );
 
   return (
     <ModuleCard

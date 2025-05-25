@@ -1,12 +1,14 @@
 import { Mail, Phone, MapPin, Building2 } from "lucide-react";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus, CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateOffice } from "@/office/office.hooks";
 import useOfficeStore from "@/office/office.store";
-import { Office } from "@/office/office.type";
+import { Office, OfficeUpdateData } from "@/office/office.type";
 
 const OfficeCard = ({
   office,
@@ -19,11 +21,7 @@ const OfficeCard = ({
   const data = useOfficeStore((state) => state.data);
   const setData = useOfficeStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateOffice({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Office, OfficeUpdateData>(setData, updateOffice, data);
 
   return (
     <ModuleCard

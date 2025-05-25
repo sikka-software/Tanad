@@ -2,13 +2,20 @@ import { useTranslations } from "next-intl";
 
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import { useUpdatePurchase } from "@/purchase/purchase.hooks";
 import usePurchaseStore from "@/purchase/purchase.store";
-import { Purchase, PurchaseStatus, PurchaseStatusProps } from "@/purchase/purchase.type";
+import {
+  Purchase,
+  PurchaseStatus,
+  PurchaseStatusProps,
+  PurchaseUpdateData,
+} from "@/purchase/purchase.type";
 
 const PurchaseCard = ({
   purchase,
@@ -23,11 +30,7 @@ const PurchaseCard = ({
   const data = usePurchaseStore((state) => state.data);
   const setData = usePurchaseStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updatePurchase({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Purchase, PurchaseUpdateData>(setData, updatePurchase, data);
 
   return (
     <ModuleCard

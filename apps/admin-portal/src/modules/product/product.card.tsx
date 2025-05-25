@@ -1,17 +1,12 @@
-import { Mail, Phone, MapPin, Building2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Card, CardContent, CardHeader } from "@/ui/card";
+import { createHandleEdit } from "@/utils/module-utils";
 
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus, CommonStatusProps } from "@/types/common.type";
 
-import { Product } from "@/product/product.type";
-
-import { useUpdateOffice } from "@/office/office.hooks";
-import useOfficeStore from "@/office/office.store";
-import { Office } from "@/office/office.type";
+import { Product, ProductUpdateData } from "@/product/product.type";
 
 import { useUpdateProduct } from "./product.hooks";
 import useProductStore from "./product.store";
@@ -28,11 +23,7 @@ const ProductCard = ({
   const data = useProductStore((state) => state.data);
   const setData = useProductStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateProduct({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Product, ProductUpdateData>(setData, updateProduct, data);
 
   return (
     <ModuleCard

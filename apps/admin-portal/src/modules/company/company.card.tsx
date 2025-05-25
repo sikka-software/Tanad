@@ -1,13 +1,15 @@
 import { Mail, Phone, Globe, MapPin, Building2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus, CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateCompany } from "@/company/company.hooks";
 import useCompanyStore from "@/company/company.store";
-import { Company } from "@/company/company.type";
+import { Company, CompanyUpdateData } from "@/company/company.type";
 
 const CompanyCard = ({
   company,
@@ -21,11 +23,7 @@ const CompanyCard = ({
   const data = useCompanyStore((state) => state.data);
   const setData = useCompanyStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateCompany({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Company, CompanyUpdateData>(setData, updateCompany, data);
 
   return (
     <ModuleCard

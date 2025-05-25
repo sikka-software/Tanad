@@ -5,11 +5,13 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateProduct } from "@/product/product.hooks";
 import useProductStore from "@/product/product.store";
-import { Product } from "@/product/product.type";
+import { Product, ProductUpdateData } from "@/product/product.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -21,11 +23,8 @@ const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const { mutateAsync: updateProduct } = useUpdateProduct();
   const setData = useProductStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateProduct({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Product, ProductUpdateData>(setData, updateProduct, data);
+
   const columns = useProductColumns();
 
   const selectedRows = useProductStore((state) => state.selectedRows);

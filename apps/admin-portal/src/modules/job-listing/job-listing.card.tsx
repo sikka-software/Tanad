@@ -1,6 +1,8 @@
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus } from "@/types/common.type";
@@ -8,7 +10,7 @@ import { CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateJobListing } from "@/job-listing/job-listing.hooks";
 import useJobListingStore from "@/job-listing/job-listing.store";
-import { JobListingWithJobs } from "@/job-listing/job-listing.type";
+import { JobListingWithJobs, JobListingUpdateData } from "@/job-listing/job-listing.type";
 
 const JobListingCard = ({
   jobListing,
@@ -22,11 +24,11 @@ const JobListingCard = ({
   const data = useJobListingStore((state) => state.data);
   const setData = useJobListingStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateJobListing({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<JobListingWithJobs, JobListingUpdateData>(
+    setData,
+    updateJobListing,
+    data,
+  );
 
   useEffect(() => {
     console.log("jobListing", jobListing);

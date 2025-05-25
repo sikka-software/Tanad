@@ -1,5 +1,7 @@
 import { useTranslations } from "next-intl";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus } from "@/types/common.type";
@@ -7,7 +9,7 @@ import { CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateWebsite } from "@/website/website.hooks";
 import useWebsiteStore from "@/website/website.store";
-import { Website } from "@/website/website.type";
+import { Website, WebsiteUpdateData } from "@/website/website.type";
 
 const WebsiteCard = ({
   website,
@@ -21,11 +23,7 @@ const WebsiteCard = ({
   const data = useWebsiteStore((state) => state.data);
   const setData = useWebsiteStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateWebsite({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Website, WebsiteUpdateData>(setData, updateWebsite, data);
 
   return (
     <ModuleCard

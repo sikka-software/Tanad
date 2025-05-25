@@ -5,15 +5,16 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
+import useExpenseColumns from "@/expense/expense.columns";
 import { useUpdateExpense } from "@/expense/expense.hooks";
 import useExpenseStore from "@/expense/expense.store";
-import { Expense } from "@/expense/expense.type";
+import { Expense, ExpenseUpdateData } from "@/expense/expense.type";
 
 import useUserStore from "@/stores/use-user-store";
-
-import useExpenseColumns from "./expense.columns";
 
 const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Expense>) => {
   const t = useTranslations();
@@ -22,11 +23,7 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
 
   const setData = useExpenseStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateExpense({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Expense, ExpenseUpdateData>(setData, updateExpense, data);
 
   const columns = useExpenseColumns(handleEdit);
 

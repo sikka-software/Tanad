@@ -1,6 +1,8 @@
 import { MapPin, LayoutGrid } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus } from "@/types/common.type";
@@ -8,7 +10,7 @@ import { CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateWarehouse } from "@/warehouse/warehouse.hooks";
 import useWarehouseStore from "@/warehouse/warehouse.store";
-import { Warehouse } from "@/warehouse/warehouse.type";
+import { Warehouse, WarehouseUpdateData } from "@/warehouse/warehouse.type";
 
 const WarehouseCard = ({
   warehouse,
@@ -22,11 +24,11 @@ const WarehouseCard = ({
   const data = useWarehouseStore((state) => state.data);
   const setData = useWarehouseStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateWarehouse({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Warehouse, WarehouseUpdateData>(
+    setData,
+    updateWarehouse,
+    data,
+  );
 
   return (
     <ModuleCard

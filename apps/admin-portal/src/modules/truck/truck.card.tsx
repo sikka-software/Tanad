@@ -1,5 +1,7 @@
 import { useTranslations } from "next-intl";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { VehicleStatus, VehicleStatusProps } from "@/types/common.type";
@@ -20,11 +22,7 @@ const TruckCard = ({
   const data = useTruckStore((state) => state.data);
   const setData = useTruckStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateTruck({ id: rowId, data: { [columnId]: value } as TruckUpdateData });
-  };
+  const handleEdit = createHandleEdit<Truck, TruckUpdateData>(setData, updateTruck, data);
 
   return (
     <ModuleCard

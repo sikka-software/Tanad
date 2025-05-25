@@ -1,12 +1,14 @@
 import { useTranslations } from "next-intl";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus, CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateOnlineStore } from "./online-store.hooks";
 import useOnlineStoreStore from "./online-store.store";
-import { OnlineStore } from "./online-store.type";
+import { OnlineStore, OnlineStoreUpdateData } from "./online-store.type";
 
 const OnlineStoreCard = ({
   onlineStore,
@@ -20,11 +22,11 @@ const OnlineStoreCard = ({
   const data = useOnlineStoreStore((state) => state.data);
   const setData = useOnlineStoreStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateOnlineStore({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<OnlineStore, OnlineStoreUpdateData>(
+    setData,
+    updateOnlineStore,
+    data,
+  );
 
   return (
     <ModuleCard

@@ -1,5 +1,7 @@
 import { useTranslations } from "next-intl";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus } from "@/types/common.type";
@@ -7,7 +9,7 @@ import { CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateDepartment } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";
-import { Department } from "@/department/department.type";
+import { Department, DepartmentUpdateData } from "@/department/department.type";
 
 const DepartmentCard = ({
   department,
@@ -21,11 +23,11 @@ const DepartmentCard = ({
   const data = useDepartmentStore((state) => state.data);
   const setData = useDepartmentStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateDepartment({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Department, DepartmentUpdateData>(
+    setData,
+    updateDepartment,
+    data,
+  );
 
   return (
     <ModuleCard

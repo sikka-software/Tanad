@@ -5,6 +5,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
@@ -12,7 +14,7 @@ import useUserStore from "@/stores/use-user-store";
 import useWebsiteColumns from "./website.columns";
 import { useUpdateWebsite } from "./website.hooks";
 import useWebsiteStore from "./website.store";
-import { Website } from "./website.type";
+import { Website, WebsiteUpdateData } from "./website.type";
 
 const WebsitesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Website>) => {
   const t = useTranslations();
@@ -20,11 +22,8 @@ const WebsitesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const { mutate: updateWebsite } = useUpdateWebsite();
   const setData = useWebsiteStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateWebsite({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Website, WebsiteUpdateData>(setData, updateWebsite, data);
+
   const columns = useWebsiteColumns(handleEdit);
   const selectedRows = useWebsiteStore((state: any) => state.selectedRows);
   const setSelectedRows = useWebsiteStore((state: any) => state.setSelectedRows);

@@ -1,10 +1,11 @@
-import { parseDate } from "@internationalized/date";
 import { format } from "date-fns";
-import { Calendar, CalendarClock, CalendarPlus, Tag } from "lucide-react";
+import { CalendarClock, CalendarPlus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useDateFormatter } from "react-aria";
 
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
+
+import { createHandleEdit } from "@/utils/module-utils";
 
 import ModuleCard from "@/components/cards/module-card";
 
@@ -12,9 +13,12 @@ import { useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import { useUpdateExpense } from "@/expense/expense.hooks";
 import useExpenseStore from "@/expense/expense.store";
-import { Expense, ExpenseStatus, ExpenseStatusProps } from "@/expense/expense.type";
-
-import useUserStore from "@/stores/use-user-store";
+import {
+  Expense,
+  ExpenseStatus,
+  ExpenseStatusProps,
+  ExpenseUpdateData,
+} from "@/expense/expense.type";
 
 const ExpenseCard = ({
   expense,
@@ -32,11 +36,7 @@ const ExpenseCard = ({
     all: { className: "size-4" },
   }).symbol;
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateExpense({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Expense, ExpenseUpdateData>(setData, updateExpense, data);
 
   return (
     <ModuleCard

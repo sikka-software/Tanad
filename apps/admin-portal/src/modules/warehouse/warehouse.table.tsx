@@ -5,11 +5,13 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateWarehouse } from "@/warehouse/warehouse.hooks";
 import useWarehouseStore from "@/warehouse/warehouse.store";
-import { Warehouse } from "@/warehouse/warehouse.type";
+import { Warehouse, WarehouseUpdateData } from "@/warehouse/warehouse.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -26,11 +28,12 @@ const WarehouseTable = ({
   const { mutate: updateWarehouse } = useUpdateWarehouse();
   const setData = useWarehouseStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "domain_id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateWarehouse({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Warehouse, WarehouseUpdateData>(
+    setData,
+    updateWarehouse,
+    data,
+  );
+
   const columns = useWarehouseColumns(handleEdit);
 
   const selectedRows = useWarehouseStore((state) => state.selectedRows);

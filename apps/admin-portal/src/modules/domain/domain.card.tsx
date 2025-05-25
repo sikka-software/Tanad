@@ -2,6 +2,8 @@ import { useTranslations } from "next-intl";
 
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
@@ -11,7 +13,7 @@ import { CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateDomain } from "@/domain/domain.hooks";
 import useDomainStore from "@/domain/domain.store";
-import { Domain } from "@/domain/domain.type";
+import { Domain, DomainUpdateData } from "@/domain/domain.type";
 
 const DomainCard = ({
   domain,
@@ -25,11 +27,8 @@ const DomainCard = ({
   const data = useDomainStore((state) => state.data);
   const setData = useDomainStore((state) => state.setData);
   const currency = useAppCurrencySymbol().symbol;
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateDomain({ id: rowId, data: { [columnId]: value } });
-  };
+
+  const handleEdit = createHandleEdit<Domain, DomainUpdateData>(setData, updateDomain, data);
 
   let recurringCost =
     domain.payment_cycle === "monthly" ? domain.monthly_payment : domain.annual_payment;

@@ -5,11 +5,13 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateDepartment } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";
-import { Department } from "@/department/department.type";
+import { Department, DepartmentUpdateData } from "@/department/department.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -27,11 +29,11 @@ const DepartmentsTable = ({
 
   const setData = useDepartmentStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateDepartment({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Department, DepartmentUpdateData>(
+    setData,
+    updateDepartment,
+    data,
+  );
 
   const columns = useDepartmentColumns(handleEdit);
   const canEditDepartment = useUserStore((state) => state.hasPermission("departments.update"));

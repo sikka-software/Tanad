@@ -5,6 +5,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateClient } from "@/client/client.hooks";
@@ -20,15 +22,11 @@ const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
 
   const setData = useClientStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateClient({ id: rowId, data: { [columnId]: value } as ClientUpdateData });
-  };
+  const { mutate: updateClient } = useUpdateClient();
+  const handleEdit = createHandleEdit<Client, ClientUpdateData>(setData, updateClient, data);
 
   const columns = useClientColumns(handleEdit);
 
-  const { mutate: updateClient } = useUpdateClient();
   const selectedRows = useClientStore((state) => state.selectedRows);
   const setSelectedRows = useClientStore((state) => state.setSelectedRows);
 

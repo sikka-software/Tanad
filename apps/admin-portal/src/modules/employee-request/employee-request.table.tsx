@@ -5,15 +5,19 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
+import useEmployeeRequestColumns from "@/employee-request/employee-request.columns";
 import { useUpdateEmployeeRequest } from "@/employee-request/employee-request.hooks";
 import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
-import { EmployeeRequest } from "@/employee-request/employee-request.type";
+import {
+  EmployeeRequest,
+  EmployeeRequestUpdateData,
+} from "@/employee-request/employee-request.type";
 
 import useUserStore from "@/stores/use-user-store";
-
-import useEmployeeRequestColumns from "./employee-request.columns";
 
 const EmployeeRequestsTable = ({
   data,
@@ -26,11 +30,11 @@ const EmployeeRequestsTable = ({
 
   const setData = useEmployeeRequestsStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateEmployeeRequest({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<EmployeeRequest, EmployeeRequestUpdateData>(
+    setData,
+    updateEmployeeRequest,
+    data,
+  );
 
   const columns = useEmployeeRequestColumns(handleEdit);
 

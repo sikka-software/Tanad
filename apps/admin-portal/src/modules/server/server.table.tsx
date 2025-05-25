@@ -5,10 +5,12 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import useServerStore from "@/server/server.store";
-import { Server } from "@/server/server.type";
+import { Server, ServerUpdateData } from "@/server/server.type";
 import useUserStore from "@/stores/use-user-store";
 
 import useServerColumns from "./server.columns";
@@ -20,11 +22,8 @@ const ServersTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
 
   const setData = useServerStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateServer({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Server, ServerUpdateData>(setData, updateServer, data);
+
   const columns = useServerColumns(handleEdit);
 
   const selectedRows = useServerStore((state) => state.selectedRows);

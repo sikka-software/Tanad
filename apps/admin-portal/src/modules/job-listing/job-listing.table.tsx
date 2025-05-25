@@ -5,6 +5,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
@@ -12,7 +14,7 @@ import useUserStore from "@/stores/use-user-store";
 import useJobListingColumns from "./job-listing.columns";
 import { useUpdateJobListing } from "./job-listing.hooks";
 import useJobListingsStore from "./job-listing.store";
-import { JobListingWithJobs } from "./job-listing.type";
+import { JobListingWithJobs, JobListingUpdateData } from "./job-listing.type";
 
 const JobListingsTable = ({
   data,
@@ -25,11 +27,12 @@ const JobListingsTable = ({
   const { mutate: updateJobListing } = useUpdateJobListing();
   const setData = useJobListingsStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateJobListing({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<JobListingWithJobs, JobListingUpdateData>(
+    setData,
+    updateJobListing,
+    data,
+  );
+
   const columns = useJobListingColumns(handleEdit);
 
   const columnVisibility = useJobListingsStore((state) => state.columnVisibility);

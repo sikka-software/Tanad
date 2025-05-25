@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
@@ -31,11 +33,7 @@ const InvoiceCard = ({
   const setData = useInvoiceStore((state) => state.setData);
   const currency = useAppCurrencySymbol({ sar: { className: "size-4" } }).symbol;
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateInvoice({ id: rowId, data: { [columnId]: value } as InvoiceUpdateData });
-  };
+  const handleEdit = createHandleEdit<Invoice, InvoiceUpdateData>(setData, updateInvoice, data);
 
   return (
     <ModuleCard

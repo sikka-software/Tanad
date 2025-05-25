@@ -1,19 +1,20 @@
 import { useTranslations } from "next-intl";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback } from "react";
 
 import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
+import useEmployeeColumns from "@/employee/employee.columns";
 import { useUpdateEmployee } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
 import { Employee, EmployeeUpdateData } from "@/employee/employee.types";
 
 import useUserStore from "@/stores/use-user-store";
-
-import useEmployeeColumns from "./employee.columns";
 
 const EmployeesTable = ({
   data,
@@ -32,16 +33,7 @@ const EmployeesTable = ({
 
   const setData = useEmployeeStore((state) => state.setData);
 
-  const handleEdit = useCallback(
-    async (rowId: string, columnId: string, value: unknown) => {
-      if (columnId === "id") return;
-      setData?.(
-        (data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)),
-      );
-      await updateEmployee({ id: rowId, data: { [columnId]: value } as EmployeeUpdateData });
-    },
-    [data, setData, updateEmployee],
-  );
+  const handleEdit = createHandleEdit<Employee, EmployeeUpdateData>(setData, updateEmployee, data);
 
   const columns = useEmployeeColumns(handleEdit);
 

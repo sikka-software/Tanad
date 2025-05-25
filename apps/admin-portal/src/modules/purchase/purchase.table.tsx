@@ -4,6 +4,8 @@ import React, { useCallback } from "react";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
@@ -11,7 +13,7 @@ import useUserStore from "@/stores/use-user-store";
 import usePurchaseColumns from "./purchase.columns";
 import { useUpdatePurchase } from "./purchase.hooks";
 import usePurchaseStore from "./purchase.store";
-import { Purchase } from "./purchase.type";
+import { Purchase, PurchaseUpdateData } from "./purchase.type";
 
 const PurchasesTable = ({
   data,
@@ -24,11 +26,8 @@ const PurchasesTable = ({
 
   const setData = usePurchaseStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updatePurchase({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Purchase, PurchaseUpdateData>(setData, updatePurchase, data);
+
   const columns = usePurchaseColumns(handleEdit);
 
   const selectedRows = usePurchaseStore((state) => state.selectedRows);

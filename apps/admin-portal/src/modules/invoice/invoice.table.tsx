@@ -4,6 +4,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateInvoice } from "@/invoice/invoice.hooks";
@@ -19,14 +21,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
   const setData = useInvoiceStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    let processedValue = value;
-    if (columnId === "issue_date" || columnId === "due_date") {
-      processedValue = new Date(value as string).toISOString();
-    }
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateInvoice({ id: rowId, data: { [columnId]: processedValue } as InvoiceUpdateData });
-  };
+  const handleEdit = createHandleEdit<Invoice, InvoiceUpdateData>(setData, updateInvoice, data);
 
   const columns = useInvoiceColumns(handleEdit);
 

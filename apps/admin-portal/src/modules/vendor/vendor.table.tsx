@@ -5,6 +5,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
@@ -20,11 +22,8 @@ const VendorsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
   const { mutate: updateVendor } = useUpdateVendor();
   const setData = useVendorStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateVendor({ id: rowId, data: { [columnId]: value } as VendorUpdateData });
-  };
+  const handleEdit = createHandleEdit<Vendor, VendorUpdateData>(setData, updateVendor, data);
+
   const columns = useVendorColumns(handleEdit);
 
   const selectedRows = useVendorStore((state) => state.selectedRows);

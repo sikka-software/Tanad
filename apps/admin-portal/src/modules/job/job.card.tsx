@@ -1,13 +1,15 @@
 import { format } from "date-fns";
 import { Calendar, DollarSign, MapPin, Building2 } from "lucide-react";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus, CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateJob } from "@/job/job.hooks";
 import useJobStore from "@/job/job.store";
-import { Job } from "@/job/job.type";
+import { Job, JobUpdateData } from "@/job/job.type";
 
 const JobCard = ({
   job,
@@ -20,11 +22,7 @@ const JobCard = ({
   const data = useJobStore((state) => state.data);
   const setData = useJobStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateJob({ id: rowId, data: { [columnId]: value } as Job });
-  };
+  const handleEdit = createHandleEdit<Job, JobUpdateData>(setData, updateJob, data);
 
   return (
     <ModuleCard

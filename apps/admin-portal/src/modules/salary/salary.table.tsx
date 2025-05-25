@@ -5,11 +5,13 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateSalary } from "@/salary/salary.hooks";
 import useSalaryStore from "@/salary/salary.store";
-import { Salary } from "@/salary/salary.type";
+import { Salary, SalaryUpdateData } from "@/salary/salary.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -20,11 +22,7 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const { mutate: updateSalary } = useUpdateSalary();
   const setData = useSalaryStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateSalary({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Salary, SalaryUpdateData>(setData, updateSalary, data);
 
   const columns = useSalaryColumns(handleEdit);
 

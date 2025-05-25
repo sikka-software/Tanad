@@ -5,11 +5,13 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateCompany } from "@/company/company.hooks";
 import useCompanyStore from "@/company/company.store";
-import { Company } from "@/company/company.type";
+import { Company, CompanyUpdateData } from "@/company/company.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -20,11 +22,8 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTable
   const setData = useCompanyStore((state) => state.setData);
   const { mutate: updateCompany } = useUpdateCompany();
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateCompany({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Company, CompanyUpdateData>(setData, updateCompany, data);
+
   const columns = useCompanyColumns(handleEdit);
 
   const columnVisibility = useCompanyStore((state) => state.columnVisibility);

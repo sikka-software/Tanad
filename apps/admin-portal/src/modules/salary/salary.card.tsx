@@ -2,6 +2,8 @@ import { CalendarDays, CircleDollarSign, ReceiptText } from "lucide-react";
 
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
@@ -11,7 +13,7 @@ import { CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateSalary } from "@/salary/salary.hooks";
 import useSalaryStore from "@/salary/salary.store";
-import { Salary } from "@/salary/salary.type";
+import { Salary, SalaryUpdateData } from "@/salary/salary.type";
 
 const formatDate = (dateString: string | null | undefined) => {
   if (!dateString) return "N/A";
@@ -36,12 +38,8 @@ const SalaryCard = ({
   const setData = useSalaryStore((state) => state.setData);
   const currency = useAppCurrencySymbol().symbol;
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateSalary({ id: rowId, data: { [columnId]: value } });
-  };
-  console.log("dedeuctions ", salary.deductions);
+  const handleEdit = createHandleEdit<Salary, SalaryUpdateData>(setData, updateSalary, data);
+
   return (
     <ModuleCard
       id={salary.id}

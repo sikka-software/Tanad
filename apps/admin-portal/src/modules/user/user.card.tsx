@@ -1,5 +1,7 @@
 import { useTranslations } from "next-intl";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus, CommonStatusProps } from "@/types/common.type";
@@ -7,7 +9,7 @@ import { CommonStatus, CommonStatusProps } from "@/types/common.type";
 import { useUpdateUser } from "@/user/user.hooks";
 import useUserStore from "@/user/user.store";
 
-import { UserType } from "./user.type";
+import { UserType, UserUpdateData } from "./user.type";
 
 const UserCard = ({
   user,
@@ -21,11 +23,7 @@ const UserCard = ({
   const data = useUserStore((state) => state.data);
   const setData = useUserStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateUser({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<UserType, UserUpdateData>(setData, updateUser, data);
 
   return (
     <ModuleCard

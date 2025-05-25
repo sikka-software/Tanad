@@ -3,13 +3,15 @@ import { useTranslations } from "next-intl";
 
 import { MoneyFormatter } from "@/ui/inputs/currency-input";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { useAppCurrencySymbol } from "@/lib/currency-utils";
 
 import { useUpdateQuote } from "@/quote/quote.hooks";
 import useQuoteStore from "@/quote/quote.store";
-import { Quote, QuoteStatus, QuoteStatusProps } from "@/quote/quote.type";
+import { Quote, QuoteStatus, QuoteStatusProps, QuoteUpdateData } from "@/quote/quote.type";
 
 const QuoteCard = ({
   quote,
@@ -26,11 +28,7 @@ const QuoteCard = ({
   const data = useQuoteStore((state) => state.data);
   const setData = useQuoteStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateQuote({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Quote, QuoteUpdateData>(setData, updateQuote, data);
 
   return (
     <ModuleCard

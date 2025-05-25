@@ -5,6 +5,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
@@ -19,11 +21,7 @@ const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps
   const { mutate: updateCar } = useUpdateCar();
   const setData = useCarStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateCar({ id: rowId, data: { [columnId]: value } as CarUpdateData });
-  };
+  const handleEdit = createHandleEdit<Car, CarUpdateData>(setData, updateCar, data);
 
   const columns = useCarColumns(handleEdit);
   const selectedRows = useCarStore((state) => state.selectedRows);

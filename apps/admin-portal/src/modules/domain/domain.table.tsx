@@ -5,6 +5,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
@@ -12,18 +14,15 @@ import useUserStore from "@/stores/use-user-store";
 import useDomainColumns from "./domain.columns";
 import { useUpdateDomain } from "./domain.hooks";
 import useDomainStore from "./domain.store";
-import { Domain } from "./domain.type";
+import { Domain, DomainUpdateData } from "./domain.type";
 
 const DomainsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Domain>) => {
   const t = useTranslations();
   const { mutate: updateDomain } = useUpdateDomain();
   const setData = useDomainStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateDomain({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Domain, DomainUpdateData>(setData, updateDomain, data);
+
   const columns = useDomainColumns(handleEdit);
 
   const selectedRows = useDomainStore((state) => state.selectedRows);

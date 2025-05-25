@@ -5,11 +5,13 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateQuote } from "@/quote/quote.hooks";
 import useQuotesStore from "@/quote/quote.store";
-import { Quote } from "@/quote/quote.type";
+import { Quote, QuoteUpdateData } from "@/quote/quote.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -21,11 +23,8 @@ const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
 
   const setData = useQuotesStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateQuote({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Quote, QuoteUpdateData>(setData, updateQuote, data);
+
   const columns = useQuoteColumns(handleEdit);
 
   const setSelectedRows = useQuotesStore((state) => state.setSelectedRows);

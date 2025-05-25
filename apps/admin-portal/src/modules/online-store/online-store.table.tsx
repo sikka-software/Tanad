@@ -5,6 +5,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
@@ -12,7 +14,7 @@ import useUserStore from "@/stores/use-user-store";
 import useOnlineStoreColumns from "./online-store.columns";
 import { useUpdateOnlineStore } from "./online-store.hooks";
 import useOnlineStoreStore from "./online-store.store";
-import { OnlineStore } from "./online-store.type";
+import { OnlineStore, OnlineStoreUpdateData } from "./online-store.type";
 
 const OnlineStoresTable = ({
   data,
@@ -24,11 +26,11 @@ const OnlineStoresTable = ({
   const { mutate: updateOnlineStore } = useUpdateOnlineStore();
   const setData = useOnlineStoreStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateOnlineStore({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<OnlineStore, OnlineStoreUpdateData>(
+    setData,
+    updateOnlineStore,
+    data,
+  );
 
   const columns = useOnlineStoreColumns(handleEdit);
 

@@ -1,5 +1,7 @@
 import { Mail, Phone, Building2, MapPin } from "lucide-react";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import ModuleCard from "@/components/cards/module-card";
 
 import { CommonStatus } from "@/types/common.type";
@@ -24,11 +26,7 @@ const ClientCard = ({
   const data = useClientStore((state) => state.data);
   const setData = useClientStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateClient({ id: rowId, data: { [columnId]: value } as ClientUpdateData });
-  };
+  const handleEdit = createHandleEdit<Client, ClientUpdateData>(setData, updateClient, data);
 
   return (
     <ModuleCard

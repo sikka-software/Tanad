@@ -5,15 +5,16 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { createHandleEdit } from "@/utils/module-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
+import useOfficeColumns from "@/office/office.columns";
 import { useUpdateOffice } from "@/office/office.hooks";
 import useOfficeStore from "@/office/office.store";
-import { Office } from "@/office/office.type";
+import { Office, OfficeUpdateData } from "@/office/office.type";
 
 import useUserStore from "@/stores/use-user-store";
-
-import useOfficeColumns from "./office.columns";
 
 const OfficesTable = ({
   data,
@@ -29,11 +30,8 @@ const OfficesTable = ({
 
   const setData = useOfficeStore((state) => state.setData);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "id") return;
-    setData?.((data || []).map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)));
-    await updateOffice({ id: rowId, data: { [columnId]: value } });
-  };
+  const handleEdit = createHandleEdit<Office, OfficeUpdateData>(setData, updateOffice, data);
+
   const columns = useOfficeColumns(handleEdit);
 
   const selectedRows = useOfficeStore((state) => state.selectedRows);
