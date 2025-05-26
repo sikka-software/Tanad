@@ -356,6 +356,35 @@ export default function InvoiceDetailPage() {
             </Card>
           {/* )} */}
 
+          {/* ZATCA Phase 2 Section */}
+          <ZatcaPhase2Section
+            invoiceData={{
+              invoiceNumber: invoice.invoice_number,
+              issueDate: invoice.issue_date || "",
+              dueDate: invoice.due_date || undefined,
+              sellerName: invoice.seller_name || "Default Company",
+              sellerVatNumber: invoice.vat_number || "000000000000000",
+              buyerName: client?.name || "Client",
+              buyerVatNumber: client?.additional_number || undefined,
+              items: invoice.items
+                ? invoice.items.map((item) => ({
+                    name: item.description || "Item",
+                    description: item.description,
+                    quantity: item.quantity,
+                    unitPrice: item.unit_price,
+                    vatRate: (invoice.tax_rate || 0) * 100,
+                    vatAmount: item.unit_price * item.quantity * (invoice.tax_rate || 0),
+                    subtotal: item.unit_price * item.quantity,
+                    total: item.unit_price * item.quantity * (1 + (invoice.tax_rate || 0)),
+                  }))
+                : [],
+              subtotal: invoice.subtotal || 0,
+              vatAmount: invoice.tax_amount || 0,
+              total: invoice.total || 0,
+            }}
+            enabled={true} // You can make this conditional based on invoice.zatca_enabled
+          />
+
           <Card>
             <CardHeader className="pb-3">
               <CardTitle>{t("Invoices.detail.notes")}</CardTitle>
