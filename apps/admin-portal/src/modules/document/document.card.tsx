@@ -1,5 +1,7 @@
 import { Link, MapPin, User } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 import { createHandleEdit } from "@/utils/module-utils";
 
@@ -20,6 +22,7 @@ const DocumentCard = ({
   document: Document;
   onActionClicked: (action: string, rowId: string) => void;
 }) => {
+  const t = useTranslations();
   const { mutate: updateDocument } = useUpdateDocument();
   const data = useDocumentStore((state) => state.data);
   const setData = useDocumentStore((state) => state.setData);
@@ -27,17 +30,38 @@ const DocumentCard = ({
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewName, setPreviewName] = useState<string | null>(null);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
 
   const handleEdit = createHandleEdit<Document, DocumentUpdateData>(setData, updateDocument, data);
 
-  const handlePreview = () => {
-    if (document.url && document.name) {
-      setPreviewUrl(document.url);
-      setPreviewName(document.name);
-      setIsPreviewOpen(true);
-    } else {
-      console.warn("Document URL or name is missing for preview.");
+  const handlePreview = async () => {
+    if (!document.id || !document.name) {
+      console.warn("Document ID or name is missing for preview.");
+      toast.error(t("Documents.error.preview_load_failed"));
+      return;
     }
+
+    setIsPreviewLoading(true);
+    try {
+      const response = await fetch(`/api/documents/get-signed-url?documentId=${document.id}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Failed to fetch signed URL: ${response.statusText}`);
+      }
+      const { signedUrl } = await response.json();
+
+      if (signedUrl) {
+        setPreviewUrl(signedUrl);
+        setPreviewName(document.name);
+        setIsPreviewOpen(true);
+      } else {
+        throw new Error("No signed URL returned from API.");
+      }
+    } catch (error) {
+      console.error("Error fetching signed URL for preview:", error);
+      toast.error(t("Documents.error.preview_load_failed_detailed", { error: (error as Error).message }));
+    }
+    setIsPreviewLoading(false);
   };
 
   return (
@@ -45,7 +69,6 @@ const DocumentCard = ({
       <ModuleCard
         id={document.id}
         title={document.name}
-        // subtitle={document.url || ""}
         currentStatus={document.status as CommonStatusProps}
         statuses={Object.values(CommonStatus) as CommonStatusProps[]}
         onStatusChange={(status: CommonStatusProps) => handleEdit(document.id, "status", status)}
@@ -61,20 +84,21 @@ const DocumentCard = ({
               <span>{document.user_id}</span>
             </div>
           )}
-          {document.url && (
+          {/* {document.url && (
             <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
               <Link className="h-4 w-4" />
               <a href={document.url} target="_blank" rel="noopener noreferrer" className="underline">
                 Link
               </a>
             </div>
-          )}
+          )} */}
 
           <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
             <MapPin className="mt-1 h-4 w-4" />
             <div>
               <p>{document.file_path}</p>
-              <p>{`${document.entity_id}, ${document.entity_type}`}</p>
+              {/* Displaying entity_id and entity_type might be for debugging, consider if needed for end-user */}
+              <p className="text-xs text-gray-500">{`${document.entity_id || 'N/A'}, ${document.entity_type || 'N/A'}`}</p>
             </div>
           </div>
         </div>

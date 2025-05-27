@@ -11,18 +11,45 @@ import { Input } from "@/ui/inputs/input";
 import { Textarea } from "@/ui/textarea";
 
 import { ImageAndPdfUploader } from "@/components/comp-545";
-import { FileWithPreview } from "@/hooks/use-file-upload";
+import { FileWithPreview, FileMetadata } from "@/hooks/use-file-upload";
 
 import { uploadDocument as uploadDocumentService } from "@/document/document.service";
+import { Database } from "@/lib/database.types";
 
 import { ModuleFormProps } from "@/types/common.type";
 
 import { useCreateDocument, useUpdateDocument } from "@/document/document.hooks";
 import useDocumentStore from "@/document/document.store";
-import { DocumentUpdateData, DocumentCreateData } from "@/document/document.type";
+import { DocumentUpdateData, DocumentCreateData, Document as DocumentType } from "@/document/document.type";
 
 import { documents } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
+
+// Define a specific EntityType for documents, matching the service expectation
+type DocumentEntityType =
+  | "document"
+  | "company"
+  | "expense"
+  | "salary"
+  | "department"
+  | "employee"
+  | "invoice"
+  | "quote"
+  | "vendor"
+  | "warehouse"
+  | "branch"
+  | "office"
+  | undefined;
+
+interface DocumentFile {
+  id?: string;
+  file: File;
+  name: string;
+  url?: string;
+  uploaded?: boolean;
+  entity_type?: DocumentEntityType; // Use the more specific type
+  entity_id?: string;
+}
 
 const createDocumentSchema = (t: (key: string) => string) => {
   const DocumentSelectSchema = createInsertSchema(documents, {
@@ -59,15 +86,23 @@ export function DocumentForm({
   const isSavingDocument = useDocumentStore((state) => state.isLoading);
   const setIsSavingDocument = useDocumentStore((state) => state.setIsLoading);
 
-  const [uploadedDocument, setUploadedDocument] = useState<FileWithPreview | null>(
-    defaultValues?.url && defaultValues?.file_path && defaultValues?.name
-      ? {
-          file: new File([], defaultValues.file_path),
-          id: defaultValues.id || defaultValues.file_path,
-          preview: defaultValues.url,
-        }
-      : null,
-  );
+  const [uploadedDocument, setUploadedDocument] = useState<FileWithPreview | null>(() => {
+    if (editMode && defaultValues && 'id' in defaultValues && defaultValues.id && defaultValues.url && defaultValues.name) {
+      const dv = defaultValues as DocumentType;
+      return {
+        id: dv.id,
+        preview: dv.url || undefined,
+        file: {
+          id: dv.id,
+          name: dv.name,
+          url: dv.url || "",
+          size: (dv as any).size || 0,
+          type: (dv as any).mime_type || "application/octet-stream",
+        } as FileMetadata,
+      };
+    }
+    return null;
+  });
   const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<DocumentFormValues>({
@@ -121,11 +156,17 @@ export function DocumentForm({
           setIsSavingDocument(false);
           return;
         }
+        if (!(uploadedDocument.file instanceof File)) {
+            toast.error(t("Documents.error.invalid_file_object"));
+            setIsSavingDocument(false);
+            return;
+        }
+
         setIsUploading(true);
-        const documentToUpload: FileWithPreview = {
+        const documentToUpload: DocumentFile = {
           file: uploadedDocument.file,
           name: formData.name.trim() || uploadedDocument.file.name,
-          entity_type: "document",
+          entity_type: "document" as DocumentEntityType, // Cast to the specific DocumentEntityType
           entity_id: enterprise?.id,
         };
 
@@ -167,18 +208,6 @@ export function DocumentForm({
 
   if (typeof window !== "undefined") {
     (window as any).documentForm = form;
-  }
-
-  const existingDocsForUploader: FileWithPreview[] = [];
-  if (editMode && defaultValues?.url && defaultValues?.name && defaultValues?.file_path) {
-    existingDocsForUploader.push({
-      id: defaultValues.id,
-      name: defaultValues.name,
-      file: new File([], defaultValues.file_path),
-      preview: defaultValues.url,
-      entity_type: "document",
-      uploaded: true,
-    });
   }
 
   return (
@@ -236,7 +265,7 @@ export function DocumentForm({
               accept="image/svg+xml,image/png,image/jpeg,image/jpg,image/gif,application/pdf"
               maxSizeMB={2}
               maxFiles={1}
-              disabled={isSavingDocument || isUploading || editMode}
+              disabled={isSavingDocument || isUploading || (editMode && !!uploadedDocument)}
             />
           </div>
         </form>

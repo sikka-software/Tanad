@@ -1,15 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/ui/dialog";
-import { Skeleton } from "@/ui/skeleton";
 import { useTranslations } from "next-intl";
+import { useState, useEffect } from "react";
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/ui/dialog";
+import { Skeleton } from "@/ui/skeleton";
 
 interface DocumentPreviewDialogProps {
   isOpen: boolean;
@@ -58,14 +53,8 @@ export function DocumentPreviewDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[80vw] md:max-w-[70vw] lg:max-w-[60vw] xl:max-w-[50vw] h-[80vh]">
-        <DialogHeader>
-          <DialogTitle>{documentName}</DialogTitle>
-          <DialogDescription>
-            {t("document_preview_description")}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="h-[calc(100%-100px)] overflow-auto py-4 relative">
+      <DialogContent className="h-[80vh] items-start gap-0 sm:max-w-[80vw] md:max-w-[70vw] lg:max-w-[60vw] xl:max-w-[50vw]">
+        <div className="relative h-full overflow-auto">
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center">
               <Skeleton className="h-full w-full" />
@@ -77,12 +66,19 @@ export function DocumentPreviewDialog({
               <p className="text-sm">{t("document_preview_image_error_desc")}</p>
             </div>
           )}
-          <div style={{ visibility: isLoading || (loadError && isImage) ? 'hidden' : 'visible', height: '100%', width: '100%' }}>
+          <div
+            // className="flex flex-col items-center justify-center bg-blue-500"
+            style={{
+              visibility: isLoading || (loadError && isImage) ? "hidden" : "visible",
+              height: "100%",
+              width: "100%",
+            }}
+          >
             {isImage ? (
               <img
                 src={documentUrl}
                 alt={documentName}
-                className="max-h-full max-w-full mx-auto object-contain"
+                className="w-full mx-auto bg-red-400 object-cover"
                 onLoad={handleLoad}
                 onError={handleError}
               />
@@ -90,7 +86,7 @@ export function DocumentPreviewDialog({
               <iframe
                 src={documentUrl}
                 title={documentName}
-                className="h-full w-full border-0"
+                className="h-fit w-full border-0 object-contain"
                 onLoad={handleLoad}
                 onError={handleError}
               />
@@ -100,4 +96,4 @@ export function DocumentPreviewDialog({
       </DialogContent>
     </Dialog>
   );
-} 
+}
