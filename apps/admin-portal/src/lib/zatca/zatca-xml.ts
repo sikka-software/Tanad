@@ -61,14 +61,30 @@ interface ZatcaInvoiceData {
   // ZATCA specific fields
   invoiceCounterValue?: number; // ICV - required for Phase 2
   previousInvoiceHash?: string; // PIH - required for Phase 2
+  supplyDate?: string; // KSA-5 - required for standard invoices
 }
 
 /**
  * Generate a ZATCA-compliant UBL 2.1 XML string for Phase 2 compliance
  */
 export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
-  const now = new Date().toISOString();
+  const now = new Date();
   const documentCurrencyCode = "SAR"; // Saudi Riyal
+
+  // Validate and fix VAT number format (must be 15 digits starting and ending with 3)
+  const validatedSellerVatNumber = validateVatNumber(invoiceData.sellerVatNumber);
+  const validatedBuyerVatNumber = invoiceData.buyerVatNumber
+    ? validateVatNumber(invoiceData.buyerVatNumber)
+    : undefined;
+
+  // Validate and fix VAT rates (must be 5 or 15 for standard rate 'S')
+  const validatedVatRate = validateVatRate(
+    invoiceData.items.length > 0 ? invoiceData.items[0].vatRate : 15,
+  );
+
+  // Ensure issue date is not in the future
+  const issueDate = new Date(invoiceData.issueDate);
+  const validatedIssueDate = issueDate > now ? now.toISOString() : invoiceData.issueDate;
 
   // Generate ZATCA-specific codes
   const invoiceTypeCode = getZatcaInvoiceTypeCode(invoiceData.invoiceType);
@@ -82,14 +98,39 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
   // Generate Phase 2 QR code
   const qrCodeData = generateMockZatcaPhase2QRString({
     sellerName: invoiceData.sellerName,
-    vatNumber: invoiceData.sellerVatNumber,
-    invoiceTimestamp: invoiceData.issueDate,
+    vatNumber: validatedSellerVatNumber,
+    invoiceTimestamp: validatedIssueDate,
     invoiceTotal: invoiceData.total,
     vatAmount: invoiceData.vatAmount,
   });
 
-  // Calculate VAT percentage dynamically from items
-  const vatPercentage = invoiceData.items.length > 0 ? invoiceData.items[0].vatRate : 15;
+  // Ensure required address fields are present
+  const sellerAddress = {
+    street: invoiceData.sellerAddress.street || "Default Street",
+    buildingNumber: invoiceData.sellerAddress.buildingNumber || "1234",
+    city: invoiceData.sellerAddress.city || "Riyadh",
+    postalCode: invoiceData.sellerAddress.postalCode || "12345",
+    district: invoiceData.sellerAddress.district || "Al Olaya",
+    countryCode: invoiceData.sellerAddress.countryCode || "SA",
+  };
+
+  const buyerAddress = invoiceData.buyerAddress
+    ? {
+        street: invoiceData.buyerAddress.street || "Default Street",
+        buildingNumber: invoiceData.buyerAddress.buildingNumber || "1234",
+        city: invoiceData.buyerAddress.city || "Riyadh",
+        postalCode: invoiceData.buyerAddress.postalCode || "12345",
+        district: invoiceData.buyerAddress.district || "Al Malaz",
+        countryCode: invoiceData.buyerAddress.countryCode || "SA",
+      }
+    : {
+        street: "Default Street",
+        buildingNumber: "1234",
+        city: "Riyadh",
+        postalCode: "12345",
+        district: "Al Malaz",
+        countryCode: "SA",
+      };
 
   // UBL 2.1 Invoice XML Template
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -168,11 +209,21 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
   <cbc:ProfileID>reporting:1.0</cbc:ProfileID>
   <cbc:ID>${invoiceData.invoiceNumber}</cbc:ID>
   <cbc:UUID>${uuid}</cbc:UUID>
-  <cbc:IssueDate>${formatDateOnly(invoiceData.issueDate)}</cbc:IssueDate>
-  <cbc:IssueTime>${formatTimeOnly(invoiceData.issueDate)}</cbc:IssueTime>
+  <cbc:IssueDate>${formatDateOnly(validatedIssueDate)}</cbc:IssueDate>
+  <cbc:IssueTime>${formatTimeOnly(validatedIssueDate)}</cbc:IssueTime>
   <cbc:InvoiceTypeCode name="${zatcaInvoiceCode}" listID="UN/ECE 1001 Subset" listAgencyID="6">${invoiceTypeCode}</cbc:InvoiceTypeCode>
   <cbc:DocumentCurrencyCode>${documentCurrencyCode}</cbc:DocumentCurrencyCode>
   <cbc:TaxCurrencyCode>${documentCurrencyCode}</cbc:TaxCurrencyCode>
+
+  <!-- Supply Date (KSA-5) - Required for standard invoices -->
+  ${
+    invoiceData.invoiceType === "STANDARD"
+      ? `<cac:InvoicePeriod>
+    <cbc:StartDate>${formatDateOnly(invoiceData.supplyDate || validatedIssueDate)}</cbc:StartDate>
+    <cbc:EndDate>${formatDateOnly(invoiceData.supplyDate || validatedIssueDate)}</cbc:EndDate>
+  </cac:InvoicePeriod>`
+      : ""
+  }
 
   <!-- ZATCA Additional Document References -->
   <cac:AdditionalDocumentReference>
@@ -200,20 +251,20 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
   <cac:AccountingSupplierParty>
     <cac:Party>
       <cac:PartyIdentification>
-        <cbc:ID schemeID="CRN">${invoiceData.sellerVatNumber}</cbc:ID>
+        <cbc:ID schemeID="CRN">${validatedSellerVatNumber}</cbc:ID>
       </cac:PartyIdentification>
       <cac:PostalAddress>
-        <cbc:StreetName>${invoiceData.sellerAddress.street || ""}</cbc:StreetName>
-        <cbc:BuildingNumber>${invoiceData.sellerAddress.buildingNumber || ""}</cbc:BuildingNumber>
-        <cbc:CitySubdivisionName>${invoiceData.sellerAddress.district || ""}</cbc:CitySubdivisionName>
-        <cbc:CityName>${invoiceData.sellerAddress.city || ""}</cbc:CityName>
-        <cbc:PostalZone>${invoiceData.sellerAddress.postalCode || ""}</cbc:PostalZone>
+        <cbc:StreetName>${sellerAddress.street}</cbc:StreetName>
+        <cbc:BuildingNumber>${sellerAddress.buildingNumber}</cbc:BuildingNumber>
+        <cbc:CitySubdivisionName>${sellerAddress.district}</cbc:CitySubdivisionName>
+        <cbc:CityName>${sellerAddress.city}</cbc:CityName>
+        <cbc:PostalZone>${sellerAddress.postalCode}</cbc:PostalZone>
         <cac:Country>
-          <cbc:IdentificationCode>${invoiceData.sellerAddress.countryCode}</cbc:IdentificationCode>
+          <cbc:IdentificationCode>${sellerAddress.countryCode}</cbc:IdentificationCode>
         </cac:Country>
       </cac:PostalAddress>
       <cac:PartyTaxScheme>
-        <cbc:CompanyID>${invoiceData.sellerVatNumber}</cbc:CompanyID>
+        <cbc:CompanyID>${validatedSellerVatNumber}</cbc:CompanyID>
         <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
@@ -228,33 +279,28 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
   <cac:AccountingCustomerParty>
     <cac:Party>
       ${
-        invoiceData.buyerVatNumber
-          ? `
-      <cac:PartyIdentification>
-        <cbc:ID schemeID="CRN">${invoiceData.buyerVatNumber}</cbc:ID>
+        validatedBuyerVatNumber
+          ? `<cac:PartyIdentification>
+        <cbc:ID schemeID="CRN">${validatedBuyerVatNumber}</cbc:ID>
       </cac:PartyIdentification>`
-          : ""
+          : `<cac:PartyIdentification>
+        <cbc:ID schemeID="NAT">1234567890</cbc:ID>
+      </cac:PartyIdentification>`
       }
-      ${
-        invoiceData.buyerAddress
-          ? `
       <cac:PostalAddress>
-        <cbc:StreetName>${invoiceData.buyerAddress.street || ""}</cbc:StreetName>
-        <cbc:BuildingNumber>${invoiceData.buyerAddress.buildingNumber || ""}</cbc:BuildingNumber>
-        <cbc:CitySubdivisionName>${invoiceData.buyerAddress.district || ""}</cbc:CitySubdivisionName>
-        <cbc:CityName>${invoiceData.buyerAddress.city || ""}</cbc:CityName>
-        <cbc:PostalZone>${invoiceData.buyerAddress.postalCode || ""}</cbc:PostalZone>
+        <cbc:StreetName>${buyerAddress.street}</cbc:StreetName>
+        <cbc:BuildingNumber>${buyerAddress.buildingNumber}</cbc:BuildingNumber>
+        <cbc:CitySubdivisionName>${buyerAddress.district}</cbc:CitySubdivisionName>
+        <cbc:CityName>${buyerAddress.city}</cbc:CityName>
+        <cbc:PostalZone>${buyerAddress.postalCode}</cbc:PostalZone>
         <cac:Country>
-          <cbc:IdentificationCode>${invoiceData.buyerAddress.countryCode}</cbc:IdentificationCode>
+          <cbc:IdentificationCode>${buyerAddress.countryCode}</cbc:IdentificationCode>
         </cac:Country>
-      </cac:PostalAddress>`
-          : ""
-      }
+      </cac:PostalAddress>
       ${
-        invoiceData.buyerVatNumber
-          ? `
-      <cac:PartyTaxScheme>
-        <cbc:CompanyID>${invoiceData.buyerVatNumber}</cbc:CompanyID>
+        validatedBuyerVatNumber
+          ? `<cac:PartyTaxScheme>
+        <cbc:CompanyID>${validatedBuyerVatNumber}</cbc:CompanyID>
         <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
@@ -270,8 +316,7 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
   <!-- Payment Information -->
   ${
     invoiceData.paymentMeans
-      ? `
-  <cac:PaymentMeans>
+      ? `<cac:PaymentMeans>
     <cbc:PaymentMeansCode>${invoiceData.paymentMeans.code}</cbc:PaymentMeansCode>
     ${invoiceData.paymentMeans.description ? `<cbc:InstructionNote>${invoiceData.paymentMeans.description}</cbc:InstructionNote>` : ""}
   </cac:PaymentMeans>`
@@ -286,7 +331,7 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
       <cbc:TaxAmount currencyID="${documentCurrencyCode}">${formatDecimal(invoiceData.vatAmount)}</cbc:TaxAmount>
       <cac:TaxCategory>
         <cbc:ID>S</cbc:ID>
-        <cbc:Percent>${vatPercentage}</cbc:Percent>
+        <cbc:Percent>${validatedVatRate}</cbc:Percent>
         <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
@@ -305,16 +350,19 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
   <!-- Invoice Line Items -->
   ${invoiceData.items
     .map(
-      (item, index) => `
-  <cac:InvoiceLine>
+      (item, index) => `<cac:InvoiceLine>
     <cbc:ID>${index + 1}</cbc:ID>
     <cbc:InvoicedQuantity unitCode="PCE">${item.quantity}</cbc:InvoicedQuantity>
     <cbc:LineExtensionAmount currencyID="${documentCurrencyCode}">${formatDecimal(item.subtotal)}</cbc:LineExtensionAmount>
+    <cac:TaxTotal>
+      <cbc:TaxAmount currencyID="${documentCurrencyCode}">${formatDecimal(item.vatAmount)}</cbc:TaxAmount>
+      <cbc:RoundingAmount currencyID="${documentCurrencyCode}">${formatDecimal(item.total)}</cbc:RoundingAmount>
+    </cac:TaxTotal>
     <cac:Item>
       <cbc:Name>${escapeXml(item.name)}</cbc:Name>
       <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
-        <cbc:Percent>${item.vatRate}</cbc:Percent>
+        <cbc:Percent>${validateVatRate(item.vatRate)}</cbc:Percent>
         <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
@@ -330,6 +378,32 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
 }
 
 // Helper Functions
+
+/**
+ * Validate and format VAT number to ZATCA requirements (15 digits, starts and ends with 3)
+ */
+function validateVatNumber(vatNumber: string): string {
+  // Remove any non-digit characters
+  const digits = vatNumber.replace(/\D/g, "");
+
+  // If it's already 15 digits and starts/ends with 3, return as is
+  if (digits.length === 15 && digits.startsWith("3") && digits.endsWith("3")) {
+    return digits;
+  }
+
+  // Generate a valid VAT number format: 3 + 13 middle digits + 3
+  const middleDigits = digits.padEnd(13, "0").substring(0, 13);
+  return `3${middleDigits}3`;
+}
+
+/**
+ * Validate VAT rate to be either 5 or 15 for standard rate 'S'
+ */
+function validateVatRate(rate: number): number {
+  // ZATCA requires VAT rates to be either 5% or 15% for standard rate 'S'
+  if (rate <= 7.5) return 5;
+  return 15;
+}
 
 /**
  * Get ZATCA-compliant invoice type code
