@@ -102,9 +102,6 @@ export default function DocumentsPage() {
     },
   });
 
-  const storeData = useDocumentStore((state) => state.data) || [];
-  const setData = useDocumentStore((state) => state.setData);
-
   const supabase = createClient();
 
   async function addSignedUrlsToDocuments(documents: any[]): Promise<any[]> {
@@ -122,10 +119,14 @@ export default function DocumentsPage() {
   }
 
   useEffect(() => {
-    if (documents && setData) {
-      addSignedUrlsToDocuments(documents).then(setData);
+    if (documents) {
+      addSignedUrlsToDocuments(documents).then((docsWithUrls) => {
+        useDocumentStore.setState({ data: docsWithUrls });
+      });
     }
-  }, [documents, setData]);
+  }, [documents]);
+
+  const storeData = useDocumentStore((state) => state.data) || [];
 
   const filteredData = useMemo(() => {
     return getFilteredData(storeData);

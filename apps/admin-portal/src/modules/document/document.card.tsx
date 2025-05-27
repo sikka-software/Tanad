@@ -1,5 +1,5 @@
 import { Link, MapPin, User } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
@@ -12,7 +12,7 @@ import { CommonStatus } from "@/types/common.type";
 import { CommonStatusProps } from "@/types/common.type";
 
 import { useUpdateDocument } from "@/document/document.hooks";
-import useDocumentStore from "@/document/document.store";
+import { useDocumentStore, useUrlCacheStore } from "@/document/document.store";
 import { Document, DocumentUpdateData } from "@/document/document.type";
 
 const DocumentCard = ({
@@ -26,49 +26,80 @@ const DocumentCard = ({
   const { mutate: updateDocument } = useUpdateDocument();
   const data = useDocumentStore((state) => state.data);
   const setData = useDocumentStore((state) => state.setData);
+  const cacheUrl = useUrlCacheStore((state) => state.cacheUrl);
+  const getCachedUrl = useUrlCacheStore((state) => state.getCachedUrl);
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [documentUrl, setDocumentUrl] = useState<string | null>(null);
 
   const handleEdit = createHandleEdit<Document, DocumentUpdateData>(setData, updateDocument, data);
 
-  const handlePreview = async () => {
-    if (!document.id || !document.name) {
-      console.warn("Document ID or name is missing for preview.");
-      toast.error(t("Documents.error.preview_load_failed"));
-      return;
-    }
+  const fetchSignedUrl = useCallback(async () => {
+    if (!document.id) return null;
 
-    setIsPreviewOpen(true);
-    setIsPreviewLoading(true);
-    setPreviewUrl(null);
-    
     try {
       const response = await fetch(`/api/documents/get-signed-url?documentId=${document.id}`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || `Failed to fetch signed URL: ${response.statusText}`);
       }
-      const { signedUrl } = await response.json();
+      const { signedUrl, expiresIn } = await response.json();
 
       if (signedUrl) {
-        setPreviewUrl(signedUrl);
-      } else {
-        throw new Error("No signed URL returned from API.");
+        cacheUrl(document.id, signedUrl, expiresIn);
+        return signedUrl;
       }
+      return null;
     } catch (error) {
       console.error("Error fetching signed URL for preview:", error);
       toast.error(t("Documents.error.preview_load_failed_detailed", { error: (error as Error).message }));
-      setIsPreviewOpen(false);
+      return null;
     }
-    setIsPreviewLoading(false);
+  }, [document.id, t, cacheUrl]);
+
+  useEffect(() => {
+    if (isPreviewOpen && !documentUrl) {
+      const loadUrl = async () => {
+        setIsLoading(true);
+        const cachedUrl = getCachedUrl(document.id);
+        if (cachedUrl) {
+          setDocumentUrl(cachedUrl);
+          setIsLoading(false);
+          return;
+        }
+
+        const newUrl = await fetchSignedUrl();
+        if (newUrl) {
+          setDocumentUrl(newUrl);
+        } else {
+          setIsPreviewOpen(false);
+          toast.error(t("Documents.error.preview_load_failed"));
+        }
+        setIsLoading(false);
+      };
+
+      loadUrl();
+    }
+  }, [isPreviewOpen, documentUrl, document.id, getCachedUrl, fetchSignedUrl, t]);
+
+  const handlePreview = () => {
+    if (!document.id || !document.name) {
+      console.warn("Document ID or name is missing for preview.");
+      toast.error(t("Documents.error.preview_load_failed"));
+      return;
+    }
+
+    const cachedUrl = getCachedUrl(document.id);
+    setDocumentUrl(cachedUrl);
+    setIsPreviewOpen(true);
   };
 
   const handleOpenChange = (open: boolean) => {
     setIsPreviewOpen(open);
     if (!open) {
-      setPreviewUrl(null);
+      setDocumentUrl(null);
+      setIsLoading(false);
     }
   };
 
@@ -114,9 +145,9 @@ const DocumentCard = ({
       <DocumentPreviewDialog
         isOpen={isPreviewOpen}
         onOpenChange={handleOpenChange}
-        documentUrl={previewUrl}
+        documentUrl={documentUrl}
         documentName={document.name}
-        isUrlLoading={isPreviewLoading}
+        isUrlLoading={isLoading}
       />
     </>
   );

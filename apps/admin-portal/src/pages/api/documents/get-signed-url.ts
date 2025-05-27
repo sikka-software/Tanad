@@ -134,7 +134,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       console.log('[API get-signed-url] Successfully created signed URL');
-      return res.status(200).json({ signedUrl: data.signedUrl });
+      return res.status(200).json({ 
+        signedUrl: data.signedUrl,
+        expiresIn: SIGNED_URL_EXPIRES_IN
+      });
 
     } catch (error: any) {
       console.error('Unexpected error in get-signed-url handler:', error);

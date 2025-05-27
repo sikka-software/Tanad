@@ -82,9 +82,10 @@ export function DocumentForm({
   const enterprise = useUserStore((state) => state.enterprise);
   const { mutate: createDocument } = useCreateDocument();
   const { mutate: updateDocument } = useUpdateDocument();
-
-  const isSavingDocument = useDocumentStore((state) => state.isLoading);
-  const setIsSavingDocument = useDocumentStore((state) => state.setIsLoading);
+  const setData = useDocumentStore((state) => state.setData);
+  const data = useDocumentStore((state) => state.data);
+  const setIsLoading = useDocumentStore((state) => state.setIsLoading);
+  const isLoading = useDocumentStore((state) => state.isLoading);
 
   const [uploadedDocument, setUploadedDocument] = useState<FileWithPreview | null>(() => {
     if (editMode && defaultValues && 'id' in defaultValues && defaultValues.id && defaultValues.url && defaultValues.name) {
@@ -118,13 +119,13 @@ export function DocumentForm({
   };
 
   const handleSubmit = async (formData: DocumentFormValues) => {
-    setIsSavingDocument(true);
+    setIsLoading(true);
 
     if (!user?.id || !enterprise?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
-      setIsSavingDocument(false);
+      setIsLoading(false);
       return;
     }
 
@@ -144,21 +145,21 @@ export function DocumentForm({
           },
           {
             onSuccess: () => {
-              setIsSavingDocument(false);
+              setIsLoading(false);
               if (onSuccess) onSuccess();
             },
-            onError: () => setIsSavingDocument(false),
+            onError: () => setIsLoading(false),
           },
         );
       } else {
         if (!uploadedDocument || !uploadedDocument.file) {
           toast.error(t("Documents.error.file_required"));
-          setIsSavingDocument(false);
+          setIsLoading(false);
           return;
         }
         if (!(uploadedDocument.file instanceof File)) {
             toast.error(t("Documents.error.invalid_file_object"));
-            setIsSavingDocument(false);
+            setIsLoading(false);
             return;
         }
 
@@ -174,8 +175,7 @@ export function DocumentForm({
         setIsUploading(false);
 
         if (createdDocumentData?.id) {
-          const prevDocs = useDocumentStore.getState().data || [];
-          useDocumentStore.getState().setData!([createdDocumentData, ...prevDocs]);
+          setData?.([createdDocumentData, ...(data || [])]);
 
           await updateDocument(
             {
@@ -184,7 +184,7 @@ export function DocumentForm({
             },
             {
               onSuccess: () => {
-                setIsSavingDocument(false);
+                setIsLoading(false);
                 if (onSuccess) onSuccess();
               },
               onError: () => {
@@ -193,83 +193,71 @@ export function DocumentForm({
             },
           );
         }
-        setIsSavingDocument(false);
+        setIsLoading(false);
         if (onSuccess) onSuccess();
       }
     } catch (error) {
-      setIsSavingDocument(false);
+      setIsLoading(false);
       setIsUploading(false);
       console.error("Failed to save document:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Documents.error.create"),
+        description: t("General.error_operation_description"),
       });
     }
   };
 
-  if (typeof window !== "undefined") {
-    (window as any).documentForm = form;
-  }
-
   return (
-    <div>
-      <Form {...form}>
-        <form
-          id={formHtmlId || "document-form"}
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit(handleSubmit)(e);
-          }}
-        >
-          <div className="form-container space-y-6">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Documents.form.name.label")} *</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Documents.form.name.placeholder")}
-                      {...field}
-                      disabled={isSavingDocument || isUploading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <Form {...form}>
+      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        {!editMode && (
+          <ImageAndPdfUploader
+            value={uploadedDocument ? [uploadedDocument] : []}
+            onChange={handleDocumentsChange}
+            maxFiles={1}
+            maxSizeMB={10}
+            accept="application/pdf,image/png,image/jpeg"
+            disabled={isLoading || isUploading}
+          />
+        )}
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Documents.form.description.label")}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={t("Documents.form.description.placeholder")}
-                      {...field}
-                      disabled={isSavingDocument || isUploading}
-                      rows={4}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <ImageAndPdfUploader
-              value={uploadedDocument ? [uploadedDocument] : []}
-              onChange={handleDocumentsChange}
-              accept="image/svg+xml,image/png,image/jpeg,image/jpg,image/gif,application/pdf"
-              maxSizeMB={2}
-              maxFiles={1}
-              disabled={isSavingDocument || isUploading || (editMode && !!uploadedDocument)}
-            />
-          </div>
-        </form>
-      </Form>
-    </div>
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("Documents.form.name.label")}</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("Documents.form.description.label")}</FormLabel>
+              <FormControl>
+                <Textarea {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {!nestedForm && (
+          <button
+            type="submit"
+            className="hidden"
+            disabled={isLoading || isUploading}
+          />
+        )}
+      </form>
+    </Form>
   );
 }
+
+export default DocumentForm;
