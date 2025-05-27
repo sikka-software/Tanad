@@ -9,6 +9,7 @@ The ZATCA Phase 2 signature and encoding functionality has been successfully int
 ### Core Integration Files
 
 1. **`zatca-phase2-integration.ts`** - Main integration service
+
    - Provides API-based interface to ZATCA SDK
    - Handles validation, signing, hash generation, and QR creation
    - Browser-compatible implementation using fetch API
@@ -21,7 +22,7 @@ The ZATCA Phase 2 signature and encoding functionality has been successfully int
 ### API Endpoints
 
 3. **`/api/zatca/validate.ts`** - Invoice validation endpoint
-4. **`/api/zatca/hash.ts`** - Hash generation endpoint  
+4. **`/api/zatca/hash.ts`** - Hash generation endpoint
 5. **`/api/zatca/sign.ts`** - Digital signing endpoint
 6. **`/api/zatca/qr.ts`** - QR code generation endpoint
 7. **`/api/zatca/process.ts`** - Complete workflow endpoint
@@ -54,7 +55,7 @@ import { ZatcaPhase2Section } from '@/components/zatca/ZatcaPhase2Section';
 import { processZatcaInvoice } from '@/lib/zatca/zatca-phase2-integration';
 
 // In your invoice form component
-<ZatcaPhase2Section 
+<ZatcaPhase2Section
   invoiceData={{
     invoiceNumber: "INV-001",
     issueDate: "2024-01-15",
@@ -73,13 +74,13 @@ import { processZatcaInvoice } from '@/lib/zatca/zatca-phase2-integration';
 ### 2. Programmatic Usage
 
 ```typescript
-import { 
+import {
   processZatcaInvoice,
   validateZatcaInvoice,
   generateZatcaHash,
   signZatcaInvoice,
-  generateZatcaQR
-} from '@/lib/zatca/zatca-phase2-integration';
+  generateZatcaQR,
+} from "@/lib/zatca/zatca-phase2-integration";
 
 // Complete processing
 const result = await processZatcaInvoice(xmlContent);
@@ -101,7 +102,7 @@ import { ZatcaPhase2Section } from '@/components/zatca/ZatcaPhase2Section';
 
 // Add after existing form fields
 {zatcaEnabled && (
-  <ZatcaPhase2Section 
+  <ZatcaPhase2Section
     invoiceData={invoiceFormData}
     enabled={zatcaEnabled}
   />
@@ -230,22 +231,24 @@ const testInvoice = {
   sellerName: "Test Company",
   sellerVatNumber: "310122393500003",
   buyerName: "Test Client",
-  items: [{
-    name: "Test Product",
-    quantity: 1,
-    unitPrice: 100,
-    vatRate: 0.15,
-    vatAmount: 15,
-    subtotal: 100,
-    total: 115
-  }],
+  items: [
+    {
+      name: "Test Product",
+      quantity: 1,
+      unitPrice: 100,
+      vatRate: 0.15,
+      vatAmount: 15,
+      subtotal: 100,
+      total: 115,
+    },
+  ],
   subtotal: 100,
   vatAmount: 15,
-  total: 115
+  total: 115,
 };
 
 const result = await processZatcaInvoice(generateZatcaXml(testInvoice));
-console.log('ZATCA Processing Result:', result);
+console.log("ZATCA Processing Result:", result);
 ```
 
 ## 📈 Monitoring and Debugging
@@ -253,11 +256,11 @@ console.log('ZATCA Processing Result:', result);
 ### Status Checking
 
 ```typescript
-import { zatcaPhase2 } from '@/lib/zatca/zatca-phase2-integration';
+import { zatcaPhase2 } from "@/lib/zatca/zatca-phase2-integration";
 
 // Check if ZATCA SDK is available
 const status = await zatcaPhase2.checkSDKAvailability();
-console.log('ZATCA SDK Status:', status);
+console.log("ZATCA SDK Status:", status);
 ```
 
 ### Error Handling
@@ -292,11 +295,13 @@ The existing Phase 1 implementation remains functional:
 ### Production Deployment
 
 1. **Get Production Certificates**
+
    - Submit CSR to ZATCA portal
    - Install production certificates
    - Update configuration
 
 2. **API Integration**
+
    - Implement ZATCA API client
    - Handle API responses
    - Set up monitoring
@@ -330,4 +335,4 @@ The existing Phase 1 implementation remains functional:
 
 ---
 
-**Note**: This integration provides a complete foundation for ZATCA Phase 2 compliance. The current implementation uses simulated responses for development and testing. For production use, ensure proper ZATCA SDK setup and production certificates are configured. 
+**Note**: This integration provides a complete foundation for ZATCA Phase 2 compliance. The current implementation uses simulated responses for development and testing. For production use, ensure proper ZATCA SDK setup and production certificates are configured.
