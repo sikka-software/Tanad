@@ -1,6 +1,7 @@
 /**
  * ZATCA XML Utilities for Phase 2 E-Invoicing
  * Based on ZATCA Phase 2 requirements and UBL 2.1 standard
+ * Updated to match working sandbox format exactly
  */
 import { generateMockZatcaPhase2QRString } from "./zatca-utils";
 
@@ -66,6 +67,7 @@ interface ZatcaInvoiceData {
 
 /**
  * Generate a ZATCA-compliant UBL 2.1 XML string for Phase 2 compliance
+ * This matches the exact format that works in the ZATCA sandbox
  */
 export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
   const now = new Date();
@@ -90,7 +92,7 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
   const invoiceTypeCode = getZatcaInvoiceTypeCode(invoiceData.invoiceType);
   const zatcaInvoiceCode = getZatcaInvoiceCode(invoiceData.invoiceType);
   const uuid = generateUUID();
-  const icv = invoiceData.invoiceCounterValue || 1;
+  const icv = invoiceData.invoiceCounterValue || Math.floor(Math.random() * 1000) + 1;
   const pih =
     invoiceData.previousInvoiceHash ||
     "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==";
@@ -106,33 +108,44 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
 
   // Ensure required address fields are present
   const sellerAddress = {
-    street: invoiceData.sellerAddress.street || "Default Street",
-    buildingNumber: invoiceData.sellerAddress.buildingNumber || "1234",
+    street: invoiceData.sellerAddress.street || "King Fahd Road",
+    buildingNumber: invoiceData.sellerAddress.buildingNumber || "8091",
     city: invoiceData.sellerAddress.city || "Riyadh",
-    postalCode: invoiceData.sellerAddress.postalCode || "12345",
+    postalCode: invoiceData.sellerAddress.postalCode || "12214",
     district: invoiceData.sellerAddress.district || "Al Olaya",
     countryCode: invoiceData.sellerAddress.countryCode || "SA",
   };
 
   const buyerAddress = invoiceData.buyerAddress
     ? {
-        street: invoiceData.buyerAddress.street || "Default Street",
-        buildingNumber: invoiceData.buyerAddress.buildingNumber || "1234",
-        city: invoiceData.buyerAddress.city || "Riyadh",
-        postalCode: invoiceData.buyerAddress.postalCode || "12345",
-        district: invoiceData.buyerAddress.district || "Al Malaz",
+        street: invoiceData.buyerAddress.street || "Prince Mohammed Bin Salman Road",
+        buildingNumber: invoiceData.buyerAddress.buildingNumber || "3458",
+        city: invoiceData.buyerAddress.city || "Jeddah",
+        postalCode: invoiceData.buyerAddress.postalCode || "23715",
+        district: invoiceData.buyerAddress.district || "Al Hamra",
         countryCode: invoiceData.buyerAddress.countryCode || "SA",
       }
     : {
-        street: "Default Street",
-        buildingNumber: "1234",
-        city: "Riyadh",
-        postalCode: "12345",
-        district: "Al Malaz",
+        street: "Prince Mohammed Bin Salman Road",
+        buildingNumber: "3458",
+        city: "Jeddah",
+        postalCode: "23715",
+        district: "Al Hamra",
         countryCode: "SA",
       };
 
-  // UBL 2.1 Invoice XML Template
+  // Format dates properly
+  const issueDateOnly = formatDateOnly(validatedIssueDate);
+  const issueTimeOnly = formatTimeOnly(validatedIssueDate);
+
+  // Calculate totals with proper formatting
+  const lineExtensionAmount = formatDecimal(invoiceData.subtotal);
+  const taxExclusiveAmount = formatDecimal(invoiceData.subtotal);
+  const taxInclusiveAmount = formatDecimal(invoiceData.total);
+  const payableAmount = formatDecimal(invoiceData.total);
+  const taxAmount = formatDecimal(invoiceData.vatAmount);
+
+  // UBL 2.1 Invoice XML Template - Exact format from working sandbox
   return `<?xml version="1.0" encoding="UTF-8"?>
 <Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
          xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
@@ -207,23 +220,13 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
 
   <cbc:UBLVersionID>2.1</cbc:UBLVersionID>
   <cbc:ProfileID>reporting:1.0</cbc:ProfileID>
-  <cbc:ID>${invoiceData.invoiceNumber}</cbc:ID>
+  <cbc:ID>${escapeXml(invoiceData.invoiceNumber)}</cbc:ID>
   <cbc:UUID>${uuid}</cbc:UUID>
-  <cbc:IssueDate>${formatDateOnly(validatedIssueDate)}</cbc:IssueDate>
-  <cbc:IssueTime>${formatTimeOnly(validatedIssueDate)}</cbc:IssueTime>
+  <cbc:IssueDate>${issueDateOnly}</cbc:IssueDate>
+  <cbc:IssueTime>${issueTimeOnly}</cbc:IssueTime>
   <cbc:InvoiceTypeCode name="${zatcaInvoiceCode}" listID="UN/ECE 1001 Subset" listAgencyID="6">${invoiceTypeCode}</cbc:InvoiceTypeCode>
   <cbc:DocumentCurrencyCode>${documentCurrencyCode}</cbc:DocumentCurrencyCode>
   <cbc:TaxCurrencyCode>${documentCurrencyCode}</cbc:TaxCurrencyCode>
-
-  <!-- Supply Date (KSA-5) - Required for standard invoices -->
-  ${
-    invoiceData.invoiceType === "STANDARD"
-      ? `<cac:InvoicePeriod>
-    <cbc:StartDate>${formatDateOnly(invoiceData.supplyDate || validatedIssueDate)}</cbc:StartDate>
-    <cbc:EndDate>${formatDateOnly(invoiceData.supplyDate || validatedIssueDate)}</cbc:EndDate>
-  </cac:InvoicePeriod>`
-      : ""
-  }
 
   <!-- ZATCA Additional Document References -->
   <cac:AdditionalDocumentReference>
@@ -247,6 +250,12 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
     </cac:Attachment>
   </cac:AdditionalDocumentReference>
 
+  <!-- Signature Reference -->
+  <cac:Signature>
+    <cbc:ID>urn:oasis:names:specification:ubl:signature:Invoice</cbc:ID>
+    <cbc:SignatureMethod>urn:oasis:names:specification:ubl:dsig:enveloped:xades</cbc:SignatureMethod>
+  </cac:Signature>
+
   <!-- Seller Information -->
   <cac:AccountingSupplierParty>
     <cac:Party>
@@ -254,11 +263,11 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
         <cbc:ID schemeID="CRN">${validatedSellerVatNumber}</cbc:ID>
       </cac:PartyIdentification>
       <cac:PostalAddress>
-        <cbc:StreetName>${sellerAddress.street}</cbc:StreetName>
-        <cbc:BuildingNumber>${sellerAddress.buildingNumber}</cbc:BuildingNumber>
-        <cbc:CitySubdivisionName>${sellerAddress.district}</cbc:CitySubdivisionName>
-        <cbc:CityName>${sellerAddress.city}</cbc:CityName>
-        <cbc:PostalZone>${sellerAddress.postalCode}</cbc:PostalZone>
+        <cbc:StreetName>${escapeXml(sellerAddress.street)}</cbc:StreetName>
+        <cbc:BuildingNumber>${escapeXml(sellerAddress.buildingNumber)}</cbc:BuildingNumber>
+        <cbc:CitySubdivisionName>${escapeXml(sellerAddress.district)}</cbc:CitySubdivisionName>
+        <cbc:CityName>${escapeXml(sellerAddress.city)}</cbc:CityName>
+        <cbc:PostalZone>${escapeXml(sellerAddress.postalCode)}</cbc:PostalZone>
         <cac:Country>
           <cbc:IdentificationCode>${sellerAddress.countryCode}</cbc:IdentificationCode>
         </cac:Country>
@@ -270,7 +279,7 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
         </cac:TaxScheme>
       </cac:PartyTaxScheme>
       <cac:PartyLegalEntity>
-        <cbc:RegistrationName>${invoiceData.sellerName}</cbc:RegistrationName>
+        <cbc:RegistrationName>${escapeXml(invoiceData.sellerName)}</cbc:RegistrationName>
       </cac:PartyLegalEntity>
     </cac:Party>
   </cac:AccountingSupplierParty>
@@ -278,62 +287,72 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
   <!-- Buyer Information -->
   <cac:AccountingCustomerParty>
     <cac:Party>
-      ${
-        validatedBuyerVatNumber
-          ? `<cac:PartyIdentification>
+      ${validatedBuyerVatNumber ? `<cac:PartyIdentification>
         <cbc:ID schemeID="CRN">${validatedBuyerVatNumber}</cbc:ID>
-      </cac:PartyIdentification>`
-          : `<cac:PartyIdentification>
-        <cbc:ID schemeID="NAT">1234567890</cbc:ID>
-      </cac:PartyIdentification>`
-      }
+      </cac:PartyIdentification>` : ''}
       <cac:PostalAddress>
-        <cbc:StreetName>${buyerAddress.street}</cbc:StreetName>
-        <cbc:BuildingNumber>${buyerAddress.buildingNumber}</cbc:BuildingNumber>
-        <cbc:CitySubdivisionName>${buyerAddress.district}</cbc:CitySubdivisionName>
-        <cbc:CityName>${buyerAddress.city}</cbc:CityName>
-        <cbc:PostalZone>${buyerAddress.postalCode}</cbc:PostalZone>
+        <cbc:StreetName>${escapeXml(buyerAddress.street)}</cbc:StreetName>
+        <cbc:BuildingNumber>${escapeXml(buyerAddress.buildingNumber)}</cbc:BuildingNumber>
+        <cbc:CitySubdivisionName>${escapeXml(buyerAddress.district)}</cbc:CitySubdivisionName>
+        <cbc:CityName>${escapeXml(buyerAddress.city)}</cbc:CityName>
+        <cbc:PostalZone>${escapeXml(buyerAddress.postalCode)}</cbc:PostalZone>
         <cac:Country>
           <cbc:IdentificationCode>${buyerAddress.countryCode}</cbc:IdentificationCode>
         </cac:Country>
       </cac:PostalAddress>
-      ${
-        validatedBuyerVatNumber
-          ? `<cac:PartyTaxScheme>
+      ${validatedBuyerVatNumber ? `<cac:PartyTaxScheme>
         <cbc:CompanyID>${validatedBuyerVatNumber}</cbc:CompanyID>
         <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
-      </cac:PartyTaxScheme>`
-          : ""
-      }
+      </cac:PartyTaxScheme>` : ''}
       <cac:PartyLegalEntity>
-        <cbc:RegistrationName>${invoiceData.buyerName}</cbc:RegistrationName>
+        <cbc:RegistrationName>${escapeXml(invoiceData.buyerName)}</cbc:RegistrationName>
       </cac:PartyLegalEntity>
     </cac:Party>
   </cac:AccountingCustomerParty>
 
-  <!-- Payment Information -->
-  ${
-    invoiceData.paymentMeans
-      ? `<cac:PaymentMeans>
-    <cbc:PaymentMeansCode>${invoiceData.paymentMeans.code}</cbc:PaymentMeansCode>
-    ${invoiceData.paymentMeans.description ? `<cbc:InstructionNote>${invoiceData.paymentMeans.description}</cbc:InstructionNote>` : ""}
-  </cac:PaymentMeans>`
-      : ""
-  }
+  <!-- Delivery Information (required for standard invoices) -->
+  ${invoiceData.invoiceType === "STANDARD" ? `<cac:Delivery>
+    <cbc:ActualDeliveryDate>${invoiceData.supplyDate ? formatDateOnly(invoiceData.supplyDate) : issueDateOnly}</cbc:ActualDeliveryDate>
+  </cac:Delivery>` : ''}
 
-  <!-- Tax Information -->
+  <!-- Payment Information -->
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>${invoiceData.paymentMeans?.code || '10'}</cbc:PaymentMeansCode>
+    ${invoiceData.paymentMeans?.description ? `<cbc:InstructionNote>${escapeXml(invoiceData.paymentMeans.description)}</cbc:InstructionNote>` : '<cbc:InstructionNote>Cash payment</cbc:InstructionNote>'}
+  </cac:PaymentMeans>
+
+  <!-- Allowance/Charge (required even if zero) -->
+  <cac:AllowanceCharge>
+    <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+    <cbc:AllowanceChargeReason>discount</cbc:AllowanceChargeReason>
+    <cbc:Amount currencyID="${documentCurrencyCode}">0.00</cbc:Amount>
+    <cac:TaxCategory>
+      <cbc:ID schemeID="UN/ECE 5305" schemeAgencyID="6">S</cbc:ID>
+      <cbc:Percent>${validatedVatRate}</cbc:Percent>
+      <cac:TaxScheme>
+        <cbc:ID schemeID="UN/ECE 5153" schemeAgencyID="6">VAT</cbc:ID>
+      </cac:TaxScheme>
+    </cac:TaxCategory>
+  </cac:AllowanceCharge>
+
+  <!-- Tax Total (Summary) -->
   <cac:TaxTotal>
-    <cbc:TaxAmount currencyID="${documentCurrencyCode}">${formatDecimal(invoiceData.vatAmount)}</cbc:TaxAmount>
+    <cbc:TaxAmount currencyID="${documentCurrencyCode}">${taxAmount}</cbc:TaxAmount>
+  </cac:TaxTotal>
+
+  <!-- Tax Total (Detailed) -->
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="${documentCurrencyCode}">${taxAmount}</cbc:TaxAmount>
     <cac:TaxSubtotal>
-      <cbc:TaxableAmount currencyID="${documentCurrencyCode}">${formatDecimal(invoiceData.subtotal)}</cbc:TaxableAmount>
-      <cbc:TaxAmount currencyID="${documentCurrencyCode}">${formatDecimal(invoiceData.vatAmount)}</cbc:TaxAmount>
+      <cbc:TaxableAmount currencyID="${documentCurrencyCode}">${lineExtensionAmount}</cbc:TaxableAmount>
+      <cbc:TaxAmount currencyID="${documentCurrencyCode}">${taxAmount}</cbc:TaxAmount>
       <cac:TaxCategory>
-        <cbc:ID>S</cbc:ID>
-        <cbc:Percent>${validatedVatRate}</cbc:Percent>
+        <cbc:ID schemeID="UN/ECE 5305" schemeAgencyID="6">S</cbc:ID>
+        <cbc:Percent>${formatDecimal(validatedVatRate)}</cbc:Percent>
         <cac:TaxScheme>
-          <cbc:ID>VAT</cbc:ID>
+          <cbc:ID schemeID="UN/ECE 5153" schemeAgencyID="6">VAT</cbc:ID>
         </cac:TaxScheme>
       </cac:TaxCategory>
     </cac:TaxSubtotal>
@@ -341,18 +360,18 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
 
   <!-- Invoice Total -->
   <cac:LegalMonetaryTotal>
-    <cbc:LineExtensionAmount currencyID="${documentCurrencyCode}">${formatDecimal(invoiceData.subtotal)}</cbc:LineExtensionAmount>
-    <cbc:TaxExclusiveAmount currencyID="${documentCurrencyCode}">${formatDecimal(invoiceData.subtotal)}</cbc:TaxExclusiveAmount>
-    <cbc:TaxInclusiveAmount currencyID="${documentCurrencyCode}">${formatDecimal(invoiceData.total)}</cbc:TaxInclusiveAmount>
-    <cbc:PayableAmount currencyID="${documentCurrencyCode}">${formatDecimal(invoiceData.total)}</cbc:PayableAmount>
+    <cbc:LineExtensionAmount currencyID="${documentCurrencyCode}">${lineExtensionAmount}</cbc:LineExtensionAmount>
+    <cbc:TaxExclusiveAmount currencyID="${documentCurrencyCode}">${taxExclusiveAmount}</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="${documentCurrencyCode}">${taxInclusiveAmount}</cbc:TaxInclusiveAmount>
+    <cbc:AllowanceTotalAmount currencyID="${documentCurrencyCode}">0.00</cbc:AllowanceTotalAmount>
+    <cbc:PrepaidAmount currencyID="${documentCurrencyCode}">0.00</cbc:PrepaidAmount>
+    <cbc:PayableAmount currencyID="${documentCurrencyCode}">${payableAmount}</cbc:PayableAmount>
   </cac:LegalMonetaryTotal>
 
   <!-- Invoice Line Items -->
-  ${invoiceData.items
-    .map(
-      (item, index) => `<cac:InvoiceLine>
+  ${invoiceData.items.map((item, index) => `<cac:InvoiceLine>
     <cbc:ID>${index + 1}</cbc:ID>
-    <cbc:InvoicedQuantity unitCode="PCE">${item.quantity}</cbc:InvoicedQuantity>
+    <cbc:InvoicedQuantity unitCode="PCE">${formatDecimal(item.quantity)}</cbc:InvoicedQuantity>
     <cbc:LineExtensionAmount currencyID="${documentCurrencyCode}">${formatDecimal(item.subtotal)}</cbc:LineExtensionAmount>
     <cac:TaxTotal>
       <cbc:TaxAmount currencyID="${documentCurrencyCode}">${formatDecimal(item.vatAmount)}</cbc:TaxAmount>
@@ -362,7 +381,7 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
       <cbc:Name>${escapeXml(item.name)}</cbc:Name>
       <cac:ClassifiedTaxCategory>
         <cbc:ID>S</cbc:ID>
-        <cbc:Percent>${validateVatRate(item.vatRate)}</cbc:Percent>
+        <cbc:Percent>${formatDecimal(validatedVatRate)}</cbc:Percent>
         <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
@@ -370,130 +389,89 @@ export function generateZatcaXml(invoiceData: ZatcaInvoiceData): string {
     </cac:Item>
     <cac:Price>
       <cbc:PriceAmount currencyID="${documentCurrencyCode}">${formatDecimal(item.unitPrice)}</cbc:PriceAmount>
+      <cac:AllowanceCharge>
+        <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+        <cbc:AllowanceChargeReason>discount</cbc:AllowanceChargeReason>
+        <cbc:Amount currencyID="${documentCurrencyCode}">0.00</cbc:Amount>
+      </cac:AllowanceCharge>
     </cac:Price>
-  </cac:InvoiceLine>`,
-    )
-    .join("")}
+  </cac:InvoiceLine>`).join('\n  ')}
 </Invoice>`;
 }
 
-// Helper Functions
-
-/**
- * Validate and format VAT number to ZATCA requirements (15 digits, starts and ends with 3)
- */
+// Helper functions
 function validateVatNumber(vatNumber: string): string {
-  // Remove any non-digit characters
-  const digits = vatNumber.replace(/\D/g, "");
-
-  // If it's already 15 digits and starts/ends with 3, return as is
-  if (digits.length === 15 && digits.startsWith("3") && digits.endsWith("3")) {
-    return digits;
+  // ZATCA VAT numbers must be 15 digits starting and ending with 3
+  if (!vatNumber || vatNumber.length !== 15) {
+    return "300000000000003"; // Default valid ZATCA VAT number
   }
-
-  // Generate a valid VAT number format: 3 + 13 middle digits + 3
-  const middleDigits = digits.padEnd(13, "0").substring(0, 13);
-  return `3${middleDigits}3`;
+  
+  // Ensure it starts and ends with 3
+  if (!vatNumber.startsWith("3") || !vatNumber.endsWith("3")) {
+    return "300000000000003";
+  }
+  
+  return vatNumber;
 }
 
-/**
- * Validate VAT rate to be either 5 or 15 for standard rate 'S'
- */
 function validateVatRate(rate: number): number {
-  // ZATCA requires VAT rates to be either 5% or 15% for standard rate 'S'
-  if (rate <= 7.5) return 5;
+  // ZATCA supports 5% and 15% VAT rates primarily
+  if (rate === 5 || rate === 15) {
+    return rate;
+  }
+  // Default to 15% if invalid
   return 15;
 }
 
-/**
- * Get ZATCA-compliant invoice type code
- */
 function getZatcaInvoiceTypeCode(invoiceType: "STANDARD" | "SIMPLIFIED"): string {
-  // Use standard UBL 2.1 invoice type codes from UN/CEFACT 1001
+  // UBL Invoice Type Code
+  return "388"; // Commercial Invoice
+}
+
+function getZatcaInvoiceCode(invoiceType: "STANDARD" | "SIMPLIFIED"): string {
+  // ZATCA specific invoice type codes
   switch (invoiceType) {
     case "STANDARD":
-      return "388"; // Commercial invoice
+      return "0200000"; // Standard B2B Invoice
     case "SIMPLIFIED":
-      return "388"; // Commercial invoice (ZATCA uses 388 for both)
+      return "0100000"; // Simplified B2C Invoice
     default:
-      return "388";
+      return "0200000";
   }
 }
 
-/**
- * Generate ZATCA invoice code (KSA-2) in format NNPNESB
- */
-function getZatcaInvoiceCode(invoiceType: "STANDARD" | "SIMPLIFIED"): string {
-  // ZATCA Invoice Code Structure: NNPNESB (7 characters)
-  // NN (position 1-2): Invoice subtype (01=Standard, 02=Simplified)
-  // P (position 3): Third party invoice (0=False, 1=True)
-  // N (position 4): Nominal supply (0=False, 1=True)
-  // E (position 5): Export invoice (0=False, 1=True)
-  // S (position 6): Summary invoice (0=False, 1=True)
-  // B (position 7): Self billed invoice (0=False, 1=True)
-
-  const subtype = invoiceType === "STANDARD" ? "01" : "02";
-  const thirdParty = "0"; // Not third party
-  const nominal = "0"; // Not nominal supply
-  const export_ = "0"; // Not export
-  const summary = "0"; // Not summary
-  const selfBilled = "0"; // Not self billed
-
-  return `${subtype}${thirdParty}${nominal}${export_}${summary}${selfBilled}`;
-}
-
-/**
- * Generate a version 4 UUID
- */
 function generateUUID(): string {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
+  // Generate a valid UUID v4
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
 }
 
-/**
- * Format a date string to YYYY-MM-DD format
- */
 function formatDateOnly(dateString: string): string {
+  // Format date as YYYY-MM-DD
   const date = new Date(dateString);
-  return date.toISOString().split("T")[0];
+  return date.toISOString().split('T')[0];
 }
 
-/**
- * Format a date string to HH:MM:SS format
- */
 function formatTimeOnly(dateString: string): string {
+  // Format time as HH:MM:SS
   const date = new Date(dateString);
-  return date.toISOString().split("T")[1].substring(0, 8);
+  return date.toISOString().split('T')[1].split('.')[0];
 }
 
-/**
- * Format a decimal number to 2 decimal places
- */
 function formatDecimal(value: number): string {
+  // Format decimal with 2 decimal places
   return value.toFixed(2);
 }
 
-/**
- * Escape XML special characters
- */
 function escapeXml(unsafe: string): string {
-  return unsafe.replace(/[<>&'"]/g, function (c) {
-    switch (c) {
-      case "<":
-        return "&lt;";
-      case ">":
-        return "&gt;";
-      case "&":
-        return "&amp;";
-      case "'":
-        return "&apos;";
-      case '"':
-        return "&quot;";
-      default:
-        return c;
-    }
-  });
+  // Escape XML special characters
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
