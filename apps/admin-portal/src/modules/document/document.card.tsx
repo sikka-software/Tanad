@@ -29,7 +29,6 @@ const DocumentCard = ({
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [previewName, setPreviewName] = useState<string | null>(null);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
 
   const handleEdit = createHandleEdit<Document, DocumentUpdateData>(setData, updateDocument, data);
@@ -41,7 +40,10 @@ const DocumentCard = ({
       return;
     }
 
+    setIsPreviewOpen(true);
     setIsPreviewLoading(true);
+    setPreviewUrl(null);
+    
     try {
       const response = await fetch(`/api/documents/get-signed-url?documentId=${document.id}`);
       if (!response.ok) {
@@ -52,16 +54,22 @@ const DocumentCard = ({
 
       if (signedUrl) {
         setPreviewUrl(signedUrl);
-        setPreviewName(document.name);
-        setIsPreviewOpen(true);
       } else {
         throw new Error("No signed URL returned from API.");
       }
     } catch (error) {
       console.error("Error fetching signed URL for preview:", error);
       toast.error(t("Documents.error.preview_load_failed_detailed", { error: (error as Error).message }));
+      setIsPreviewOpen(false);
     }
     setIsPreviewLoading(false);
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    setIsPreviewOpen(open);
+    if (!open) {
+      setPreviewUrl(null);
+    }
   };
 
   return (
@@ -105,9 +113,10 @@ const DocumentCard = ({
       </ModuleCard>
       <DocumentPreviewDialog
         isOpen={isPreviewOpen}
-        onOpenChange={setIsPreviewOpen}
+        onOpenChange={handleOpenChange}
         documentUrl={previewUrl}
-        documentName={previewName}
+        documentName={document.name}
+        isUrlLoading={isPreviewLoading}
       />
     </>
   );

@@ -11,6 +11,7 @@ interface DocumentPreviewDialogProps {
   onOpenChange: (isOpen: boolean) => void;
   documentUrl: string | null;
   documentName: string | null;
+  isUrlLoading?: boolean;
 }
 
 export function DocumentPreviewDialog({
@@ -18,38 +19,31 @@ export function DocumentPreviewDialog({
   onOpenChange,
   documentUrl,
   documentName,
+  isUrlLoading = false,
 }: DocumentPreviewDialogProps) {
   const t = useTranslations("General");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isContentLoading, setIsContentLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
 
+  // Reset loading state when dialog opens/closes
   useEffect(() => {
-    if (isOpen && documentUrl) {
-      setIsLoading(true);
-      setLoadError(false);
-    } else if (!isOpen) {
-      setIsLoading(true);
+    if (!isOpen) {
+      setIsContentLoading(true);
       setLoadError(false);
     }
-  }, [isOpen, documentUrl]);
-
-  if (!documentUrl || !documentName) {
-    return null;
-  }
-
-  const isImage = [".jpg", ".jpeg", ".png", ".gif", ".webp"].some((ext) =>
-    documentUrl.toLowerCase().endsWith(ext),
-  );
+  }, [isOpen]);
 
   const handleLoad = () => {
-    setIsLoading(false);
+    setIsContentLoading(false);
     setLoadError(false);
   };
 
   const handleError = () => {
-    setIsLoading(false);
+    setIsContentLoading(false);
     setLoadError(true);
   };
+
+  const isLoading = isUrlLoading || isContentLoading;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -60,38 +54,42 @@ export function DocumentPreviewDialog({
               <Skeleton className="h-full w-full" />
             </div>
           )}
-          {!isLoading && loadError && isImage && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-red-500">
-              <p>{t("document_preview_image_error_title")}</p>
-              <p className="text-sm">{t("document_preview_image_error_desc")}</p>
-            </div>
+          {documentUrl && (
+            <>
+              {loadError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-red-500">
+                  <p>{t("document_preview_image_error_title")}</p>
+                  <p className="text-sm">{t("document_preview_image_error_desc")}</p>
+                </div>
+              )}
+              <div
+                style={{
+                  visibility: loadError ? "hidden" : "visible",
+                  height: "100%",
+                  width: "100%",
+                  display: isLoading ? "none" : "block"
+                }}
+              >
+                {documentUrl.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/) ? (
+                  <img
+                    src={documentUrl}
+                    alt={documentName || ""}
+                    className="w-full mx-auto object-cover"
+                    onLoad={handleLoad}
+                    onError={handleError}
+                  />
+                ) : (
+                  <iframe
+                    src={documentUrl}
+                    title={documentName || ""}
+                    className="h-full w-full border-0 object-contain"
+                    onLoad={handleLoad}
+                    onError={handleError}
+                  />
+                )}
+              </div>
+            </>
           )}
-          <div
-            // className="flex flex-col items-center justify-center bg-blue-500"
-            style={{
-              visibility: isLoading || (loadError && isImage) ? "hidden" : "visible",
-              height: "100%",
-              width: "100%",
-            }}
-          >
-            {isImage ? (
-              <img
-                src={documentUrl}
-                alt={documentName}
-                className="w-full mx-auto bg-red-400 object-cover"
-                onLoad={handleLoad}
-                onError={handleError}
-              />
-            ) : (
-              <iframe
-                src={documentUrl}
-                title={documentName}
-                className="h-fit w-full border-0 object-contain"
-                onLoad={handleLoad}
-                onError={handleError}
-              />
-            )}
-          </div>
         </div>
       </DialogContent>
     </Dialog>

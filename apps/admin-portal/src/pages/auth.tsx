@@ -232,7 +232,7 @@ export default function Auth() {
           alt={`Tanad Logo`}
           src={logoSrc}
         />
-        <div className="text-muted-foreground w-full pt-4 text-center text-sm md:text-start xl:whitespace-nowrap">
+        <div className="text-muted-foreground w-full pt-4 text-center text-sm sm:text-start xl:whitespace-nowrap">
           {t("General.tagline")}
         </div>
       </div>
