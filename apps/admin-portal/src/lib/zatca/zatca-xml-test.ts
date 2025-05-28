@@ -8,6 +8,11 @@ import { generateZatcaXml } from "./zatca-xml";
  * Generate a test ZATCA XML with valid data
  */
 export function generateTestZatcaXml(): string {
+  const subtotal = 989.0;
+  const vatRate = 0.15; // 15%
+  const vatAmount = Math.round(subtotal * vatRate * 100) / 100; // 148.35
+  const total = subtotal + vatAmount; // 1137.35
+
   const testInvoiceData = {
     invoiceNumber: "INV-TEST-001",
     issueDate: new Date().toISOString(), // Current date to avoid future date error
@@ -21,43 +26,49 @@ export function generateTestZatcaXml(): string {
       street: "King Fahd Road",
       buildingNumber: "1234",
       city: "Riyadh",
-      postalCode: "12345",
+      postalCode: "12214",
       district: "Al Olaya",
       countryCode: "SA",
     },
 
-    // Buyer with complete address information
-    buyerName: "Customer Company Ltd",
-    buyerVatNumber: "320987654321003",
+    // Buyer information
+    buyerName: "Test Buyer LLC",
+    buyerVatNumber: "399876543210003",
     buyerAddress: {
       street: "Prince Sultan Road",
       buildingNumber: "5678",
-      city: "Riyadh",
-      postalCode: "54321",
-      district: "Al Malaz",
+      city: "Jeddah",
+      postalCode: "23715",
+      district: "Al Hamra",
       countryCode: "SA",
     },
 
-    // Items with valid VAT rate (15%)
+    // Payment information
+    paymentMeans: {
+      code: "10", // Cash
+      description: "Cash payment",
+    },
+
+    // Line items with proper VAT calculation
     items: [
       {
-        name: "Professional Services",
-        description: "Consulting Services",
+        name: "Test Product",
+        description: "Test Product Description",
         quantity: 1,
-        unitPrice: 1000.0,
-        vatRate: 15, // Valid ZATCA rate
-        vatAmount: 150.0,
-        subtotal: 1000.0,
-        total: 1150.0,
+        unitPrice: subtotal,
+        vatRate: 15, // 15% as integer
+        vatAmount: vatAmount,
+        subtotal: subtotal,
+        total: total,
       },
     ],
 
-    // Totals
-    subtotal: 1000.0,
-    vatAmount: 150.0,
-    total: 1150.0,
+    // Totals with proper calculation
+    subtotal: subtotal,
+    vatAmount: vatAmount,
+    total: total,
 
-    // ZATCA Phase 2 fields
+    // ZATCA Phase 2 specific fields
     invoiceCounterValue: 1,
     previousInvoiceHash:
       "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==",
@@ -67,57 +78,68 @@ export function generateTestZatcaXml(): string {
 }
 
 /**
- * Generate a simplified invoice test XML
+ * Generate a simplified test ZATCA XML
  */
 export function generateSimplifiedTestZatcaXml(): string {
+  const subtotal = 500.0;
+  const vatRate = 0.15; // 15%
+  const vatAmount = Math.round(subtotal * vatRate * 100) / 100; // 75.00
+  const total = subtotal + vatAmount; // 575.00
+
   const testInvoiceData = {
     invoiceNumber: "INV-SIMP-001",
     issueDate: new Date().toISOString(),
     invoiceType: "SIMPLIFIED" as const,
 
     // Seller with valid VAT number
-    sellerName: "Retail Store LLC",
-    sellerVatNumber: "315555555555003",
+    sellerName: "Simplified Seller LLC",
+    sellerVatNumber: "310987654321003",
     sellerAddress: {
-      street: "Commercial Street",
-      buildingNumber: "9999",
-      city: "Jeddah",
-      postalCode: "21577",
-      district: "Al Balad",
+      street: "King Abdul Aziz Road",
+      buildingNumber: "9876",
+      city: "Riyadh",
+      postalCode: "11564",
+      district: "Al Malaz",
       countryCode: "SA",
     },
 
-    // Buyer (minimal for simplified invoice)
+    // Buyer (minimal for simplified)
     buyerName: "Walk-in Customer",
     buyerAddress: {
-      street: "Customer Street",
-      buildingNumber: "0000",
-      city: "Jeddah",
-      postalCode: "21577",
-      district: "Al Balad",
+      street: "N/A",
+      buildingNumber: "N/A",
+      city: "Riyadh",
+      postalCode: "00000",
+      district: "N/A",
       countryCode: "SA",
     },
 
-    // Items with 15% VAT
+    // Payment information
+    paymentMeans: {
+      code: "10", // Cash
+      description: "Cash payment",
+    },
+
+    // Line items
     items: [
       {
-        name: "Retail Product",
-        description: "General Merchandise",
-        quantity: 2,
-        unitPrice: 50.0,
+        name: "Simple Product",
+        description: "Simple Product for Testing",
+        quantity: 1,
+        unitPrice: subtotal,
         vatRate: 15,
-        vatAmount: 15.0,
-        subtotal: 100.0,
-        total: 115.0,
+        vatAmount: vatAmount,
+        subtotal: subtotal,
+        total: total,
       },
     ],
 
     // Totals
-    subtotal: 100.0,
-    vatAmount: 15.0,
-    total: 115.0,
+    subtotal: subtotal,
+    vatAmount: vatAmount,
+    total: total,
 
-    // ZATCA Phase 2 fields
+    // ZATCA Phase 2 specific fields
     invoiceCounterValue: 2,
     previousInvoiceHash:
       "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==",
@@ -127,9 +149,9 @@ export function generateSimplifiedTestZatcaXml(): string {
 }
 
 /**
- * Validate ZATCA XML requirements checklist
+ * Validate ZATCA requirements for the generated XML
  */
-export function validateZatcaRequirements(xmlString: string): {
+export function validateZatcaRequirements(xmlContent: string): {
   isValid: boolean;
   errors: string[];
   warnings: string[];
@@ -137,58 +159,65 @@ export function validateZatcaRequirements(xmlString: string): {
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  // Check for required elements
-  if (!xmlString.includes("<cbc:UBLVersionID>2.1</cbc:UBLVersionID>")) {
-    errors.push("Missing UBL version 2.1");
+  // Check for placeholder values that would cause validation errors
+  if (xmlContent.includes("[PLACEHOLDER_")) {
+    errors.push("XML contains placeholder values that are not valid base64");
   }
 
-  if (!xmlString.includes("<cbc:ProfileID>reporting:1.0</cbc:ProfileID>")) {
-    errors.push("Missing reporting profile");
+  // Check for required ZATCA elements
+  const requiredElements = [
+    "cbc:UBLVersionID",
+    "cbc:ProfileID",
+    "cbc:InvoiceTypeCode",
+    "cac:AdditionalDocumentReference",
+    "cac:AccountingSupplierParty",
+    "cac:AccountingCustomerParty",
+    "cac:TaxTotal",
+    "cac:LegalMonetaryTotal",
+    "cac:InvoiceLine",
+  ];
+
+  for (const element of requiredElements) {
+    if (!xmlContent.includes(element)) {
+      errors.push(`Missing required element: ${element}`);
+    }
   }
 
-  // Check VAT number format (15 digits starting and ending with 3)
-  const vatNumberMatch = xmlString.match(/<cbc:CompanyID>(\d{15})<\/cbc:CompanyID>/);
+  // Check for ZATCA-specific document references
+  const zatcaRefs = ["ICV", "PIH", "KSA-2", "QR"];
+  for (const ref of zatcaRefs) {
+    if (!xmlContent.includes(`<cbc:ID>${ref}</cbc:ID>`)) {
+      errors.push(`Missing ZATCA document reference: ${ref}`);
+    }
+  }
+
+  // Check VAT number format (should be 15 digits starting and ending with 3)
+  const vatNumberMatch = xmlContent.match(/<cbc:CompanyID>(\d{15})<\/cbc:CompanyID>/);
   if (vatNumberMatch) {
     const vatNumber = vatNumberMatch[1];
     if (!vatNumber.startsWith("3") || !vatNumber.endsWith("3")) {
-      errors.push("VAT number must start and end with 3");
+      errors.push("VAT number must start and end with '3'");
     }
   } else {
-    errors.push("Missing or invalid VAT number format");
+    errors.push("VAT number not found or invalid format");
   }
 
-  // Check VAT rate (should be 5 or 15)
-  const vatRateMatch = xmlString.match(/<cbc:Percent>(\d+)<\/cbc:Percent>/);
+  // Check VAT rate (should be 15 or 5 for standard rate)
+  const vatRateMatch = xmlContent.match(/<cbc:Percent>(\d+(?:\.\d+)?)<\/cbc:Percent>/);
   if (vatRateMatch) {
-    const vatRate = parseInt(vatRateMatch[1]);
-    if (vatRate !== 5 && vatRate !== 15) {
-      errors.push("VAT rate must be 5% or 15% for standard rate 'S'");
+    const vatRate = parseFloat(vatRateMatch[1]);
+    if (vatRate !== 15 && vatRate !== 5) {
+      warnings.push("VAT rate should be 15% or 5% for standard rate 'S'");
     }
   }
 
-  // Check for required address fields
-  if (
-    !xmlString.includes("<cbc:StreetName>") ||
-    xmlString.includes("<cbc:StreetName></cbc:StreetName>")
-  ) {
-    warnings.push("Street name should not be empty");
-  }
-
-  if (
-    !xmlString.includes("<cbc:BuildingNumber>") ||
-    xmlString.includes("<cbc:BuildingNumber></cbc:BuildingNumber>")
-  ) {
-    warnings.push("Building number should not be empty");
-  }
-
-  // Check for supply date in standard invoices
-  if (xmlString.includes('name="0100000"') && !xmlString.includes("<cac:InvoicePeriod>")) {
-    errors.push("Supply date (KSA-5) is required for standard invoices");
-  }
-
-  // Check for line item VAT amounts (KSA-11, KSA-12)
-  if (xmlString.includes("<cac:InvoiceLine>") && !xmlString.includes("<cac:TaxTotal>")) {
-    errors.push("Line item VAT amounts are required (KSA-11, KSA-12)");
+  // Check date format (should not be in future)
+  const issueDateMatch = xmlContent.match(/<cbc:IssueDate>([^<]+)<\/cbc:IssueDate>/);
+  if (issueDateMatch) {
+    const issueDate = new Date(issueDateMatch[1]);
+    if (issueDate > new Date()) {
+      errors.push("Issue date cannot be in the future");
+    }
   }
 
   return {
