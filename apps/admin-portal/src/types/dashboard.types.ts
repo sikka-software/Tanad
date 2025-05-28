@@ -1,4 +1,13 @@
 interface DashboardStats {
+  totalUsers?: number;
+  totalRoles?: number;
+  totalDocuments?: number;
+
+  totalClients?: number;
+  totalCompanies?: number;
+  totalVendors?: number;
+  totalIndividuals?: number;
+
   totalSalaries?: number;
   totalInvoices?: number;
   totalProducts?: number;
@@ -7,9 +16,6 @@ interface DashboardStats {
   totalEmployees?: number;
   totalDepartments?: number;
   totalJobs?: number;
-  totalClients?: number;
-  totalCompanies?: number;
-  totalVendors?: number;
   totalOffices?: number;
   totalWarehouses?: number;
   totalBranches?: number;
@@ -18,11 +24,9 @@ interface DashboardStats {
   totalExpenses?: number;
   totalPurchases?: number;
   totalQuotes?: number;
-  totalRoles?: number;
   totalJobListings?: number;
   totalEmployeeRequests?: number;
   totalApplicants?: number;
-  totalUsers?: number;
   totalDomains?: number;
   totalWebsites?: number;
   totalServers?: number;

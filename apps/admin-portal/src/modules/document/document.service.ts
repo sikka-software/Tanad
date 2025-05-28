@@ -1,6 +1,8 @@
-import { Document, DocumentCreateData, DocumentUpdateData } from "./document.type";
 import { DocumentFile } from "@/ui/documents-uploader";
+
 import { createClient } from "@/utils/supabase/component";
+
+import { Document, DocumentCreateData, DocumentUpdateData } from "./document.type";
 
 const supabase = createClient();
 
@@ -93,7 +95,10 @@ export async function duplicateDocument(id: string): Promise<Document> {
   return response.json();
 }
 
-export async function uploadDocument(document: DocumentFile, enterprise: EnterpriseInfo | null | undefined) {
+export async function uploadDocument(
+  document: DocumentFile,
+  enterprise: EnterpriseInfo | null | undefined,
+) {
   const { data: userData, error: userError } = await supabase.auth.getUser();
 
   if (userError || !userData?.user?.id) {
@@ -106,10 +111,10 @@ export async function uploadDocument(document: DocumentFile, enterprise: Enterpr
   }
 
   const fileExt = document.file.name.split(".").pop() || "bin";
-  
+
   // Sanitize the document name for the file path
-  let originalNameWithoutExtension = document.name.includes('.') 
-    ? document.name.substring(0, document.name.lastIndexOf('.'))
+  let originalNameWithoutExtension = document.name.includes(".")
+    ? document.name.substring(0, document.name.lastIndexOf("."))
     : document.name;
 
   let safeDocumentName = originalNameWithoutExtension
@@ -118,7 +123,7 @@ export async function uploadDocument(document: DocumentFile, enterprise: Enterpr
     .replace(/[^a-zA-Z0-9\-]/g, ""); // Remove characters not alphanumeric or hyphen
 
   // If safeDocumentName is empty or just hyphens after sanitization, use a default name
-  if (!safeDocumentName.replace(/-/g, "")) { 
+  if (!safeDocumentName.replace(/-/g, "")) {
     safeDocumentName = "document";
   }
   // Ensure name is not too long (optional, but good practice for some storage systems)
@@ -190,10 +195,11 @@ export async function uploadDocument(document: DocumentFile, enterprise: Enterpr
     }
   } else {
     // Fallback if file_path was unexpectedly missing from dbDocumentData
-     finalUrl = signedUrlData.signedUrl;
-     console.warn("file_path was missing from the document record immediately after creation. Using pre-insert signed URL.");
+    finalUrl = signedUrlData.signedUrl;
+    console.warn(
+      "file_path was missing from the document record immediately after creation. Using pre-insert signed URL.",
+    );
   }
-  
 
   return { ...dbDocumentData, url: finalUrl };
 }
@@ -224,7 +230,7 @@ export async function getDocumentsByEntity(entityId: string, entityType: string)
         return { ...doc, url: signedUrlData?.signedUrl };
       }
       return { ...doc, url: null }; // If no file_path, URL is null
-    })
+    }),
   );
 
   return documentsWithSignedUrls as Document[];

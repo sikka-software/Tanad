@@ -21,8 +21,16 @@ export default function Dashboard() {
   const viewMode = useDashboardStore((state) => state.viewMode);
   const setViewMode = useDashboardStore((state) => state.setViewMode);
 
-  const supabase = createClient();
-  const [stats, setStats] = useState<DashboardStats>({
+  let emptyStats: DashboardStats = {
+    totalUsers: 0,
+    totalRoles: 0,
+    totalDocuments: 0,
+
+    totalClients: 0,
+    totalCompanies: 0,
+    totalVendors: 0,
+    totalIndividuals: 0,
+
     totalInvoices: 0,
     totalProducts: 0,
     totalRevenue: 0,
@@ -30,9 +38,6 @@ export default function Dashboard() {
     totalEmployees: 0,
     totalDepartments: 0,
     totalJobs: 0,
-    totalClients: 0,
-    totalCompanies: 0,
-    totalVendors: 0,
     totalSalaries: 0,
     totalOffices: 0,
     totalWarehouses: 0,
@@ -42,16 +47,17 @@ export default function Dashboard() {
     totalExpenses: 0,
     totalPurchases: 0,
     totalQuotes: 0,
-    totalRoles: 0,
     totalJobListings: 0,
     totalEmployeeRequests: 0,
     // totalApplicants: 0,
-    totalUsers: 0,
     totalDomains: 0,
     totalWebsites: 0,
     totalServers: 0,
     totalOnlineStores: 0,
-  });
+  };
+
+  const supabase = createClient();
+  const [stats, setStats] = useState<DashboardStats>(emptyStats);
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState<string | null>(null);
 
@@ -131,14 +137,20 @@ export default function Dashboard() {
         // console.log("invoices", totalInvoices);
         try {
           const [
+            totalUsers,
+            totalRoles,
+            totalDocuments,
+
+            totalClients,
+            totalCompanies,
+            totalVendors,
+            totalIndividuals,
+
             totalInvoices,
             totalProducts,
             totalEmployees,
             totalDepartments,
             totalJobs,
-            totalClients,
-            totalCompanies,
-            totalVendors,
             totalOffices,
             totalWarehouses,
             totalBranches,
@@ -148,24 +160,28 @@ export default function Dashboard() {
             totalPurchases,
             totalSalaries,
             totalQuotes,
-            totalRoles,
             totalJobListings,
             totalEmployeeRequests,
             // totalApplicants,
-            totalUsers,
             totalDomains,
             totalWebsites,
             totalServers,
             totalOnlineStores,
           ] = await Promise.all([
+            fetchUserCount(),
+            fetchCount("roles"),
+            fetchCount("documents"),
+
+            fetchCount("clients"),
+            fetchCount("companies"),
+            fetchCount("vendors"),
+            fetchCount("individuals"),
+
             fetchCount("invoices"),
             fetchCount("products"),
             fetchCount("employees"),
             fetchCount("departments"),
             fetchCount("jobs"),
-            fetchCount("clients"),
-            fetchCount("companies"),
-            fetchCount("vendors"),
             fetchCount("offices"),
             fetchCount("warehouses"),
             fetchCount("branches"),
@@ -175,11 +191,9 @@ export default function Dashboard() {
             fetchCount("purchases"),
             fetchCount("salaries"),
             fetchCount("quotes"),
-            fetchCount("roles"),
             fetchCount("job_listings"),
             fetchCount("employee_requests"),
             // fetchCount("applicants"),
-            fetchUserCount(),
             fetchCount("domains"),
             fetchCount("websites"),
             fetchCount("servers"),
@@ -187,14 +201,20 @@ export default function Dashboard() {
           ]);
 
           setStats({
+            totalUsers,
+            totalRoles,
+            totalDocuments,
+
+            totalClients,
+            totalCompanies,
+            totalVendors,
+            totalIndividuals,
+
             totalInvoices,
             totalProducts,
             totalEmployees,
             totalDepartments,
             totalJobs,
-            totalClients,
-            totalCompanies,
-            totalVendors,
             totalOffices,
             totalWarehouses,
             totalBranches,
@@ -204,11 +224,9 @@ export default function Dashboard() {
             totalPurchases,
             totalSalaries,
             totalQuotes,
-            totalRoles,
             totalJobListings,
             totalEmployeeRequests,
             // totalApplicants,
-            totalUsers,
             totalDomains,
             totalWebsites,
             totalServers,
@@ -223,36 +241,7 @@ export default function Dashboard() {
                 : "An error occurred while fetching dashboard stats",
             );
             // Reset stats on error
-            setStats({
-              totalInvoices: 0,
-              totalProducts: 0,
-              totalRevenue: 0,
-              pendingInvoices: 0,
-              totalEmployees: 0,
-              totalDepartments: 0,
-              totalJobs: 0,
-              totalClients: 0,
-              totalCompanies: 0,
-              totalVendors: 0,
-              totalSalaries: 0,
-              totalOffices: 0,
-              totalWarehouses: 0,
-              totalBranches: 0,
-              totalCars: 0,
-              totalTrucks: 0,
-              totalExpenses: 0,
-              totalPurchases: 0,
-              totalQuotes: 0,
-              totalRoles: 0,
-              totalJobListings: 0,
-              totalEmployeeRequests: 0,
-              totalApplicants: 0,
-              totalUsers: 0,
-              totalDomains: 0,
-              totalWebsites: 0,
-              totalServers: 0,
-              totalOnlineStores: 0,
-            });
+            setStats(emptyStats);
           }
         } finally {
           if (isMounted) {
