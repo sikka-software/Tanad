@@ -10,17 +10,20 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/inputs/input";
 import { Textarea } from "@/ui/textarea";
 
-import { ImageAndPdfUploader } from "@/components/comp-545";
 import { FileWithPreview, FileMetadata } from "@/hooks/use-file-upload";
 
-import { uploadDocument as uploadDocumentService } from "@/document/document.service";
-import { Database } from "@/lib/database.types";
+import { ImageAndPdfUploader } from "@/components/comp-545";
 
 import { ModuleFormProps } from "@/types/common.type";
 
 import { useCreateDocument, useUpdateDocument } from "@/document/document.hooks";
+import { uploadDocument as uploadDocumentService } from "@/document/document.service";
 import useDocumentStore from "@/document/document.store";
-import { DocumentUpdateData, DocumentCreateData, Document as DocumentType } from "@/document/document.type";
+import {
+  DocumentUpdateData,
+  DocumentCreateData,
+  Document as DocumentType,
+} from "@/document/document.type";
 
 import { documents } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
@@ -88,7 +91,14 @@ export function DocumentForm({
   const isLoading = useDocumentStore((state) => state.isLoading);
 
   const [uploadedDocument, setUploadedDocument] = useState<FileWithPreview | null>(() => {
-    if (editMode && defaultValues && 'id' in defaultValues && defaultValues.id && defaultValues.url && defaultValues.name) {
+    if (
+      editMode &&
+      defaultValues &&
+      "id" in defaultValues &&
+      defaultValues.id &&
+      defaultValues.url &&
+      defaultValues.name
+    ) {
       const dv = defaultValues as DocumentType;
       return {
         id: dv.id,
@@ -158,9 +168,9 @@ export function DocumentForm({
           return;
         }
         if (!(uploadedDocument.file instanceof File)) {
-            toast.error(t("Documents.error.invalid_file_object"));
-            setIsLoading(false);
-            return;
+          toast.error(t("Documents.error.invalid_file_object"));
+          setIsLoading(false);
+          return;
         }
 
         setIsUploading(true);
@@ -180,7 +190,10 @@ export function DocumentForm({
           await updateDocument(
             {
               id: createdDocumentData.id,
-              data: { description: formData.description?.trim() ?? null, notes: null } as DocumentUpdateData,
+              data: {
+                description: formData.description?.trim() ?? null,
+                notes: null,
+              } as DocumentUpdateData,
             },
             {
               onSuccess: () => {
@@ -249,11 +262,7 @@ export function DocumentForm({
         />
 
         {!nestedForm && (
-          <button
-            type="submit"
-            className="hidden"
-            disabled={isLoading || isUploading}
-          />
+          <button type="submit" className="hidden" disabled={isLoading || isUploading} />
         )}
       </form>
     </Form>

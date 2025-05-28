@@ -401,6 +401,11 @@ export function OfficeForm({
             control={form.control}
             disabled={isLoading}
           />
+          {/* <DocumentsFromSection
+            inDialog={editMode || nestedForm}
+            control={form.control}
+            title={t("Offices.form.documents.label")}
+          /> */}
           <NotesSection
             inDialog={editMode || nestedForm}
             control={form.control}
