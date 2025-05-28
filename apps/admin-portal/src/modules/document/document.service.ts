@@ -264,3 +264,22 @@ export async function deleteDocument(documentId: string) {
     throw deleteError;
   }
 }
+
+export async function addSignedUrlsToDocuments(documents: Document[]): Promise<Document[]> {
+  return await Promise.all(
+    (documents || []).map(async (doc) => {
+      if (doc.file_path) {
+        const { data, error } = await supabase.storage
+          .from('enterprise-documents')
+          .createSignedUrl(doc.file_path, 3600);
+        
+        if (error) {
+          console.error('Error creating signed URL:', error);
+          return { ...doc, url: '' };
+        }
+        return { ...doc, url: data?.signedUrl || '' };
+      }
+      return doc;
+    })
+  );
+}

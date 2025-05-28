@@ -8,6 +8,7 @@ import {
   fetchDocuments,
   updateDocument,
   duplicateDocument,
+  addSignedUrlsToDocuments,
 } from "./document.service";
 import type { Document, DocumentCreateData, DocumentUpdateData } from "./document.type";
 
@@ -22,7 +23,10 @@ export const documentKeys = {
 export function useDocuments() {
   return useQuery({
     queryKey: documentKeys.lists(),
-    queryFn: fetchDocuments,
+    queryFn: async () => {
+      const documents = await fetchDocuments();
+      return addSignedUrlsToDocuments(documents);
+    },
   });
 }
 
