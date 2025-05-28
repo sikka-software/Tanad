@@ -119,32 +119,59 @@ export default function InvoiceDetailPage() {
 
         items:
           invoice.items && invoice.items.length > 0
-            ? invoice.items.map((item) => ({
-                name: item.description || "Item",
-                description: item.description,
-                quantity: item.quantity,
-                unitPrice: item.unit_price,
-                vatRate: (invoice.tax_rate || 0.15) * 100, // Ensure it's 15% for validation
-                vatAmount: item.unit_price * item.quantity * (invoice.tax_rate || 0.15),
-                subtotal: item.unit_price * item.quantity,
-                total: item.unit_price * item.quantity * (1 + (invoice.tax_rate || 0.15)),
-              }))
+            ? invoice.items.map((item) => {
+                const subtotal = item.unit_price * item.quantity;
+                const vatRate = 0.15; // 15% VAT rate
+                const vatAmount = Math.round(subtotal * vatRate * 100) / 100; // Round to 2 decimals
+                const total = subtotal + vatAmount;
+
+                return {
+                  name: item.description || "Item",
+                  description: item.description,
+                  quantity: item.quantity,
+                  unitPrice: item.unit_price,
+                  vatRate: 15, // 15% as integer
+                  vatAmount: vatAmount,
+                  subtotal: subtotal,
+                  total: total,
+                };
+              })
             : [
                 {
                   name: "Default Item",
                   description: "Default Item",
                   quantity: 1,
-                  unitPrice: invoice.subtotal || 989.0,
+                  unitPrice: 989.0,
                   vatRate: 15,
-                  vatAmount: (invoice.subtotal || 989.0) * 0.15,
-                  subtotal: invoice.subtotal || 989.0,
-                  total: (invoice.subtotal || 989.0) * 1.15,
+                  vatAmount: Math.round(989.0 * 0.15 * 100) / 100, // 148.35
+                  subtotal: 989.0,
+                  total: 989.0 + Math.round(989.0 * 0.15 * 100) / 100, // 1137.35
                 },
               ],
 
-        subtotal: invoice.subtotal || 989.0,
-        vatAmount: invoice.tax_amount || (invoice.subtotal || 989.0) * 0.15,
-        total: invoice.total || (invoice.subtotal || 989.0) * 1.15,
+        subtotal:
+          invoice.items && invoice.items.length > 0
+            ? invoice.items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
+            : 989.0,
+        vatAmount:
+          invoice.items && invoice.items.length > 0
+            ? Math.round(
+                invoice.items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0) *
+                  0.15 *
+                  100,
+              ) / 100
+            : Math.round(989.0 * 0.15 * 100) / 100,
+        total:
+          invoice.items && invoice.items.length > 0
+            ? (() => {
+                const subtotal = invoice.items.reduce(
+                  (sum, item) => sum + item.unit_price * item.quantity,
+                  0,
+                );
+                const vatAmount = Math.round(subtotal * 0.15 * 100) / 100;
+                return subtotal + vatAmount;
+              })()
+            : 989.0 + Math.round(989.0 * 0.15 * 100) / 100,
 
         // ZATCA Phase 2 specific fields
         invoiceCounterValue: 1,
