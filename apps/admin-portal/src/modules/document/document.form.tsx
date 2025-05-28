@@ -12,7 +12,7 @@ import { Textarea } from "@/ui/textarea";
 
 import { FileWithPreview, FileMetadata } from "@/hooks/use-file-upload";
 
-import { ImageAndPdfUploader } from "@/components/comp-545";
+import { ImageAndPdfUploader } from "@/components/ui/image-and-pdf-uploader";
 
 import { ModuleFormProps } from "@/types/common.type";
 

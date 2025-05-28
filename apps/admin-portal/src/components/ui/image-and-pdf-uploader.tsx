@@ -1,15 +1,17 @@
-import { AlertCircleIcon, ImageIcon, UploadIcon, XIcon } from "lucide-react"
-import { useFileUpload, FileWithPreview } from "@/hooks/use-file-upload"
-import { Button } from "@/components/ui/button"
-import React from "react"
+import { AlertCircleIcon, ImageIcon, UploadIcon, XIcon } from "lucide-react";
+import React from "react";
+
+import { useFileUpload, FileWithPreview } from "@/hooks/use-file-upload";
+
+import { Button } from "@/components/ui/button";
 
 export interface ImageAndPdfUploaderProps {
-  value: FileWithPreview[]
-  onChange: (files: FileWithPreview[]) => void
-  accept?: string
-  maxSizeMB?: number
-  maxFiles?: number
-  disabled?: boolean
+  value: FileWithPreview[];
+  onChange: (files: FileWithPreview[]) => void;
+  accept?: string;
+  maxSizeMB?: number;
+  maxFiles?: number;
+  disabled?: boolean;
 }
 
 export function ImageAndPdfUploader({
@@ -20,7 +22,7 @@ export function ImageAndPdfUploader({
   maxFiles = 1,
   disabled = false,
 }: ImageAndPdfUploaderProps) {
-  const maxSize = maxSizeMB * 1024 * 1024
+  const maxSize = maxSizeMB * 1024 * 1024;
 
   const [state, actions] = useFileUpload({
     accept,
@@ -36,37 +38,34 @@ export function ImageAndPdfUploader({
           type: f.file.type,
           url: f.preview || "",
           id: f.id,
-        }
+        };
       }
-      return f.file
+      return f.file;
     }),
     onFilesChange: onChange,
-  })
+  });
 
-  const files = state.files
-  const previewUrl = files[0]?.preview || null
-  const fileName = files[0]?.file.name || null
-  const errors = state.errors
-  const isDragging = state.isDragging
+  const files = state.files;
+  const previewUrl = files[0]?.preview || null;
+  const fileName = files[0]?.file.name || null;
+  const errors = state.errors;
+  const isDragging = state.isDragging;
 
   React.useEffect(() => {
     // Keep uploader in sync with value prop
-    if (
-      value.length !== files.length ||
-      value.some((v, i) => v.id !== files[i]?.id)
-    ) {
-      actions.clearFiles()
+    if (value.length !== files.length || value.some((v, i) => v.id !== files[i]?.id)) {
+      actions.clearFiles();
       if (value.length > 0) {
         const fileObjs = value
           .map((v) => (v.file instanceof File ? v.file : null))
-          .filter((f): f is File => !!f)
+          .filter((f): f is File => !!f);
         if (fileObjs.length > 0) {
-          actions.addFiles(fileObjs)
+          actions.addFiles(fileObjs);
         }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value])
+  }, [value]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -88,9 +87,9 @@ export function ImageAndPdfUploader({
           {previewUrl ? (
             <div className="absolute inset-0 flex items-center justify-center p-4">
               {files[0]?.file.type === "application/pdf" ? (
-                <div className="flex flex-col items-center justify-center w-full h-full">
+                <div className="flex h-full w-full flex-col items-center justify-center">
                   <span className="text-xs font-medium">PDF Uploaded</span>
-                  <span className="text-xs text-muted-foreground mt-1">{fileName}</span>
+                  <span className="text-muted-foreground mt-1 text-xs">{fileName}</span>
                 </div>
               ) : (
                 <img
@@ -118,10 +117,7 @@ export function ImageAndPdfUploader({
                 onClick={actions.openFileDialog}
                 disabled={disabled}
               >
-                <UploadIcon
-                  className="-ms-1 size-4 opacity-60"
-                  aria-hidden="true"
-                />
+                <UploadIcon className="-ms-1 size-4 opacity-60" aria-hidden="true" />
                 Select file
               </Button>
             </div>
@@ -144,22 +140,11 @@ export function ImageAndPdfUploader({
       </div>
 
       {errors.length > 0 && (
-        <div
-          className="text-destructive flex items-center gap-1 text-xs"
-          role="alert"
-        >
+        <div className="text-destructive flex items-center gap-1 text-xs" role="alert">
           <AlertCircleIcon className="size-3 shrink-0" />
           <span>{errors[0]}</span>
         </div>
       )}
-
-      <p
-        aria-live="polite"
-        role="region"
-        className="text-muted-foreground mt-2 text-center text-xs"
-      >
-        Single file uploader w/ max size (drop area + button)
-      </p>
     </div>
-  )
+  );
 }

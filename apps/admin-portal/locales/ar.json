@@ -4533,6 +4533,7 @@
         "required": "المساحة مطلوبة"
       },
       "address": { "label": "عنوان المكتب" },
+      "documents": { "label": "مستندات المكتب" },
       "notes": { "label": "ملاحظات المكتب" }
     },
     "messages": {

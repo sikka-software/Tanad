@@ -14,6 +14,7 @@ import PhoneInput from "@/ui/inputs/phone-input";
 import UnitsInput from "@/ui/inputs/units-input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
+import { DocumentsFormSection } from "@/components/forms/documents-form-section";
 import NotesSection from "@/components/forms/notes-section";
 
 import { addressSchema } from "@/lib/schemas/address.schema";
@@ -401,11 +402,14 @@ export function OfficeForm({
             control={form.control}
             disabled={isLoading}
           />
-          {/* <DocumentsFromSection
+          <DocumentsFormSection
             inDialog={editMode || nestedForm}
             control={form.control}
             title={t("Offices.form.documents.label")}
-          /> */}
+            entityType="office"
+            entityId={defaultValues?.id}
+            disabled={isLoading}
+          />
           <NotesSection
             inDialog={editMode || nestedForm}
             control={form.control}
