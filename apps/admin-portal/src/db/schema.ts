@@ -1649,6 +1649,52 @@ export const employees = pgTable(
   ],
 );
 
+export const vehicles = pgTable(
+  "vehicles",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+
+    make: text().notNull(),
+    model: text().notNull(),
+    year: smallint().notNull(),
+    color: text(),
+    vin: text(),
+    code: text(),
+    license_country: text(),
+    license_plate: text(),
+    ownership_status: vehicle_ownership_status().default("owned"),
+    status: vehicle_status().default("active"),
+    daily_payment: numeric({ precision: 10, scale: 2 }),
+    weekly_payment: numeric({ precision: 10, scale: 2 }),
+    monthly_payment: numeric({ precision: 10, scale: 2 }),
+    annual_payment: numeric({ precision: 10, scale: 2 }),
+    payment_cycle: payment_cycle(),
+    purchase_date: date(),
+    purchase_price: numeric({ precision: 13, scale: 2 }),
+    notes: jsonb(),
+  },
+  (table) => [
+    index("vehicles_enterprise_id_idx").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("vehicles_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "vehicles_enterprise_id_enterprises_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.user_id],
+      foreignColumns: [usersInAuth.id],
+      name: "vehicles_user_id_users_id_fk",
+    }),
+  ],
+);
 export const cars = pgTable(
   "cars",
   {

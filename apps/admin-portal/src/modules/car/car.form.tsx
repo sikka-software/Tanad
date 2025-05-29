@@ -10,10 +10,9 @@ import CountryInput from "@/ui/inputs/country-input";
 import { CurrencyInput } from "@/ui/inputs/currency-input";
 import DigitsInput from "@/ui/inputs/digits-input";
 import { Input } from "@/ui/inputs/input";
+import LicensePlateInput from "@/ui/inputs/license-plate-input";
 import NumberInput from "@/ui/inputs/number-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-
-import { customResolver } from "@/utils/form-utils";
 
 import { getNotesValue } from "@/lib/utils";
 
@@ -208,6 +207,8 @@ export function CarForm({
                 </FormItem>
               )}
             />
+
+            <LicensePlateInput />
             <FormField
               control={form.control}
               name="name"

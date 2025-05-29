@@ -19,7 +19,7 @@ export function getStripeInstance() {
 
   try {
     stripeInstance = new Stripe(key, {
-      apiVersion: "2025-04-30.basil", // Use the API version specified in the type
+      apiVersion: "2025-05-28.basil", // Use the API version specified in the type
       appInfo: {
         name: "Tanad",
         version: "0.1.0",
