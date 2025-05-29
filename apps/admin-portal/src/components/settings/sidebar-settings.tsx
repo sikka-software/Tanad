@@ -121,7 +121,7 @@ const SidebarSettings = ({
   const t = useTranslations();
   const pathname = usePathname();
   const [isDirty, setIsDirty] = useState(false);
-  const [menuList, setMenuList] = useState(getMenuList(pathname));
+  const [menuList, setMenuList] = useState(getMenuList(pathname || ""));
 
   const user = useUserStore((state) => state.user);
   const profile = useUserStore((state) => state.profile);
@@ -160,7 +160,7 @@ const SidebarSettings = ({
 
     // Only initialize once when profile is loaded
     // or when hidden_menu_items changes
-    const currentMenu = getMenuList(pathname);
+    const currentMenu = getMenuList(pathname || "");
 
     // Initialize the enabledItems state regardless of profile data
     // This ensures we always have a valid state to work with

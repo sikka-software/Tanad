@@ -11,15 +11,12 @@ import React from "react";
 import { Button } from "@/ui/button";
 import { Card, CardContent } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
-import { ScrollArea } from "@/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 
 import GeneralSettings from "@/components/settings/general-settings";
 import NotificationSettings from "@/components/settings/notification-settings";
 import PreferenceSettings from "@/components/settings/preference-settings";
 import SidebarSettings from "@/components/settings/sidebar-settings";
-
-import { getMenuList } from "@/lib/sidebar-list";
 
 // Valid tab names for type safety
 const validTabs = ["general", "navigation", "preferences", "notifications", "billing"] as const;
@@ -45,7 +42,6 @@ const SettingsPage = () => {
   const router = useRouter();
   const t = useTranslations();
   const lang = useLocale();
-  const [menuList, setMenuList] = useState(getMenuList(pathname));
   const [activeTab, setActiveTab] = useState<TabName>("general");
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
