@@ -402,14 +402,16 @@ export function OfficeForm({
             control={form.control}
             disabled={isLoading}
           />
-          <DocumentsFormSection
-            inDialog={editMode || nestedForm}
-            control={form.control}
-            title={t("Offices.form.documents.label")}
-            entityType="office"
-            entityId={defaultValues?.id}
-            disabled={isLoading}
-          />
+          {editMode && defaultValues?.id && (
+            <DocumentsFormSection
+              inDialog={editMode || nestedForm}
+              control={form.control}
+              title={t("Offices.form.documents.label")}
+              entityType="office"
+              entityId={defaultValues.id}
+              disabled={isLoading}
+            />
+          )}
           <NotesSection
             inDialog={editMode || nestedForm}
             control={form.control}
