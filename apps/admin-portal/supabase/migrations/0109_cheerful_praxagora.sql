@@ -1,0 +1,1 @@
+CREATE TYPE "public"."vehicle_type" AS ENUM('car', 'truck', 'van', 'bus', 'motorcycle', 'other');

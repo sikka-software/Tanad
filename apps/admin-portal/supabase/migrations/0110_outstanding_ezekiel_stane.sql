@@ -1,0 +1,1 @@
+ALTER TABLE "vehicles" ADD COLUMN "vehicle_type" "vehicle_type" NOT NULL;

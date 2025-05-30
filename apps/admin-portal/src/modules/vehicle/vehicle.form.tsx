@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -20,7 +21,7 @@ import { ModuleFormProps, PaymentCycle } from "@/types/common.type";
 import { VehicleStatus } from "@/types/common.type";
 import { VehicleOwnershipStatus } from "@/types/vehicle.types";
 
-import { vehicles } from "@/db/schema";
+import { vehicle_type, vehicles } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 import { useCreateVehicle, useUpdateVehicle } from "@/vehicle/vehicle.hooks";
 import useVehicleStore from "@/vehicle/vehicle.store";
@@ -31,6 +32,7 @@ export const createVehicleSchema = (t: (key: string) => string) => {
     // name: z
     //   .string({ message: t("Vehicles.form.name.required") })
     //   .min(1, { message: t("Vehicles.form.name.required") }),
+    vehicle_type: z.enum(vehicle_type.enumValues),
     make: z
       .string({ message: t("Vehicles.form.make.required") })
       .min(1, t("Vehicles.form.make.required")),
@@ -78,6 +80,8 @@ export function VehicleForm({
   const t = useTranslations();
   const lang = useLocale();
 
+  const [selectedVehicleTypes, setSelectedVehicleTypes] = useState<string[]>([]);
+
   const user = useUserStore((state) => state.user);
   const enterprise = useUserStore((state) => state.enterprise);
 
@@ -102,6 +106,7 @@ export function VehicleForm({
       annual_payment: defaultValues?.annual_payment || undefined,
       payment_cycle: defaultValues?.payment_cycle || "monthly",
       status: defaultValues?.status || "active",
+      vehicle_type: defaultValues?.vehicle_type || "car",
       notes: getNotesValue(defaultValues),
     },
   });
@@ -155,6 +160,43 @@ export function VehicleForm({
           <input hidden type="text" value={user?.id} {...form.register("user_id")} />
           <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
           <div className="form-fields-cols-2">
+            <FormField
+              control={form.control}
+              name="vehicle_type"
+              render={() => (
+                <FormItem>
+                  <div className="grid gap-4 md:grid-cols-1 @min-[500px]/jobs-section:grid-cols-3 @min-[800px]/jobs-section:grid-cols-4">
+                    {["car", "truck", "van", "bus", "motorcycle", "other"].map((type) => (
+                      <div
+                        key={type}
+                        className={`group relative cursor-pointer overflow-hidden rounded-lg border p-4 transition-all ${
+                          selectedVehicleTypes.includes(type)
+                            ? "border-primary bg-primary/5"
+                            : "hover:shadow-md"
+                        }`}
+                        onClick={() => setSelectedVehicleTypes([type])}
+                      >
+                        <div className="mb-2 flex flex-row justify-between">
+                          <span className="text-sm text-gray-500">
+                            {t(`Vehicles.form.type.${type}`)}
+                          </span>
+                          {selectedVehicleTypes.includes(type) && (
+                            <div className="bg-primary size-3 rounded-full" />
+                          )}
+                        </div>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h4 className="font-semibold">{t(`Vehicles.form.type.${type}`)}</h4>
+                          </div>
+                        </div>
+                        <div className="mt-2 space-y-1"></div>
+                      </div>
+                    ))}
+                  </div>
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="status"

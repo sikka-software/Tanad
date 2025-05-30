@@ -383,6 +383,15 @@ export const vehicle_ownership_status = pgEnum("vehicle_ownership_status", [
   "rented",
 ]);
 
+export const vehicle_type = pgEnum("vehicle_type", [
+  "car",
+  "truck",
+  "van",
+  "bus",
+  "motorcycle",
+  "other",
+]);
+
 export const clients = pgTable(
   "clients",
   {
@@ -1671,6 +1680,8 @@ export const vehicles = pgTable(
     enterprise_id: uuid().notNull(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+
+    vehicle_type: vehicle_type().notNull(),
 
     make: text().notNull(),
     model: text().notNull(),

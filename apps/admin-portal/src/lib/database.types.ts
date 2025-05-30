@@ -2255,6 +2255,7 @@ export type Database = {
           status: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at: string
           user_id: string
+          vehicle_type: Database["public"]["Enums"]["vehicle_type"]
           vin: string | null
           weekly_payment: number | null
           year: number
@@ -2283,6 +2284,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at?: string
           user_id: string
+          vehicle_type: Database["public"]["Enums"]["vehicle_type"]
           vin?: string | null
           weekly_payment?: number | null
           year: number
@@ -2311,6 +2313,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at?: string
           user_id?: string
+          vehicle_type?: Database["public"]["Enums"]["vehicle_type"]
           vin?: string | null
           weekly_payment?: number | null
           year?: number
@@ -3195,6 +3198,7 @@ export type Database = {
         | "retired"
         | "stored"
         | "other"
+      vehicle_type: "car" | "truck" | "van" | "bus" | "motorcycle" | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3644,6 +3648,7 @@ export const Constants = {
         "stored",
         "other",
       ],
+      vehicle_type: ["car", "truck", "van", "bus", "motorcycle", "other"],
     },
   },
 } as const
