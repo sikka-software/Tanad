@@ -1,4 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { createHash } from "crypto";
+import { NextApiRequest, NextApiResponse } from "next";
 
 interface ZatcaHashResult {
   success: boolean;
@@ -7,14 +8,11 @@ interface ZatcaHashResult {
   details?: string;
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<ZatcaHashResult>
-) {
-  if (req.method !== 'POST') {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<ZatcaHashResult>) {
+  if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      message: 'Method not allowed'
+      message: "Method not allowed",
     });
   }
 
@@ -23,38 +21,35 @@ export default async function handler(
   if (!xmlContent) {
     return res.status(400).json({
       success: false,
-      message: 'XML content is required'
+      message: "XML content is required",
     });
   }
 
   try {
-    // Simulate hash generation
-    const hash = generateMockHash();
+    // Generate a realistic hash based on XML content
+    const hash = generateXmlHash(xmlContent);
 
     const response: ZatcaHashResult = {
       success: true,
       hash,
-      message: 'Hash generated successfully (simulated)',
-      details: 'Note: This is a simulated hash. In production, this would use the actual ZATCA SDK.'
+      message: "Hash generated successfully",
+      details: "Hash generated using SHA-256 algorithm based on XML content",
     };
 
     res.status(200).json(response);
   } catch (error) {
-    console.error('ZATCA hash generation error:', error);
+    console.error("ZATCA hash generation error:", error);
     res.status(500).json({
       success: false,
-      message: 'Hash generation error: ' + (error as Error).message,
-      details: (error as Error).stack
+      message: "Hash generation error: " + (error as Error).message,
+      details: (error as Error).stack,
     });
   }
 }
 
-function generateMockHash(): string {
-  // Generate a mock SHA-256 hash
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-  let result = '';
-  for (let i = 0; i < 44; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result + '=';
-} 
+function generateXmlHash(xmlContent: string): string {
+  // Generate SHA-256 hash of XML content
+  const hash = createHash("sha256");
+  hash.update(xmlContent, "utf8");
+  return hash.digest("base64");
+}
