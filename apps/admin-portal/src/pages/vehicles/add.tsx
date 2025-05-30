@@ -7,7 +7,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { generateDummyCar } from "@/lib/dummy-factory";
+import { generateDummyVehicle } from "@/lib/dummy-factory";
 
 import { VehicleForm } from "@/vehicle/vehicle.form";
 import useVehicleStore from "@/vehicle/vehicle.store";
@@ -32,7 +32,7 @@ export default function AddVehiclePage() {
           submit_form: t("Pages.Vehicles.add"),
           cancel: t("General.cancel"),
         }}
-        // dummyButton={generateDummyCar}
+        dummyButton={generateDummyVehicle}
       />
 
       <VehicleForm

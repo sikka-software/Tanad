@@ -9,7 +9,7 @@ import { CardActionsProps } from "@/types/common.type";
 
 interface ModuleCardProps<T> extends CardActionsProps {
   id: string;
-  title: string;
+  title: string | React.ReactNode;
   subtitle?: string;
   currentStatus: T;
   statuses: T[];

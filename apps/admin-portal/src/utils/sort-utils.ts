@@ -26,6 +26,7 @@ const models = [
   "online_stores",
   "cars",
   "trucks",
+  "vehicles",
 ];
 
 interface SortOptions {

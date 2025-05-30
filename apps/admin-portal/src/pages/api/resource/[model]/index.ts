@@ -51,6 +51,7 @@ const modelMap: Record<string, ModelConfig> = {
   offices: { tableName: "offices" },
   warehouses: { tableName: "warehouses" },
   products: { tableName: "products" },
+  vehicles: { tableName: "vehicles" },
   cars: { tableName: "cars" },
   trucks: { tableName: "trucks" },
   vendors: { tableName: "vendors" },

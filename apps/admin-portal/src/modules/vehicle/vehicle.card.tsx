@@ -1,3 +1,4 @@
+import { BusIcon, Bike, TruckIcon, CarIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { createHandleEdit } from "@/utils/module-utils";
@@ -24,11 +25,27 @@ const VehicleCard = ({
 
   const handleEdit = createHandleEdit<Vehicle, VehicleUpdateData>(setData, updateVehicle, data);
 
+  const vehicleTypeIcon = () => {
+    switch (vehicle.vehicle_type) {
+      case "car":
+        return <CarIcon className="size-4" />;
+      case "truck":
+        return <TruckIcon className="size-4" />;
+      case "bus":
+        return <BusIcon className="size-4" />;
+      case "motorcycle":
+        return <Bike className="size-4" />;
+    }
+  };
   return (
     <ModuleCard
       id={vehicle.id}
       parentTranslationKey="Vehicles"
-      title={vehicle.make}
+      title={
+        <>
+          {vehicleTypeIcon()} {vehicle.make}
+        </>
+      }
       subtitle={String(vehicle.year)}
       currentStatus={vehicle.status as VehicleStatusProps}
       statuses={Object.values(VehicleStatus) as VehicleStatusProps[]}
