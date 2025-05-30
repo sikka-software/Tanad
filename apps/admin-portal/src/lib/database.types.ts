@@ -523,7 +523,7 @@ export type Database = {
           notes: Json | null
           status: Database["public"]["Enums"]["common_status"] | null
           updated_at: string
-          url: string
+          url: string | null
           user_id: string
         }
         Insert: {
@@ -538,7 +538,7 @@ export type Database = {
           notes?: Json | null
           status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string
-          url: string
+          url?: string | null
           user_id: string
         }
         Update: {
@@ -553,7 +553,7 @@ export type Database = {
           notes?: Json | null
           status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string
-          url?: string
+          url?: string | null
           user_id?: string
         }
         Relationships: []
@@ -604,6 +604,65 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "domains_enterprise_id_enterprises_id_fk"
+            columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "enterprises"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drivers: {
+        Row: {
+          created_at: string
+          email: string
+          enterprise_id: string
+          first_name: string
+          id: string
+          last_name: string
+          license_country: string | null
+          license_expiration_date: string | null
+          license_number: string | null
+          notes: Json | null
+          phone: string | null
+          status: Database["public"]["Enums"]["common_status"] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          enterprise_id: string
+          first_name: string
+          id?: string
+          last_name: string
+          license_country?: string | null
+          license_expiration_date?: string | null
+          license_number?: string | null
+          notes?: Json | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["common_status"] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          enterprise_id?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          license_country?: string | null
+          license_expiration_date?: string | null
+          license_number?: string | null
+          notes?: Json | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["common_status"] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drivers_enterprise_id_enterprises_id_fk"
             columns: ["enterprise_id"]
             isOneToOne: false
             referencedRelation: "enterprises"
@@ -2171,6 +2230,108 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicles: {
+        Row: {
+          annual_payment: number | null
+          code: string | null
+          color: string | null
+          created_at: string
+          daily_payment: number | null
+          driver_id: string | null
+          enterprise_id: string
+          id: string
+          license_country: string | null
+          license_plate: string | null
+          make: string
+          model: string
+          monthly_payment: number | null
+          notes: Json | null
+          ownership_status:
+            | Database["public"]["Enums"]["vehicle_ownership_status"]
+            | null
+          payment_cycle: Database["public"]["Enums"]["payment_cycle"] | null
+          purchase_date: string | null
+          purchase_price: number | null
+          status: Database["public"]["Enums"]["vehicle_status"] | null
+          updated_at: string
+          user_id: string
+          vin: string | null
+          weekly_payment: number | null
+          year: number
+        }
+        Insert: {
+          annual_payment?: number | null
+          code?: string | null
+          color?: string | null
+          created_at?: string
+          daily_payment?: number | null
+          driver_id?: string | null
+          enterprise_id: string
+          id?: string
+          license_country?: string | null
+          license_plate?: string | null
+          make: string
+          model: string
+          monthly_payment?: number | null
+          notes?: Json | null
+          ownership_status?:
+            | Database["public"]["Enums"]["vehicle_ownership_status"]
+            | null
+          payment_cycle?: Database["public"]["Enums"]["payment_cycle"] | null
+          purchase_date?: string | null
+          purchase_price?: number | null
+          status?: Database["public"]["Enums"]["vehicle_status"] | null
+          updated_at?: string
+          user_id: string
+          vin?: string | null
+          weekly_payment?: number | null
+          year: number
+        }
+        Update: {
+          annual_payment?: number | null
+          code?: string | null
+          color?: string | null
+          created_at?: string
+          daily_payment?: number | null
+          driver_id?: string | null
+          enterprise_id?: string
+          id?: string
+          license_country?: string | null
+          license_plate?: string | null
+          make?: string
+          model?: string
+          monthly_payment?: number | null
+          notes?: Json | null
+          ownership_status?:
+            | Database["public"]["Enums"]["vehicle_ownership_status"]
+            | null
+          payment_cycle?: Database["public"]["Enums"]["payment_cycle"] | null
+          purchase_date?: string | null
+          purchase_price?: number | null
+          status?: Database["public"]["Enums"]["vehicle_status"] | null
+          updated_at?: string
+          user_id?: string
+          vin?: string | null
+          weekly_payment?: number | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_driver_id_drivers_id_fk"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_enterprise_id_enterprises_id_fk"
+            columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "enterprises"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendors: {
         Row: {
           additional_number: string | null
@@ -2761,6 +2922,8 @@ export type Database = {
         | "CAR"
         | "TRUCK"
         | "INDIVIDUAL"
+        | "VEHICLE"
+        | "DRIVER"
       app_permission:
         | "users.create"
         | "users.read"
@@ -2906,6 +3069,18 @@ export type Database = {
         | "online_stores.update"
         | "online_stores.export"
         | "online_stores.duplicate"
+        | "vehicles.read"
+        | "vehicles.create"
+        | "vehicles.delete"
+        | "vehicles.update"
+        | "vehicles.export"
+        | "vehicles.duplicate"
+        | "drivers.read"
+        | "drivers.create"
+        | "drivers.delete"
+        | "drivers.update"
+        | "drivers.export"
+        | "drivers.duplicate"
         | "cars.read"
         | "cars.create"
         | "cars.delete"
@@ -3186,6 +3361,8 @@ export const Constants = {
         "CAR",
         "TRUCK",
         "INDIVIDUAL",
+        "VEHICLE",
+        "DRIVER",
       ],
       app_permission: [
         "users.create",
@@ -3332,6 +3509,18 @@ export const Constants = {
         "online_stores.update",
         "online_stores.export",
         "online_stores.duplicate",
+        "vehicles.read",
+        "vehicles.create",
+        "vehicles.delete",
+        "vehicles.update",
+        "vehicles.export",
+        "vehicles.duplicate",
+        "drivers.read",
+        "drivers.create",
+        "drivers.delete",
+        "drivers.update",
+        "drivers.export",
+        "drivers.duplicate",
         "cars.read",
         "cars.create",
         "cars.delete",

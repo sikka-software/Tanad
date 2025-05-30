@@ -403,21 +403,37 @@ function getSystemAdminMenus(pathname: string): SidebarMenuGroupProps["items"] {
 function getFleetMenus(pathname: string): SidebarMenuGroupProps["items"] {
   return [
     {
-      title: ModulesOptions.cars.label,
-      translationKey: ModulesOptions.cars.label,
-      icon: ModulesOptions.cars.icon,
-      url: ModulesOptions.cars.url,
-      is_active: pathname.startsWith(ModulesOptions.cars.url),
-      action: ModulesOptions.cars.url + "/add",
+      title: ModulesOptions.vehicles.label,
+      translationKey: ModulesOptions.vehicles.label,
+      icon: ModulesOptions.vehicles.icon,
+      url: ModulesOptions.vehicles.url,
+      is_active: pathname.startsWith(ModulesOptions.vehicles.url),
+      action: ModulesOptions.vehicles.url + "/add",
     },
     {
-      title: ModulesOptions.trucks.label,
-      translationKey: ModulesOptions.trucks.label,
-      icon: ModulesOptions.trucks.icon,
-      url: ModulesOptions.trucks.url,
-      is_active: pathname.startsWith(ModulesOptions.trucks.url),
-      action: ModulesOptions.trucks.url + "/add",
+      title: ModulesOptions.drivers.label,
+      translationKey: ModulesOptions.drivers.label,
+      icon: ModulesOptions.drivers.icon,
+      url: ModulesOptions.drivers.url,
+      is_active: pathname.startsWith(ModulesOptions.drivers.url),
+      action: ModulesOptions.drivers.url + "/add",
     },
+    // {
+    //   title: ModulesOptions.cars.label,
+    //   translationKey: ModulesOptions.cars.label,
+    //   icon: ModulesOptions.cars.icon,
+    //   url: ModulesOptions.cars.url,
+    //   is_active: pathname.startsWith(ModulesOptions.cars.url),
+    //   action: ModulesOptions.cars.url + "/add",
+    // },
+    // {
+    //   title: ModulesOptions.trucks.label,
+    //   translationKey: ModulesOptions.trucks.label,
+    //   icon: ModulesOptions.trucks.icon,
+    //   url: ModulesOptions.trucks.url,
+    //   is_active: pathname.startsWith(ModulesOptions.trucks.url),
+    //   action: ModulesOptions.trucks.url + "/add",
+    // },
   ];
 }
 

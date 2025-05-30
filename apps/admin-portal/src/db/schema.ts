@@ -90,6 +90,8 @@ export const activity_target_type = pgEnum("activity_target_type", [
   "CAR",
   "TRUCK",
   "INDIVIDUAL",
+  "VEHICLE",
+  "DRIVER",
 ]);
 export const app_permission = pgEnum("app_permission", [
   "users.create",
@@ -236,6 +238,18 @@ export const app_permission = pgEnum("app_permission", [
   "online_stores.update",
   "online_stores.export",
   "online_stores.duplicate",
+  "vehicles.read",
+  "vehicles.create",
+  "vehicles.delete",
+  "vehicles.update",
+  "vehicles.export",
+  "vehicles.duplicate",
+  "drivers.read",
+  "drivers.create",
+  "drivers.delete",
+  "drivers.update",
+  "drivers.export",
+  "drivers.duplicate",
   "cars.read",
   "cars.create",
   "cars.delete",
@@ -1676,6 +1690,7 @@ export const vehicles = pgTable(
     purchase_date: date(),
     purchase_price: numeric({ precision: 13, scale: 2 }),
     notes: jsonb(),
+    driver_id: uuid(),
   },
   (table) => [
     index("vehicles_enterprise_id_idx").using(
@@ -1693,8 +1708,51 @@ export const vehicles = pgTable(
       foreignColumns: [usersInAuth.id],
       name: "vehicles_user_id_users_id_fk",
     }),
+    foreignKey({
+      columns: [table.driver_id],
+      foreignColumns: [drivers.id],
+      name: "vehicles_driver_id_drivers_id_fk",
+    }).onDelete("set null"),
   ],
 );
+
+export const drivers = pgTable(
+  "drivers",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
+    first_name: text().notNull(),
+    last_name: text().notNull(),
+    email: text().notNull(),
+    phone: text(),
+    license_number: text(),
+    license_expiration_date: date(),
+    license_country: text(),
+    status: common_status().default("active"),
+    notes: jsonb(),
+  },
+  (table) => [
+    index("drivers_enterprise_id_idx").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("drivers_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "drivers_enterprise_id_enterprises_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.user_id],
+      foreignColumns: [usersInAuth.id],
+      name: "drivers_user_id_users_id_fk",
+    }),
+  ],
+);
+
 export const cars = pgTable(
   "cars",
   {

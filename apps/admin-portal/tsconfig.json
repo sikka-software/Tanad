@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -18,147 +14,55 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@tanad.config": [
-        "./tanad.config.ts"
-      ],
-      "@/components/*": [
-        "./src/components/*"
-      ],
-      "@/hooks/*": [
-        "./src/hooks/*"
-      ],
-      "@/lib/*": [
-        "./src/lib/*"
-      ],
-      "@/pages/*": [
-        "./src/pages/*"
-      ],
-      "@/utils/*": [
-        "./src/utils/*"
-      ],
-      "@/types/*": [
-        "./src/types/*"
-      ],
-      "@/forms/*": [
-        "./src/components/forms/*"
-      ],
-      "@/tables/*": [
-        "./src/components/tables/*"
-      ],
-      "@/ui/*": [
-        "./src/components/ui/*"
-      ],
-      "@/office/*": [
-        "./src/modules/office/*"
-      ],
-      "@/job/*": [
-        "./src/modules/job/*"
-      ],
-      "@/applicant/*": [
-        "./src/modules/applicant/*"
-      ],
-      "@/branch/*": [
-        "./src/modules/branch/*"
-      ],
-      "@/client/*": [
-        "./src/modules/client/*"
-      ],
-      "@/company/*": [
-        "./src/modules/company/*"
-      ],
-      "@/dashboard/*": [
-        "./src/modules/dashboard/*"
-      ],
-      "@/department/*": [
-        "./src/modules/department/*"
-      ],
-      "@/employee/*": [
-        "./src/modules/employee/*"
-      ],
-      "@/employee-request/*": [
-        "./src/modules/employee-request/*"
-      ],
-      "@/expense/*": [
-        "./src/modules/expense/*"
-      ],
-      "@/invoice/*": [
-        "./src/modules/invoice/*"
-      ],
-      "@/job-listing/*": [
-        "./src/modules/job-listing/*"
-      ],
-      "@/product/*": [
-        "./src/modules/product/*"
-      ],
-      "@/purchase/*": [
-        "./src/modules/purchase/*"
-      ],
-      "@/quote/*": [
-        "./src/modules/quote/*"
-      ],
-      "@/role/*": [
-        "./src/modules/role/*"
-      ],
-      "@/salary/*": [
-        "./src/modules/salary/*"
-      ],
-      "@/sale/*": [
-        "./src/modules/sale/*"
-      ],
-      "@/setting/*": [
-        "./src/modules/setting/*"
-      ],
-      "@/user/*": [
-        "./src/modules/user/*"
-      ],
-      "@/vendor/*": [
-        "./src/modules/vendor/*"
-      ],
-      "@/warehouse/*": [
-        "./src/modules/warehouse/*"
-      ],
-      "@/domain/*": [
-        "./src/modules/domain/*"
-      ],
-      "@/website/*": [
-        "./src/modules/website/*"
-      ],
-      "@/server/*": [
-        "./src/modules/server/*"
-      ],
-      "@/truck/*": [
-        "./src/modules/truck/*"
-      ],
-      "@/car/*": [
-        "./src/modules/car/*"
-      ],
-      "@/activity/*": [
-        "./src/modules/activity/*"
-      ],
-      "@/bank_account/*": [
-        "./src/modules/bank_account/*"
-      ],
-      "@/enterprise/*": [
-        "./src/modules/enterprise/*"
-      ],
-      "@/onboarding/*": [
-        "./src/modules/onboarding/*"
-      ],
-      "@/online-store/*": [
-        "./src/modules/online-store/*"
-      ],
-      "@/permission/*": [
-        "./src/modules/permission/*"
-      ],
-      "@/individual/*": [
-        "./src/modules/individual/*"
-      ],
-      "@/document/*": [
-        "./src/modules/document/*"
-      ]
+      "@/*": ["./src/*"],
+      "@tanad.config": ["./tanad.config.ts"],
+      "@/components/*": ["./src/components/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/pages/*": ["./src/pages/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/types/*": ["./src/types/*"],
+      "@/forms/*": ["./src/components/forms/*"],
+      "@/tables/*": ["./src/components/tables/*"],
+      "@/ui/*": ["./src/components/ui/*"],
+      "@/office/*": ["./src/modules/office/*"],
+      "@/job/*": ["./src/modules/job/*"],
+      "@/applicant/*": ["./src/modules/applicant/*"],
+      "@/branch/*": ["./src/modules/branch/*"],
+      "@/client/*": ["./src/modules/client/*"],
+      "@/company/*": ["./src/modules/company/*"],
+      "@/dashboard/*": ["./src/modules/dashboard/*"],
+      "@/department/*": ["./src/modules/department/*"],
+      "@/employee/*": ["./src/modules/employee/*"],
+      "@/employee-request/*": ["./src/modules/employee-request/*"],
+      "@/expense/*": ["./src/modules/expense/*"],
+      "@/invoice/*": ["./src/modules/invoice/*"],
+      "@/job-listing/*": ["./src/modules/job-listing/*"],
+      "@/product/*": ["./src/modules/product/*"],
+      "@/purchase/*": ["./src/modules/purchase/*"],
+      "@/quote/*": ["./src/modules/quote/*"],
+      "@/role/*": ["./src/modules/role/*"],
+      "@/salary/*": ["./src/modules/salary/*"],
+      "@/sale/*": ["./src/modules/sale/*"],
+      "@/setting/*": ["./src/modules/setting/*"],
+      "@/user/*": ["./src/modules/user/*"],
+      "@/vendor/*": ["./src/modules/vendor/*"],
+      "@/warehouse/*": ["./src/modules/warehouse/*"],
+      "@/domain/*": ["./src/modules/domain/*"],
+      "@/website/*": ["./src/modules/website/*"],
+      "@/server/*": ["./src/modules/server/*"],
+      "@/truck/*": ["./src/modules/truck/*"],
+      "@/car/*": ["./src/modules/car/*"],
+      "@/activity/*": ["./src/modules/activity/*"],
+      "@/bank_account/*": ["./src/modules/bank_account/*"],
+      "@/enterprise/*": ["./src/modules/enterprise/*"],
+      "@/onboarding/*": ["./src/modules/onboarding/*"],
+      "@/online-store/*": ["./src/modules/online-store/*"],
+      "@/permission/*": ["./src/modules/permission/*"],
+      "@/individual/*": ["./src/modules/individual/*"],
+      "@/document/*": ["./src/modules/document/*"],
+      "@/vehicle/*": ["./src/modules/vehicle/*"],
+      "@/driver/*": ["./src/modules/driver/*"]
     },
     "plugins": [
       {
@@ -167,13 +71,6 @@
     ],
     "baseUrl": "."
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "next-env.d.ts",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", "next-env.d.ts", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

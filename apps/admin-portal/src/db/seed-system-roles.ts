@@ -205,6 +205,20 @@ const systemRolePermissions: Record<string, string[]> = {
     "online_stores.duplicate",
     "online_stores.export",
 
+    "vehicles.read",
+    "vehicles.create",
+    "vehicles.delete",
+    "vehicles.update",
+    "vehicles.export",
+    "vehicles.duplicate",
+
+    "drivers.read",
+    "drivers.create",
+    "drivers.delete",
+    "drivers.update",
+    "drivers.export",
+    "drivers.duplicate",
+
     "cars.read",
     "cars.create",
     "cars.delete",

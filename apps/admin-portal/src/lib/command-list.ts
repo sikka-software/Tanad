@@ -198,6 +198,20 @@ export const commandList = [
     heading: "Pages.Fleet.title",
     items: [
       {
+        icon: ModulesOptions.vehicles.icon,
+        label: ModulesOptions.vehicles.label,
+        shortcut: "⌘V",
+        href: ModulesOptions.vehicles.url,
+        addHref: ModulesOptions.vehicles.url + "/add",
+      },
+      {
+        icon: ModulesOptions.drivers.icon,
+        label: ModulesOptions.drivers.label,
+        shortcut: "⌘D",
+        href: ModulesOptions.drivers.url,
+        addHref: ModulesOptions.drivers.url + "/add",
+      },
+      {
         icon: ModulesOptions.cars.icon,
         label: ModulesOptions.cars.label,
         shortcut: "⌘D",

@@ -59,7 +59,9 @@ export type TanadModules =
   | "servers"
   | "domains"
   | "online_stores"
+  | "vehicles"
   | "cars"
+  | "drivers"
   | "trucks"
   | "storage"
   | "recruitment"
@@ -304,11 +306,25 @@ const ModulesOptions: Record<
     url: "/online_stores",
     category: "IT",
   },
+  vehicles: {
+    icon: Car,
+    label: "Pages.Vehicles.title",
+    translationKey: "Pages.Vehicles.title",
+    url: "/vehicles",
+    category: "Fleet",
+  },
   cars: {
     icon: Car,
     label: "Pages.Cars.title",
     translationKey: "Pages.Cars.title",
     url: "/cars",
+    category: "Fleet",
+  },
+  drivers: {
+    icon: User,
+    label: "Pages.Drivers.title",
+    translationKey: "Pages.Drivers.title",
+    url: "/drivers",
     category: "Fleet",
   },
   trucks: {

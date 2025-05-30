@@ -30,6 +30,8 @@ const TanadModulesDirectories = [
   "domains",
   "online-store",
   "car",
+  "vehicle",
+  "driver",
   "truck",
   "recruitment",
   "bank-account",
