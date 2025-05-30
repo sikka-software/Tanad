@@ -4294,6 +4294,17 @@
   },
   "Vehicles": {
     "form": {
+      "type": {
+        "label": "نوع المركبة",
+        "car": "سيارة",
+        "truck": "شاحنة",
+        "bus": "حافلة",
+        "motorcycle": "دراجة"
+      },
+      "code": {
+        "label": "الرمز",
+        "placeholder": "أدخل الرمز"
+      },
       "make": {
         "label": "الشركة المصنعة",
         "placeholder": "مثال: Toyota, Ford",

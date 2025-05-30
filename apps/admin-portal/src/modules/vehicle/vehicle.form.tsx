@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
+import { Car, Truck, Bus, Bike } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -141,6 +142,29 @@ export function VehicleForm({
     }
   };
 
+  const VehicleTypes = [
+    {
+      label: t("Vehicles.form.type.car"),
+      value: "car",
+      icon: Car,
+    },
+    {
+      label: t("Vehicles.form.type.truck"),
+      value: "truck",
+      icon: Truck,
+    },
+    {
+      label: t("Vehicles.form.type.bus"),
+      value: "bus",
+      icon: Bus,
+    },
+    {
+      label: t("Vehicles.form.type.motorcycle"),
+      value: "motorcycle",
+      icon: Bike,
+    },
+  ];
+
   if (typeof window !== "undefined") {
     (window as any).vehicleForm = form;
   }
@@ -159,44 +183,44 @@ export function VehicleForm({
         <div className="form-container">
           <input hidden type="text" value={user?.id} {...form.register("user_id")} />
           <input hidden type="text" value={enterprise?.id} {...form.register("enterprise_id")} />
-          <div className="form-fields-cols-2">
-            <FormField
-              control={form.control}
-              name="vehicle_type"
-              render={() => (
-                <FormItem>
-                  <div className="grid gap-4 md:grid-cols-1 @min-[500px]/jobs-section:grid-cols-3 @min-[800px]/jobs-section:grid-cols-4">
-                    {["car", "truck", "van", "bus", "motorcycle", "other"].map((type) => (
+          <FormField
+            control={form.control}
+            name="vehicle_type"
+            render={() => (
+              <FormItem>
+                <div className="flex flex-col">
+                  <FormLabel>{t("Vehicles.form.type.label")}</FormLabel>
+                  <div className="grid grid-cols-3 gap-2">
+                    {VehicleTypes.map((type) => (
                       <div
-                        key={type}
+                        key={type.value}
                         className={`group relative cursor-pointer overflow-hidden rounded-lg border p-4 transition-all ${
-                          selectedVehicleTypes.includes(type)
+                          selectedVehicleTypes.includes(type.value)
                             ? "border-primary bg-primary/5"
                             : "hover:shadow-md"
                         }`}
-                        onClick={() => setSelectedVehicleTypes([type])}
+                        onClick={() => setSelectedVehicleTypes([type.value])}
                       >
-                        <div className="mb-2 flex flex-row justify-between">
-                          <span className="text-sm text-gray-500">
-                            {t(`Vehicles.form.type.${type}`)}
-                          </span>
-                          {selectedVehicleTypes.includes(type) && (
-                            <div className="bg-primary size-3 rounded-full" />
-                          )}
-                        </div>
+                        {selectedVehicleTypes.includes(type.value) && (
+                          <div className="bg-primary absolute end-2 top-2 size-3 rounded-full" />
+                        )}
                         <div className="flex items-start justify-between">
-                          <div>
-                            <h4 className="font-semibold">{t(`Vehicles.form.type.${type}`)}</h4>
+                          <div className="flex items-center gap-2">
+                            <type.icon className="size-6" />
+
+                            <h4 className="font-semibold">
+                              {t(`Vehicles.form.type.${type.value}`)}
+                            </h4>
                           </div>
                         </div>
-                        <div className="mt-2 space-y-1"></div>
                       </div>
                     ))}
                   </div>
-                </FormItem>
-              )}
-            />
-
+                </div>
+              </FormItem>
+            )}
+          />
+          <div className="form-fields-cols-2">
             <FormField
               control={form.control}
               name="status"

@@ -222,6 +222,382 @@
     "report_issue_description_thank_you": "Our team has been notified and will investigate this issue soon.",
     "cascade_delete": "Delete related data"
   },
+
+  "Pages": {
+    "ActivityLogs": {
+      "title": "Activity Logs",
+      "description": "Manage activity logs"
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Manage settings"
+    },
+    "Account": {
+      "title": "Account",
+      "description": "Manage accounts"
+    },
+    "Billing": {
+      "title": "Billing",
+      "description": "Manage billing"
+    },
+    "Finance": { "title": "Finance" },
+    "CRM": { "title": "Sales & Marketing" },
+    "Operations": { "title": "Operations" },
+    "IT": { "title": "IT" },
+    "Administration": { "title": "Administration" },
+    "Accounting": { "title": "Accounting" },
+    "HumanResources": { "title": "Human Resources" },
+    "Recruitment": { "title": "Recruitment" },
+    "Storage": { "title": "Storage" },
+    "Internet": { "title": "Internet" },
+    "Fleet": { "title": "Fleet" },
+    "SystemAdmin": { "title": "System Admin" },
+    "Dashboard": { "title": "Dashboard" },
+    "Analytics": { "title": "Analytics" },
+    "Help": { "title": "Help" },
+    "Documents": {
+      "title": "Documents",
+      "add": "Add Document",
+      "edit": "Edit Document",
+      "delete": "Delete Document",
+      "no_documents": "No documents",
+      "document": "Document",
+      "document_description": "Document description"
+    },
+    "Products": {
+      "title": "Products",
+      "singular": "Product",
+      "add": "Add Product",
+      "create": "Create Product",
+      "edit": "Edit Product",
+      "search": "Search Product",
+      "select": "Select Product",
+      "no_products_found": "No products found"
+    },
+    "Invoices": {
+      "title": "Invoices",
+      "singular": "Invoice",
+      "add": "Add Invoice",
+      "create": "Create Invoice",
+      "edit": "Edit Invoice",
+      "search": "Search Invoice",
+      "select": "Select Invoice",
+      "no_invoices_found": "No invoices found"
+    },
+    "Sales": {
+      "title": "Sales",
+      "singular": "Sale",
+      "add": "Add Sale",
+      "create": "Create Sale",
+      "edit": "Edit Sale",
+      "search": "Search Sale",
+      "select": "Select Sale",
+      "no_sales_found": "No sales found"
+    },
+    "Quotes": {
+      "title": "Quotes",
+      "singular": "Quote",
+      "add": "Add Quote",
+      "create": "Create Quote",
+      "edit": "Edit Quote",
+      "search": "Search Quote",
+      "select": "Select Quote",
+      "no_quotes_found": "No quotes found"
+    },
+    "Contacts": {
+      "title": "Contacts",
+      "singular": "Contact",
+      "add": "Add Contact",
+      "create": "Create Contact",
+      "edit": "Edit Contact",
+      "search": "Search Contact",
+      "select": "Select Contact",
+      "no_contacts_found": "No contacts found"
+    },
+    "Individuals": {
+      "title": "Individuals",
+      "singular": "Individual",
+      "add": "Add Individual",
+      "create": "Create Individual",
+      "edit": "Edit Individual",
+      "search": "Search Individual",
+      "select": "Select Individual",
+      "no_individuals_found": "No individuals found"
+    },
+    "EmployeeRequests": {
+      "title": "Employee Requests",
+      "singular": "Employee Request",
+      "add": "Add Employee Request",
+      "create": "Create Employee Request",
+      "edit": "Edit Employee Request",
+      "search": "Search Employee Request",
+      "select": "Select Employee Request",
+      "no_employee_requests_found": "No employee requests found"
+    },
+    "Clients": {
+      "title": "Clients",
+      "singular": "Client",
+      "add": "Add Client",
+      "create": "Create Client",
+      "edit": "Edit Client",
+      "search": "Search Client",
+      "select": "Select Client",
+      "no_clients_found": "No clients found"
+    },
+    "Warehouses": {
+      "title": "Warehouses",
+      "singular": "Warehouse",
+      "add": "Add Warehouse",
+      "create": "Create Warehouse",
+      "edit": "Edit Warehouse",
+      "search": "Search Warehouse",
+      "select": "Select Warehouse",
+      "no_warehouses_found": "No warehouses found"
+    },
+    "Branches": {
+      "title": "Branches",
+      "singular": "Branch",
+      "add": "Add Branch",
+      "create": "Create Branch",
+      "edit": "Edit Branch",
+      "search": "Search Branch",
+      "select": "Select Branch",
+      "no_branches_found": "No branches found"
+    },
+    "Vendors": {
+      "title": "Vendors",
+      "singular": "Vendor",
+      "add": "Add Vendor",
+      "create": "Create Vendor",
+      "edit": "Edit Vendor",
+      "search": "Search Vendor",
+      "select": "Select Vendor",
+      "no_vendors_found": "No vendors found"
+    },
+    "Attendance": {
+      "title": "Attendance",
+      "singular": "Attendance",
+      "add": "Add Attendance",
+      "create": "Create Attendance",
+      "edit": "Edit Attendance",
+      "search": "Search Attendance",
+      "select": "Select Attendance",
+      "no_attendance_found": "No attendance found"
+    },
+    "Applicants": {
+      "title": "Applicants",
+      "singular": "Applicant",
+      "add": "Add Applicant",
+      "create": "Create Applicant",
+      "edit": "Edit Applicant",
+      "search": "Search Applicant",
+      "select": "Select Applicant",
+      "no_applicants_found": "No applicants found"
+    },
+    "Users": {
+      "title": "Users",
+      "singular": "User",
+      "add": "Add User",
+      "create": "Create User",
+      "edit": "Edit User",
+      "search": "Search User",
+      "select": "Select User",
+      "no_users_found": "No users found"
+    },
+    "Locations": {
+      "title": "Locations",
+      "singular": "Location",
+      "add": "Add Location",
+      "create": "Create Location",
+      "edit": "Edit Location",
+      "search": "Search Location",
+      "select": "Select Location",
+      "no_locations_found": "No locations found"
+    },
+    "Offices": {
+      "title": "Offices",
+      "description": "Manage offices",
+      "singular": "Office",
+      "add": "Add Office",
+      "create": "Create Office",
+      "edit": "Edit Office",
+      "search": "Search Office",
+      "select": "Select Office",
+      "no_offices_found": "No offices found"
+    },
+    "Employees": {
+      "all": "All Employees",
+      "title": "Employees",
+      "singular": "Employee",
+      "add": "Add Employee",
+      "create": "Create Employee",
+      "edit": "Edit Employee",
+      "search": "Search Employee",
+      "select": "Select Employee",
+      "no_employees_found": "No employees found"
+    },
+    "Roles": {
+      "title": "Roles",
+      "singular": "Role",
+      "add": "Add Role",
+      "create": "Create Role",
+      "edit": "Edit Role",
+      "search": "Search Role",
+      "select": "Select Role",
+      "no_roles_found": "No roles found"
+    },
+    "Permissions": {
+      "title": "Permissions",
+      "singular": "Permission",
+      "add": "Add Permission",
+      "create": "Create Permission",
+      "edit": "Edit Permission",
+      "search": "Search Permission",
+      "select": "Select Permission",
+      "no_permissions_found": "No permissions found"
+    },
+    "Departments": {
+      "title": "Departments",
+      "singular": "Department",
+      "add": "Add Department",
+      "create": "Create Department",
+      "edit": "Edit Department",
+      "search": "Search Department",
+      "select": "Select Department",
+      "no_departments_found": "No departments found"
+    },
+    "Jobs": {
+      "title": "Jobs",
+      "singular": "Job",
+      "add": "Add Job",
+      "create": "Create Job",
+      "edit": "Edit Job",
+      "search": "Search Job",
+      "select": "Select Job",
+      "no_jobs_found": "No jobs found"
+    },
+    "Vehicles": {
+      "title": "Vehicles",
+      "singular": "Vehicle",
+      "add": "Add Vehicle",
+      "create": "Create Vehicle",
+      "edit": "Edit Vehicle",
+      "search": "Search Vehicle",
+      "select": "Select Vehicle",
+      "no_cars_found": "No vehicles found"
+    },
+    "Drivers": {
+      "title": "Drivers",
+      "singular": "Driver",
+      "add": "Add Driver",
+      "create": "Create Driver",
+      "edit": "Edit Driver",
+      "search": "Search Driver",
+      "select": "Select Driver",
+      "no_drivers_found": "No drivers found"
+    },
+    "Companies": {
+      "title": "Companies",
+      "singular": "Company",
+      "add": "Add Company",
+      "create": "Create Company",
+      "edit": "Edit Company",
+      "search": "Search Company",
+      "select": "Select Company",
+      "no_companies_found": "No companies found"
+    },
+    "Domains": {
+      "title": "Domains",
+      "singular": "Domain",
+      "add": "Add Domain",
+      "create": "Create Domain",
+      "edit": "Edit Domain",
+      "search": "Search Domain",
+      "select": "Select Domain",
+      "no_domains_found": "No domains found"
+    },
+    "Expenses": {
+      "title": "Expenses",
+      "singular": "Expense",
+      "add": "Add Expense",
+      "create": "Create Expense",
+      "edit": "Edit Expense",
+      "search": "Search Expense",
+      "select": "Select Expense",
+      "no_expenses_found": "No expenses found"
+    },
+    "JobListings": {
+      "title": "Job Listings",
+      "singular": "Job Listing",
+      "add": "Add Job Listing",
+      "create": "Create Job Listing",
+      "edit": "Edit Job Listing",
+      "search": "Search Job Listing",
+      "select": "Select Job Listing",
+      "no_job_listings_found": "No job listings found"
+    },
+    "OnlineStores": {
+      "title": "Online Stores",
+      "singular": "Online Store",
+      "add": "Add Online Store",
+      "create": "Create Online Store",
+      "edit": "Edit Online Store",
+      "search": "Search Online Store",
+      "select": "Select Online Store",
+      "no_online_stores_found": "No online stores found"
+    },
+    "Purchases": {
+      "title": "Purchases",
+      "singular": "Purchase",
+      "add": "Add Purchase",
+      "create": "Create Purchase",
+      "edit": "Edit Purchase",
+      "search": "Search Purchase",
+      "select": "Select Purchase",
+      "no_purchases_found": "No purchases found"
+    },
+    "Salaries": {
+      "title": "Salaries",
+      "singular": "Salary",
+      "add": "Add Salary",
+      "create": "Create Salary",
+      "edit": "Edit Salary",
+      "search": "Search Salary",
+      "select": "Select Salary",
+      "no_salaries_found": "No salaries found"
+    },
+    "Servers": {
+      "title": "Servers",
+      "singular": "Server",
+      "add": "Add Server",
+      "create": "Create Server",
+      "edit": "Edit Server",
+      "search": "Search Server",
+      "select": "Select Server",
+      "no_servers_found": "No servers found"
+    },
+    "Websites": {
+      "title": "Websites",
+      "singular": "Website",
+      "add": "Add Website",
+      "create": "Create Website",
+      "edit": "Edit Website",
+      "search": "Search Website",
+      "select": "Select Website",
+      "no_websites_found": "No websites found"
+    },
+    "BankAccounts": {
+      "title": "Bank Accounts",
+      "singular": "Bank Account",
+      "add": "Add Bank Account",
+      "create": "Create Bank Account",
+      "edit": "Edit Bank Account",
+      "search": "Search Bank Account",
+      "select": "Select Bank Account",
+      "no_bank_accounts_found": "No bank accounts found"
+    }
+  },
+
   "Flags": {
     "timezone_soon": {
       "title": "Soon",
@@ -901,127 +1277,6 @@
     "over_email_send_rate_limit": "You have requested a password reset too frequently. Please try again later.",
     "invalid_credentials": "Invalid email or password"
   },
-  "Editor": {
-    "change_thumbnail": "Change Link Icon",
-    "link_title_required": "Link title is required",
-    "link_url_required": "Link URL is required",
-    "link_url_invalid": "Link URL is invalid",
-    "lock_link": {
-      "password_protected": {
-        "title": "Password Protected",
-        "description": "You can add a password to the link to prevent access unless the correct password is entered",
-        "invalid_password": "Incorrect password",
-        "password_required": "Password is required"
-      },
-      "requires_date_of_birth": {
-        "title": "Link Requires Date of Birth",
-        "description": "You can require a date of birth for the link to prevent access unless the correct date of birth is entered",
-        "too_young": "You are younger than the minimum required age",
-        "day_required": "Day is required",
-        "month_required": "Month is required",
-        "year_required": "Year is required"
-      },
-      "min_age": {
-        "label": "Minimum Age",
-        "placeholder": "Enter minimum age"
-      }
-    },
-    "try_lazim": {
-      "title": "Long link?",
-      "description": "Try Lazim platform to shorten long links",
-      "go_to_lazim": "Let's get started"
-    },
-    "delivery_apps": {
-      "hungerstation": "HungerStation",
-      "jahez": "Jahez",
-      "keeta": "Keeta",
-      "toyou": "ToYou",
-      "careem": "Careem",
-      "mrsool": "Mrsool"
-    },
-    "link_types": {
-      "link": "Link",
-      "header": "Header",
-      "youtube": "Video",
-      "delivery-apps": "Delivery Apps",
-      "document": "Document",
-      "form": "Form"
-    },
-    "thumbnail": {
-      "choose_icon": "Choose Icon",
-      "choose_image": "Choose Image",
-      "icon_position": "Icon Position",
-      "position_start": "Start of Text",
-      "position_end": "End of Text"
-    },
-    "remove_thumbnail": "Remove Image",
-    "failed_to_update_thumbnail": "Failed to update thumbnail",
-    "header-added-successfully": "Header added successfully",
-    "failed-to-add-header": "Failed to add header",
-    "header-updated-successfully": "Header updated successfully",
-    "failed-to-update-header": "Failed to update header",
-    "link-added-successfully": "Link added successfully",
-    "failed-to-add-link": "Failed to add link",
-    "link_updated_successfully": "Link updated successfully",
-    "failed-to-update-link": "Failed to update link",
-    "title": "Links",
-    "link-status-updated-successfully": "Link status updated successfully",
-    "link-failed-to-update-status": "Failed to update link status",
-    "header-status-updated-successfully": "Header status updated successfully",
-    "header-failed-to-update-status": "Failed to update header status",
-    "confirm-delete-link": "Confirm Delete Link",
-    "confirm-delete-header": "Confirm Delete Header",
-    "single_link_title": "Link Title",
-    "single_link_url": "Link URL",
-    "change-pukla": "Change Pukla",
-    "select_a_pukla": "Select a Pukla",
-    "success_deleting_link": "Link deleted successfully",
-    "error_deleting_link": "Failed to delete link",
-    "error_deleting_header": "Failed to delete header",
-    "success_deleting_header": "Header deleted successfully",
-    "order-updated-successfully": "Links order updated successfully",
-    "select_pukla": "Select Pukla",
-    "description": "Manage all your other links",
-    "add-header": "New Header",
-    "add-link": "New Link",
-    "add-new-link": "Add Link",
-    "add-new-header": "Add New Header",
-    "add-button": "New Button",
-    "select_pukla_to_start_editing": "Select a Pukla to start editing",
-    "link": "Link",
-    "embed-video": "Embed Video",
-    "document": "Document",
-    "form": "Form",
-    "delivery-apps": "Delivery Apps",
-    "no-items": "No items found",
-    "header": "Header",
-    "header-title": {
-      "label": "Header Title",
-      "placeholder": "Enter header title"
-    },
-    "link-title": {
-      "label": "Title",
-      "placeholder": "Link title"
-    },
-    "link-url": {
-      "label": "URL",
-      "placeholder": "https://example.com"
-    },
-    "no_items_found": "No items found",
-    "change_layout": "Change Layout",
-    "default_layout": "Default",
-    "double_height_layout": "Double Height",
-    "half_width_layout": "Half Width",
-    "save": "Save",
-    "edit_pukla": "Edit Pukla",
-    "slug": "Short Link",
-    "slug_already_taken": "This short link is already taken",
-    "pukla_updated_successfully": "Pukla updated successfully",
-    "square_layout": "Square",
-    "layout_updated_successfully": "Layout updated successfully",
-    "failed_to_update_layout": "Failed to update layout",
-    "search_icons": "Search Icons..."
-  },
   "Theme": {
     "title": "Theme",
     "predefined_themes": "Predefined Themes",
@@ -1322,8 +1577,7 @@
       "data_management": "Data Management",
       "custom_automation": "Custom Automation",
       "biomitric_auth": "Biometric Authentication",
-      "complete_white_label": "Complete White Label",
-      "multiple_payment_gateways": "Multiple Payment Gateways"
+      "complete_white_label": "Complete White Label"
     },
     "selected_plan_button": "Select Plan",
     "tanad_pro_description": "Pro plan for small businesses",
@@ -1349,6 +1603,73 @@
   "Account": {
     "title": "Account",
     "description": "Manage all your accounts"
+  },
+  "Vehicles": {
+    "form": {
+      "type": {
+        "label": "Vehicle Type",
+        "car": "Car",
+        "truck": "Truck",
+        "bus": "Bus",
+        "motorcycle": "Motorcycle"
+      },
+      "code": {
+        "label": "Code",
+        "placeholder": "Enter Code"
+      },
+      "make": {
+        "label": "Make",
+        "placeholder": "Example: Toyota, Ford",
+        "required": "Make is required"
+      },
+      "model": {
+        "label": "Model",
+        "placeholder": "Example: Camry, Mustang",
+        "required": "Model is required"
+      },
+      "year": {
+        "label": "Year",
+        "placeholder": "Example: 2023",
+        "required": "Year is required"
+      },
+      "color": {
+        "label": "Color",
+        "placeholder": "Example: Red, Blue"
+      },
+      "vin": {
+        "label": "VIN",
+        "placeholder": "Enter VIN",
+        "invalid": "VIN is invalid",
+        "exact_length": "VIN must be 17 digits"
+      },
+      "license_country": {
+        "label": "License Country",
+        "placeholder": "Example: Saudi Arabia"
+      },
+      "license_plate": {
+        "label": "License Plate",
+        "placeholder": "Enter License Plate"
+      },
+      "ownership_status": {
+        "label": "Ownership Status",
+        "placeholder": "Select Ownership Status",
+        "required": "Ownership Status is required",
+        "owned": "Owned",
+        "rented": "Rented",
+        "financed": "Financed"
+      },
+      "status": {
+        "label": "Status",
+        "placeholder": "Select Status",
+        "active": "Active",
+        "maintenance": "Maintenance",
+        "sold": "Sold",
+        "totaled": "Totaled",
+        "retired": "Retired",
+        "stored": "Stored",
+        "other": "Other"
+      }
+    }
   },
   "Share": {
     "twitter": "Share on X (Twitter)",

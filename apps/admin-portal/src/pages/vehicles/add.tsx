@@ -32,7 +32,7 @@ export default function AddVehiclePage() {
           submit_form: t("Pages.Vehicles.add"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={generateDummyCar}
+        // dummyButton={generateDummyCar}
       />
 
       <VehicleForm
