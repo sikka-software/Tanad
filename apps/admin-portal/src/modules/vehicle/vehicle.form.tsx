@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 import { Car, Truck, Bus, Bike } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -80,8 +79,6 @@ export function VehicleForm({
 }: ModuleFormProps<VehicleUpdateData | VehicleCreateData>) {
   const t = useTranslations();
   const lang = useLocale();
-
-  const [selectedVehicleTypes, setSelectedVehicleTypes] = useState<string[]>([]);
 
   const user = useUserStore((state) => state.user);
   const enterprise = useUserStore((state) => state.enterprise);
@@ -195,13 +192,15 @@ export function VehicleForm({
                       <div
                         key={type.value}
                         className={`group relative cursor-pointer overflow-hidden rounded-lg border p-4 transition-all ${
-                          selectedVehicleTypes.includes(type.value)
+                          form.watch("vehicle_type") === type.value
                             ? "border-primary bg-primary/5"
                             : "hover:shadow-md"
                         }`}
-                        onClick={() => setSelectedVehicleTypes([type.value])}
+                        onClick={() => {
+                          form.setValue("vehicle_type", type.value as any);
+                        }}
                       >
-                        {selectedVehicleTypes.includes(type.value) && (
+                        {form.watch("vehicle_type") === type.value && (
                           <div className="bg-primary absolute end-2 top-2 size-3 rounded-full" />
                         )}
                         <div className="flex items-start justify-between">
