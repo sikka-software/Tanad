@@ -18,30 +18,33 @@ export const TEST_SELLER_NAMES = [
 
 /**
  * Generate a valid 15-digit VAT number for testing
- * Saudi Arabian VAT numbers are 15 digits starting with 3
+ * ZATCA requirement: Must be 15 digits starting and ending with '3'
  * @returns A valid format VAT number for testing purposes
  */
 export function generateTestVatNumber(): string {
-  // Valid Saudi VAT numbers start with 3
+  // Start with 3
   let vatNumber = "3";
 
-  // Generate 14 more random digits
-  for (let i = 0; i < 14; i++) {
+  // Generate 13 middle random digits
+  for (let i = 0; i < 13; i++) {
     vatNumber += Math.floor(Math.random() * 10).toString();
   }
+
+  // End with 3
+  vatNumber += "3";
 
   return vatNumber;
 }
 
 /**
- * List of predefined valid VAT numbers for testing
+ * List of predefined valid VAT numbers for testing (ZATCA-compliant)
  */
 export const TEST_VAT_NUMBERS = [
   "310122393500003", // Example from ZATCA documentation
-  "311111111111113",
-  "300000000000003",
-  "399999999999993",
-  generateTestVatNumber(),
+  "311111111111113", // Valid format: starts and ends with 3
+  "300000000000003", // Valid format: starts and ends with 3
+  "399999999999993", // Valid format: starts and ends with 3
+  "312345678901233", // Valid format: starts and ends with 3
 ];
 
 /**
@@ -147,6 +150,7 @@ export function generateTestInvoice(
  */
 export function generateTestZatcaXml() {
   const testData = generateTestInvoiceData();
+  const buyerVatNumber = generateTestVatNumber();
 
   return generateZatcaXml({
     invoiceNumber: `ZATCA-${Math.floor(Math.random() * 10000)
@@ -164,16 +168,18 @@ export function generateTestZatcaXml() {
       city: "Riyadh",
       postalCode: "12214",
       countryCode: "SA",
+      district: "Al Olaya", // Required for KSA
     },
 
     buyerName: "Test Customer",
-    buyerVatNumber: generateTestVatNumber(),
+    buyerVatNumber: buyerVatNumber,
     buyerAddress: {
       street: "Prince Mohammed Bin Salman Road",
       buildingNumber: "3458",
       city: "Jeddah",
       postalCode: "23715",
       countryCode: "SA",
+      district: "Al Hamra", // Required for KSA
     },
 
     paymentMeans: {
@@ -197,5 +203,10 @@ export function generateTestZatcaXml() {
     subtotal: testData.subtotal,
     vatAmount: testData.vatAmount,
     total: testData.total,
+
+    // ZATCA Phase 2 specific fields
+    invoiceCounterValue: Math.floor(Math.random() * 1000) + 1, // ICV
+    previousInvoiceHash:
+      "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==", // PIH
   });
 }
