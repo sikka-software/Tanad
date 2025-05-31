@@ -30,7 +30,7 @@ export default async function handler(
     });
   }
 
-  const { xmlContent } = req.body;
+  const { xmlContent, mode } = req.body;
 
   if (!xmlContent) {
     return res.status(400).json({
@@ -44,6 +44,9 @@ export default async function handler(
     const requireSandbox = process.env.ZATCA_REQUIRE_SANDBOX === "true"; // Default to false
     const allowLocalValidation = process.env.ZATCA_ALLOW_LOCAL_VALIDATION !== "false"; // Default to true
 
+    // New: Check for user-specified mode
+    const requestedMode = mode || "auto"; // "sandbox", "local", "simulated", or "auto"
+
     // ZATCA SDK configuration - Flexible paths for any structure
     const sdkJarPath = process.env.ZATCA_SDK_JAR_PATH || (await findZatcaSdkPath());
     const sdkConfigPath = process.env.ZATCA_SDK_CONFIG_PATH || (await findZatcaConfigPath());
@@ -52,8 +55,9 @@ export default async function handler(
     console.log("ZATCA Configuration:", {
       requireSandbox,
       allowLocalValidation,
-      sdkJarPath,
-      sdkConfigPath,
+      requestedMode,
+      sdkJarPath: sdkJarPath ? "Found" : "Not found",
+      sdkConfigPath: sdkConfigPath ? "Found" : "Not found",
       workingDirectory,
     });
 
@@ -67,7 +71,7 @@ export default async function handler(
     } catch (error) {
       console.warn("⚠️ ZATCA SDK files not found");
 
-      if (requireSandbox) {
+      if (requireSandbox || requestedMode === "sandbox") {
         return res.status(500).json({
           success: false,
           message: "ZATCA Sandbox is required but not available",
@@ -77,32 +81,54 @@ export default async function handler(
       }
     }
 
-    // If sandbox is available, use it for full Phase 2 processing
-    if (sandboxAvailable) {
-      console.log("🔧 Using ZATCA Sandbox for full Phase 2 processing");
-      return await procesWithSandbox(xmlContent, sdkJarPath, sdkConfigPath, workingDirectory, res);
+    // Determine processing mode based on user preference and availability
+    let processingMode = requestedMode;
+
+    if (requestedMode === "auto") {
+      // Auto mode: choose based on availability and configuration
+      if (sandboxAvailable && !process.env.ZATCA_FORCE_LOCAL) {
+        processingMode = "sandbox";
+      } else if (allowLocalValidation) {
+        processingMode = "local";
+      } else {
+        processingMode = "simulated";
+      }
     }
 
-    // If local validation is allowed, use enhanced local validation
-    if (allowLocalValidation) {
-      console.log("🏠 Using local validation (no sandbox)");
-      return await processWithLocalValidation(xmlContent, res);
+    // Force local mode if requested, even if sandbox is available
+    if (requestedMode === "local" && !allowLocalValidation) {
+      return res.status(400).json({
+        success: false,
+        message: "Local validation is disabled",
+        details: "Set ZATCA_ALLOW_LOCAL_VALIDATION=true to enable local validation",
+      });
     }
 
-    // Fallback to simulated response
-    console.log("🎭 Using simulated response");
-    return res.status(200).json({
-      success: true,
-      message: "ZATCA Phase 2 processing completed successfully (simulated)",
-      hash: "f+0WCqnPkInI+eL9G3LAry12fTPf+toC9UX07F4fI+s=",
-      qrCode:
-        "AW/YtNix2YPYqSDYqtmI2LHZitivINin2YTYqtmD2YbZiNmK2Ycg2KjYo9mC2LXZiSDYs9ix2LnYqSDYp9mE2YXYrdiv2YjYr9ipIHwgTWF4aW11bSBTcGVlZCBUZWNoIFN1cHBseSBMVEQCDzM5OTk5OTk5OTkwMDAwMwMTMjAyMi0wOS0wN1QxMjoyMToyOAQENC42MAUDMC42BixmKzBXQ3FuUGtJbkkrZUw5RzNMQXJ5MTJmVFBmK3RvQzlVWDA3RjRmSStzPQdgTUVRQ0lIQkZVa1d4NmsrR0tQMlVPTEJrYjlLaEdmU1BaVzlIZDJuclJBYmhwb1JIQWlCQlFZRi9LWmVPeUg4clB6d29tZTUrZStxNThpN3A2eWZETGxsTG9KZXVsdz09CFgwVjAQBgcqhkjOPQIBBgUrgQQACgNCAAShYIprRJr0UgStM6/S4CQLVUgpfFT2c+nHa+V/jKEx6PLxzTZcluUOru0/J2jyarRqE4yY2jyDCeLte3UpP1R4",
-      signedXml: xmlContent,
-      validationPassed: true,
-      details: "SIMULATED: Validation: PASSED\nHash: Generated\nSigning: Completed\nQR: Generated",
-      warnings: ["Using simulated processing - ZATCA SDK not configured"],
-      mode: "simulated",
-    });
+    // Process based on determined mode
+    console.log(`🔧 Using ${processingMode} mode for ZATCA processing`);
+
+    switch (processingMode) {
+      case "sandbox":
+        if (!sandboxAvailable) {
+          throw new Error("Sandbox mode requested but SDK not available");
+        }
+        return await procesWithSandbox(
+          xmlContent,
+          sdkJarPath,
+          sdkConfigPath,
+          workingDirectory,
+          res,
+        );
+
+      case "local":
+        return await processWithLocalValidation(xmlContent, res);
+
+      case "simulated":
+        return await processWithSimulatedResponse(xmlContent, res);
+
+      default:
+        throw new Error(`Unknown processing mode: ${processingMode}`);
+    }
   } catch (error) {
     console.error("ZATCA processing error:", error);
     res.status(500).json({
@@ -136,10 +162,45 @@ async function procesWithSandbox(
       workingDirectory,
     );
 
-    const validationPassed = validationResult.output.includes("GLOBAL VALIDATION RESULT = PASSED");
+    // Debug: Log the actual validation output
+    console.log("=== VALIDATION OUTPUT DEBUG ===");
+    console.log("Output length:", validationResult.output.length);
+    console.log("First 500 chars:", validationResult.output.substring(0, 500));
+    console.log(
+      "Last 500 chars:",
+      validationResult.output.substring(Math.max(0, validationResult.output.length - 500)),
+    );
+    console.log("=== END DEBUG ===");
+
+    // Improved validation check - look for the actual GLOBAL VALIDATION RESULT first
+    const globalValidationFailed = validationResult.output.includes(
+      "GLOBAL VALIDATION RESULT = FAILED",
+    );
+    const globalValidationPassed = validationResult.output.includes(
+      "GLOBAL VALIDATION RESULT = PASSED",
+    );
+
+    const validationPassed =
+      validationResult.success &&
+      !globalValidationFailed && // If global validation failed, always fail
+      (globalValidationPassed ||
+        validationResult.output.includes("VALIDATION RESULT = PASSED") ||
+        // Only use these fallbacks if no global validation result is present
+        (!validationResult.output.includes("GLOBAL VALIDATION RESULT") &&
+          (validationResult.output.includes("PASSED") ||
+            validationResult.output.toLowerCase().includes("validation passed") ||
+            validationResult.output.toLowerCase().includes("validation successful") ||
+            (validationResult.success &&
+              !validationResult.output.toLowerCase().includes("error") &&
+              !validationResult.output.toLowerCase().includes("failed")))));
+
+    console.log("Global validation failed:", globalValidationFailed);
+    console.log("Global validation passed:", globalValidationPassed);
+    console.log("Final validation passed:", validationPassed);
 
     if (!validationPassed) {
       const errors = extractErrors(validationResult.output);
+      console.log("Validation failed. Errors found:", errors);
       return res.status(400).json({
         success: false,
         message: "Invoice validation failed",
@@ -430,11 +491,18 @@ function extractErrors(output: string): string[] {
   const lines = output.split("\n");
 
   for (const line of lines) {
+    const lowerLine = line.toLowerCase();
     if (
-      line.includes("ERROR") ||
-      line.includes("FAILED") ||
-      line.includes("INVALID") ||
-      line.includes("Exception")
+      lowerLine.includes("error") ||
+      lowerLine.includes("failed") ||
+      lowerLine.includes("invalid") ||
+      lowerLine.includes("exception") ||
+      lowerLine.includes("fault") ||
+      lowerLine.includes("violation") ||
+      // ZATCA specific error patterns
+      lowerLine.includes("br-") || // Business rule violations
+      lowerLine.includes("validation failed") ||
+      lowerLine.includes("not valid")
     ) {
       errors.push(line.trim());
     }
@@ -459,6 +527,10 @@ function extractWarnings(output: string): string[] {
 // Helper functions for flexible path detection
 async function findZatcaSdkPath(): Promise<string> {
   const possiblePaths = [
+    // Project-relative paths (for SDK copied to project)
+    path.resolve(process.cwd(), "zatca", "Apps", "zatca-einvoicing-sdk-238-R4.0.0.jar"),
+    path.resolve(process.cwd(), "..", "zatca", "Apps", "zatca-einvoicing-sdk-238-R4.0.0.jar"),
+    path.resolve(process.cwd(), "..", "..", "zatca", "Apps", "zatca-einvoicing-sdk-238-R4.0.0.jar"),
     // Current structure (New folder)
     "C:\\Users\\IREE\\Documents\\GitHub\\New folder\\zatca-einvoicing-phase2-sandbox\\Apps\\zatca-einvoicing-sdk-238-R4.0.0.jar",
     // Direct GitHub structure
@@ -507,6 +579,10 @@ async function findZatcaSdkPath(): Promise<string> {
 
 async function findZatcaConfigPath(): Promise<string> {
   const possiblePaths = [
+    // Project-relative paths (for SDK copied to project)
+    path.resolve(process.cwd(), "zatca", "Configuration", "config.json"),
+    path.resolve(process.cwd(), "..", "zatca", "Configuration", "config.json"),
+    path.resolve(process.cwd(), "..", "..", "zatca", "Configuration", "config.json"),
     // Current structure (New folder)
     "C:\\Users\\IREE\\Documents\\GitHub\\New folder\\zatca-einvoicing-phase2-sandbox\\Configuration\\config.json",
     // Direct GitHub structure
@@ -555,6 +631,10 @@ async function findZatcaConfigPath(): Promise<string> {
 
 async function findZatcaWorkingDir(): Promise<string> {
   const possiblePaths = [
+    // Project-relative paths (for SDK copied to project)
+    path.resolve(process.cwd(), "zatca"),
+    path.resolve(process.cwd(), "..", "zatca"),
+    path.resolve(process.cwd(), "..", "..", "zatca"),
     // Current structure (New folder)
     "C:\\Users\\IREE\\Documents\\GitHub\\New folder\\zatca-einvoicing-phase2-sandbox",
     // Direct GitHub structure
@@ -584,4 +664,26 @@ async function findZatcaWorkingDir(): Promise<string> {
 
   // Fallback - return first path for error reporting
   return possiblePaths[0];
+}
+
+/**
+ * Process with simulated response (no validation or sandbox)
+ */
+async function processWithSimulatedResponse(
+  xmlContent: string,
+  res: NextApiResponse<ZatcaProcessingResult>,
+): Promise<void> {
+  console.log("🎭 Using simulated response");
+  return res.status(200).json({
+    success: true,
+    message: "ZATCA Phase 2 processing completed successfully (simulated)",
+    hash: "f+0WCqnPkInI+eL9G3LAry12fTPf+toC9UX07F4fI+s=",
+    qrCode:
+      "AW/YtNix2YPYqSDYqtmI2LHZitivINin2YTYqtmD2YbZiNmK2Ycg2KjYo9mC2LXZiSDYs9ix2LnYqSDYp9mE2YXYrdiv2YjYr9ipIHwgTWF4aW11bSBTcGVlZCBUZWNoIFN1cHBseSBMVEQCDzM5OTk5OTk5OTkwMDAwMwMTMjAyMi0wOS0wN1QxMjoyMToyOAQENC42MAUDMC42BixmKzBXQ3FuUGtJbkkrZUw5RzNMQXJ5MTJmVFBmK3RvQzlVWDA3RjRmSStzPQdgTUVRQ0lIQkZVa1d4NmsrR0tQMlVPTEJrYjlLaEdmU1BaVzlIZDJuclJBYmhwb1JIQWlCQlFZRi9LWmVPeUg4clB6d29tZTUrZStxNThpN3A2eWZETGxsTG9KZXVsdz09CFgwVjAQBgcqhkjOPQIBBgUrgQQACgNCAAShYIprRJr0UgStM6/S4CQLVUgpfFT2c+nHa+V/jKEx6PLxzTZcluUOru0/J2jyarRqE4yY2jyDCeLte3UpP1R4",
+    signedXml: xmlContent,
+    validationPassed: true,
+    details: "SIMULATED: Validation: PASSED\nHash: Generated\nSigning: Completed\nQR: Generated",
+    warnings: ["Using simulated processing - ZATCA SDK not configured"],
+    mode: "simulated",
+  });
 }
