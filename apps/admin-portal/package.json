@@ -159,6 +159,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/throttle-debounce": "^5.0.2",
+    "@types/xmldom": "^0.1.34",
     "drizzle-kit": "^0.31.1",
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",
